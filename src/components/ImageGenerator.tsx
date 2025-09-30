@@ -1,14 +1,12 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Sparkles, Download, Lock } from "lucide-react";
+import { Loader2, Sparkles, Download } from "lucide-react";
 import { StyleSelector } from "./StyleSelector";
 import { SizeSelector } from "./SizeSelector";
-import PremiumModal from "./PremiumModal";
 
 export type ImageStyle = "ghibli" | "3d" | "animated" | "realistic" | "vintage" | "cyberpunk";
 export type ImageSize = "square" | "portrait" | "landscape";
@@ -19,55 +17,8 @@ export const ImageGenerator = () => {
   const [size, setSize] = useState<ImageSize>("square");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
-  const [isPremium, setIsPremium] = useState(false);
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkPremiumStatus(session.user.id);
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkPremiumStatus(session.user.id);
-      } else {
-        setIsPremium(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const checkPremiumStatus = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_subscriptions")
-      .select("is_premium")
-      .eq("user_id", userId)
-      .single();
-
-    setIsPremium(data?.is_premium ?? false);
-  };
 
   const handleGenerate = async () => {
-    if (!user) {
-      toast.error("Please sign in to generate images");
-      navigate("/auth");
-      return;
-    }
-
-    if (!isPremium) {
-      setShowPremiumModal(true);
-      return;
-    }
-
     if (!prompt.trim()) {
       toast.error("Please enter a description for your image");
       return;
@@ -142,7 +93,7 @@ export const ImageGenerator = () => {
 
           <Button
             onClick={handleGenerate}
-            disabled={isGenerating || !user}
+            disabled={isGenerating}
             className="w-full h-14 text-lg font-semibold gradient-epic hover:opacity-90 transition-opacity"
             size="lg"
           >
@@ -150,16 +101,6 @@ export const ImageGenerator = () => {
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 Generating Magic...
-              </>
-            ) : !user ? (
-              <>
-                <Lock className="mr-2 h-5 w-5" />
-                Sign In to Generate
-              </>
-            ) : !isPremium ? (
-              <>
-                <Lock className="mr-2 h-5 w-5" />
-                Premium Required
               </>
             ) : (
               <>
@@ -191,12 +132,6 @@ export const ImageGenerator = () => {
           </Button>
         </Card>
       )}
-
-      <PremiumModal
-        open={showPremiumModal}
-        onOpenChange={setShowPremiumModal}
-        onSuccess={() => checkPremiumStatus(user?.id)}
-      />
     </div>
   );
 };
