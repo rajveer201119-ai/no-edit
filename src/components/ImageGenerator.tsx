@@ -22,7 +22,6 @@ export const ImageGenerator = () => {
   const [user, setUser] = useState<any>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [remainingPrompts, setRemainingPrompts] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,14 +47,13 @@ export const ImageGenerator = () => {
   }, []);
 
   const checkPremiumStatus = async (userId: string) => {
-    const { data } = await supabase.rpc("check_daily_limit", {
-      user_id_param: userId,
-    });
+    const { data } = await supabase
+      .from("user_subscriptions")
+      .select("is_premium")
+      .eq("user_id", userId)
+      .single();
 
-    if (data && data.length > 0) {
-      setIsPremium(data[0].is_premium);
-      setRemainingPrompts(data[0].remaining_prompts);
-    }
+    setIsPremium(data?.is_premium ?? false);
   };
 
   const handleGenerate = async () => {
@@ -65,13 +63,8 @@ export const ImageGenerator = () => {
       return;
     }
 
-    if (remainingPrompts <= 0) {
-      if (!isPremium) {
-        toast.error("Daily limit reached! Upgrade to premium for 50 prompts/day");
-        setShowPremiumModal(true);
-      } else {
-        toast.error("Daily limit reached! You've used all 50 prompts for today");
-      }
+    if (!isPremium) {
+      setShowPremiumModal(true);
       return;
     }
 
@@ -103,8 +96,7 @@ export const ImageGenerator = () => {
 
       if (data?.imageUrl) {
         setGeneratedImage(data.imageUrl);
-        await checkPremiumStatus(user.id);
-        toast.success(`Image generated! ${remainingPrompts - 1} prompts remaining today`);
+        toast.success("Image generated successfully!");
       } else {
         toast.error("Failed to generate image");
       }
@@ -132,16 +124,6 @@ export const ImageGenerator = () => {
     <div className="w-full max-w-6xl mx-auto space-y-8">
       <Card className="glass-card p-6 md:p-8 space-y-6 border-2">
         <div className="space-y-4">
-          {user && (
-            <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-epic/10 border border-white/10">
-              <span className="text-sm font-medium">
-                {isPremium ? "Premium Plan" : "Free Plan"}
-              </span>
-              <span className="text-sm font-semibold gradient-epic-text">
-                {remainingPrompts} / {isPremium ? "50" : "2"} prompts remaining today
-              </span>
-            </div>
-          )}
           <div>
             <label className="text-sm font-medium mb-2 block gradient-epic-text">
               Describe Your Vision
@@ -174,10 +156,10 @@ export const ImageGenerator = () => {
                 <Lock className="mr-2 h-5 w-5" />
                 Sign In to Generate
               </>
-            ) : remainingPrompts <= 0 ? (
+            ) : !isPremium ? (
               <>
                 <Lock className="mr-2 h-5 w-5" />
-                {isPremium ? "Daily Limit Reached" : "Upgrade to Premium"}
+                Premium Required
               </>
             ) : (
               <>

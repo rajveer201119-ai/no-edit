@@ -40,7 +40,7 @@ const PremiumModal = ({ open, onOpenChange, onSuccess }: PremiumModalProps) => {
         .select("*")
         .eq("code", couponCode.trim())
         .eq("is_used", false)
-        .maybeSingle();
+        .single();
 
       if (couponError || !coupon) {
         toast({
@@ -59,7 +59,7 @@ const PremiumModal = ({ open, onOpenChange, onSuccess }: PremiumModalProps) => {
           used_by_user_id: user.id,
           used_at: new Date().toISOString(),
         })
-        .eq("id", coupon.id);
+        .eq("code", couponCode.trim());
 
       if (updateCouponError) throw updateCouponError;
 
@@ -104,7 +104,7 @@ const PremiumModal = ({ open, onOpenChange, onSuccess }: PremiumModalProps) => {
             Upgrade to Premium
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Unlock 50 prompts/day and priority processing with premium
+            Unlock unlimited image generation with premium access
           </DialogDescription>
         </DialogHeader>
 
@@ -129,11 +129,10 @@ const PremiumModal = ({ open, onOpenChange, onSuccess }: PremiumModalProps) => {
           </div>
 
           <div className="p-4 rounded-lg bg-gradient-epic/10 border border-white/10">
-            <p className="text-center font-semibold text-lg mb-2">₹10 only</p>
-            <div className="space-y-1 text-center text-sm">
-              <p className="text-muted-foreground">Pay cash offline to Rajveer</p>
-              <p className="font-medium gradient-epic-text">50 prompts per day</p>
-            </div>
+            <p className="text-center font-semibold text-lg">₹10 only</p>
+            <p className="text-center text-sm text-muted-foreground mt-1">
+              Pay cash offline to Rajveer and get your premium code
+            </p>
           </div>
 
           <div className="space-y-2">
