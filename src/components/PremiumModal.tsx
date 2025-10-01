@@ -40,7 +40,7 @@ const PremiumModal = ({ open, onOpenChange, onSuccess }: PremiumModalProps) => {
         .select("*")
         .eq("code", couponCode.trim())
         .eq("is_used", false)
-        .single();
+        .maybeSingle();
 
       if (couponError || !coupon) {
         toast({
@@ -59,7 +59,7 @@ const PremiumModal = ({ open, onOpenChange, onSuccess }: PremiumModalProps) => {
           used_by_user_id: user.id,
           used_at: new Date().toISOString(),
         })
-        .eq("code", couponCode.trim());
+        .eq("id", coupon.id);
 
       if (updateCouponError) throw updateCouponError;
 
@@ -104,7 +104,7 @@ const PremiumModal = ({ open, onOpenChange, onSuccess }: PremiumModalProps) => {
             Upgrade to Premium
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Unlock unlimited image generation with premium access
+            Unlock 50 prompts/day and priority processing with premium
           </DialogDescription>
         </DialogHeader>
 
