@@ -129,10 +129,11 @@ const PremiumModal = ({ open, onOpenChange, onSuccess }: PremiumModalProps) => {
           </div>
 
           <div className="p-4 rounded-lg bg-gradient-epic/10 border border-white/10">
-            <p className="text-center font-semibold text-lg">₹10 only</p>
-            <p className="text-center text-sm text-muted-foreground mt-1">
-              Pay cash offline to Rajveer and get your premium code
-            </p>
+            <p className="text-center font-semibold text-lg mb-2">₹10 only</p>
+            <div className="space-y-1 text-center text-sm">
+              <p className="text-muted-foreground">Pay cash offline to Rajveer</p>
+              <p className="font-medium gradient-epic-text">50 prompts per day</p>
+            </div>
           </div>
 
           <div className="space-y-2">

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,7 +19,33 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log("Generating image with:", { prompt, style, size });
+    // Get authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Authorization required" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Create Supabase client
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    // Get user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      console.error("Auth error:", userError);
+      return new Response(JSON.stringify({ error: "Authentication failed" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    console.log("Generating image for user:", user.id, "with:", { prompt, style, size });
 
     // Map size to dimensions
     const dimensionsMap: Record<string, { width: number; height: number }> = {
@@ -82,6 +109,15 @@ serve(async (req) => {
     if (!imageUrl) {
       console.error("No image in response:", data);
       throw new Error("No image generated");
+    }
+
+    // Increment prompt usage
+    const { error: incrementError } = await supabase.rpc("increment_prompt_usage", {
+      user_id_param: user.id,
+    });
+
+    if (incrementError) {
+      console.error("Error incrementing usage:", incrementError);
     }
 
     return new Response(JSON.stringify({ 

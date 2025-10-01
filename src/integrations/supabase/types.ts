@@ -139,6 +139,33 @@ export type Database = {
         }
         Relationships: []
       }
+      prompt_usage: {
+        Row: {
+          created_at: string | null
+          id: string
+          prompt_count: number
+          updated_at: string | null
+          usage_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          prompt_count?: number
+          updated_at?: string | null
+          usage_date?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          prompt_count?: number
+          updated_at?: string | null
+          usage_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -192,12 +219,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_daily_limit: {
+        Args: { user_id_param: string }
+        Returns: {
+          can_generate: boolean
+          is_premium: boolean
+          remaining_prompts: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_prompt_usage: {
+        Args: { user_id_param: string }
+        Returns: undefined
       }
       is_premium_user: {
         Args: { user_id_param: string }
