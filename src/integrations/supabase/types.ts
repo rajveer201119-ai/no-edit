@@ -29,33 +29,6 @@ export type Database = {
         }
         Relationships: []
       }
-      coupon_codes: {
-        Row: {
-          code: string
-          created_at: string
-          id: string
-          is_used: boolean
-          used_at: string | null
-          used_by_user_id: string | null
-        }
-        Insert: {
-          code: string
-          created_at?: string
-          id?: string
-          is_used?: boolean
-          used_at?: string | null
-          used_by_user_id?: string | null
-        }
-        Update: {
-          code?: string
-          created_at?: string
-          id?: string
-          is_used?: boolean
-          used_at?: string | null
-          used_by_user_id?: string | null
-        }
-        Relationships: []
-      }
       likes: {
         Row: {
           created_at: string
@@ -157,36 +130,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_subscriptions: {
-        Row: {
-          coupon_code_used: string | null
-          created_at: string
-          id: string
-          is_premium: boolean
-          premium_until: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          coupon_code_used?: string | null
-          created_at?: string
-          id?: string
-          is_premium?: boolean
-          premium_until?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          coupon_code_used?: string | null
-          created_at?: string
-          id?: string
-          is_premium?: boolean
-          premium_until?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
@@ -197,10 +140,6 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
-        Returns: boolean
-      }
-      is_premium_user: {
-        Args: { user_id_param: string }
         Returns: boolean
       }
     }
