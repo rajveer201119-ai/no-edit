@@ -29,6 +29,33 @@ export type Database = {
         }
         Relationships: []
       }
+      coupon_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_used: boolean
+          used_at: string | null
+          used_by_user_id: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+          used_by_user_id?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+          used_by_user_id?: string | null
+        }
+        Relationships: []
+      }
       likes: {
         Row: {
           created_at: string
@@ -112,6 +139,33 @@ export type Database = {
         }
         Relationships: []
       }
+      prompt_usage: {
+        Row: {
+          created_at: string | null
+          id: string
+          prompt_count: number
+          updated_at: string | null
+          usage_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          prompt_count?: number
+          updated_at?: string | null
+          usage_date?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          prompt_count?: number
+          updated_at?: string | null
+          usage_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -130,16 +184,62 @@ export type Database = {
         }
         Relationships: []
       }
+      user_subscriptions: {
+        Row: {
+          coupon_code_used: string | null
+          created_at: string
+          id: string
+          is_premium: boolean
+          premium_until: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coupon_code_used?: string | null
+          created_at?: string
+          id?: string
+          is_premium?: boolean
+          premium_until?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coupon_code_used?: string | null
+          created_at?: string
+          id?: string
+          is_premium?: boolean
+          premium_until?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      check_daily_limit: {
+        Args: { user_id_param: string }
+        Returns: {
+          can_generate: boolean
+          is_premium: boolean
+          remaining_prompts: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      increment_prompt_usage: {
+        Args: { user_id_param: string }
+        Returns: undefined
+      }
+      is_premium_user: {
+        Args: { user_id_param: string }
         Returns: boolean
       }
     }
