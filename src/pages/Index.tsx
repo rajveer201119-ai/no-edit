@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/Hero";
 import { ImageGenerator } from "@/components/ImageGenerator";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   const [isAuthed, setIsAuthed] = useState(false);
@@ -44,6 +45,7 @@ const Index = () => {
         <Hero />
         <ImageGenerator />
       </div>
+      <Footer />
     </div>
   );
 };
