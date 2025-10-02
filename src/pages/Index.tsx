@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/Hero";
 import { ImageGenerator } from "@/components/ImageGenerator";
 import { Footer } from "@/components/Footer";
+import { Feed } from "@/components/Feed";
 
 const Index = () => {
   const [isAuthed, setIsAuthed] = useState(false);
@@ -44,6 +45,7 @@ const Index = () => {
         </header>
         <Hero />
         <ImageGenerator />
+        <Feed />
       </div>
       <Footer />
     </div>
