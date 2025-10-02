@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 import { HfInference } from 'https://esm.sh/@huggingface/inference@2.3.2';
 
 const corsHeaders = {
@@ -33,7 +34,7 @@ serve(async (req) => {
 
     // Convert the blob to a base64 string
     const arrayBuffer = await image.arrayBuffer();
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+    const base64 = base64Encode(arrayBuffer);
     const imageUrl = `data:image/png;base64,${base64}`;
 
     return new Response(JSON.stringify({ 
