@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -12,6 +13,7 @@ export type ImageStyle = "ghibli" | "3d" | "animated" | "realistic" | "vintage" 
 export type ImageSize = "square" | "portrait" | "landscape";
 
 export const ImageGenerator = () => {
+  const navigate = useNavigate();
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState<ImageStyle>("realistic");
   const [size, setSize] = useState<ImageSize>("square");
@@ -30,6 +32,12 @@ export const ImageGenerator = () => {
   };
 
   const handleGenerate = async () => {
+    if (!currentUserId) {
+      toast.error("Please sign up or sign in to generate images");
+      navigate("/auth");
+      return;
+    }
+
     if (!prompt.trim()) {
       toast.error("Please enter a description for your image");
       return;
