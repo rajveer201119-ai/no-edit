@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Sparkles, Download } from "lucide-react";
+import { Loader2, Sparkles, Download, Upload } from "lucide-react";
 import { StyleSelector } from "./StyleSelector";
 import { SizeSelector } from "./SizeSelector";
 
@@ -17,6 +17,17 @@ export const ImageGenerator = () => {
   const [size, setSize] = useState<ImageSize>("square");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setCurrentUserId(user?.id || null);
+  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -78,6 +89,59 @@ export const ImageGenerator = () => {
     toast.success("Image downloaded!");
   };
 
+  const handleSaveToFeed = async () => {
+    if (!generatedImage || !currentUserId) {
+      toast.error("Please sign in to save images to the feed");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Convert base64 to blob
+      const base64Data = generatedImage.split(',')[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/png' });
+
+      // Upload to storage
+      const fileName = `${currentUserId}/${Date.now()}.png`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('post-images')
+        .upload(fileName, blob);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('post-images')
+        .getPublicUrl(fileName);
+
+      // Create post
+      const { error: postError } = await supabase
+        .from('posts')
+        .insert({
+          user_id: currentUserId,
+          image_url: publicUrl,
+          content: prompt,
+        });
+
+      if (postError) throw postError;
+
+      toast.success("Image saved to feed!");
+      setGeneratedImage(null);
+      setPrompt("");
+    } catch (error) {
+      console.error("Save error:", error);
+      toast.error("Failed to save image to feed");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto space-y-8">
       <Card className="glass-card p-6 md:p-8 space-y-6 border-2">
@@ -129,14 +193,33 @@ export const ImageGenerator = () => {
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg" />
           </div>
-          <Button
-            onClick={handleDownload}
-            variant="outline"
-            className="w-full border-white/20 hover:bg-white/10"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Download Image
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              onClick={handleDownload}
+              variant="outline"
+              className="flex-1 border-white/20 hover:bg-white/10"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Download
+            </Button>
+            <Button
+              onClick={handleSaveToFeed}
+              disabled={isSaving || !currentUserId}
+              className="flex-1 gradient-epic hover:opacity-90"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Save to Feed
+                </>
+              )}
+            </Button>
+          </div>
         </Card>
       )}
     </div>

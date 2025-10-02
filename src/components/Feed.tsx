@@ -24,6 +24,26 @@ export const Feed = () => {
   useEffect(() => {
     fetchPosts();
     getCurrentUser();
+
+    // Subscribe to new posts
+    const channel = supabase
+      .channel('posts-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'posts'
+        },
+        () => {
+          fetchPosts();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const getCurrentUser = async () => {
