@@ -51,9 +51,16 @@ export const ImageGenerator = () => {
       } else {
         toast.error("Failed to generate image");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Generation error:", error);
-      toast.error("Failed to generate image. Please try again.");
+      const msg = String(error?.message ?? "");
+      if (msg.includes("402")) {
+        toast.error("AI credits exhausted. Please add credits to your workspace to continue.");
+      } else if (msg.includes("429")) {
+        toast.error("Rate limit exceeded. Please wait a few seconds and try again.");
+      } else {
+        toast.error("Failed to generate image. Please try again shortly.");
+      }
     } finally {
       setIsGenerating(false);
     }

@@ -1,7 +1,30 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/Hero";
 import { ImageGenerator } from "@/components/ImageGenerator";
 
 const Index = () => {
+  const [isAuthed, setIsAuthed] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthed(!!session);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthed(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   return (
     <div className="min-h-screen">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -11,6 +34,13 @@ const Index = () => {
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8">
+        <header className="flex justify-end mb-4">
+          {isAuthed ? (
+            <Button variant="outline" onClick={signOut}>Sign out</Button>
+          ) : (
+            <Button onClick={() => navigate("/auth")}>Sign in</Button>
+          )}
+        </header>
         <Hero />
         <ImageGenerator />
       </div>
