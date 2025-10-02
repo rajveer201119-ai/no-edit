@@ -15,13 +15,17 @@ interface FeedCardProps {
       avatar_url: string;
     };
     likes: { id: string; user_id: string }[];
+    favorites: { id: string; user_id: string }[];
+    tags: string[];
   };
   currentUser: string | null;
   onLike: (postId: string) => void;
+  onFavorite: (postId: string) => void;
 }
 
-export const FeedCard = ({ post, currentUser, onLike }: FeedCardProps) => {
+export const FeedCard = ({ post, currentUser, onLike, onFavorite }: FeedCardProps) => {
   const hasLiked = currentUser ? post.likes.some(like => like.user_id === currentUser) : false;
+  const hasFavorited = currentUser ? post.favorites.some(fav => fav.user_id === currentUser) : false;
 
   const handleDownload = async () => {
     try {
@@ -84,6 +88,17 @@ export const FeedCard = ({ post, currentUser, onLike }: FeedCardProps) => {
           <Button
             variant="ghost"
             size="icon"
+            onClick={() => onFavorite(post.id)}
+            disabled={!currentUser}
+            className={hasFavorited ? "text-yellow-500" : ""}
+            title="Add to favorites"
+          >
+            <Heart className={hasFavorited ? "fill-current" : ""} />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={handleDownload}
             className="ml-auto"
           >
@@ -92,6 +107,19 @@ export const FeedCard = ({ post, currentUser, onLike }: FeedCardProps) => {
         </div>
 
         <p className="text-sm">{post.content}</p>
+        
+        {post.tags && post.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {post.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </Card>
   );

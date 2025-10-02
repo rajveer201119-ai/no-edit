@@ -21,6 +21,12 @@ export const ImageGenerator = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [previousState, setPreviousState] = useState<{
+    prompt: string;
+    style: ImageStyle;
+    size: ImageSize;
+    image: string | null;
+  } | null>(null);
 
   useEffect(() => {
     checkUser();
@@ -29,6 +35,17 @@ export const ImageGenerator = () => {
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setCurrentUserId(user?.id || null);
+  };
+
+  const handleUndo = () => {
+    if (previousState) {
+      setPrompt(previousState.prompt);
+      setStyle(previousState.style);
+      setSize(previousState.size);
+      setGeneratedImage(previousState.image);
+      setPreviousState(null);
+      toast.success("Reverted to previous state");
+    }
   };
 
   const handleGenerate = async () => {
@@ -42,6 +59,14 @@ export const ImageGenerator = () => {
       toast.error("Please enter a description for your image");
       return;
     }
+
+    // Save current state for undo
+    setPreviousState({
+      prompt,
+      style,
+      size,
+      image: generatedImage,
+    });
 
     setIsGenerating(true);
     setGeneratedImage(null);
@@ -170,24 +195,38 @@ export const ImageGenerator = () => {
           <StyleSelector value={style} onChange={setStyle} disabled={isGenerating} />
           <SizeSelector value={size} onChange={setSize} disabled={isGenerating} />
 
-          <Button
-            onClick={handleGenerate}
-            disabled={isGenerating}
-            className="w-full h-14 text-lg font-semibold gradient-epic hover:opacity-90 transition-opacity"
-            size="lg"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Generating Magic...
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-5 w-5" />
-                Generate Image
-              </>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="flex-1 h-14 text-lg font-semibold gradient-epic hover:opacity-90 transition-opacity"
+              size="lg"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Generating Magic...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  Generate Image
+                </>
+              )}
+            </Button>
+            
+            {previousState && (
+              <Button
+                onClick={handleUndo}
+                disabled={isGenerating}
+                variant="outline"
+                size="lg"
+                className="h-14"
+              >
+                Undo
+              </Button>
             )}
-          </Button>
+          </div>
         </div>
       </Card>
 
