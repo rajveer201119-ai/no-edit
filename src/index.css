@@ -8,6 +8,64 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* Light mode colors */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
+
+    --primary: 280 80% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 340 75% 55%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 40%;
+
+    --accent: 20 90% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 280 80% 50%;
+
+    --radius: 1rem;
+    
+    /* Epic gradient colors */
+    --gradient-purple: 280 80% 50%;
+    --gradient-pink: 340 75% 55%;
+    --gradient-orange: 20 90% 55%;
+    --gradient-yellow: 45 100% 50%;
+    
+    /* Glass effect */
+    --glass-bg: 0 0% 100% / 0.6;
+    --glass-border: 240 10% 10% / 0.1;
+    
+    /* Glow effects */
+    --glow-purple: 280 80% 50% / 0.3;
+    --glow-pink: 340 75% 55% / 0.3;
+    --glow-orange: 20 90% 55% / 0.3;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark mode colors */
     --background: 240 10% 5%;
     --foreground: 0 0% 98%;
 
@@ -35,44 +93,15 @@ All colors MUST be HSL.
     --border: 240 5% 15%;
     --input: 240 5% 15%;
     --ring: 280 80% 60%;
-
-    --radius: 1rem;
     
-    /* Epic gradient colors */
-    --gradient-purple: 280 80% 60%;
-    --gradient-pink: 340 80% 65%;
-    --gradient-orange: 20 90% 60%;
-    --gradient-yellow: 45 100% 60%;
-    
-    /* Glass effect */
+    /* Glass effect for dark mode */
     --glass-bg: 240 10% 10% / 0.4;
     --glass-border: 0 0% 100% / 0.1;
     
-    /* Glow effects */
+    /* Glow effects for dark mode */
     --glow-purple: 280 80% 60% / 0.5;
     --glow-pink: 340 80% 65% / 0.5;
     --glow-orange: 20 90% 60% / 0.5;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 240 10% 5%;
-    --foreground: 0 0% 98%;
   }
 }
 
@@ -83,8 +112,16 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
-    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(240 10% 8%) 100%);
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  body:not(.dark) {
+    background: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(240 10% 98%) 100%);
+  }
+  
+  .dark body {
+    background: linear-gradient(135deg, hsl(240 10% 5%) 0%, hsl(240 10% 8%) 100%);
   }
 }
 

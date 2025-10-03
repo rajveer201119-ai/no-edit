@@ -6,6 +6,7 @@ import { Hero } from "@/components/Hero";
 import { ImageGenerator } from "@/components/ImageGenerator";
 import { Footer } from "@/components/Footer";
 import { Feed } from "@/components/Feed";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const [isAuthed, setIsAuthed] = useState(false);
@@ -36,7 +37,8 @@ const Index = () => {
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8">
-        <header className="flex justify-end mb-4">
+        <header className="flex justify-end items-center gap-3 mb-4">
+          <ThemeToggle />
           {isAuthed ? (
             <Button variant="outline" onClick={signOut}>Sign out</Button>
           ) : (
