@@ -63,41 +63,47 @@ export const Feed = () => {
 
   const fetchPosts = async () => {
     try {
-      const { data: postsData, error: postsError } = await supabase
-        .from("posts")
-        .select("*")
-        .not("image_url", "is", null)
-        .order("created_at", { ascending: false });
+      // Optimized: Fetch all data in parallel instead of sequentially
+      const [{ data: postsData, error: postsError }, { data: allLikes }, { data: allFavorites }, { data: allProfiles }] = await Promise.all([
+        supabase
+          .from("posts")
+          .select("*")
+          .not("image_url", "is", null)
+          .order("created_at", { ascending: false }),
+        supabase.from("likes").select("id, user_id, post_id"),
+        supabase.from("favorites").select("id, user_id, post_id"),
+        supabase.from("profiles").select("id, username, avatar_url")
+      ]);
 
       if (postsError) throw postsError;
 
-      const postsWithDetails = await Promise.all(
-        (postsData || []).map(async (post) => {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("username, avatar_url")
-            .eq("id", post.user_id)
-            .single();
+      // Create lookup maps for O(1) access
+      const likesMap = new Map<string, { id: string; user_id: string }[]>();
+      const favoritesMap = new Map<string, { id: string; user_id: string }[]>();
+      const profilesMap = new Map<string, { username: string; avatar_url: string }>();
 
-          const { data: likes } = await supabase
-            .from("likes")
-            .select("id, user_id")
-            .eq("post_id", post.id);
+      allLikes?.forEach(like => {
+        if (!likesMap.has(like.post_id)) likesMap.set(like.post_id, []);
+        likesMap.get(like.post_id)!.push({ id: like.id, user_id: like.user_id });
+      });
 
-          const { data: favorites } = await supabase
-            .from("favorites")
-            .select("id, user_id")
-            .eq("post_id", post.id);
+      allFavorites?.forEach(fav => {
+        if (!favoritesMap.has(fav.post_id)) favoritesMap.set(fav.post_id, []);
+        favoritesMap.get(fav.post_id)!.push({ id: fav.id, user_id: fav.user_id });
+      });
 
-          return {
-            ...post,
-            profiles: profile || { username: "Unknown", avatar_url: "" },
-            likes: likes || [],
-            favorites: favorites || [],
-            tags: post.tags || [],
-          };
-        })
-      );
+      allProfiles?.forEach(profile => {
+        profilesMap.set(profile.id, { username: profile.username, avatar_url: profile.avatar_url });
+      });
+
+      // Map posts with their details using lookup maps
+      const postsWithDetails = (postsData || []).map(post => ({
+        ...post,
+        profiles: profilesMap.get(post.user_id) || { username: "Unknown", avatar_url: "" },
+        likes: likesMap.get(post.id) || [],
+        favorites: favoritesMap.get(post.id) || [],
+        tags: post.tags || [],
+      }));
 
       setPosts(postsWithDetails);
       
@@ -120,14 +126,24 @@ export const Feed = () => {
     const post = posts.find(p => p.id === postId);
     const hasLiked = post?.likes.some(like => like.user_id === currentUser);
 
+    // Optimistic update
+    setPosts(prevPosts => prevPosts.map(p => {
+      if (p.id === postId) {
+        if (hasLiked) {
+          return { ...p, likes: p.likes.filter(like => like.user_id !== currentUser) };
+        } else {
+          return { ...p, likes: [...p.likes, { id: 'temp', user_id: currentUser }] };
+        }
+      }
+      return p;
+    }));
+
     if (hasLiked) {
       const likeId = post?.likes.find(like => like.user_id === currentUser)?.id;
       await supabase.from("likes").delete().eq("id", likeId);
     } else {
       await supabase.from("likes").insert({ post_id: postId, user_id: currentUser });
     }
-
-    fetchPosts();
   };
 
   const handleFavorite = async (postId: string) => {
@@ -136,14 +152,24 @@ export const Feed = () => {
     const post = posts.find(p => p.id === postId);
     const hasFavorited = post?.favorites.some(fav => fav.user_id === currentUser);
 
+    // Optimistic update
+    setPosts(prevPosts => prevPosts.map(p => {
+      if (p.id === postId) {
+        if (hasFavorited) {
+          return { ...p, favorites: p.favorites.filter(fav => fav.user_id !== currentUser) };
+        } else {
+          return { ...p, favorites: [...p.favorites, { id: 'temp', user_id: currentUser }] };
+        }
+      }
+      return p;
+    }));
+
     if (hasFavorited) {
       const favId = post?.favorites.find(fav => fav.user_id === currentUser)?.id;
       await supabase.from("favorites").delete().eq("id", favId);
     } else {
       await supabase.from("favorites").insert({ post_id: postId, user_id: currentUser });
     }
-
-    fetchPosts();
   };
 
   const handleDelete = async (postId: string) => {

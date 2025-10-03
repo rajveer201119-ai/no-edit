@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Download, Heart, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -25,7 +26,7 @@ interface FeedCardProps {
   onDelete: (postId: string) => void;
 }
 
-export const FeedCard = ({ post, currentUser, onLike, onFavorite, onDelete }: FeedCardProps) => {
+const FeedCardComponent = ({ post, currentUser, onLike, onFavorite, onDelete }: FeedCardProps) => {
   const hasLiked = currentUser ? post.likes.some(like => like.user_id === currentUser) : false;
   const hasFavorited = currentUser ? post.favorites.some(fav => fav.user_id === currentUser) : false;
 
@@ -138,3 +139,5 @@ export const FeedCard = ({ post, currentUser, onLike, onFavorite, onDelete }: Fe
     </Card>
   );
 };
+
+export const FeedCard = memo(FeedCardComponent);

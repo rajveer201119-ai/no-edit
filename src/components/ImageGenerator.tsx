@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Sparkles, Download, Upload } from "lucide-react";
+import { Loader2, Sparkles, Download, Upload, X } from "lucide-react";
 import { StyleSelector } from "./StyleSelector";
 import { SizeSelector } from "./SizeSelector";
 
@@ -183,13 +183,27 @@ export const ImageGenerator = () => {
             <label className="text-sm font-medium mb-2 block gradient-epic-text">
               Describe Your Vision
             </label>
-            <Textarea
-              placeholder="e.g., A majestic dragon soaring through sunset clouds, breathing fire..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              className="min-h-32 bg-card/80 backdrop-blur-sm border-white/10 focus:border-primary resize-none text-base text-foreground placeholder:text-muted-foreground"
-              disabled={isGenerating}
-            />
+            <div className="relative">
+              <Textarea
+                placeholder="e.g., A majestic dragon soaring through sunset clouds, breathing fire..."
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                className="min-h-32 bg-card/80 backdrop-blur-sm border-white/10 focus:border-primary resize-none text-base text-foreground placeholder:text-muted-foreground pr-10"
+                disabled={isGenerating}
+              />
+              {prompt && !isGenerating && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setPrompt("")}
+                  className="absolute top-2 right-2 h-6 w-6 hover:bg-destructive/20"
+                  title="Clear prompt"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
 
           <StyleSelector value={style} onChange={setStyle} disabled={isGenerating} />
