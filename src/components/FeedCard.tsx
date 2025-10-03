@@ -1,4 +1,4 @@
-import { Download, Heart } from "lucide-react";
+import { Download, Heart, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -10,6 +10,7 @@ interface FeedCardProps {
     image_url: string;
     content: string;
     created_at: string;
+    user_id: string;
     profiles: {
       username: string;
       avatar_url: string;
@@ -21,9 +22,10 @@ interface FeedCardProps {
   currentUser: string | null;
   onLike: (postId: string) => void;
   onFavorite: (postId: string) => void;
+  onDelete: (postId: string) => void;
 }
 
-export const FeedCard = ({ post, currentUser, onLike, onFavorite }: FeedCardProps) => {
+export const FeedCard = ({ post, currentUser, onLike, onFavorite, onDelete }: FeedCardProps) => {
   const hasLiked = currentUser ? post.likes.some(like => like.user_id === currentUser) : false;
   const hasFavorited = currentUser ? post.favorites.some(fav => fav.user_id === currentUser) : false;
 
@@ -104,6 +106,18 @@ export const FeedCard = ({ post, currentUser, onLike, onFavorite }: FeedCardProp
           >
             <Download />
           </Button>
+
+          {currentUser === post.user_id && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(post.id)}
+              className="text-destructive hover:text-destructive"
+              title="Delete post"
+            >
+              <Trash2 />
+            </Button>
+          )}
         </div>
 
         <p className="text-sm">{post.content}</p>

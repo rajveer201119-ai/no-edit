@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 interface Post {
   id: string;
@@ -145,6 +146,20 @@ export const Feed = () => {
     fetchPosts();
   };
 
+  const handleDelete = async (postId: string) => {
+    if (!currentUser) return;
+
+    const { error } = await supabase.from("posts").delete().eq("id", postId);
+    
+    if (error) {
+      toast.error("Failed to delete post");
+      return;
+    }
+
+    toast.success("Post deleted successfully");
+    fetchPosts();
+  };
+
   const filteredPosts = posts.filter(post => {
     const matchesSearch = searchQuery === "" || 
       post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -237,6 +252,7 @@ export const Feed = () => {
                   currentUser={currentUser}
                   onLike={handleLike}
                   onFavorite={handleFavorite}
+                  onDelete={handleDelete}
                 />
               ))
             )}
@@ -255,6 +271,7 @@ export const Feed = () => {
                   currentUser={currentUser}
                   onLike={handleLike}
                   onFavorite={handleFavorite}
+                  onDelete={handleDelete}
                 />
               ))
             )}
