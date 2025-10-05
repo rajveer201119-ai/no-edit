@@ -249,8 +249,9 @@ export const ImageGenerator = () => {
           <div className="relative group">
             <img
               src={generatedImage}
-              alt="Generated artwork"
+              alt={`AI generated ${style} style artwork: ${prompt}`}
               className="w-full h-auto rounded-lg shadow-2xl"
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg" />
           </div>
