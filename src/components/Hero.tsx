@@ -13,7 +13,7 @@ export const Hero = () => {
       
       <div className="space-y-4 max-w-3xl mx-auto">
         <h1 className="text-4xl md:text-6xl font-bold gradient-epic-text leading-tight">
-          Free AI Image Generator - Create Professional Art Instantly
+          Efficient AI Image Generator - Create Professional Art Instantly
         </h1>
         <h2 className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-normal">
           Transform text into stunning images with AI. Generate Ghibli-style art, 3D renders, realistic photos, cyberpunk graphics, vintage posters, and animated artwork. Perfect for social media, ads, and creative projects.

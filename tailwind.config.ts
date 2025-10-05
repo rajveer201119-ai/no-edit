@@ -84,6 +84,10 @@ export default {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-20px)" },
         },
+        "cursor-blink": {
+          "0%, 49%": { borderRight: "2px solid hsl(var(--primary))" },
+          "50%, 100%": { borderRight: "2px solid transparent" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -91,6 +95,7 @@ export default {
         "gradient-shift": "gradient-shift 8s ease infinite",
         "glow-pulse": "glow-pulse 3s ease-in-out infinite",
         "float": "float 6s ease-in-out infinite",
+        "cursor-blink": "cursor-blink 1s step-end infinite",
       },
     },
   },

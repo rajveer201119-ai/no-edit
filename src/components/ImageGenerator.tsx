@@ -188,7 +188,7 @@ export const ImageGenerator = () => {
                 placeholder="e.g., A majestic dragon soaring through sunset clouds, breathing fire..."
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                className="min-h-32 bg-card/80 backdrop-blur-sm border-white/10 focus:border-primary resize-none text-base text-foreground placeholder:text-muted-foreground pr-10"
+                className="min-h-32 bg-card/80 backdrop-blur-sm border-white/10 focus:border-primary resize-none text-base text-foreground placeholder:text-muted-foreground pr-10 animate-cursor-blink"
                 disabled={isGenerating}
               />
               {prompt && !isGenerating && (
