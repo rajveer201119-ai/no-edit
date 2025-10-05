@@ -1,4 +1,5 @@
 import { Github, Linkedin, Twitter, Instagram } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
@@ -13,6 +14,12 @@ export const Footer = () => {
             <p className="text-xs text-gray-400 mt-2">
               ALL RIGHTS RESERVED BY NO BOX © 2025
             </p>
+            <Link 
+              to="/terms" 
+              className="text-xs text-gray-400 hover:text-primary transition-colors block mt-1"
+            >
+              Terms & Conditions
+            </Link>
           </div>
           
           <div className="flex gap-4">
