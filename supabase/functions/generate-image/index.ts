@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
+import { HfInference } from 'https://esm.sh/@huggingface/inference@2.3.2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,69 +14,32 @@ serve(async (req) => {
 
   try {
     const { prompt, style, size } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const HF_TOKEN = Deno.env.get("HUGGING_FACE_ACCESS_TOKEN");
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!HF_TOKEN) {
+      throw new Error("HUGGING_FACE_ACCESS_TOKEN is not configured");
     }
 
-    console.log("Generating image with Lovable AI:", { prompt, style, size });
+    console.log("Generating image with:", { prompt, style, size });
 
-    // Enhance prompt with style and size
-    let enhancedPrompt = `${prompt}, ${style} style, high quality, professional, detailed`;
-    
-    // Add aspect ratio guidance
-    if (size === 'portrait') {
-      enhancedPrompt += ', portrait orientation, 3:4 aspect ratio';
-    } else if (size === 'landscape') {
-      enhancedPrompt += ', landscape orientation, 16:9 aspect ratio';
-    } else {
-      enhancedPrompt += ', square aspect ratio, 1:1';
-    }
+    // Enhance prompt with style
+    const styledPrompt = `${prompt}, ${style} style, high quality, professional, detailed`;
 
-    // Call Lovable AI image generation
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: enhancedPrompt
-          }
-        ],
-        modalities: ["image", "text"]
-      })
+    const hf = new HfInference(HF_TOKEN);
+
+    const image = await hf.textToImage({
+      inputs: styledPrompt,
+      model: 'black-forest-labs/FLUX.1-schnell',
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Lovable AI error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        throw new Error("Rate limit exceeded. Please try again in a moment.");
-      }
-      if (response.status === 402) {
-        throw new Error("Payment required. Please add credits to your Lovable workspace.");
-      }
-      
-      throw new Error(`AI gateway error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-    if (!imageUrl) {
-      throw new Error("No image was generated");
-    }
+    // Convert the blob to a base64 string
+    const arrayBuffer = await image.arrayBuffer();
+    const base64 = base64Encode(arrayBuffer);
+    const imageUrl = `data:image/png;base64,${base64}`;
 
     return new Response(JSON.stringify({ 
       imageUrl,
-      prompt: enhancedPrompt 
+      prompt: styledPrompt 
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
