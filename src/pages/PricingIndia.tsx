@@ -148,64 +148,67 @@ const PricingIndia = () => {
       </div>
 
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent className="sm:max-w-md glass-card border-2">
+        <DialogContent className="sm:max-w-md max-w-[95vw] glass-card border-2 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl gradient-epic-text">
+            <DialogTitle className="text-xl sm:text-2xl gradient-epic-text">
               Upgrade to Pro - Payment Instructions
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-sm">
               Follow these simple steps to get premium access
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6 py-4">
-            <div className="space-y-4">
-              <div className="glass-card p-4 border border-primary/30 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold">
+          <div className="space-y-4 sm:space-y-6 py-4">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="glass-card p-3 sm:p-4 border border-primary/30 rounded-lg">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm">
                     1
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold mb-2">Pay ₹10 via UPI</h4>
-                    <p className="text-sm text-muted-foreground mb-2">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold mb-2 text-sm sm:text-base">Pay ₹10 via UPI</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                       UPI Number:
                     </p>
-                    <div className="glass-card p-3 border border-white/10 rounded">
-                      <code className="text-primary font-mono">8638910252</code>
+                    <div className="glass-card p-2 sm:p-3 border border-white/10 rounded">
+                      <code className="text-primary font-mono text-sm sm:text-base break-all">8638910252</code>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="glass-card p-4 border border-primary/30 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold">
+              <div className="glass-card p-3 sm:p-4 border border-primary/30 rounded-lg">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm">
                     2
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold mb-2">Send Payment Screenshot</h4>
-                    <p className="text-sm text-muted-foreground mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold mb-2 text-sm sm:text-base">Send Payment Screenshot</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-3">
                       Send screenshot to WhatsApp:
                     </p>
                     <Button
                       onClick={handleWhatsAppClick}
-                      className="w-full gradient-epic hover:opacity-90"
+                      className="w-full gradient-epic hover:opacity-90 text-sm sm:text-base h-9 sm:h-10"
                     >
                       <span className="mr-2">💬</span>
-                      Send via WhatsApp (+91 8638910252)
+                      <span className="truncate">Send via WhatsApp</span>
                     </Button>
+                    <p className="text-xs text-muted-foreground mt-2 break-all">
+                      +91 8638910252
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="glass-card p-4 border border-primary/30 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold">
+              <div className="glass-card p-3 sm:p-4 border border-primary/30 rounded-lg">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm">
                     3
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold mb-2">Get Premium Access</h4>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold mb-2 text-sm sm:text-base">Get Premium Access</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Your account will be upgraded to Pro within 24 hours
                     </p>
                   </div>
@@ -216,7 +219,7 @@ const PricingIndia = () => {
             <Button
               variant="outline"
               onClick={() => setShowPaymentDialog(false)}
-              className="w-full"
+              className="w-full text-sm sm:text-base h-9 sm:h-10"
             >
               Close
             </Button>

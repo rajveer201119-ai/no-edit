@@ -149,52 +149,52 @@ const PricingInternational = () => {
       </div>
 
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent className="sm:max-w-md glass-card border-2">
+        <DialogContent className="sm:max-w-md max-w-[95vw] glass-card border-2 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl gradient-epic-text">
+            <DialogTitle className="text-xl sm:text-2xl gradient-epic-text">
               Upgrade to Pro - Contact Instructions
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-sm">
               Follow these steps to get premium access
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6 py-4">
-            <div className="space-y-4">
-              <div className="glass-card p-4 border border-primary/30 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold">
+          <div className="space-y-4 sm:space-y-6 py-4">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="glass-card p-3 sm:p-4 border border-primary/30 rounded-lg">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm">
                     1
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold mb-2">Contact via Email</h4>
-                    <p className="text-sm text-muted-foreground mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold mb-2 text-sm sm:text-base">Contact via Email</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-3">
                       Send an email to get payment instructions:
                     </p>
-                    <div className="glass-card p-3 border border-white/10 rounded mb-3">
-                      <code className="text-primary font-mono text-sm break-all">
+                    <div className="glass-card p-2 sm:p-3 border border-white/10 rounded mb-3">
+                      <code className="text-primary font-mono text-xs sm:text-sm break-all">
                         rajveer201119@gmail.com
                       </code>
                     </div>
                     <Button
                       onClick={handleEmailClick}
-                      className="w-full gradient-epic hover:opacity-90"
+                      className="w-full gradient-epic hover:opacity-90 text-sm sm:text-base h-9 sm:h-10"
                     >
                       <span className="mr-2">📧</span>
-                      Send Email
+                      <span className="truncate">Send Email</span>
                     </Button>
                   </div>
                 </div>
               </div>
 
-              <div className="glass-card p-4 border border-primary/30 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold">
+              <div className="glass-card p-3 sm:p-4 border border-primary/30 rounded-lg">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm">
                     2
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold mb-2">Get Premium Access</h4>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold mb-2 text-sm sm:text-base">Get Premium Access</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       You'll receive payment instructions via email. After payment confirmation, your account will be upgraded to Pro.
                     </p>
                   </div>
@@ -205,7 +205,7 @@ const PricingInternational = () => {
             <Button
               variant="outline"
               onClick={() => setShowPaymentDialog(false)}
-              className="w-full"
+              className="w-full text-sm sm:text-base h-9 sm:h-10"
             >
               Close
             </Button>
