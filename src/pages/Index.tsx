@@ -6,6 +6,7 @@ import { Hero } from "@/components/Hero";
 import { ImageGenerator } from "@/components/ImageGenerator";
 import { Footer } from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ProPlanDialog } from "@/components/ProPlanDialog";
 
 const Feed = lazy(() => import("@/components/Feed").then(mod => ({ default: mod.Feed })));
 
@@ -31,6 +32,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <ProPlanDialog />
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="absolute top-20 left-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
