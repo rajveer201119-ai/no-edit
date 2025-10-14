@@ -7,6 +7,7 @@ import { ImageGenerator } from "@/components/ImageGenerator";
 import { Footer } from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
+import { InstallButton } from "@/components/InstallButton";
 import { Sparkles, Shield } from "lucide-react";
 
 const Feed = lazy(() => import("@/components/Feed").then(mod => ({ default: mod.Feed })));
@@ -66,6 +67,7 @@ const Index = () => {
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         <header className="flex justify-end items-center gap-3 mb-4">
+          <InstallButton />
           <ThemeToggle />
           {isAdmin && (
             <Button 

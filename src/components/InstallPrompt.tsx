@@ -8,51 +8,30 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-}
+import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 
 export const InstallPrompt = () => {
   const [showPrompt, setShowPrompt] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const { isInstallable, promptInstall } = useInstallPrompt();
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      
-      // Show prompt after 10 seconds once we have the install prompt
-      setTimeout(() => {
-        if (!localStorage.getItem("installPromptDismissed")) {
-          setShowPrompt(true);
-        }
-      }, 10000);
-    };
+    if (!isInstallable) return;
 
-    // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      return; // App is already installed
-    }
+    // Show prompt after 10 seconds if app is installable
+    const timer = setTimeout(() => {
+      if (!localStorage.getItem("installPromptDismissed")) {
+        setShowPrompt(true);
+      }
+    }, 10000);
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    };
-  }, []);
+    return () => clearTimeout(timer);
+  }, [isInstallable]);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-
-    if (outcome === "accepted") {
-      setDeferredPrompt(null);
+    const accepted = await promptInstall();
+    if (accepted) {
+      setShowPrompt(false);
     }
-    setShowPrompt(false);
   };
 
   const handleDismiss = () => {
@@ -60,7 +39,7 @@ export const InstallPrompt = () => {
     localStorage.setItem("installPromptDismissed", "true");
   };
 
-  if (!showPrompt || !deferredPrompt) return null;
+  if (!showPrompt || !isInstallable) return null;
 
   return (
     <Dialog open={showPrompt} onOpenChange={(open) => !open && handleDismiss()}>
