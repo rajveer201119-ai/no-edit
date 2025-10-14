@@ -15,13 +15,13 @@ export const ProPlanDialog = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Show popup 2 seconds after page load, only once per session
+    // Show popup 6 seconds after page load, only once per session
     const hasSeenPopup = sessionStorage.getItem("hasSeenProPopup");
     if (!hasSeenPopup) {
       const timer = setTimeout(() => {
         setIsOpen(true);
         sessionStorage.setItem("hasSeenProPopup", "true");
-      }, 2000);
+      }, 6000);
       return () => clearTimeout(timer);
     }
   }, []);
