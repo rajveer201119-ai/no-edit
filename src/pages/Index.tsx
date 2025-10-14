@@ -7,25 +7,49 @@ import { ImageGenerator } from "@/components/ImageGenerator";
 import { Footer } from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Shield } from "lucide-react";
 
 const Feed = lazy(() => import("@/components/Feed").then(mod => ({ default: mod.Feed })));
 
 const Index = () => {
   const [isAuthed, setIsAuthed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthed(!!session);
+      if (session?.user) {
+        checkAdminRole(session.user.id);
+      } else {
+        setIsAdmin(false);
+      }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthed(!!session);
+      if (session?.user) {
+        checkAdminRole(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const checkAdminRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase.rpc('has_role', {
+        _user_id: userId,
+        _role: 'admin'
+      });
+      
+      if (!error && data) {
+        setIsAdmin(true);
+      }
+    } catch (error) {
+      console.error("Error checking admin role:", error);
+    }
+  };
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -43,6 +67,16 @@ const Index = () => {
       <div className="relative z-10 container mx-auto px-4 py-8">
         <header className="flex justify-end items-center gap-3 mb-4">
           <ThemeToggle />
+          {isAdmin && (
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/admin")}
+              className="border-primary/50 hover:bg-primary/10"
+            >
+              <Shield className="mr-2 h-4 w-4" />
+              Admin
+            </Button>
+          )}
           <Button 
             variant="outline" 
             onClick={() => navigate("/pricing-india")}
