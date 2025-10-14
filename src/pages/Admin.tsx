@@ -120,15 +120,11 @@ const Admin = () => {
       const premiumUntil = new Date(premiumDate);
       premiumUntil.setHours(23, 59, 59, 999);
 
-      const { error } = await supabase
-        .from('user_subscriptions')
-        .upsert({
-          user_id: userId,
-          is_premium: true,
-          premium_until: premiumUntil.toISOString(),
-        }, {
-          onConflict: 'user_id'
-        });
+      const { error } = await supabase.rpc('admin_set_premium', {
+        target_user: userId,
+        is_premium: true,
+        premium_until: premiumUntil.toISOString(),
+      });
 
       if (error) throw error;
 
@@ -142,15 +138,11 @@ const Admin = () => {
 
   const revokePremium = async (userId: string) => {
     try {
-      const { error } = await supabase
-        .from('user_subscriptions')
-        .upsert({
-          user_id: userId,
-          is_premium: false,
-          premium_until: null,
-        }, {
-          onConflict: 'user_id'
-        });
+      const { error } = await supabase.rpc('admin_set_premium', {
+        target_user: userId,
+        is_premium: false,
+        premium_until: null,
+      });
 
       if (error) throw error;
 

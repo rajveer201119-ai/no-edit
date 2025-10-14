@@ -251,6 +251,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_set_premium: {
+        Args: {
+          is_premium: boolean
+          premium_until: string
+          target_user: string
+        }
+        Returns: undefined
+      }
       check_daily_limit: {
         Args: { user_id_param: string }
         Returns: {
