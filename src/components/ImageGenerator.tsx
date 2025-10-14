@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Sparkles, Download, Upload, X } from "lucide-react";
+import { Loader2, Sparkles, Download, Upload, X, Zap } from "lucide-react";
 import { StyleSelector } from "./StyleSelector";
 import { SizeSelector } from "./SizeSelector";
 
@@ -27,14 +28,36 @@ export const ImageGenerator = () => {
     size: ImageSize;
     image: string | null;
   } | null>(null);
+  const [remainingPrompts, setRemainingPrompts] = useState<number | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     checkUser();
   }, []);
 
+  const fetchDailyLimit = async (userId: string) => {
+    try {
+      const { data, error } = await supabase.rpc('check_daily_limit', {
+        user_id_param: userId
+      });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setRemainingPrompts(data[0].remaining_prompts);
+        setIsPremium(data[0].is_premium);
+      }
+    } catch (error) {
+      console.error("Error fetching daily limit:", error);
+    }
+  };
+
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setCurrentUserId(user?.id || null);
+    if (user?.id) {
+      await fetchDailyLimit(user.id);
+    }
   };
 
   const handleUndo = () => {
@@ -92,6 +115,10 @@ export const ImageGenerator = () => {
       if (data?.imageUrl) {
         setGeneratedImage(data.imageUrl);
         toast.success("Image generated successfully!");
+        // Refresh daily limit after successful generation
+        if (currentUserId) {
+          await fetchDailyLimit(currentUserId);
+        }
       } else {
         toast.error("Failed to generate image");
       }
@@ -179,6 +206,19 @@ export const ImageGenerator = () => {
     <div className="w-full max-w-6xl mx-auto space-y-8">
       <Card className="glass-card p-6 md:p-8 space-y-6 border-2">
         <div className="space-y-4">
+          {currentUserId && remainingPrompts !== null && (
+            <div className="flex items-center justify-between gap-4 p-3 md:p-4 rounded-lg bg-primary/5 border border-primary/20">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <Zap className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0" />
+                <span className="text-xs md:text-sm font-medium text-foreground truncate">
+                  Daily Generations
+                </span>
+              </div>
+              <Badge variant="default" className="flex-shrink-0 text-xs md:text-sm px-2 md:px-3 py-1">
+                {remainingPrompts} / {isPremium ? '25' : '2'} left
+              </Badge>
+            </div>
+          )}
           <div>
             <label className="text-sm font-medium mb-2 block gradient-epic-text">
               Describe Your Vision
