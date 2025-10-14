@@ -22,22 +22,26 @@ export const InstallPrompt = () => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
+      
+      // Show prompt after 10 seconds once we have the install prompt
+      setTimeout(() => {
+        if (!localStorage.getItem("installPromptDismissed")) {
+          setShowPrompt(true);
+        }
+      }, 10000);
     };
+
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      return; // App is already installed
+    }
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-    // Show prompt after 10 seconds if app is installable
-    const timer = setTimeout(() => {
-      if (deferredPrompt && !localStorage.getItem("installPromptDismissed")) {
-        setShowPrompt(true);
-      }
-    }, 10000);
-
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-      clearTimeout(timer);
     };
-  }, [deferredPrompt]);
+  }, []);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
