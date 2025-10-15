@@ -31,9 +31,16 @@ serve(async (req) => {
       model: 'black-forest-labs/FLUX.1-schnell',
     });
 
-    // Convert the blob to a base64 string
+    // Convert the blob to a base64 string in chunks to avoid stack overflow
     const arrayBuffer = await image.arrayBuffer();
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = '';
+    const chunkSize = 8192;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+      binary += String.fromCharCode(...chunk);
+    }
+    const base64 = btoa(binary);
     const imageUrl = `data:image/png;base64,${base64}`;
 
     return new Response(JSON.stringify({ 
