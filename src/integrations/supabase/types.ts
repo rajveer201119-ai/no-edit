@@ -259,6 +259,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      assign_admin_role_by_email: {
+        Args: { user_email: string }
+        Returns: undefined
+      }
       check_daily_limit: {
         Args: { user_id_param: string }
         Returns: {
