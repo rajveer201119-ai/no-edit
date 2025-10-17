@@ -254,13 +254,9 @@ export type Database = {
       admin_set_premium: {
         Args: {
           is_premium: boolean
-          premium_until?: string
+          premium_until: string
           target_user: string
         }
-        Returns: undefined
-      }
-      assign_admin_role_by_email: {
-        Args: { user_email: string }
         Returns: undefined
       }
       check_daily_limit: {
