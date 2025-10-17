@@ -19,10 +19,13 @@ All colors MUST be HSL.
     --popover-foreground: 0 0% 15%;
 
     --primary: 25 82% 56%;
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 0 0% 5%;
 
     --secondary: 10 76% 52%;
     --secondary-foreground: 0 0% 100%;
+    
+    /* Yellow accent for highlights */
+    --yellow-accent: 60 100% 50%;
 
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 40%;
