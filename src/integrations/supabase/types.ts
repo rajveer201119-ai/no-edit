@@ -254,7 +254,7 @@ export type Database = {
       admin_set_premium: {
         Args: {
           is_premium: boolean
-          premium_until: string
+          premium_until?: string
           target_user: string
         }
         Returns: undefined

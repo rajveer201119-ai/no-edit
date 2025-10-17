@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/Hero";
 import { ImageGenerator } from "@/components/ImageGenerator";
+import { PlansSection } from "@/components/PlansSection";
 import { Footer } from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
@@ -124,6 +125,8 @@ const Index = () => {
                     <ImageGenerator />
                   </div>
                 </section>
+                
+                <PlansSection />
                 
                 <section aria-label="Community Generated Images" id="feed" className="scroll-mt-20">
                   <Suspense fallback={<div className="text-center py-8">Loading feed...</div>}>
