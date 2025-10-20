@@ -124,10 +124,13 @@ export const ImageGenerator = () => {
       }
     } catch (error: any) {
       console.error("Generation error:", error);
-      const msg = String(error?.message ?? "");
-      if (msg.includes("402")) {
-        toast.error("AI credits exhausted. Please add credits to your workspace to continue.");
-      } else if (msg.includes("429")) {
+      const rawMsg = String(error?.message ?? "");
+      const match = rawMsg.match(/\b(4\d{2}|5\d{2})\b/);
+      const status = (error as any)?.status ?? (error as any)?.context?.response?.status ?? (match ? Number(match[0]) : undefined);
+
+      if (status === 402 || rawMsg.toLowerCase().includes("payment required")) {
+        toast.error("AI credits exhausted. Add credits in Settings → Workspace → Usage to continue.");
+      } else if (status === 429 || rawMsg.toLowerCase().includes("rate limit")) {
         toast.error("Rate limit exceeded. Please wait a few seconds and try again.");
       } else {
         toast.error("Failed to generate image. Please try again shortly.");
