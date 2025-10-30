@@ -1,14 +1,10 @@
-import epicLogo from "@/assets/epic-logo.png";
+import { ShaderAnimation } from "@/components/ui/shader-animation";
 
 export const Hero = () => {
   return (
     <div className="text-center space-y-8 py-12 md:py-20 px-4">
-      <div className="animate-float">
-        <img 
-          src={epicLogo} 
-          alt="EPIC Logo" 
-          className="w-64 md:w-96 mx-auto drop-shadow-2xl"
-        />
+      <div className="animate-float w-64 md:w-96 h-64 md:h-96 mx-auto rounded-xl overflow-hidden">
+        <ShaderAnimation />
       </div>
       
       <div className="space-y-4 max-w-3xl mx-auto">
