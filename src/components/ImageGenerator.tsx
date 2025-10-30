@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { GradientButton } from "@/components/ui/gradient-button";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -253,35 +254,35 @@ export const ImageGenerator = () => {
           <SizeSelector value={size} onChange={setSize} disabled={isGenerating} />
 
           <div className="flex gap-2">
-            <Button
+            <GradientButton
               onClick={handleGenerate}
               disabled={isGenerating}
-              className="flex-1 h-14 text-lg font-semibold gradient-epic hover:opacity-90 transition-opacity"
-              size="lg"
+              className="flex-1 h-14 text-lg font-semibold relative z-10"
             >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Generating Magic...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 h-5 w-5" />
-                  Generate Image
-                </>
-              )}
-            </Button>
+              <span className="relative z-10">
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin inline" />
+                    Generating Magic...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-5 w-5 inline" />
+                    Generate Image
+                  </>
+                )}
+              </span>
+            </GradientButton>
             
             {previousState && (
-              <Button
+              <GradientButton
                 onClick={handleUndo}
                 disabled={isGenerating}
-                variant="outline"
-                size="lg"
-                className="h-14"
+                variant="variant"
+                className="h-14 relative z-10"
               >
-                Undo
-              </Button>
+                <span className="relative z-10">Undo</span>
+              </GradientButton>
             )}
           </div>
         </div>
@@ -299,31 +300,35 @@ export const ImageGenerator = () => {
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg" />
           </div>
           <div className="flex gap-3">
-            <Button
+            <GradientButton
               onClick={handleDownload}
-              variant="outline"
-              className="flex-1 border-white/20 hover:bg-white/10"
+              variant="variant"
+              className="flex-1 relative z-10"
             >
-              <Download className="mr-2 h-4 w-4" />
-              Download
-            </Button>
-            <Button
+              <span className="relative z-10">
+                <Download className="mr-2 h-4 w-4 inline" />
+                Download
+              </span>
+            </GradientButton>
+            <GradientButton
               onClick={handleSaveToFeed}
               disabled={isSaving || !currentUserId}
-              className="flex-1 gradient-epic hover:opacity-90"
+              className="flex-1 relative z-10"
             >
-              {isSaving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Save to Feed
-                </>
-              )}
-            </Button>
+              <span className="relative z-10">
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin inline" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4 inline" />
+                    Save to Feed
+                  </>
+                )}
+              </span>
+            </GradientButton>
           </div>
         </Card>
       )}

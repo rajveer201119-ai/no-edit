@@ -1,6 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { GradientButton } from "@/components/ui/gradient-button";
 import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/Hero";
 import { ImageGenerator } from "@/components/ImageGenerator";
@@ -70,27 +71,34 @@ const Index = () => {
           <InstallButton />
           <ThemeToggle />
           {isAdmin && (
-            <Button 
-              variant="outline" 
+            <GradientButton 
+              variant="variant"
               onClick={() => navigate("/admin")}
-              className="border-primary/50 hover:bg-primary/10"
+              className="relative z-10"
             >
-              <Shield className="mr-2 h-4 w-4" />
-              Admin
-            </Button>
+              <span className="relative z-10">
+                <Shield className="mr-2 h-4 w-4 inline" />
+                Admin
+              </span>
+            </GradientButton>
           )}
-          <Button 
-            variant="outline" 
+          <GradientButton 
             onClick={() => navigate("/pricing-india")}
-            className="border-primary/50 hover:bg-primary/10"
+            className="relative z-10"
           >
-            <Sparkles className="mr-2 h-4 w-4" />
-            View Plans
-          </Button>
+            <span className="relative z-10">
+              <Sparkles className="mr-2 h-4 w-4 inline" />
+              View Plans
+            </span>
+          </GradientButton>
           {isAuthed ? (
-            <Button variant="outline" onClick={signOut}>Sign out</Button>
+            <GradientButton variant="variant" onClick={signOut} className="relative z-10">
+              <span className="relative z-10">Sign out</span>
+            </GradientButton>
           ) : (
-            <Button onClick={() => navigate("/auth")}>Sign in</Button>
+            <GradientButton onClick={() => navigate("/auth")} className="relative z-10">
+              <span className="relative z-10">Sign in</span>
+            </GradientButton>
           )}
         </header>
         <main>
