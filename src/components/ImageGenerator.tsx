@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Loader2, Sparkles, Download, Upload, X, Zap } from "lucide-react";
 import { StyleSelector } from "./StyleSelector";
 import { SizeSelector } from "./SizeSelector";
+import { SpaceBackground } from "@/components/ui/space-background";
 
 export type ImageStyle = "ghibli" | "3d" | "animated" | "realistic" | "vintage" | "cyberpunk";
 export type ImageSize = "square" | "portrait" | "landscape";
@@ -205,6 +206,7 @@ export const ImageGenerator = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-8">
+      {isGenerating && <SpaceBackground particleCount={450} />}
       <Card className="glass-card p-6 md:p-8 space-y-6 border-2">
         <div className="space-y-4">
           {currentUserId && remainingPrompts !== null && (
