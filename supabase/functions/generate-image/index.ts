@@ -42,6 +42,72 @@ serve(async (req) => {
 
     const sizeStr = `${dims.width}x${dims.height}`;
 
+    // PRIMARY: Pollinations.ai (fast)
+    try {
+      const primaryUrl = new URL(`https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}`);
+      primaryUrl.searchParams.set("size", sizeStr);
+      primaryUrl.searchParams.set("model", "flux");
+      primaryUrl.searchParams.set("enhance", "true");
+      primaryUrl.searchParams.set("nologo", "true");
+
+      const primaryController = new AbortController();
+      const primaryTimeout = setTimeout(() => primaryController.abort(), 25000);
+      let primaryResp = await fetch(primaryUrl.toString(), { 
+        method: "GET", 
+        headers: { Accept: "image/*" },
+        signal: primaryController.signal
+      });
+      clearTimeout(primaryTimeout);
+
+      if (!primaryResp.ok) {
+        const text = await primaryResp.text().catch(() => "");
+        const mentionsDiv = /divisible/i.test(text);
+        if (primaryResp.status !== 200 || mentionsDiv) {
+          const fbUrl = new URL(primaryUrl.toString());
+          fbUrl.searchParams.set("size", "640x640");
+          fbUrl.searchParams.set("enhance", "false");
+
+          const fbController = new AbortController();
+          const fbTimeout = setTimeout(() => fbController.abort(), 20000);
+          try {
+            primaryResp = await fetch(fbUrl.toString(), { 
+              method: "GET", 
+              headers: { Accept: "image/*" },
+              signal: fbController.signal
+            });
+          } finally {
+            clearTimeout(fbTimeout);
+          }
+        }
+      }
+
+      if (primaryResp.ok) {
+        const arrayBuffer = await primaryResp.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        
+        // Convert to base64 safely in chunks
+        let binary = '';
+        const chunkSize = 8192;
+        for (let i = 0; i < uint8Array.length; i += chunkSize) {
+          const chunk = uint8Array.subarray(i, Math.min(i + chunkSize, uint8Array.length));
+          binary += String.fromCharCode.apply(null, Array.from(chunk));
+        }
+        const base64 = btoa(binary);
+        const contentType = primaryResp.headers.get("content-type") ?? "image/png";
+        const imageUrl = `data:${contentType};base64,${base64}`;
+
+        return new Response(JSON.stringify({ imageUrl, prompt: styledPrompt }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } catch (e: any) {
+      if (e?.name === "AbortError") {
+        // Timed out; fall through to fallback
+      } else {
+        console.error("Pollinations primary failed:", e);
+      }
+    }
+
     // Try Lovable AI first (Gemini image model) for faster, reliable generation
     try {
       const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
