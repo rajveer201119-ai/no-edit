@@ -15,7 +15,8 @@ export const Hero = () => {
           <img 
             src={epicLogo} 
             alt="EPIC Logo" 
-            className="w-48 md:w-72 mx-auto drop-shadow-2xl"
+            className="w-48 md:w-72 mx-auto drop-shadow-2xl relative z-20 brightness-110"
+            style={{ filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.5))' }}
           />
         </div>
         
