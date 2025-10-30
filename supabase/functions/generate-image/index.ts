@@ -33,12 +33,12 @@ serve(async (req) => {
       sizeHint,
     ].filter(Boolean).join(", ");
 
-    // Map sizes to robust, model-friendly dimensions (multiples of 64)
+    // Map sizes to smaller, faster dimensions (multiples of 64)
     const dims = size === "portrait"
-      ? { width: 896, height: 1152 }
+      ? { width: 512, height: 768 }
       : size === "landscape"
-      ? { width: 1152, height: 896 }
-      : { width: 1024, height: 1024 };
+      ? { width: 768, height: 512 }
+      : { width: 640, height: 640 };
 
     const sizeStr = `${dims.width}x${dims.height}`;
 
@@ -52,11 +52,31 @@ serve(async (req) => {
       return u;
     };
 
-    // Try primary request (FLUX, requested size)
+    // Try primary request (FLUX, requested size) with 25 second timeout
     let url = buildUrl({ size: sizeStr, model: "flux", enhance: true });
     console.log("Generating image via Pollinations:", { style, size, dims, prompt: styledPrompt, url: url.toString() });
 
-    let imageResp = await fetch(url.toString(), { method: "GET", headers: { Accept: "image/*" } });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+    
+    let imageResp: Response;
+    try {
+      imageResp = await fetch(url.toString(), { 
+        method: "GET", 
+        headers: { Accept: "image/*" },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        return new Response(
+          JSON.stringify({ error: "Request timed out. Please try again with a simpler prompt." }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      throw error;
+    }
 
     // Fallback 1: If not OK or divisible error, try square 1024 with FLUX
     if (!imageResp.ok) {
@@ -64,9 +84,28 @@ serve(async (req) => {
       console.error("Pollinations error (primary):", imageResp.status, text.slice(0, 300));
       const mentionsDiv = /divisible/i.test(text);
       if (imageResp.status !== 200 || mentionsDiv) {
-        url = buildUrl({ size: "1024x1024", model: "flux", enhance: false });
+        url = buildUrl({ size: "640x640", model: "flux", enhance: false });
         console.log("Retrying Pollinations (fallback 1):", url.toString());
-        imageResp = await fetch(url.toString(), { method: "GET", headers: { Accept: "image/*" } });
+        
+        const fallbackController = new AbortController();
+        const fallbackTimeout = setTimeout(() => fallbackController.abort(), 20000);
+        try {
+          imageResp = await fetch(url.toString(), { 
+            method: "GET", 
+            headers: { Accept: "image/*" },
+            signal: fallbackController.signal
+          });
+          clearTimeout(fallbackTimeout);
+        } catch (error: any) {
+          clearTimeout(fallbackTimeout);
+          if (error.name === 'AbortError') {
+            return new Response(
+              JSON.stringify({ error: "Request timed out. Please try a different prompt." }),
+              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          throw error;
+        }
       }
     }
 
