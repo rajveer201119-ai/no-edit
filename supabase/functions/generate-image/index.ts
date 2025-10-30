@@ -42,6 +42,67 @@ serve(async (req) => {
 
     const sizeStr = `${dims.width}x${dims.height}`;
 
+    // Try Lovable AI first (Gemini image model) for faster, reliable generation
+    try {
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (LOVABLE_API_KEY) {
+        const aiController = new AbortController();
+        const aiTimeout = setTimeout(() => aiController.abort(), 35000);
+
+        const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash-image-preview",
+            messages: [
+              {
+                role: "user",
+                content: `Create an image: ${styledPrompt}`,
+              },
+            ],
+            modalities: ["image", "text"],
+          }),
+          signal: aiController.signal,
+        });
+        clearTimeout(aiTimeout);
+
+        if (aiResp.ok) {
+          const data = await aiResp.json();
+          const imageUrl = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url as string | undefined;
+          if (imageUrl) {
+            return new Response(JSON.stringify({ imageUrl, prompt: styledPrompt }), {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+        } else {
+          if (aiResp.status === 429) {
+            return new Response(JSON.stringify({ error: "Rate limits exceeded, please try again later." }), {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+          if (aiResp.status === 402) {
+            return new Response(JSON.stringify({ error: "Payment required, please add credits to your workspace." }), {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+          const txt = await aiResp.text().catch(() => "");
+          console.error("Lovable AI error:", aiResp.status, txt.slice(0, 300));
+          // fall through to Pollinations fallback
+        }
+      }
+    } catch (e: any) {
+      if (e?.name === "AbortError") {
+        return new Response(JSON.stringify({ error: "Request timed out. Please try again in a moment." }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      console.error("Lovable AI exception:", e);
+      // fall through to Pollinations fallback
+    }
+
     // Helper to build Pollinations URL with options
     const buildUrl = (opts: { size: string; model?: string; enhance?: boolean }) => {
       const u = new URL(`https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}`);
