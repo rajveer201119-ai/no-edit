@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Shield, ArrowLeft, Crown, Calendar } from "lucide-react";
+import { Shield, ArrowLeft, Crown, Calendar, Users, Megaphone, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface UserData {
@@ -17,12 +19,27 @@ interface UserData {
   premium_until: string | null;
 }
 
+interface Announcement {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'alert';
+  is_active: boolean;
+  created_at: string;
+}
+
 const Admin = () => {
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<UserData[]>([]);
   const [premiumDates, setPremiumDates] = useState<Record<string, string>>({});
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [newAnnouncement, setNewAnnouncement] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'info' | 'warning' | 'success' | 'alert'
+  });
 
   useEffect(() => {
     checkAdminAccess();
@@ -52,7 +69,7 @@ const Admin = () => {
       }
 
       setIsAdmin(true);
-      await fetchUsers();
+      await Promise.all([fetchUsers(), fetchAnnouncements()]);
     } catch (error) {
       console.error("Error checking admin access:", error);
       toast.error("Error verifying admin access");
@@ -154,6 +171,84 @@ const Admin = () => {
     }
   };
 
+  const fetchAnnouncements = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('announcements')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setAnnouncements((data || []) as Announcement[]);
+    } catch (error) {
+      console.error("Error fetching announcements:", error);
+      toast.error("Failed to fetch announcements");
+    }
+  };
+
+  const createAnnouncement = async () => {
+    if (!newAnnouncement.title || !newAnnouncement.message) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { error } = await supabase
+        .from('announcements')
+        .insert({
+          title: newAnnouncement.title,
+          message: newAnnouncement.message,
+          type: newAnnouncement.type,
+          created_by: user?.id
+        });
+
+      if (error) throw error;
+
+      toast.success("Announcement created successfully!");
+      setNewAnnouncement({ title: '', message: '', type: 'info' });
+      await fetchAnnouncements();
+    } catch (error) {
+      console.error("Error creating announcement:", error);
+      toast.error("Failed to create announcement");
+    }
+  };
+
+  const toggleAnnouncementStatus = async (id: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('announcements')
+        .update({ is_active: !currentStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success(`Announcement ${!currentStatus ? 'activated' : 'deactivated'}`);
+      await fetchAnnouncements();
+    } catch (error) {
+      console.error("Error toggling announcement:", error);
+      toast.error("Failed to update announcement");
+    }
+  };
+
+  const deleteAnnouncement = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('announcements')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success("Announcement deleted successfully!");
+      await fetchAnnouncements();
+    } catch (error) {
+      console.error("Error deleting announcement:", error);
+      toast.error("Failed to delete announcement");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -182,12 +277,126 @@ const Admin = () => {
                 <Shield className="h-8 w-8 text-primary" />
                 Admin Panel
               </h1>
-              <p className="text-muted-foreground mt-1">Manage user premium access</p>
+              <div className="flex items-center gap-4 mt-2">
+                <p className="text-muted-foreground">Manage users & announcements</p>
+                <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-semibold">{users.length} users</span>
+                </div>
+              </div>
             </div>
           </div>
           <ThemeToggle />
         </div>
 
+        {/* Announcements Section */}
+        <Card className="p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Megaphone className="h-6 w-6 text-primary" />
+            <h2 className="text-2xl font-bold">Announcements</h2>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="grid gap-4">
+              <div>
+                <Label htmlFor="announcement-title">Title</Label>
+                <Input
+                  id="announcement-title"
+                  value={newAnnouncement.title}
+                  onChange={(e) => setNewAnnouncement(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Enter announcement title"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="announcement-message">Message</Label>
+                <Textarea
+                  id="announcement-message"
+                  value={newAnnouncement.message}
+                  onChange={(e) => setNewAnnouncement(prev => ({ ...prev, message: e.target.value }))}
+                  placeholder="Enter announcement message"
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="announcement-type">Type</Label>
+                <Select
+                  value={newAnnouncement.type}
+                  onValueChange={(value) => setNewAnnouncement(prev => ({ ...prev, type: value as any }))}
+                >
+                  <SelectTrigger id="announcement-type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="info">Info</SelectItem>
+                    <SelectItem value="success">Success</SelectItem>
+                    <SelectItem value="warning">Warning</SelectItem>
+                    <SelectItem value="alert">Alert</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <Button onClick={createAnnouncement} className="gradient-epic">
+                Create Announcement
+              </Button>
+            </div>
+
+            <div className="space-y-2 mt-6">
+              <h3 className="font-semibold mb-3">Active Announcements</h3>
+              {announcements.length === 0 ? (
+                <p className="text-muted-foreground text-sm">No announcements yet</p>
+              ) : (
+                announcements.map((announcement) => (
+                  <Card key={announcement.id} className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold">{announcement.title}</h4>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            announcement.type === 'info' ? 'bg-blue-500/20 text-blue-500' :
+                            announcement.type === 'success' ? 'bg-green-500/20 text-green-500' :
+                            announcement.type === 'warning' ? 'bg-yellow-500/20 text-yellow-500' :
+                            'bg-red-500/20 text-red-500'
+                          }`}>
+                            {announcement.type}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{announcement.message}</p>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {new Date(announcement.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant={announcement.is_active ? "secondary" : "default"}
+                          size="sm"
+                          onClick={() => toggleAnnouncementStatus(announcement.id, announcement.is_active)}
+                        >
+                          {announcement.is_active ? 'Deactivate' : 'Activate'}
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => deleteAnnouncement(announcement.id)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))
+              )}
+            </div>
+          </div>
+        </Card>
+
+        {/* Users Section */}
+        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <Crown className="h-6 w-6 text-primary" />
+          Premium Management
+        </h2>
+        
         <div className="space-y-4">
           {users.length === 0 ? (
             <Card className="p-8 text-center">
