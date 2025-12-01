@@ -97,59 +97,74 @@ export const ImageGenerator = () => {
     setGeneratedImage(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke('generate-image', {
-        body: { prompt, style, size }
+      // Build styled prompt
+      const styleDescriptions: Record<ImageStyle, string> = {
+        ghibli: "Studio Ghibli anime style, whimsical, hand-drawn aesthetic",
+        "3d": "3D rendered, CGI, detailed modeling, professional rendering",
+        animated: "Animated style, vibrant, expressive, cartoon-like",
+        realistic: "Photorealistic, ultra-detailed, natural lighting, cinematic",
+        vintage: "Vintage style, retro, nostalgic, aged aesthetic",
+        cyberpunk: "Cyberpunk style, neon lights, futuristic, dystopian"
+      };
+      
+      const styledPrompt = `${prompt.trim()}. ${styleDescriptions[style]}`;
+      
+      // Determine dimensions
+      const dimensions = size === "portrait" 
+        ? { width: 768, height: 1024 }
+        : size === "landscape"
+        ? { width: 1024, height: 768 }
+        : { width: 1024, height: 1024 };
+      
+      // Call Pollinations.ai directly (no API key needed)
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}?width=${dimensions.width}&height=${dimensions.height}&model=flux&nologo=true&enhance=true`;
+      
+      // Preload the image to ensure it's ready
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = imageUrl;
       });
-
-      if (error) throw error;
-
-      if (data?.error) {
-        if (data.error.includes("Rate limit")) {
-          toast.error("Rate limit reached. Please wait a moment and try again.");
-        } else if (data.error.includes("Payment required")) {
-          toast.error("Credits needed. Please add credits to continue.");
-        } else {
-          toast.error(data.error);
-        }
-        return;
-      }
-
-      if (data?.imageUrl) {
-        setGeneratedImage(data.imageUrl);
-        toast.success("Image generated successfully!");
-        // Refresh daily limit after successful generation
-        if (currentUserId) {
-          await fetchDailyLimit(currentUserId);
-        }
-      } else {
-        toast.error("Failed to generate image");
+      
+      setGeneratedImage(imageUrl);
+      toast.success("Image generated successfully!");
+      
+      // Refresh daily limit after successful generation
+      if (currentUserId) {
+        await fetchDailyLimit(currentUserId);
       }
     } catch (error: any) {
       console.error("Generation error:", error);
-      const rawMsg = String(error?.message ?? "");
-      
-      if (rawMsg.toLowerCase().includes("model is loading")) {
-        toast.error("AI model is warming up. Please wait 20 seconds and try again.");
-      } else if (rawMsg.toLowerCase().includes("rate limit")) {
-        toast.error("Rate limit exceeded. Please wait a few minutes and try again.");
-      } else {
-        toast.error("Failed to generate image. Please try again shortly.");
-      }
+      toast.error("Failed to generate image. Please try again.");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!generatedImage) return;
     
-    const link = document.createElement('a');
-    link.href = generatedImage;
-    link.download = `epic-${Date.now()}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success("Image downloaded!");
+    try {
+      const response = await fetch(generatedImage);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `epic-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast.success("Image downloaded!");
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to download image");
+    }
   };
 
   const handleSaveToFeed = async () => {
@@ -160,15 +175,9 @@ export const ImageGenerator = () => {
 
     setIsSaving(true);
     try {
-      // Convert base64 to blob
-      const base64Data = generatedImage.split(',')[1];
-      const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'image/png' });
+      // Fetch the image from URL
+      const response = await fetch(generatedImage);
+      const blob = await response.blob();
 
       // Upload to storage
       const fileName = `${currentUserId}/${Date.now()}.png`;
