@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
 import { InstallButton } from "@/components/InstallButton";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { Sparkles, Shield } from "lucide-react";
 
 const Feed = lazy(() => import("@/components/Feed").then(mod => ({ default: mod.Feed })));
@@ -101,6 +102,7 @@ const Index = () => {
             </GradientButton>
           )}
         </header>
+        <AnnouncementBanner />
         <main>
           <Hero />
           <section aria-label="AI Image Generator Tool">
