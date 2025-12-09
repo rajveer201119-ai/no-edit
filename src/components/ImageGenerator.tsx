@@ -119,7 +119,9 @@ export const ImageGenerator = () => {
       // Add seed for unique generation each time
       const seed = Math.floor(Math.random() * 1000000);
       
-      // Try to load the image with timeout and retry
+      toast.loading("Generating your image... This may take up to 2 minutes.", { id: "generating", duration: 120000 });
+      
+      // Try to load the image with timeout
       const loadImageWithTimeout = (url: string, timeoutMs: number): Promise<string> => {
         return new Promise((resolve, reject) => {
           const img = new Image();
@@ -140,33 +142,12 @@ export const ImageGenerator = () => {
         });
       };
 
-      // Try multiple Pollinations configurations
-      const urls = [
-        `https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&nologo=true`,
-        `https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed + 1}`,
-        `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt.trim())}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed + 2}`
-      ];
-
-      let loadedUrl: string | null = null;
-      let lastError: Error | null = null;
-
-      for (const url of urls) {
-        try {
-          toast.loading("Generating your image...", { id: "generating" });
-          loadedUrl = await loadImageWithTimeout(url, 90000); // 90 second timeout
-          toast.dismiss("generating");
-          break;
-        } catch (err) {
-          lastError = err as Error;
-          console.warn("Attempt failed, trying next:", err);
-          continue;
-        }
-      }
-
-      if (!loadedUrl) {
-        throw lastError || new Error("All generation attempts failed");
-      }
-
+      // Use a simple, clean URL - Pollinations works best with minimal parameters
+      const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(styledPrompt)}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&nologo=true&model=flux`;
+      
+      const loadedUrl = await loadImageWithTimeout(imageUrl, 120000); // 2 minute timeout
+      
+      toast.dismiss("generating");
       setGeneratedImage(loadedUrl);
       toast.success("Image generated successfully!");
       
@@ -177,7 +158,9 @@ export const ImageGenerator = () => {
     } catch (error: any) {
       console.error("Generation error:", error);
       toast.dismiss("generating");
-      toast.error("Image generation service is currently unavailable. Please try again in a moment.");
+      toast.error("The image generation service is temporarily unavailable. Please try again in a few minutes.", {
+        duration: 5000
+      });
     } finally {
       setIsGenerating(false);
     }
