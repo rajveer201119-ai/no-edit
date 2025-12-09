@@ -116,20 +116,34 @@ export const ImageGenerator = () => {
         ? { width: 1024, height: 768 }
         : { width: 1024, height: 1024 };
       
+      // Add seed for unique generation each time
+      const seed = Math.floor(Math.random() * 1000000);
+      
       // Call Pollinations.ai directly (no API key needed)
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}?width=${dimensions.width}&height=${dimensions.height}&model=flux&nologo=true&enhance=true`;
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}?width=${dimensions.width}&height=${dimensions.height}&model=flux&nologo=true&seed=${seed}`;
       
-      // Preload the image to ensure it's ready
-      const img = new Image();
-      img.crossOrigin = "anonymous";
+      // Try to load the image with timeout
+      const loadImage = (url: string): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          const timeout = setTimeout(() => {
+            reject(new Error("Image load timeout"));
+          }, 60000); // 60 second timeout for generation
+          
+          img.onload = () => {
+            clearTimeout(timeout);
+            resolve(url);
+          };
+          img.onerror = () => {
+            clearTimeout(timeout);
+            reject(new Error("Image failed to load"));
+          };
+          img.src = url;
+        });
+      };
       
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = imageUrl;
-      });
-      
-      setGeneratedImage(imageUrl);
+      const loadedUrl = await loadImage(imageUrl);
+      setGeneratedImage(loadedUrl);
       toast.success("Image generated successfully!");
       
       // Refresh daily limit after successful generation
