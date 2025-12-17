@@ -95,127 +95,76 @@ export const ImageGenerator = () => {
 
     setIsGenerating(true);
     setGeneratedImage(null);
+    toast.loading("Generating your image...", { id: "generating", duration: 120000 });
 
     try {
-      // Build styled prompt
-      const styleDescriptions: Record<ImageStyle, string> = {
-        ghibli: "Studio Ghibli anime style, whimsical, hand-drawn aesthetic",
-        "3d": "3D rendered, CGI, detailed modeling, professional rendering",
-        animated: "Animated style, vibrant, expressive, cartoon-like",
-        realistic: "Photorealistic, ultra-detailed, natural lighting, cinematic",
-        vintage: "Vintage style, retro, nostalgic, aged aesthetic",
-        cyberpunk: "Cyberpunk style, neon lights, futuristic, dystopian"
-      };
-      
-      const styledPrompt = `${prompt.trim()}. ${styleDescriptions[style]}`;
-      
-      // Determine dimensions
-      const dimensions = size === "portrait" 
-        ? { width: 768, height: 1024 }
-        : size === "landscape"
-        ? { width: 1024, height: 768 }
-        : { width: 1024, height: 1024 };
-      
-      // Add seed for unique generation each time
-      const seed = Math.floor(Math.random() * 1000000);
-      
-      toast.loading("Generating your image... This may take up to 2 minutes.", { id: "generating", duration: 120000 });
-      
-      // Try to load the image with timeout
-      const loadImageWithTimeout = (url: string, timeoutMs: number): Promise<string> => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          const timeout = setTimeout(() => {
-            img.src = "";
-            reject(new Error("Image load timeout"));
-          }, timeoutMs);
-          
-          img.onload = () => {
-            clearTimeout(timeout);
-            resolve(url);
-          };
-          img.onerror = () => {
-            clearTimeout(timeout);
-            reject(new Error("Image failed to load"));
-          };
-          img.src = url;
-        });
-      };
+      const { data, error } = await supabase.functions.invoke("generate-image", {
+        body: {
+          prompt: prompt.trim(),
+          style,
+          size,
+        },
+      });
 
-      // Use a simple, clean URL - Pollinations works best with minimal parameters
-      const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(styledPrompt)}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&nologo=true&model=flux`;
-      
-      const loadedUrl = await loadImageWithTimeout(imageUrl, 120000); // 2 minute timeout
-      
-      toast.dismiss("generating");
-      setGeneratedImage(loadedUrl);
+      if (error) throw error;
+      if (!data) throw new Error("No response from image service");
+      if (data.error) throw new Error(data.error);
+
+      const imageUrl = data.imageUrl as string | undefined;
+      if (!imageUrl) throw new Error("Image generation failed");
+
+      setGeneratedImage(imageUrl);
       toast.success("Image generated successfully!");
-      
+
       // Refresh daily limit after successful generation
       if (currentUserId) {
         await fetchDailyLimit(currentUserId);
       }
     } catch (error: any) {
       console.error("Generation error:", error);
-      toast.dismiss("generating");
-      toast.error("The image generation service is temporarily unavailable. Please try again in a few minutes.", {
-        duration: 5000
-      });
+      toast.error(
+        error?.message ||
+          "The image generation service is temporarily unavailable. Please try again in a few minutes.",
+        {
+          duration: 5000,
+        }
+      );
     } finally {
+      toast.dismiss("generating");
       setIsGenerating(false);
     }
   };
 
-  // Convert image URL to blob using canvas (bypasses CORS)
-  const imageToBlob = async (imageUrl: string): Promise<Blob> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          reject(new Error("Could not get canvas context"));
-          return;
-        }
-        ctx.drawImage(img, 0, 0);
-        canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(blob);
-          } else {
-            reject(new Error("Failed to convert to blob"));
-          }
-        }, "image/png");
-      };
-      img.onerror = () => reject(new Error("Failed to load image"));
-      img.src = imageUrl;
-    });
+  const getImageBlob = async (imageUrl: string): Promise<Blob> => {
+    const resp = await fetch(imageUrl);
+    if (!resp.ok) throw new Error("Failed to fetch image");
+    return await resp.blob();
   };
 
   const handleDownload = async () => {
     if (!generatedImage) return;
-    
+
     try {
       toast.loading("Preparing download...", { id: "download" });
-      const blob = await imageToBlob(generatedImage);
+
+      const blob = await getImageBlob(generatedImage);
       const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
+
+      const extension = blob.type === "image/jpeg" ? "jpg" : "png";
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `epic-${Date.now()}.png`;
+      link.download = `epic-${Date.now()}.${extension}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      
-      toast.dismiss("download");
+
       toast.success("Image downloaded!");
     } catch (error) {
       console.error("Download error:", error);
+      toast.error("Failed to download image");
+    } finally {
       toast.dismiss("download");
-      toast.error("Failed to download image. Try right-clicking and 'Save image as...'");
     }
   };
 
@@ -226,45 +175,44 @@ export const ImageGenerator = () => {
     }
 
     setIsSaving(true);
+    toast.loading("Saving to feed...", { id: "saving" });
+
     try {
-      toast.loading("Saving to feed...", { id: "saving" });
-      
-      // Convert image to blob using canvas
-      const blob = await imageToBlob(generatedImage);
+      const blob = await getImageBlob(generatedImage);
+      const extension = blob.type === "image/jpeg" ? "jpg" : "png";
 
       // Upload to storage
-      const fileName = `${currentUserId}/${Date.now()}.png`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('post-images')
-        .upload(fileName, blob);
+      const fileName = `${currentUserId}/${Date.now()}.${extension}`;
+      const { error: uploadError } = await supabase.storage
+        .from("post-images")
+        .upload(fileName, blob, {
+          contentType: blob.type || "image/png",
+        });
 
       if (uploadError) throw uploadError;
 
       // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('post-images')
-        .getPublicUrl(fileName);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("post-images").getPublicUrl(fileName);
 
       // Create post
-      const { error: postError } = await supabase
-        .from('posts')
-        .insert({
-          user_id: currentUserId,
-          image_url: publicUrl,
-          content: prompt,
-        });
+      const { error: postError } = await supabase.from("posts").insert({
+        user_id: currentUserId,
+        image_url: publicUrl,
+        content: prompt,
+      });
 
       if (postError) throw postError;
 
-      toast.dismiss("saving");
       toast.success("Image saved to feed!");
       setGeneratedImage(null);
       setPrompt("");
     } catch (error) {
       console.error("Save error:", error);
-      toast.dismiss("saving");
       toast.error("Failed to save image to feed");
     } finally {
+      toast.dismiss("saving");
       setIsSaving(false);
     }
   };
