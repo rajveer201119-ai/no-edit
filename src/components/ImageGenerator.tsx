@@ -166,12 +166,40 @@ export const ImageGenerator = () => {
     }
   };
 
+  // Convert image URL to blob using canvas (bypasses CORS)
+  const imageToBlob = async (imageUrl: string): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Could not get canvas context"));
+          return;
+        }
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error("Failed to convert to blob"));
+          }
+        }, "image/png");
+      };
+      img.onerror = () => reject(new Error("Failed to load image"));
+      img.src = imageUrl;
+    });
+  };
+
   const handleDownload = async () => {
     if (!generatedImage) return;
     
     try {
-      const response = await fetch(generatedImage);
-      const blob = await response.blob();
+      toast.loading("Preparing download...", { id: "download" });
+      const blob = await imageToBlob(generatedImage);
       const url = URL.createObjectURL(blob);
       
       const link = document.createElement('a');
@@ -182,10 +210,12 @@ export const ImageGenerator = () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
+      toast.dismiss("download");
       toast.success("Image downloaded!");
     } catch (error) {
       console.error("Download error:", error);
-      toast.error("Failed to download image");
+      toast.dismiss("download");
+      toast.error("Failed to download image. Try right-clicking and 'Save image as...'");
     }
   };
 
@@ -197,9 +227,10 @@ export const ImageGenerator = () => {
 
     setIsSaving(true);
     try {
-      // Fetch the image from URL
-      const response = await fetch(generatedImage);
-      const blob = await response.blob();
+      toast.loading("Saving to feed...", { id: "saving" });
+      
+      // Convert image to blob using canvas
+      const blob = await imageToBlob(generatedImage);
 
       // Upload to storage
       const fileName = `${currentUserId}/${Date.now()}.png`;
@@ -225,11 +256,13 @@ export const ImageGenerator = () => {
 
       if (postError) throw postError;
 
+      toast.dismiss("saving");
       toast.success("Image saved to feed!");
       setGeneratedImage(null);
       setPrompt("");
     } catch (error) {
       console.error("Save error:", error);
+      toast.dismiss("saving");
       toast.error("Failed to save image to feed");
     } finally {
       setIsSaving(false);
