@@ -2,7 +2,6 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { GradientButton } from "@/components/ui/gradient-button";
-import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/Hero";
 import { ImageGenerator } from "@/components/ImageGenerator";
 import { Footer } from "@/components/Footer";
@@ -10,6 +9,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
 import { InstallButton } from "@/components/InstallButton";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { SEO, homePageSchema } from "@/components/SEO";
 import { Sparkles, Shield } from "lucide-react";
 
 const Feed = lazy(() => import("@/components/Feed").then(mod => ({ default: mod.Feed })));
@@ -59,8 +59,16 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <ProPlanDialog />
+    <>
+      <SEO 
+        title="EPIC - Free AI Image Generator | Create Stunning Art in Seconds"
+        description="Free AI image generator with Ghibli, 3D, Realistic, Cyberpunk styles. Create professional artwork, ads, posters, and social media graphics instantly. No design skills needed."
+        keywords="AI image generator, free AI art, AI art generator, text to image, Ghibli style art, 3D render, realistic AI photos, cyberpunk art, AI poster maker"
+        canonicalUrl="https://epic-ai-generator.lovable.app/"
+        structuredData={homePageSchema}
+      />
+      <div className="min-h-screen">
+        <ProPlanDialog />
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="absolute top-20 left-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
@@ -114,9 +122,10 @@ const Index = () => {
             </Suspense>
           </section>
         </main>
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </>
   );
 };
 

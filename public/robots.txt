@@ -1,8 +1,13 @@
+# EPIC AI Image Generator - Robots.txt
+# https://epic-ai-generator.lovable.app
+
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Twitterbot
 Allow: /
@@ -10,5 +15,21 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
 User-agent: *
 Allow: /
+
+# Block authentication and admin pages
+Disallow: /auth
+Disallow: /admin
+
+# Sitemap location
+Sitemap: https://epic-ai-generator.lovable.app/sitemap.xml
