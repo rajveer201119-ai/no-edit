@@ -3,55 +3,128 @@ import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
-    <footer className="bg-black text-white py-8 mt-16 border-t border-white/10">
+    <footer className="bg-black text-white py-12 mt-16 border-t border-white/10">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-center md:text-left">
-            <p className="text-sm mb-1">
-              <span className="font-semibold">Founder:</span> RAJVEER RINKU
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          {/* Brand Section */}
+          <div className="md:col-span-1">
+            <h3 className="text-xl font-bold mb-4">EPIC AI</h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Transform your ideas into stunning AI-generated artwork. Create professional images in seconds with our advanced AI technology.
             </p>
-            <p className="text-sm mb-1">UNIT OF - NO BOX</p>
-            <p className="text-xs text-gray-400 mt-2">
-              ALL RIGHTS RESERVED BY NO BOX © 2025
-            </p>
-            <Link 
-              to="/terms" 
-              className="text-xs text-gray-400 hover:text-primary transition-colors block mt-1"
-            >
-              Terms & Conditions
-            </Link>
           </div>
+
+          {/* Quick Links */}
+          <nav className="md:col-span-1" aria-label="Quick Links">
+            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link 
+                  to="/" 
+                  className="text-sm text-gray-400 hover:text-primary transition-colors"
+                >
+                  AI Image Generator
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/pricing-india" 
+                  className="text-sm text-gray-400 hover:text-primary transition-colors"
+                >
+                  Pricing (India)
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/pricing-international" 
+                  className="text-sm text-gray-400 hover:text-primary transition-colors"
+                >
+                  Pricing (International)
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/terms" 
+                  className="text-sm text-gray-400 hover:text-primary transition-colors"
+                >
+                  Terms & Conditions
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
+          {/* AI Art Styles */}
+          <div className="md:col-span-1">
+            <h4 className="text-lg font-semibold mb-4">AI Art Styles</h4>
+            <ul className="space-y-2 text-sm text-gray-400">
+              <li>Ghibli Anime Style</li>
+              <li>3D Render Art</li>
+              <li>Realistic AI Photos</li>
+              <li>Cyberpunk Graphics</li>
+              <li>Vintage Posters</li>
+              <li>Animated Characters</li>
+            </ul>
+          </div>
+
+          {/* Company Info */}
+          <div className="md:col-span-1">
+            <h4 className="text-lg font-semibold mb-4">Company</h4>
+            <address className="not-italic text-sm text-gray-400 space-y-2">
+              <p>
+                <span className="font-semibold text-white">Founder:</span> RAJVEER RINKU
+              </p>
+              <p>UNIT OF - NO BOX</p>
+              <p className="text-xs mt-4">
+                ALL RIGHTS RESERVED BY NO BOX © 2025
+              </p>
+            </address>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-gray-400">
+            © 2025 EPIC AI Image Generator. All rights reserved.
+          </p>
           
-          <div className="flex gap-4">
+          <nav className="flex gap-4" aria-label="Social Media Links">
             <a 
-              href="#" 
+              href="https://twitter.com" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-primary transition-colors"
-              aria-label="Twitter"
+              aria-label="Follow us on Twitter"
             >
               <Twitter size={24} />
             </a>
             <a 
-              href="#" 
+              href="https://instagram.com" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-primary transition-colors"
-              aria-label="Instagram"
+              aria-label="Follow us on Instagram"
             >
               <Instagram size={24} />
             </a>
             <a 
-              href="#" 
+              href="https://linkedin.com" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-primary transition-colors"
-              aria-label="LinkedIn"
+              aria-label="Connect with us on LinkedIn"
             >
               <Linkedin size={24} />
             </a>
             <a 
-              href="#" 
+              href="https://github.com" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-primary transition-colors"
-              aria-label="GitHub"
+              aria-label="Visit our GitHub"
             >
               <Github size={24} />
             </a>
-          </div>
+          </nav>
         </div>
       </div>
     </footer>
