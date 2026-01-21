@@ -116,14 +116,17 @@ const AnimatedTextarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 AnimatedTextarea.displayName = "AnimatedTextarea";
 
 interface AnimatedAIChatProps {
-    onGenerate?: (prompt: string) => void;
+    onGenerate?: (prompt: string, command?: string) => void;
+    isGenerating?: boolean;
+    remainingPrompts?: number | null;
+    isPremium?: boolean;
 }
 
-export function AnimatedAIChat({ onGenerate }: AnimatedAIChatProps) {
+export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating, remainingPrompts, isPremium }: AnimatedAIChatProps) {
     const [value, setValue] = useState("");
     const [attachments, setAttachments] = useState<string[]>([]);
-    const [isTyping, setIsTyping] = useState(false);
     const [isPending, startTransition] = useTransition();
+    const [activeCommand, setActiveCommand] = useState<string | null>(null);
     const [activeSuggestion, setActiveSuggestion] = useState<number>(-1);
     const [showCommandPalette, setShowCommandPalette] = useState(false);
     const [recentCommand, setRecentCommand] = useState<string | null>(null);
@@ -234,16 +237,16 @@ export function AnimatedAIChat({ onGenerate }: AnimatedAIChatProps) {
     };
 
     const handleSendMessage = () => {
-        if (value.trim()) {
-            onGenerate?.(value.trim());
-            startTransition(() => {
-                setIsTyping(true);
-                setTimeout(() => {
-                    setIsTyping(false);
-                    setValue("");
-                    adjustHeight(true);
-                }, 1000);
-            });
+        if (value.trim() && !externalIsGenerating) {
+            // Extract command if present
+            const commandMatch = value.match(/^\/(\w+)\s*/);
+            const command = commandMatch ? commandMatch[1] : undefined;
+            const cleanPrompt = command ? value.replace(/^\/\w+\s*/, '') : value;
+            
+            onGenerate?.(cleanPrompt.trim(), command);
+            setValue("");
+            adjustHeight(true);
+            setActiveCommand(null);
         }
     };
 
@@ -304,6 +307,18 @@ export function AnimatedAIChat({ onGenerate }: AnimatedAIChatProps) {
                         >
                             Describe your design idea or use a command
                         </motion.p>
+                        {remainingPrompts !== null && remainingPrompts !== undefined && (
+                            <motion.div
+                                className="flex items-center justify-center gap-2"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.4 }}
+                            >
+                                <span className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+                                    {remainingPrompts} / {isPremium ? '25' : '2'} generations left today
+                                </span>
+                            </motion.div>
+                        )}
                     </div>
 
                     <motion.div
@@ -466,16 +481,16 @@ export function AnimatedAIChat({ onGenerate }: AnimatedAIChatProps) {
                                     onClick={handleSendMessage}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    disabled={!value.trim() || isTyping}
+                                    disabled={!value.trim() || externalIsGenerating}
                                     className={cn(
                                         "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                                         "flex items-center gap-2",
-                                        value.trim()
+                                        value.trim() && !externalIsGenerating
                                             ? "bg-primary text-primary-foreground hover:bg-primary/90"
                                             : "bg-muted text-muted-foreground cursor-not-allowed"
                                     )}
                                 >
-                                    {isTyping ? (
+                                    {externalIsGenerating ? (
                                         <>
                                             <motion.div
                                                 className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
