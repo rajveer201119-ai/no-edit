@@ -15,16 +15,16 @@ const defaultOgImage = "https://storage.googleapis.com/gpt-engineer-file-uploads
 const baseUrl = "https://epic-ai-generator.lovable.app";
 
 export const SEO = ({
-  title = "EPIC - AI Image Generator | Create Stunning Art in Seconds",
-  description = "Free AI image generator with Ghibli, 3D, Realistic, Cyberpunk styles. Create professional artwork, ads, posters, and social media graphics instantly. No design skills needed.",
-  keywords = "AI image generator, free AI art, AI art generator, text to image, Ghibli style art, 3D render, realistic AI photos, cyberpunk art, AI poster maker",
+  title = "EPIC - Design Generator for Non-Designers | Create Professional Designs Instantly",
+  description = "AI-powered design generator for non-designers. Create stunning logos, social media graphics, banners, posters, and business cards instantly. No design skills needed.",
+  keywords = "AI design generator, design for non-designers, logo maker, social media graphics, banner maker, poster design, business card maker, AI graphic design",
   canonicalUrl = baseUrl,
   ogImage = defaultOgImage,
   ogType = "website",
   structuredData,
   noIndex = false,
 }: SEOProps) => {
-  const fullTitle = title.includes("EPIC") ? title : `${title} | EPIC AI`;
+  const fullTitle = title.includes("EPIC") ? title : `${title} | EPIC Design`;
 
   return (
     <Helmet>
@@ -43,7 +43,7 @@ export const SEO = ({
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImage} />
-      <meta property="og:site_name" content="EPIC AI Image Generator" />
+      <meta property="og:site_name" content="EPIC Design Generator" />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -69,23 +69,23 @@ export const homePageSchema = {
     {
       "@type": "WebApplication",
       "@id": `${baseUrl}/#webapp`,
-      "name": "EPIC AI Image Generator",
-      "applicationCategory": "MultimediaApplication",
+      "name": "EPIC Design Generator",
+      "applicationCategory": "DesignApplication",
       "operatingSystem": "Any",
       "url": baseUrl,
-      "description": "Free AI image generator with multiple artistic styles including Ghibli, 3D renders, realistic photos, and cyberpunk graphics.",
+      "description": "AI-powered design generator for non-designers. Create logos, social media graphics, banners, posters, and business cards instantly.",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
       "featureList": [
-        "Ghibli Anime Style Generation",
-        "3D Render Art Creation",
-        "Realistic AI Photos",
-        "Cyberpunk Graphics",
-        "Vintage Poster Design",
-        "Animated Character Art"
+        "Logo Design",
+        "Social Media Graphics",
+        "Banner Creation",
+        "Poster Design",
+        "Business Card Maker",
+        "Presentation Slides"
       ]
     },
     {
@@ -102,7 +102,7 @@ export const homePageSchema = {
       "@type": "WebSite",
       "@id": `${baseUrl}/#website`,
       "url": baseUrl,
-      "name": "EPIC AI Image Generator",
+      "name": "EPIC Design Generator",
       "publisher": {
         "@id": `${baseUrl}/#organization`
       }
@@ -113,11 +113,11 @@ export const homePageSchema = {
 export const pricingPageSchema = (currency: string, proPrice: number) => ({
   "@context": "https://schema.org",
   "@type": "Product",
-  "name": "EPIC AI Pro Plan",
-  "description": "Unlimited AI image generation with priority support and advanced features",
+  "name": "EPIC Design Pro Plan",
+  "description": "Unlimited AI design generation with priority support and advanced features",
   "brand": {
     "@type": "Brand",
-    "name": "EPIC AI"
+    "name": "EPIC Design"
   },
   "offers": [
     {
@@ -126,7 +126,7 @@ export const pricingPageSchema = (currency: string, proPrice: number) => ({
       "price": "0",
       "priceCurrency": currency,
       "availability": "https://schema.org/InStock",
-      "description": "5 free image generations per day"
+      "description": "5 free design generations per day"
     },
     {
       "@type": "Offer",
@@ -135,7 +135,7 @@ export const pricingPageSchema = (currency: string, proPrice: number) => ({
       "priceCurrency": currency,
       "availability": "https://schema.org/InStock",
       "priceValidUntil": "2025-12-31",
-      "description": "Unlimited AI image generation with priority support"
+      "description": "Unlimited AI design generation with priority support"
     }
   ]
 });

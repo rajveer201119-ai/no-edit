@@ -14,7 +14,7 @@ export const Hero = () => {
         <div className="animate-float">
           <img 
             src={epicLogo} 
-            alt="EPIC AI Image Generator - Transform text into stunning artwork with artificial intelligence" 
+            alt="EPIC Design Generator - Create professional designs without design skills" 
             className="w-48 md:w-72 mx-auto drop-shadow-2xl relative z-20 brightness-110"
             style={{ filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.5))' }}
             width={288}
@@ -25,21 +25,21 @@ export const Hero = () => {
         
         <div className="space-y-4 max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight drop-shadow-lg">
-            Free AI Image Generator - Create Stunning Art Instantly
+            Design Generator for Non-Designers
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto font-normal drop-shadow-md">
-            Transform text into stunning images with AI. Generate Ghibli-style art, 3D renders, realistic photos, cyberpunk graphics, vintage posters, and animated artwork. Perfect for social media, ads, and creative projects.
+            Create stunning logos, social media graphics, banners, posters, and more with AI. No design skills needed — just describe what you want and watch the magic happen.
           </p>
         </div>
 
-        <nav className="flex flex-wrap justify-center gap-4 text-sm md:text-base" role="navigation" aria-label="AI Art Styles">
+        <nav className="flex flex-wrap justify-center gap-4 text-sm md:text-base" role="navigation" aria-label="Design Types">
           {[
-            { name: "Ghibli Anime Style", desc: "Create Studio Ghibli inspired anime artwork" },
-            { name: "3D Render Art", desc: "Generate professional 3D rendered graphics" },
-            { name: "Realistic AI Photos", desc: "Create photorealistic AI images" },
-            { name: "Cyberpunk Graphics", desc: "Design futuristic cyberpunk art" },
-            { name: "Vintage Posters", desc: "Generate retro and vintage style posters" },
-            { name: "Animated Characters", desc: "Create animated character designs" }
+            { name: "Logo Design", desc: "Create professional logos for your brand" },
+            { name: "Social Media", desc: "Design eye-catching social media posts" },
+            { name: "Banners", desc: "Generate web and marketing banners" },
+            { name: "Posters", desc: "Design stunning posters and flyers" },
+            { name: "Business Cards", desc: "Create professional business cards" },
+            { name: "Presentations", desc: "Design beautiful presentation slides" }
           ].map((feature, i) => (
             <div 
               key={feature.name}
