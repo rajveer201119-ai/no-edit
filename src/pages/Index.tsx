@@ -61,9 +61,9 @@ const Index = () => {
   return (
     <>
       <SEO 
-        title="EPIC - Free AI Image Generator | Create Stunning Art in Seconds"
-        description="Free AI image generator with Ghibli, 3D, Realistic, Cyberpunk styles. Create professional artwork, ads, posters, and social media graphics instantly. No design skills needed."
-        keywords="AI image generator, free AI art, AI art generator, text to image, Ghibli style art, 3D render, realistic AI photos, cyberpunk art, AI poster maker"
+        title="EPIC - Design Generator for Non-Designers | Create Professional Designs Instantly"
+        description="AI-powered design generator for non-designers. Create stunning logos, social media graphics, banners, posters, and business cards instantly. No design skills needed."
+        keywords="AI design generator, design for non-designers, logo maker, social media graphics, banner maker, poster design, business card maker, AI graphic design"
         canonicalUrl="https://epic-ai-generator.lovable.app/"
         structuredData={homePageSchema}
       />

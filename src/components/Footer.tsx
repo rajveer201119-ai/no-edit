@@ -8,9 +8,9 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
           <div className="md:col-span-1">
-            <h3 className="text-xl font-bold mb-4">EPIC AI</h3>
+            <h3 className="text-xl font-bold mb-4">EPIC Design</h3>
             <p className="text-sm text-gray-400 mb-4">
-              Transform your ideas into stunning AI-generated artwork. Create professional images in seconds with our advanced AI technology.
+              Design generator for non-designers. Create professional logos, social media graphics, banners, and more with AI. No design skills needed.
             </p>
           </div>
 
@@ -23,7 +23,7 @@ export const Footer = () => {
                   to="/" 
                   className="text-sm text-gray-400 hover:text-primary transition-colors"
                 >
-                  AI Image Generator
+                  Design Generator
                 </Link>
               </li>
               <li>
@@ -53,16 +53,16 @@ export const Footer = () => {
             </ul>
           </nav>
 
-          {/* AI Art Styles */}
+          {/* Design Types */}
           <div className="md:col-span-1">
-            <h4 className="text-lg font-semibold mb-4">AI Art Styles</h4>
+            <h4 className="text-lg font-semibold mb-4">Design Types</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>Ghibli Anime Style</li>
-              <li>3D Render Art</li>
-              <li>Realistic AI Photos</li>
-              <li>Cyberpunk Graphics</li>
-              <li>Vintage Posters</li>
-              <li>Animated Characters</li>
+              <li>Logo Design</li>
+              <li>Social Media Graphics</li>
+              <li>Banners & Headers</li>
+              <li>Posters & Flyers</li>
+              <li>Business Cards</li>
+              <li>Presentation Slides</li>
             </ul>
           </div>
 
@@ -84,7 +84,7 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-400">
-            © 2025 EPIC AI Image Generator. All rights reserved.
+            © 2025 EPIC Design Generator. All rights reserved.
           </p>
           
           <nav className="flex gap-4" aria-label="Social Media Links">
