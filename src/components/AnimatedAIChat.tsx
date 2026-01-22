@@ -9,6 +9,7 @@ import {
     Paperclip,
     XIcon,
     Sparkles,
+    Command,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import * as React from "react";
@@ -85,10 +86,11 @@ const AnimatedTextarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             <div className={cn("relative", containerClassName)}>
                 <textarea
                     className={cn(
-                        "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm",
+                        "flex min-h-[80px] w-full rounded-md border-none bg-transparent px-3 py-2 text-sm",
                         "transition-all duration-200 ease-in-out",
-                        "placeholder:text-muted-foreground",
+                        "placeholder:text-white/30",
                         "disabled:cursor-not-allowed disabled:opacity-50",
+                        "text-white",
                         showRing
                             ? "focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                             : "",
@@ -102,7 +104,7 @@ const AnimatedTextarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 
                 {showRing && isFocused && (
                     <motion.span
-                        className="absolute inset-0 rounded-md pointer-events-none ring-2 ring-offset-0 ring-violet-500/30"
+                        className="absolute inset-0 rounded-md pointer-events-none ring-1 ring-white/20"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -238,7 +240,6 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
 
     const handleSendMessage = () => {
         if (value.trim() && !externalIsGenerating) {
-            // Extract command if present
             const commandMatch = value.match(/^\/(\w+)\s*/);
             const command = commandMatch ? commandMatch[1] : undefined;
             const cleanPrompt = command ? value.replace(/^\/\w+\s*/, '') : value;
@@ -269,19 +270,15 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
     };
 
     return (
-        <div className="w-full flex flex-col items-center justify-center p-6 relative overflow-hidden">
-            <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
-                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
-                <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-fuchsia-500/10 rounded-full mix-blend-normal filter blur-[96px] animate-pulse delay-1000" />
-            </div>
+        <div className="w-full flex flex-col items-center justify-center p-4 md:p-6 relative overflow-hidden">
             <div className="w-full max-w-2xl mx-auto relative">
                 <motion.div
-                    className="relative z-10 space-y-8"
+                    className="relative z-10 space-y-6"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
                 >
+                    {/* Header Section */}
                     <div className="text-center space-y-3">
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
@@ -289,18 +286,18 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                             transition={{ delay: 0.2, duration: 0.5 }}
                             className="inline-block"
                         >
-                            <h2 className="text-2xl md:text-3xl font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/60 pb-1">
+                            <h2 className="text-xl md:text-2xl font-medium tracking-tight text-white pb-1">
                                 What would you like to design?
                             </h2>
                             <motion.div
-                                className="h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"
+                                className="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
                                 initial={{ width: 0, opacity: 0 }}
                                 animate={{ width: "100%", opacity: 1 }}
                                 transition={{ delay: 0.5, duration: 0.8 }}
                             />
                         </motion.div>
                         <motion.p
-                            className="text-sm text-muted-foreground"
+                            className="text-xs md:text-sm text-white/50"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.3 }}
@@ -314,61 +311,85 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.4 }}
                             >
-                                <span className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-                                    {remainingPrompts} / {isPremium ? '25' : '2'} generations left today
+                                <span className="text-xs px-3 py-1.5 rounded-full bg-white/5 text-white/70 border border-white/10 backdrop-blur-sm">
+                                    <span className="text-green-400">{remainingPrompts}</span> / {isPremium ? '25' : '2'} generations left today
                                 </span>
                             </motion.div>
                         )}
                     </div>
 
+                    {/* Glass Card Input Container */}
                     <motion.div
-                        className="relative backdrop-blur-2xl bg-card/50 rounded-2xl border border-border shadow-2xl"
+                        className="relative overflow-hidden rounded-2xl"
                         initial={{ scale: 0.98 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.1 }}
                     >
+                        {/* Glass background layers */}
+                        <div className="absolute inset-0 bg-black/40 backdrop-blur-xl" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.08] to-transparent" />
+                        <div className="absolute inset-0 rounded-2xl border border-white/10" />
+                        
+                        {/* Animated glow effect */}
+                        <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
+
+                        {/* Command Palette */}
                         <AnimatePresence>
                             {showCommandPalette && (
                                 <motion.div
                                     ref={commandPaletteRef}
-                                    className="absolute left-4 right-4 bottom-full mb-2 backdrop-blur-xl bg-popover rounded-lg z-50 shadow-lg border border-border overflow-hidden"
+                                    className="absolute left-4 right-4 bottom-full mb-2 z-50 overflow-hidden rounded-xl"
                                     initial={{ opacity: 0, y: 5 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 5 }}
                                     transition={{ duration: 0.15 }}
                                 >
-                                    <div className="py-1">
-                                        {commandSuggestions.map((suggestion, index) => (
-                                            <motion.div
-                                                key={suggestion.prefix}
-                                                className={cn(
-                                                    "flex items-center gap-2 px-3 py-2 text-xs transition-colors cursor-pointer",
-                                                    activeSuggestion === index
-                                                        ? "bg-accent text-accent-foreground"
-                                                        : "text-muted-foreground hover:bg-accent/50"
-                                                )}
-                                                onClick={() => selectCommandSuggestion(index)}
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                transition={{ delay: index * 0.03 }}
-                                            >
-                                                <div className="w-5 h-5 flex items-center justify-center text-muted-foreground">
-                                                    {suggestion.icon}
-                                                </div>
-                                                <div className="font-medium text-foreground">
-                                                    {suggestion.label}
-                                                </div>
-                                                <div className="text-muted-foreground text-xs ml-1">
-                                                    {suggestion.prefix}
-                                                </div>
-                                            </motion.div>
-                                        ))}
+                                    <div className="relative bg-black/60 backdrop-blur-2xl border border-white/10 rounded-xl overflow-hidden">
+                                        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent" />
+                                        <div className="relative py-1">
+                                            {commandSuggestions.map((suggestion, index) => (
+                                                <motion.div
+                                                    key={suggestion.prefix}
+                                                    className={cn(
+                                                        "flex items-center gap-3 px-4 py-3 text-sm transition-all cursor-pointer relative",
+                                                        activeSuggestion === index
+                                                            ? "bg-white/10"
+                                                            : "hover:bg-white/5"
+                                                    )}
+                                                    onClick={() => selectCommandSuggestion(index)}
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    transition={{ delay: index * 0.03 }}
+                                                >
+                                                    <div className={cn(
+                                                        "w-8 h-8 flex items-center justify-center rounded-lg transition-colors",
+                                                        activeSuggestion === index
+                                                            ? "bg-white/10 text-white"
+                                                            : "bg-white/5 text-white/60"
+                                                    )}>
+                                                        {suggestion.icon}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="font-medium text-white">
+                                                            {suggestion.label}
+                                                        </div>
+                                                        <div className="text-white/40 text-xs">
+                                                            {suggestion.description}
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-white/30 text-xs font-mono">
+                                                        {suggestion.prefix}
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
-                        <div className="p-4">
+                        {/* Textarea Section */}
+                        <div className="relative p-4">
                             <AnimatedTextarea
                                 ref={textareaRef}
                                 value={value}
@@ -382,13 +403,13 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                                 placeholder="Describe your design... e.g., 'A minimalist logo for a coffee shop'"
                                 containerClassName="w-full"
                                 className={cn(
-                                    "w-full px-4 py-3",
+                                    "w-full px-2 py-2",
                                     "resize-none",
                                     "bg-transparent",
                                     "border-none",
-                                    "text-foreground text-sm",
+                                    "text-white text-sm",
                                     "focus:outline-none",
-                                    "placeholder:text-muted-foreground/50",
+                                    "placeholder:text-white/30",
                                     "min-h-[60px]"
                                 )}
                                 style={{
@@ -398,10 +419,11 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                             />
                         </div>
 
+                        {/* Attachments */}
                         <AnimatePresence>
                             {attachments.length > 0 && (
                                 <motion.div
-                                    className="px-4 pb-3 flex gap-2 flex-wrap"
+                                    className="relative px-4 pb-3 flex gap-2 flex-wrap"
                                     initial={{ opacity: 0, height: 0 }}
                                     animate={{ opacity: 1, height: "auto" }}
                                     exit={{ opacity: 0, height: 0 }}
@@ -409,7 +431,7 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                                     {attachments.map((file, index) => (
                                         <motion.div
                                             key={index}
-                                            className="flex items-center gap-2 text-xs bg-muted py-1.5 px-3 rounded-lg text-muted-foreground"
+                                            className="flex items-center gap-2 text-xs bg-white/5 border border-white/10 py-1.5 px-3 rounded-lg text-white/70"
                                             initial={{ opacity: 0, scale: 0.9 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             exit={{ opacity: 0, scale: 0.9 }}
@@ -417,7 +439,7 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                                             <span>{file}</span>
                                             <button
                                                 onClick={() => removeAttachment(index)}
-                                                className="text-muted-foreground hover:text-foreground transition-colors"
+                                                className="text-white/40 hover:text-white transition-colors"
                                             >
                                                 <XIcon className="w-3 h-3" />
                                             </button>
@@ -427,19 +449,16 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                             )}
                         </AnimatePresence>
 
-                        <div className="p-4 border-t border-border flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
+                        {/* Footer Actions */}
+                        <div className="relative p-4 border-t border-white/10 flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-2">
                                 <motion.button
                                     type="button"
                                     onClick={handleAttachFile}
                                     whileTap={{ scale: 0.94 }}
-                                    className="p-2 text-muted-foreground hover:text-foreground rounded-lg transition-colors relative group"
+                                    className="p-2.5 text-white/50 hover:text-white hover:bg-white/10 rounded-xl transition-all relative group"
                                 >
                                     <Paperclip className="w-4 h-4" />
-                                    <motion.span
-                                        className="absolute inset-0 bg-accent/50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                                        layoutId="button-highlight"
-                                    />
                                 </motion.button>
                                 <motion.button
                                     type="button"
@@ -450,22 +469,22 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                                     }}
                                     whileTap={{ scale: 0.94 }}
                                     className={cn(
-                                        "flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs transition-colors",
+                                        "flex items-center gap-2 px-3 py-2 rounded-xl text-xs transition-all",
                                         showCommandPalette
-                                            ? "bg-accent text-accent-foreground"
-                                            : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                                            ? "bg-white/10 text-white"
+                                            : "text-white/50 hover:text-white hover:bg-white/5"
                                     )}
                                 >
-                                    <span>/</span>
-                                    <span className="text-muted-foreground">Commands</span>
+                                    <Command className="w-3.5 h-3.5" />
+                                    <span>Commands</span>
                                 </motion.button>
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
                                 <AnimatePresence>
                                     {recentCommand && (
                                         <motion.div
-                                            className="text-xs text-primary flex items-center gap-1"
+                                            className="text-xs text-green-400/80 flex items-center gap-1.5"
                                             initial={{ opacity: 0, x: 10 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             exit={{ opacity: 0, x: -10 }}
@@ -476,6 +495,7 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                                     )}
                                 </AnimatePresence>
 
+                                {/* Generate Button with Glass Effect */}
                                 <motion.button
                                     type="button"
                                     onClick={handleSendMessage}
@@ -483,37 +503,60 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                                     whileTap={{ scale: 0.98 }}
                                     disabled={!value.trim() || externalIsGenerating}
                                     className={cn(
-                                        "px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                                        "relative px-5 py-2.5 rounded-xl text-sm font-medium transition-all overflow-hidden",
                                         "flex items-center gap-2",
                                         value.trim() && !externalIsGenerating
-                                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                                            : "bg-muted text-muted-foreground cursor-not-allowed"
+                                            ? "text-white"
+                                            : "text-white/30 cursor-not-allowed"
                                     )}
                                 >
-                                    {externalIsGenerating ? (
-                                        <>
-                                            <motion.div
-                                                className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
-                                                animate={{ rotate: 360 }}
-                                                transition={{
-                                                    duration: 1,
-                                                    repeat: Infinity,
-                                                    ease: "linear",
-                                                }}
-                                            />
-                                            Generating...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Sparkles className="w-4 h-4" />
-                                            Generate
-                                        </>
-                                    )}
+                                    {/* Button background */}
+                                    <div className={cn(
+                                        "absolute inset-0 transition-all",
+                                        value.trim() && !externalIsGenerating
+                                            ? "bg-gradient-to-r from-rose-500/80 via-orange-500/80 to-amber-500/80"
+                                            : "bg-white/5"
+                                    )} />
+                                    
+                                    {/* Glass overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10" />
+                                    
+                                    {/* Border */}
+                                    <div className={cn(
+                                        "absolute inset-0 rounded-xl border transition-all",
+                                        value.trim() && !externalIsGenerating
+                                            ? "border-white/20"
+                                            : "border-white/5"
+                                    )} />
+
+                                    {/* Content */}
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        {externalIsGenerating ? (
+                                            <>
+                                                <motion.div
+                                                    className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                                                    animate={{ rotate: 360 }}
+                                                    transition={{
+                                                        duration: 1,
+                                                        repeat: Infinity,
+                                                        ease: "linear",
+                                                    }}
+                                                />
+                                                Generating...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Sparkles className="w-4 h-4" />
+                                                Generate
+                                            </>
+                                        )}
+                                    </span>
                                 </motion.button>
                             </div>
                         </div>
                     </motion.div>
 
+                    {/* Quick Suggestion Pills */}
                     <motion.div
                         className="flex flex-wrap justify-center gap-2"
                         initial={{ opacity: 0 }}
@@ -525,9 +568,9 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                                 <motion.button
                                     key={suggestion}
                                     onClick={() => setValue(`Create a ${suggestion.toLowerCase()} for `)}
-                                    whileHover={{ scale: 1.05 }}
+                                    whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.1)" }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="px-3 py-1.5 text-xs rounded-full bg-muted/50 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors border border-border/50"
+                                    className="px-4 py-2 text-xs rounded-full bg-white/5 text-white/60 hover:text-white transition-all border border-white/10 backdrop-blur-sm"
                                 >
                                     {suggestion}
                                 </motion.button>
