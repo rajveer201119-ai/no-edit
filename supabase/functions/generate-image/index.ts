@@ -5,35 +5,51 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Design-specific prompt templates for different design types
+const designTemplates: Record<string, string> = {
+  logo: "Professional logo design, clean vector style, minimal and modern, scalable icon, brand identity, white or transparent background, centered composition",
+  social: "Social media graphic, eye-catching design, vibrant colors, modern layout, Instagram/Facebook ready, 1:1 aspect ratio, engaging visual",
+  banner: "Web banner design, wide format, professional marketing material, clean typography space, call-to-action ready, hero image style",
+  poster: "Poster design, high impact visual, print-ready quality, bold typography space, event promotional style, professional layout",
+  default: "Professional graphic design, clean and modern, high quality, visually appealing",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { prompt, style, size } = await req.json();
+    const { prompt, style, size, designType } = await req.json();
 
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
       return new Response(
-        JSON.stringify({ error: "Please enter a description for your image." }),
+        JSON.stringify({ error: "Please enter a description for your design." }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Build a concise, high-quality prompt with style + size hints
+    // Get the design template based on type
+    const template = designTemplates[designType] || designTemplates.default;
+    
+    // Build size hint
     const sizeHint =
       size === "portrait" ? "portrait orientation, 4:5 aspect ratio" :
       size === "landscape" ? "landscape orientation, 16:9 aspect ratio" :
       "square orientation, 1:1 aspect ratio";
 
+    // Build optimized design prompt
     const styledPrompt = [
       prompt,
-      style ? `${style} style` : null,
-      "high quality, professional, detailed",
+      template,
+      style ? `${style} style aesthetic` : null,
+      "ultra high quality, professional, detailed, 8K resolution",
       sizeHint,
     ].filter(Boolean).join(", ");
 
-    // Map sizes to smaller, faster dimensions (multiples of 64)
+    console.log("Design generation request:", { designType, style, size, prompt: styledPrompt.slice(0, 200) });
+
+    // Map sizes to dimensions (multiples of 64)
     const dims = size === "portrait"
       ? { width: 512, height: 768 }
       : size === "landscape"
@@ -42,78 +58,12 @@ serve(async (req) => {
 
     const sizeStr = `${dims.width}x${dims.height}`;
 
-    // PRIMARY: Pollinations.ai (fast)
-    try {
-      const primaryUrl = new URL(`https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}`);
-      primaryUrl.searchParams.set("size", sizeStr);
-      primaryUrl.searchParams.set("model", "flux");
-      primaryUrl.searchParams.set("enhance", "true");
-      primaryUrl.searchParams.set("nologo", "true");
-
-      const primaryController = new AbortController();
-      const primaryTimeout = setTimeout(() => primaryController.abort(), 25000);
-      let primaryResp = await fetch(primaryUrl.toString(), { 
-        method: "GET", 
-        headers: { Accept: "image/*" },
-        signal: primaryController.signal
-      });
-      clearTimeout(primaryTimeout);
-
-      if (!primaryResp.ok) {
-        const text = await primaryResp.text().catch(() => "");
-        const mentionsDiv = /divisible/i.test(text);
-        if (primaryResp.status !== 200 || mentionsDiv) {
-          const fbUrl = new URL(primaryUrl.toString());
-          fbUrl.searchParams.set("size", "640x640");
-          fbUrl.searchParams.set("enhance", "false");
-
-          const fbController = new AbortController();
-          const fbTimeout = setTimeout(() => fbController.abort(), 20000);
-          try {
-            primaryResp = await fetch(fbUrl.toString(), { 
-              method: "GET", 
-              headers: { Accept: "image/*" },
-              signal: fbController.signal
-            });
-          } finally {
-            clearTimeout(fbTimeout);
-          }
-        }
-      }
-
-      if (primaryResp.ok) {
-        const arrayBuffer = await primaryResp.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-        
-        // Convert to base64 safely in chunks
-        let binary = '';
-        const chunkSize = 8192;
-        for (let i = 0; i < uint8Array.length; i += chunkSize) {
-          const chunk = uint8Array.subarray(i, Math.min(i + chunkSize, uint8Array.length));
-          binary += String.fromCharCode.apply(null, Array.from(chunk));
-        }
-        const base64 = btoa(binary);
-        const contentType = primaryResp.headers.get("content-type") ?? "image/png";
-        const imageUrl = `data:${contentType};base64,${base64}`;
-
-        return new Response(JSON.stringify({ imageUrl, prompt: styledPrompt }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-    } catch (e: any) {
-      if (e?.name === "AbortError") {
-        // Timed out; fall through to fallback
-      } else {
-        console.error("Pollinations primary failed:", e);
-      }
-    }
-
-    // Try Lovable AI first (Gemini image model) for faster, reliable generation
+    // Try Lovable AI first (Gemini image model) - best quality for designs
     try {
       const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
       if (LOVABLE_API_KEY) {
         const aiController = new AbortController();
-        const aiTimeout = setTimeout(() => aiController.abort(), 35000);
+        const aiTimeout = setTimeout(() => aiController.abort(), 45000);
 
         const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -126,7 +76,7 @@ serve(async (req) => {
             messages: [
               {
                 role: "user",
-                content: `Create an image: ${styledPrompt}`,
+                content: `Generate a professional design image: ${styledPrompt}`,
               },
             ],
             modalities: ["image", "text"],
@@ -139,6 +89,7 @@ serve(async (req) => {
           const data = await aiResp.json();
           const imageUrl = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url as string | undefined;
           if (imageUrl) {
+            console.log("Design generated successfully via Lovable AI");
             return new Response(JSON.stringify({ imageUrl, prompt: styledPrompt }), {
               headers: { ...corsHeaders, "Content-Type": "application/json" },
             });
@@ -156,20 +107,17 @@ serve(async (req) => {
           }
           const txt = await aiResp.text().catch(() => "");
           console.error("Lovable AI error:", aiResp.status, txt.slice(0, 300));
-          // fall through to Pollinations fallback
         }
       }
     } catch (e: any) {
       if (e?.name === "AbortError") {
-        return new Response(JSON.stringify({ error: "Request timed out. Please try again in a moment." }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        console.log("Lovable AI timed out, falling back to Pollinations");
+      } else {
+        console.error("Lovable AI exception:", e);
       }
-      console.error("Lovable AI exception:", e);
-      // fall through to Pollinations fallback
     }
 
-    // Helper to build Pollinations URL with options
+    // Fallback to Pollinations.ai
     const buildUrl = (opts: { size: string; model?: string; enhance?: boolean }) => {
       const u = new URL(`https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}`);
       u.searchParams.set("size", opts.size);
@@ -179,12 +127,11 @@ serve(async (req) => {
       return u;
     };
 
-    // Try primary request (FLUX, requested size) with 25 second timeout
     let url = buildUrl({ size: sizeStr, model: "flux", enhance: true });
-    console.log("Generating image via Pollinations:", { style, size, dims, prompt: styledPrompt, url: url.toString() });
+    console.log("Generating design via Pollinations:", url.toString().slice(0, 200));
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000);
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
     
     let imageResp: Response;
     try {
@@ -198,52 +145,49 @@ serve(async (req) => {
       clearTimeout(timeoutId);
       if (error.name === 'AbortError') {
         return new Response(
-          JSON.stringify({ error: "Request timed out. Please try again with a simpler prompt." }),
+          JSON.stringify({ error: "Request timed out. Please try again with a simpler description." }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       throw error;
     }
 
-    // Fallback 1: If not OK or divisible error, try square 1024 with FLUX
+    // Fallback if primary fails
     if (!imageResp.ok) {
       const text = await imageResp.text().catch(() => "");
       console.error("Pollinations error (primary):", imageResp.status, text.slice(0, 300));
-      const mentionsDiv = /divisible/i.test(text);
-      if (imageResp.status !== 200 || mentionsDiv) {
-        url = buildUrl({ size: "640x640", model: "flux", enhance: false });
-        console.log("Retrying Pollinations (fallback 1):", url.toString());
-        
-        const fallbackController = new AbortController();
-        const fallbackTimeout = setTimeout(() => fallbackController.abort(), 20000);
-        try {
-          imageResp = await fetch(url.toString(), { 
-            method: "GET", 
-            headers: { Accept: "image/*" },
-            signal: fallbackController.signal
-          });
-          clearTimeout(fallbackTimeout);
-        } catch (error: any) {
-          clearTimeout(fallbackTimeout);
-          if (error.name === 'AbortError') {
-            return new Response(
-              JSON.stringify({ error: "Request timed out. Please try a different prompt." }),
-              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-          }
-          throw error;
+      
+      url = buildUrl({ size: "640x640", model: "flux", enhance: false });
+      console.log("Retrying Pollinations (fallback):", url.toString().slice(0, 200));
+      
+      const fallbackController = new AbortController();
+      const fallbackTimeout = setTimeout(() => fallbackController.abort(), 25000);
+      try {
+        imageResp = await fetch(url.toString(), { 
+          method: "GET", 
+          headers: { Accept: "image/*" },
+          signal: fallbackController.signal
+        });
+        clearTimeout(fallbackTimeout);
+      } catch (error: any) {
+        clearTimeout(fallbackTimeout);
+        if (error.name === 'AbortError') {
+          return new Response(
+            JSON.stringify({ error: "Request timed out. Please try a simpler prompt." }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
         }
+        throw error;
       }
     }
 
-    // If still not OK, return friendly error but keep 200 so client can show message
     if (!imageResp.ok) {
       const text = await imageResp.text().catch(() => "");
       const status = imageResp.status;
       console.error("Pollinations error (final):", status, text.slice(0, 300));
       const humanMsg = status === 429
         ? "Rate limit exceeded. Please wait a minute and try again."
-        : "Image provider is busy. Please try again in a moment.";
+        : "Design service is busy. Please try again in a moment.";
       return new Response(
         JSON.stringify({ error: humanMsg }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -253,7 +197,7 @@ serve(async (req) => {
     const arrayBuffer = await imageResp.arrayBuffer();
     const uint8Array = new Uint8Array(arrayBuffer);
     
-    // Convert to base64 safely (chunk by chunk to avoid call stack overflow)
+    // Convert to base64 safely in chunks
     let binary = '';
     const chunkSize = 8192;
     for (let i = 0; i < uint8Array.length; i += chunkSize) {
@@ -265,13 +209,12 @@ serve(async (req) => {
     const contentType = imageResp.headers.get("content-type") ?? "image/png";
     const imageUrl = `data:${contentType};base64,${base64}`;
 
+    console.log("Design generated successfully via Pollinations");
     return new Response(JSON.stringify({ imageUrl, prompt: styledPrompt }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
     console.error("Error in generate-image function:", error);
-
-    // Always return 200 with an error message so client can show a toast
     const msg = error instanceof Error ? error.message : String(error ?? "Unknown error");
     return new Response(
       JSON.stringify({ error: msg || "Unexpected error. Please try again." }),

@@ -116,6 +116,17 @@ const Index = () => {
       return;
     }
 
+    // Check credits BEFORE generating
+    if (remainingPrompts !== null && remainingPrompts <= 0) {
+      toast.error(
+        isPremium 
+          ? "You've used all 25 daily credits. Come back tomorrow!" 
+          : "You've used your 2 free daily credits. Upgrade to Pro for 25 credits/day!",
+        { duration: 5000 }
+      );
+      return;
+    }
+
     setIsGenerating(true);
     setGeneratedImage(null);
     setLastPrompt(prompt);
@@ -123,24 +134,17 @@ const Index = () => {
 
     try {
       const style = getStyleFromCommand(command);
+      const designType = command || 'default';
       
-      // Add design-specific context to the prompt
-      let enhancedPrompt = prompt;
-      if (command === 'logo') {
-        enhancedPrompt = `Professional logo design: ${prompt}. Clean, modern, scalable vector style.`;
-      } else if (command === 'social') {
-        enhancedPrompt = `Social media graphic: ${prompt}. Eye-catching, vibrant, perfect for Instagram/Facebook.`;
-      } else if (command === 'banner') {
-        enhancedPrompt = `Web banner design: ${prompt}. Wide format, professional marketing banner.`;
-      } else if (command === 'poster') {
-        enhancedPrompt = `Poster design: ${prompt}. High impact, print-ready poster design.`;
-      }
+      // Determine size based on design type
+      const size = command === 'banner' ? 'landscape' : command === 'poster' ? 'portrait' : 'square';
 
       const { data, error } = await supabase.functions.invoke("generate-image", {
         body: {
-          prompt: enhancedPrompt,
+          prompt,
           style,
-          size: command === 'banner' ? 'landscape' : command === 'poster' ? 'portrait' : 'square',
+          size,
+          designType,
         },
       });
 
@@ -151,13 +155,14 @@ const Index = () => {
       const imageUrl = data.imageUrl as string | undefined;
       if (!imageUrl) throw new Error("Design generation failed");
 
+      // Increment usage AFTER successful generation
+      await supabase.rpc('increment_prompt_usage', { user_id_param: currentUserId });
+
       setGeneratedImage(imageUrl);
       toast.success("Design created successfully!");
 
-      // Refresh daily limit after successful generation
-      if (currentUserId) {
-        await fetchDailyLimit(currentUserId);
-      }
+      // Refresh daily limit to update UI
+      await fetchDailyLimit(currentUserId);
     } catch (error: any) {
       console.error("Generation error:", error);
       toast.error(
@@ -168,7 +173,7 @@ const Index = () => {
       toast.dismiss("generating");
       setIsGenerating(false);
     }
-  }, [currentUserId, navigate]);
+  }, [currentUserId, navigate, remainingPrompts, isPremium]);
 
   const getImageBlob = async (imageUrl: string): Promise<Blob> => {
     const resp = await fetch(imageUrl);
