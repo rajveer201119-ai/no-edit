@@ -1,19 +1,46 @@
-import { useState } from "react";
-import { MessageSquare, Image, Download, Menu, X, Sparkles, Shield, LogOut, LogIn } from "lucide-react";
+import { useState, useEffect } from "react";
+import { 
+  MessageSquare, 
+  Image, 
+  Download, 
+  Menu, 
+  X, 
+  Sparkles, 
+  Shield, 
+  LogOut, 
+  LogIn,
+  FolderOpen,
+  Plus,
+  Trash2
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
+import { supabase } from "@/integrations/supabase/client";
+
+export interface Project {
+  id: string;
+  name: string;
+  prompt: string;
+  image_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type TabType = "chat" | "feed" | { type: "project"; project: Project };
 
 interface GlassSidebarProps {
-  activeTab: "chat" | "feed";
-  onTabChange: (tab: "chat" | "feed") => void;
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
   isAuthed: boolean;
   isAdmin: boolean;
+  currentUserId: string | null;
   onSignOut: () => void;
   onSignIn: () => void;
   onViewPlans: () => void;
   onAdminClick: () => void;
+  projects: Project[];
+  onProjectsChange: () => void;
 }
 
 export const GlassSidebar = ({
@@ -21,10 +48,13 @@ export const GlassSidebar = ({
   onTabChange,
   isAuthed,
   isAdmin,
+  currentUserId,
   onSignOut,
   onSignIn,
   onViewPlans,
   onAdminClick,
+  projects,
+  onProjectsChange,
 }: GlassSidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { isInstallable, promptInstall } = useInstallPrompt();
@@ -33,6 +63,36 @@ export const GlassSidebar = ({
     { id: "chat" as const, label: "AI Chat", icon: MessageSquare },
     { id: "feed" as const, label: "AI Gallery", icon: Image },
   ];
+
+  const isTabActive = (tabId: "chat" | "feed") => {
+    if (typeof activeTab === "string") {
+      return activeTab === tabId;
+    }
+    return false;
+  };
+
+  const isProjectActive = (projectId: string) => {
+    if (typeof activeTab === "object" && activeTab.type === "project") {
+      return activeTab.project.id === projectId;
+    }
+    return false;
+  };
+
+  const handleDeleteProject = async (projectId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    const { error } = await supabase
+      .from("projects")
+      .delete()
+      .eq("id", projectId);
+    
+    if (!error) {
+      onProjectsChange();
+      if (isProjectActive(projectId)) {
+        onTabChange("chat");
+      }
+    }
+  };
 
   return (
     <>
@@ -70,7 +130,7 @@ export const GlassSidebar = ({
         {/* Glass effect overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-black/10 pointer-events-none" />
         
-        <div className="relative h-full flex flex-col p-4">
+        <div className="relative h-full flex flex-col p-4 overflow-hidden">
           {/* Logo Section */}
           <div className="flex items-center justify-center py-6 mb-4">
             <div className="relative">
@@ -83,10 +143,10 @@ export const GlassSidebar = ({
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-2">
+          <nav className="space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id;
+              const isActive = isTabActive(item.id);
               
               return (
                 <button
@@ -105,7 +165,6 @@ export const GlassSidebar = ({
                     ]
                   )}
                 >
-                  {/* Active indicator glow */}
                   {isActive && (
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full shadow-[0_0_10px_rgba(139,92,246,0.8)]" />
                   )}
@@ -126,8 +185,65 @@ export const GlassSidebar = ({
             })}
           </nav>
 
+          {/* Projects Section */}
+          {isAuthed && projects.length > 0 && (
+            <div className="mt-4 flex-1 overflow-hidden flex flex-col">
+              <div className="flex items-center gap-2 px-2 py-2 text-xs text-muted-foreground uppercase tracking-wider">
+                <FolderOpen className="h-3 w-3" />
+                <span className="md:hidden lg:inline">Projects</span>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto space-y-1 scrollbar-thin scrollbar-thumb-white/10">
+                {projects.map((project) => {
+                  const isActive = isProjectActive(project.id);
+                  
+                  return (
+                    <button
+                      key={project.id}
+                      onClick={() => {
+                        onTabChange({ type: "project", project });
+                        setIsOpen(false);
+                      }}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200",
+                        "hover:bg-white/10 group relative text-left",
+                        isActive && [
+                          "bg-primary/20 border border-primary/30"
+                        ]
+                      )}
+                    >
+                      {project.image_url ? (
+                        <img 
+                          src={project.image_url} 
+                          alt="" 
+                          className="w-8 h-8 rounded object-cover shrink-0"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded bg-muted/50 shrink-0" />
+                      )}
+                      
+                      <span className={cn(
+                        "text-sm truncate flex-1 md:hidden lg:inline",
+                        isActive ? "text-foreground" : "text-muted-foreground"
+                      )}>
+                        {project.name}
+                      </span>
+                      
+                      <button
+                        onClick={(e) => handleDeleteProject(project.id, e)}
+                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-destructive/20 rounded transition-opacity md:hidden lg:flex"
+                      >
+                        <Trash2 className="h-3 w-3 text-destructive" />
+                      </button>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Bottom Actions */}
-          <div className="space-y-2 pt-4 border-t border-white/10">
+          <div className="space-y-2 pt-4 border-t border-white/10 mt-auto">
             {/* Install Button - Always show if installable */}
             {isInstallable && (
               <button
