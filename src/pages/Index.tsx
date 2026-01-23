@@ -5,12 +5,11 @@ import { GradientButton } from "@/components/ui/gradient-button";
 import { Hero } from "@/components/Hero";
 import { AnimatedAIChat } from "@/components/AnimatedAIChat";
 import { Footer } from "@/components/Footer";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
-import { InstallButton } from "@/components/InstallButton";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { GlassSidebar } from "@/components/GlassSidebar";
 import { SEO, homePageSchema } from "@/components/SEO";
-import { Sparkles, Shield, Download, Upload, Loader2 } from "lucide-react";
+import { Download, Upload, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { SpaceBackground } from "@/components/ui/space-background";
 import { toast } from "sonner";
@@ -30,6 +29,7 @@ const Index = () => {
   const [remainingPrompts, setRemainingPrompts] = useState<number | null>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState<"chat" | "feed">("chat");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -266,120 +266,110 @@ const Index = () => {
         canonicalUrl="https://epic-ai-generator.lovable.app/"
         structuredData={homePageSchema}
       />
-      <div className="min-h-screen">
+      <div className="min-h-screen flex">
         <ProPlanDialog />
         {isGenerating && <SpaceBackground particleCount={450} />}
         
-        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-          <div className="absolute top-20 left-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-        </div>
+        {/* Glass Sidebar */}
+        <GlassSidebar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          isAuthed={isAuthed}
+          isAdmin={isAdmin}
+          onSignOut={signOut}
+          onSignIn={() => navigate("/auth")}
+          onViewPlans={() => navigate("/pricing-india")}
+          onAdminClick={() => navigate("/admin")}
+        />
+        
+        {/* Main Content */}
+        <div className="flex-1 md:ml-20 lg:ml-64">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+            <div className="absolute top-20 left-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+          </div>
 
-        <div className="relative z-10 container mx-auto px-4 py-8">
-          <header className="flex justify-end items-center gap-3 mb-4">
-            <InstallButton />
-            <ThemeToggle />
-            {isAdmin && (
-              <GradientButton 
-                variant="variant"
-                onClick={() => navigate("/admin")}
-                className="relative z-10"
-              >
-                <span className="relative z-10">
-                  <Shield className="mr-2 h-4 w-4 inline" />
-                  Admin
-                </span>
-              </GradientButton>
-            )}
-            <GradientButton 
-              onClick={() => navigate("/pricing-india")}
-              className="relative z-10"
-            >
-              <span className="relative z-10">
-                <Sparkles className="mr-2 h-4 w-4 inline" />
-                View Plans
-              </span>
-            </GradientButton>
-            {isAuthed ? (
-              <GradientButton variant="variant" onClick={signOut} className="relative z-10">
-                <span className="relative z-10">Sign out</span>
-              </GradientButton>
-            ) : (
-              <GradientButton onClick={() => navigate("/auth")} className="relative z-10">
-                <span className="relative z-10">Sign in</span>
-              </GradientButton>
-            )}
-          </header>
-          <AnnouncementBanner />
-          <main>
-            <Hero />
-            
-            <section aria-label="AI Design Generator Tool" className="mt-8">
-              <AnimatedAIChat 
-                onGenerate={handleGenerate}
-                isGenerating={isGenerating}
-                remainingPrompts={remainingPrompts}
-                isPremium={isPremium}
-              />
+          <div className="relative z-10 container mx-auto px-4 py-8">
+            <AnnouncementBanner />
+            <main>
+              <Hero />
               
-              {/* Generated Image Display */}
-              {generatedImage && (
-                <div className="max-w-2xl mx-auto mt-8">
-                  <Card className="glass-card p-4 md:p-6 space-y-4 animate-fade-in border-2 glow-purple">
-                    <div className="relative group">
-                      <img
-                        src={generatedImage}
-                        alt={`AI generated design: ${lastPrompt}`}
-                        className="w-full h-auto rounded-lg shadow-2xl"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg" />
+              {/* Tab Content */}
+              {activeTab === "chat" && (
+                <section aria-label="AI Design Generator Tool" className="mt-8 animate-fade-in">
+                  <AnimatedAIChat 
+                    onGenerate={handleGenerate}
+                    isGenerating={isGenerating}
+                    remainingPrompts={remainingPrompts}
+                    isPremium={isPremium}
+                  />
+                  
+                  {/* Generated Image Display */}
+                  {generatedImage && (
+                    <div className="max-w-2xl mx-auto mt-8">
+                      <Card className="glass-card p-4 md:p-6 space-y-4 animate-fade-in border-2 glow-purple">
+                        <div className="relative group">
+                          <img
+                            src={generatedImage}
+                            alt={`AI generated design: ${lastPrompt}`}
+                            className="w-full h-auto rounded-lg shadow-2xl"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg" />
+                        </div>
+                        <div className="flex gap-3">
+                          <GradientButton
+                            onClick={handleDownload}
+                            variant="variant"
+                            className="flex-1 relative z-10"
+                          >
+                            <span className="relative z-10">
+                              <Download className="mr-2 h-4 w-4 inline" />
+                              Download
+                            </span>
+                          </GradientButton>
+                          <GradientButton
+                            onClick={handleSaveToFeed}
+                            disabled={isSaving || !currentUserId}
+                            className="flex-1 relative z-10"
+                          >
+                            <span className="relative z-10">
+                              {isSaving ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin inline" />
+                                  Saving...
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="mr-2 h-4 w-4 inline" />
+                                  Save to Gallery
+                                </>
+                              )}
+                            </span>
+                          </GradientButton>
+                        </div>
+                      </Card>
                     </div>
-                    <div className="flex gap-3">
-                      <GradientButton
-                        onClick={handleDownload}
-                        variant="variant"
-                        className="flex-1 relative z-10"
-                      >
-                        <span className="relative z-10">
-                          <Download className="mr-2 h-4 w-4 inline" />
-                          Download
-                        </span>
-                      </GradientButton>
-                      <GradientButton
-                        onClick={handleSaveToFeed}
-                        disabled={isSaving || !currentUserId}
-                        className="flex-1 relative z-10"
-                      >
-                        <span className="relative z-10">
-                          {isSaving ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin inline" />
-                              Saving...
-                            </>
-                          ) : (
-                            <>
-                              <Upload className="mr-2 h-4 w-4 inline" />
-                              Save to Gallery
-                            </>
-                          )}
-                        </span>
-                      </GradientButton>
-                    </div>
-                  </Card>
-                </div>
+                  )}
+                </section>
               )}
-            </section>
-            
-            <section aria-label="Community Generated Designs" className="mt-16">
-              <Suspense fallback={<div className="text-center py-8">Loading gallery...</div>}>
-                <Feed />
-              </Suspense>
-            </section>
-          </main>
+              
+              {activeTab === "feed" && (
+                <section aria-label="Community Generated Designs" className="mt-8 animate-fade-in">
+                  <Suspense fallback={
+                    <div className="flex items-center justify-center py-20">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  }>
+                    <Feed />
+                  </Suspense>
+                </section>
+              )}
+            </main>
+          </div>
+          <Footer />
         </div>
-        <Footer />
       </div>
     </>
   );
