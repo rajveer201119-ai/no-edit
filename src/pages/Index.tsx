@@ -7,7 +7,8 @@ import { AnimatedAIChat } from "@/components/AnimatedAIChat";
 import { Footer } from "@/components/Footer";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
-import { GlassSidebar } from "@/components/GlassSidebar";
+import { GlassSidebar, type Project, type TabType } from "@/components/GlassSidebar";
+import { ImageEditor } from "@/components/ImageEditor";
 import { SEO, homePageSchema } from "@/components/SEO";
 import { Download, Upload, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -29,7 +30,8 @@ const Index = () => {
   const [remainingPrompts, setRemainingPrompts] = useState<number | null>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<"chat" | "feed">("chat");
+  const [activeTab, setActiveTab] = useState<TabType>("chat");
+  const [projects, setProjects] = useState<Project[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,9 +41,11 @@ const Index = () => {
       if (session?.user) {
         checkAdminRole(session.user.id);
         fetchDailyLimit(session.user.id);
+        fetchProjects(session.user.id);
       } else {
         setIsAdmin(false);
         setRemainingPrompts(null);
+        setProjects([]);
       }
     });
 
@@ -51,11 +55,30 @@ const Index = () => {
       if (session?.user) {
         checkAdminRole(session.user.id);
         fetchDailyLimit(session.user.id);
+        fetchProjects(session.user.id);
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchProjects = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false });
+    
+    if (!error && data) {
+      setProjects(data);
+    }
+  };
+
+  const refreshProjects = useCallback(() => {
+    if (currentUserId) {
+      fetchProjects(currentUserId);
+    }
+  }, [currentUserId]);
 
   const fetchDailyLimit = async (userId: string) => {
     try {
@@ -93,7 +116,6 @@ const Index = () => {
     await supabase.auth.signOut();
   };
 
-  // Map command to style
   const getStyleFromCommand = (command?: string): ImageStyle => {
     switch (command) {
       case 'logo': return 'realistic';
@@ -116,7 +138,6 @@ const Index = () => {
       return;
     }
 
-    // Check credits BEFORE generating
     if (remainingPrompts !== null && remainingPrompts <= 0) {
       toast.error(
         isPremium 
@@ -135,17 +156,10 @@ const Index = () => {
     try {
       const style = getStyleFromCommand(command);
       const designType = command || 'default';
-      
-      // Determine size based on design type
       const size = command === 'banner' ? 'landscape' : command === 'poster' ? 'portrait' : 'square';
 
       const { data, error } = await supabase.functions.invoke("generate-image", {
-        body: {
-          prompt,
-          style,
-          size,
-          designType,
-        },
+        body: { prompt, style, size, designType },
       });
 
       if (error) throw error;
@@ -155,14 +169,35 @@ const Index = () => {
       const imageUrl = data.imageUrl as string | undefined;
       if (!imageUrl) throw new Error("Design generation failed");
 
-      // Increment usage AFTER successful generation
       await supabase.rpc('increment_prompt_usage', { user_id_param: currentUserId });
+
+      // Create a new project
+      const projectName = prompt.slice(0, 50) + (prompt.length > 50 ? "..." : "");
+      const { data: newProject, error: projectError } = await supabase
+        .from("projects")
+        .insert({
+          user_id: currentUserId,
+          name: projectName,
+          prompt: prompt,
+          image_url: imageUrl
+        })
+        .select()
+        .single();
+
+      if (projectError) {
+        console.error("Failed to create project:", projectError);
+      }
 
       setGeneratedImage(imageUrl);
       toast.success("Design created successfully!");
-
-      // Refresh daily limit to update UI
+      
       await fetchDailyLimit(currentUserId);
+      await fetchProjects(currentUserId);
+
+      // Open the project in editor tab
+      if (newProject) {
+        setActiveTab({ type: "project", project: newProject });
+      }
     } catch (error: any) {
       console.error("Generation error:", error);
       toast.error(
@@ -221,22 +256,15 @@ const Index = () => {
       const blob = await getImageBlob(generatedImage);
       const extension = blob.type === "image/jpeg" ? "jpg" : "png";
 
-      // Upload to storage
       const fileName = `${currentUserId}/${Date.now()}.${extension}`;
       const { error: uploadError } = await supabase.storage
         .from("post-images")
-        .upload(fileName, blob, {
-          contentType: blob.type || "image/png",
-        });
+        .upload(fileName, blob, { contentType: blob.type || "image/png" });
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("post-images").getPublicUrl(fileName);
+      const { data: { publicUrl } } = supabase.storage.from("post-images").getPublicUrl(fileName);
 
-      // Create post
       const { error: postError } = await supabase.from("posts").insert({
         user_id: currentUserId,
         image_url: publicUrl,
@@ -257,6 +285,77 @@ const Index = () => {
     }
   };
 
+  const handleProjectImageUpdate = (newImageUrl: string) => {
+    if (typeof activeTab === "object" && activeTab.type === "project") {
+      setActiveTab({
+        type: "project",
+        project: { ...activeTab.project, image_url: newImageUrl }
+      });
+      refreshProjects();
+    }
+  };
+
+  const renderContent = () => {
+    // Project editor tab
+    if (typeof activeTab === "object" && activeTab.type === "project") {
+      if (!activeTab.project.image_url) {
+        return (
+          <div className="flex items-center justify-center h-full text-muted-foreground">
+            No image to edit
+          </div>
+        );
+      }
+      
+      return (
+        <ImageEditor
+          projectId={activeTab.project.id}
+          projectName={activeTab.project.name}
+          imageUrl={activeTab.project.image_url}
+          onImageUpdate={handleProjectImageUpdate}
+          onClose={() => setActiveTab("chat")}
+        />
+      );
+    }
+
+    // Chat tab
+    if (activeTab === "chat") {
+      return (
+        <>
+          <AnnouncementBanner />
+          <Hero />
+          
+          <section aria-label="AI Design Generator Tool" className="mt-8 animate-fade-in">
+            <AnimatedAIChat 
+              onGenerate={handleGenerate}
+              isGenerating={isGenerating}
+              remainingPrompts={remainingPrompts}
+              isPremium={isPremium}
+            />
+          </section>
+        </>
+      );
+    }
+
+    // Feed tab
+    if (activeTab === "feed") {
+      return (
+        <section aria-label="Community Generated Designs" className="mt-8 animate-fade-in">
+          <Suspense fallback={
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          }>
+            <Feed />
+          </Suspense>
+        </section>
+      );
+    }
+
+    return null;
+  };
+
+  const isEditorMode = typeof activeTab === "object" && activeTab.type === "project";
+
   return (
     <>
       <SEO 
@@ -270,105 +369,43 @@ const Index = () => {
         <ProPlanDialog />
         {isGenerating && <SpaceBackground particleCount={450} />}
         
-        {/* Glass Sidebar */}
         <GlassSidebar
           activeTab={activeTab}
           onTabChange={setActiveTab}
           isAuthed={isAuthed}
           isAdmin={isAdmin}
+          currentUserId={currentUserId}
           onSignOut={signOut}
           onSignIn={() => navigate("/auth")}
           onViewPlans={() => navigate("/pricing-india")}
           onAdminClick={() => navigate("/admin")}
+          projects={projects}
+          onProjectsChange={refreshProjects}
         />
         
-        {/* Main Content */}
-        <div className="flex-1 md:ml-20 lg:ml-64">
-          <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-            <div className="absolute top-20 left-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-          </div>
+        <div className="flex-1 md:ml-20 lg:ml-64 flex flex-col min-h-screen">
+          {!isEditorMode && (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+              <div className="absolute top-20 left-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+            </div>
+          )}
 
-          <div className="relative z-10 container mx-auto px-4 py-8">
-            <AnnouncementBanner />
-            <main>
-              <Hero />
-              
-              {/* Tab Content */}
-              {activeTab === "chat" && (
-                <section aria-label="AI Design Generator Tool" className="mt-8 animate-fade-in">
-                  <AnimatedAIChat 
-                    onGenerate={handleGenerate}
-                    isGenerating={isGenerating}
-                    remainingPrompts={remainingPrompts}
-                    isPremium={isPremium}
-                  />
-                  
-                  {/* Generated Image Display */}
-                  {generatedImage && (
-                    <div className="max-w-2xl mx-auto mt-8">
-                      <Card className="glass-card p-4 md:p-6 space-y-4 animate-fade-in border-2 glow-purple">
-                        <div className="relative group">
-                          <img
-                            src={generatedImage}
-                            alt={`AI generated design: ${lastPrompt}`}
-                            className="w-full h-auto rounded-lg shadow-2xl"
-                            loading="lazy"
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg" />
-                        </div>
-                        <div className="flex gap-3">
-                          <GradientButton
-                            onClick={handleDownload}
-                            variant="variant"
-                            className="flex-1 relative z-10"
-                          >
-                            <span className="relative z-10">
-                              <Download className="mr-2 h-4 w-4 inline" />
-                              Download
-                            </span>
-                          </GradientButton>
-                          <GradientButton
-                            onClick={handleSaveToFeed}
-                            disabled={isSaving || !currentUserId}
-                            className="flex-1 relative z-10"
-                          >
-                            <span className="relative z-10">
-                              {isSaving ? (
-                                <>
-                                  <Loader2 className="mr-2 h-4 w-4 animate-spin inline" />
-                                  Saving...
-                                </>
-                              ) : (
-                                <>
-                                  <Upload className="mr-2 h-4 w-4 inline" />
-                                  Save to Gallery
-                                </>
-                              )}
-                            </span>
-                          </GradientButton>
-                        </div>
-                      </Card>
-                    </div>
-                  )}
-                </section>
-              )}
-              
-              {activeTab === "feed" && (
-                <section aria-label="Community Generated Designs" className="mt-8 animate-fade-in">
-                  <Suspense fallback={
-                    <div className="flex items-center justify-center py-20">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  }>
-                    <Feed />
-                  </Suspense>
-                </section>
-              )}
-            </main>
-          </div>
-          <Footer />
+          {isEditorMode ? (
+            <div className="flex-1 relative z-10">
+              {renderContent()}
+            </div>
+          ) : (
+            <>
+              <div className="relative z-10 container mx-auto px-4 py-8 flex-1">
+                <main>
+                  {renderContent()}
+                </main>
+              </div>
+              <Footer />
+            </>
+          )}
         </div>
       </div>
     </>
