@@ -55,25 +55,36 @@ export const ImageEditor = ({
     setCurrentImage(imageUrl);
   }, [imageUrl]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const getPointerPosition = (e: React.MouseEvent | React.TouchEvent) => {
+    const rect = imageContainerRef.current!.getBoundingClientRect();
+    if ('touches' in e) {
+      const touch = e.touches[0] || e.changedTouches[0];
+      return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+      };
+    }
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  };
+
+  const handlePointerDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isCropping || !imageContainerRef.current) return;
+    e.preventDefault();
     
-    const rect = imageContainerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
+    const { x, y } = getPointerPosition(e);
     setDragStart({ x, y });
     setIsDragging(true);
     setCropArea({ x, y, width: 0, height: 0 });
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handlePointerMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging || !isCropping || !imageContainerRef.current) return;
+    e.preventDefault();
     
-    const rect = imageContainerRef.current.getBoundingClientRect();
-    const currentX = e.clientX - rect.left;
-    const currentY = e.clientY - rect.top;
-    
+    const { x: currentX, y: currentY } = getPointerPosition(e);
     setCropArea({
       x: Math.min(dragStart.x, currentX),
       y: Math.min(dragStart.y, currentY),
@@ -82,7 +93,7 @@ export const ImageEditor = ({
     });
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = () => {
     setIsDragging(false);
   };
 
@@ -295,12 +306,16 @@ export const ImageEditor = ({
           ref={imageContainerRef}
           className={cn(
             "relative mx-auto inline-block",
-            isCropping && "cursor-crosshair select-none"
+            isCropping && "cursor-crosshair select-none touch-none"
           )}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+          onMouseDown={handlePointerDown}
+          onMouseMove={handlePointerMove}
+          onMouseUp={handlePointerUp}
+          onMouseLeave={handlePointerUp}
+          onTouchStart={handlePointerDown}
+          onTouchMove={handlePointerMove}
+          onTouchEnd={handlePointerUp}
+          onTouchCancel={handlePointerUp}
         >
           <img
             src={currentImage}
