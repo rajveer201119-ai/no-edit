@@ -55,7 +55,8 @@ export const Hero = () => {
           width={160}
           height={160}
           loading="eager"
-          fetchPriority="high"
+          // @ts-ignore - fetchpriority is valid HTML attribute
+          fetchpriority="high"
         />
       </div>
       
