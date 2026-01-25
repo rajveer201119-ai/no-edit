@@ -24,8 +24,8 @@ export const Hero = () => {
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden min-h-[70vh] md:min-h-[85vh]">
       <WebGLShader />
       
-      <div className="relative border border-border/30 p-2 w-full mx-auto max-w-3xl">
-        <main className="relative border border-border/30 py-8 md:py-10 overflow-hidden px-4 backdrop-blur-sm bg-background/5">
+      <div className="relative p-2 w-full mx-auto max-w-3xl">
+        <main className="relative py-8 md:py-10 overflow-hidden px-4 backdrop-blur-sm bg-background/5">
           {/* Logo */}
           <div className="flex justify-center mb-4 md:mb-5">
             <img 
