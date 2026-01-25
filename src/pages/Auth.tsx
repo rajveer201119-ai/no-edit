@@ -86,7 +86,9 @@ const Auth = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">
+              {mode === "signup" ? "Set Your Own Password" : "Password"}
+            </Label>
             <Input
               id="password"
               type="password"
@@ -94,6 +96,7 @@ const Auth = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="••••••••"
+              minLength={6}
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>

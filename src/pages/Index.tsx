@@ -1,6 +1,7 @@
 import { useEffect, useState, lazy, Suspense, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { Hero } from "@/components/Hero";
 import { AnimatedAIChat } from "@/components/AnimatedAIChat";
@@ -10,7 +11,7 @@ import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { GlassSidebar, type Project, type TabType } from "@/components/GlassSidebar";
 import { ImageEditor } from "@/components/ImageEditor";
 import { SEO, homePageSchema } from "@/components/SEO";
-import { Download, Upload, Loader2 } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { SpaceBackground } from "@/components/ui/space-background";
 import { toast } from "sonner";
@@ -127,18 +128,15 @@ const Index = () => {
   };
 
   const handleGenerate = useCallback(async (prompt: string, command?: string) => {
-    if (!currentUserId) {
-      toast.error("Please sign in to generate designs");
-      navigate("/auth");
-      return;
-    }
+    // Allow generation without signup - auth is only required for editor
 
     if (!prompt.trim()) {
       toast.error("Please describe what you want to design");
       return;
     }
 
-    if (remainingPrompts !== null && remainingPrompts <= 0) {
+    // Only check limits if user is logged in
+    if (currentUserId && remainingPrompts !== null && remainingPrompts <= 0) {
       toast.error(
         isPremium 
           ? "You've used all 25 daily credits. Come back tomorrow!" 
@@ -169,35 +167,40 @@ const Index = () => {
       const imageUrl = data.imageUrl as string | undefined;
       if (!imageUrl) throw new Error("Design generation failed");
 
-      await supabase.rpc('increment_prompt_usage', { user_id_param: currentUserId });
+      // Track usage and create project only if logged in
+      if (currentUserId) {
+        await supabase.rpc('increment_prompt_usage', { user_id_param: currentUserId });
 
-      // Create a new project
-      const projectName = prompt.slice(0, 50) + (prompt.length > 50 ? "..." : "");
-      const { data: newProject, error: projectError } = await supabase
-        .from("projects")
-        .insert({
-          user_id: currentUserId,
-          name: projectName,
-          prompt: prompt,
-          image_url: imageUrl
-        })
-        .select()
-        .single();
+        // Create a new project
+        const projectName = prompt.slice(0, 50) + (prompt.length > 50 ? "..." : "");
+        const { data: newProject, error: projectError } = await supabase
+          .from("projects")
+          .insert({
+            user_id: currentUserId,
+            name: projectName,
+            prompt: prompt,
+            image_url: imageUrl
+          })
+          .select()
+          .single();
 
-      if (projectError) {
-        console.error("Failed to create project:", projectError);
+        if (projectError) {
+          console.error("Failed to create project:", projectError);
+        }
+
+        await fetchDailyLimit(currentUserId);
+        await fetchProjects(currentUserId);
+
+        // Open the project in editor tab
+        if (newProject) {
+          setActiveTab({ type: "project", project: newProject });
+          toast.success("Design created! Opening editor...");
+          return;
+        }
       }
 
       setGeneratedImage(imageUrl);
-      toast.success("Design created successfully!");
-      
-      await fetchDailyLimit(currentUserId);
-      await fetchProjects(currentUserId);
-
-      // Open the project in editor tab
-      if (newProject) {
-        setActiveTab({ type: "project", project: newProject });
-      }
+      toast.success("Design created! Sign in to save and edit.");
     } catch (error: any) {
       console.error("Generation error:", error);
       toast.error(
@@ -296,8 +299,17 @@ const Index = () => {
   };
 
   const renderContent = () => {
-    // Project editor tab
+    // Project editor tab - require auth
     if (typeof activeTab === "object" && activeTab.type === "project") {
+      if (!isAuthed) {
+        return (
+          <div className="flex flex-col items-center justify-center h-full gap-4 p-4">
+            <p className="text-muted-foreground text-center">Sign in to access the editor</p>
+            <Button onClick={() => navigate("/auth")}>Sign In</Button>
+          </div>
+        );
+      }
+      
       if (!activeTab.project.image_url) {
         return (
           <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -320,7 +332,7 @@ const Index = () => {
     // Chat tab
     if (activeTab === "chat") {
       return (
-        <div className="flex flex-col">
+        <div className="flex flex-col min-h-full">
           <AnnouncementBanner />
           <Hero />
           
@@ -332,6 +344,37 @@ const Index = () => {
               isPremium={isPremium}
             />
           </section>
+          
+          {/* Show generated image for non-authenticated users */}
+          {generatedImage && !isAuthed && (
+            <div className="mt-8 mb-8 max-w-2xl mx-auto w-full px-4">
+              <Card className="p-4 glass-card border-white/10">
+                <img 
+                  src={generatedImage} 
+                  alt="Generated design" 
+                  className="w-full h-auto rounded-lg mb-4"
+                />
+                <div className="flex flex-col gap-2">
+                  <Button onClick={() => navigate("/auth")} className="w-full">
+                    Sign in to Save & Edit
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={async () => {
+                      const link = document.createElement("a");
+                      link.href = generatedImage;
+                      link.download = `epic-design-${Date.now()}.png`;
+                      link.click();
+                    }}
+                    className="w-full"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
         </div>
       );
     }
@@ -365,7 +408,7 @@ const Index = () => {
         canonicalUrl="https://epic-ai-generator.lovable.app/"
         structuredData={homePageSchema}
       />
-      <div className="min-h-screen flex">
+      <div className="min-h-screen flex flex-col md:flex-row">
         <ProPlanDialog />
         {isGenerating && <SpaceBackground particleCount={450} />}
         
@@ -383,7 +426,7 @@ const Index = () => {
           onProjectsChange={refreshProjects}
         />
         
-        <div className="flex-1 md:ml-20 lg:ml-64 flex flex-col min-h-screen">
+        <div className="flex-1 ml-0 pt-14 md:pt-0 md:ml-20 lg:ml-64 flex flex-col min-h-screen overflow-x-hidden">
           {!isEditorMode && (
             <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
               <div className="absolute top-20 left-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
