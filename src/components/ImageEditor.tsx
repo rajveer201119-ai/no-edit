@@ -22,7 +22,13 @@ import {
   Trash2,
   Plus,
   Minus,
-  Type
+  Type,
+  Terminal,
+  Activity,
+  Wifi,
+  Circle,
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -867,7 +873,11 @@ export const ImageEditor = ({
   const activeText = textOverlays.find(t => t.id === activeTextId);
 
   return (
-    <div className="h-[calc(100vh-3.5rem)] md:h-screen flex flex-col overflow-hidden bg-background">
+    <div className="h-[calc(100vh-3.5rem)] md:h-screen flex flex-col overflow-hidden bg-background relative">
+      {/* Liquid Glass Background Effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5 pointer-events-none" />
+      <div className="absolute inset-0 backdrop-blur-[100px] pointer-events-none opacity-50" />
+      
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -877,76 +887,106 @@ export const ImageEditor = ({
         onChange={handleFileUpload}
       />
 
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 md:px-4 md:py-3 border-b border-border/50 bg-background/95 backdrop-blur-xl flex-shrink-0">
-        <h2 className="text-sm md:text-base font-semibold truncate max-w-[180px] md:max-w-none flex items-center gap-2">
-          <ImageIcon className="h-4 w-4 text-primary" />
-          {projectName}
+      {/* Terminal-Style Header */}
+      <div className="relative flex items-center justify-between px-3 py-2 md:px-4 md:py-3 border-b border-border/30 bg-background/80 backdrop-blur-xl flex-shrink-0">
+        {/* Terminal Window Controls */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-destructive/80 hover:bg-destructive transition-colors cursor-pointer" onClick={onClose} />
+            <div className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors cursor-pointer" />
+            <div className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 transition-colors cursor-pointer" />
+          </div>
+          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border/30">
+            <Terminal className="h-3 w-3 text-primary" />
+            <span className="text-xs font-mono text-muted-foreground">epic-editor</span>
+          </div>
+        </div>
+        
+        <h2 className="text-sm md:text-base font-mono font-semibold truncate max-w-[180px] md:max-w-none flex items-center gap-2 text-foreground">
+          <span className="text-primary">~</span>/{projectName}
         </h2>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
-          <X className="h-4 w-4" />
-        </Button>
+        
+        {/* Status Signals */}
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/50 border border-border/30">
+            <Wifi className="h-3 w-3 text-green-500" />
+            <Activity className="h-3 w-3 text-primary animate-pulse" />
+          </div>
+          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
-      {/* Mobile Tab Toggle */}
-      <div className="md:hidden flex border-b border-border/50 bg-background/95">
+      {/* Mobile Tab Toggle - Terminal Style */}
+      <div className="md:hidden flex border-b border-border/30 bg-background/80 backdrop-blur-xl">
         <button
           onClick={() => setActiveTab("chat")}
           className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors",
+            "flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-mono font-medium transition-all",
             activeTab === "chat" 
-              ? "text-primary border-b-2 border-primary" 
-              : "text-muted-foreground"
+              ? "text-primary border-b-2 border-primary bg-primary/5" 
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
           )}
         >
-          <MessageSquare className="h-4 w-4" />
-          Chat
+          <Terminal className="h-4 w-4" />
+          <span className="flex items-center gap-1.5">
+            Terminal
+            {isEditing && <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
+          </span>
         </button>
         <button
           onClick={() => setActiveTab("preview")}
           className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors",
+            "flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-mono font-medium transition-all",
             activeTab === "preview" 
-              ? "text-primary border-b-2 border-primary" 
-              : "text-muted-foreground"
+              ? "text-primary border-b-2 border-primary bg-primary/5" 
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
           )}
         >
           <ImageIcon className="h-4 w-4" />
-          Preview
+          Canvas
         </button>
       </div>
 
       {/* Split Screen Layout */}
-      <div className="flex-1 flex min-h-0">
-        {/* Chat Panel - Desktop always visible, Mobile conditional */}
+      <div className="flex-1 flex min-h-0 relative">
+        {/* Chat Panel - Liquid Glass Terminal */}
         <div className={cn(
-          "w-full md:w-80 lg:w-96 md:border-r border-border/50 flex-shrink-0 flex flex-col",
+          "w-full md:w-80 lg:w-96 md:border-r border-border/30 flex-shrink-0 flex flex-col",
           activeTab === "chat" ? "flex" : "hidden md:flex"
         )}>
-          <div className="flex flex-col h-full bg-background/95 backdrop-blur-xl">
-            {/* Chat Header with Credits */}
-            <div className="flex items-center justify-between p-3 border-b border-border/50">
+          <div className="flex flex-col h-full bg-background/60 backdrop-blur-xl relative overflow-hidden">
+            {/* Subtle glass refraction effect */}
+            <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+            
+            {/* Terminal Header with Status */}
+            <div className="relative flex items-center justify-between p-3 border-b border-border/30 bg-muted/20">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">AI Editor</span>
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-black/30 border border-border/30">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="text-[10px] font-mono text-green-500 uppercase tracking-wider">Live</span>
+                </div>
+                <Terminal className="h-4 w-4 text-primary" />
+                <span className="text-sm font-mono font-medium">AI Terminal</span>
               </div>
               {remainingCredits !== null && (
                 <div className={cn(
-                  "flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium",
+                  "flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-mono border",
                   remainingCredits > 0 
-                    ? "bg-primary/10 text-primary" 
-                    : "bg-destructive/10 text-destructive"
+                    ? "bg-primary/10 text-primary border-primary/30" 
+                    : "bg-destructive/10 text-destructive border-destructive/30"
                 )}>
                   <Zap className="h-3 w-3" />
-                  <span>{remainingCredits} {isPremium ? "/10 edits" : "/1 edit"}</span>
+                  <span>{remainingCredits}/{isPremium ? "10" : "1"}</span>
                 </div>
               )}
             </div>
             
-            {/* Chat Messages */}
-            <ScrollArea className="flex-1 p-3">
+            {/* Terminal Messages */}
+            <ScrollArea className="flex-1 p-3 relative">
               <div className="space-y-3" ref={chatScrollRef}>
-                {chatMessages.map((message) => (
+                {chatMessages.map((message, index) => (
                   <div
                     key={message.id}
                     className={cn(
@@ -956,47 +996,78 @@ export const ImageEditor = ({
                   >
                     <div
                       className={cn(
-                        "max-w-[85%] rounded-2xl px-3 py-2 text-sm",
+                        "max-w-[85%] rounded-lg px-3 py-2 text-sm font-mono relative",
                         message.role === "user"
-                          ? "bg-primary text-primary-foreground rounded-br-md"
-                          : "bg-muted text-foreground rounded-bl-md"
+                          ? "bg-primary/20 text-foreground border border-primary/30 rounded-br-sm"
+                          : "bg-muted/50 text-foreground border border-border/30 rounded-bl-sm"
                       )}
                     >
-                      {message.content}
+                      {message.role === "assistant" && (
+                        <div className="flex items-center gap-1.5 mb-1.5 text-[10px] text-muted-foreground">
+                          <CheckCircle2 className="h-3 w-3 text-green-500" />
+                          <span>EPIC_AI</span>
+                          <span className="text-border">|</span>
+                          <span>{message.timestamp.toLocaleTimeString()}</span>
+                        </div>
+                      )}
+                      {message.role === "user" && (
+                        <div className="flex items-center gap-1.5 mb-1.5 text-[10px] text-primary/70 justify-end">
+                          <span>{message.timestamp.toLocaleTimeString()}</span>
+                          <span className="text-border">|</span>
+                          <span>you</span>
+                          <Circle className="h-2 w-2 fill-primary text-primary" />
+                        </div>
+                      )}
+                      <span className="whitespace-pre-wrap">{message.content}</span>
                     </div>
                   </div>
                 ))}
                 {isEditing && (
                   <div className="flex justify-start">
-                    <div className="bg-muted rounded-2xl rounded-bl-md px-3 py-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                    <div className="bg-muted/50 border border-border/30 rounded-lg rounded-bl-sm px-3 py-2 font-mono">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                        <span className="text-muted-foreground">Processing</span>
+                        <span className="animate-pulse">...</span>
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
             </ScrollArea>
             
-            {/* Chat Input */}
-            <div className="p-3 border-t border-border/50">
+            {/* Terminal Input */}
+            <div className="relative p-3 border-t border-border/30 bg-muted/10">
+              <div className="flex items-center gap-2 mb-2 text-[10px] font-mono text-muted-foreground">
+                <span className="text-primary">$</span>
+                <span>enter command or describe edit</span>
+                <span className="ml-auto flex items-center gap-1">
+                  <Activity className="h-3 w-3 text-green-500" />
+                  <span className="text-green-500">ready</span>
+                </span>
+              </div>
               <div className="flex gap-2">
-                <Textarea
-                  value={editPrompt}
-                  onChange={(e) => setEditPrompt(e.target.value)}
-                  placeholder="Describe your edit..."
-                  className="min-h-[44px] max-h-[120px] resize-none bg-muted/50 border-border/50 text-sm rounded-xl"
-                  disabled={isEditing}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleAIEdit();
-                    }
-                  }}
-                />
+                <div className="flex-1 relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-primary font-mono text-sm">&gt;</span>
+                  <Textarea
+                    value={editPrompt}
+                    onChange={(e) => setEditPrompt(e.target.value)}
+                    placeholder="describe your edit..."
+                    className="min-h-[44px] max-h-[120px] resize-none bg-black/30 border-border/30 text-sm font-mono rounded-lg pl-7 focus:border-primary/50 focus:ring-primary/20"
+                    disabled={isEditing}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleAIEdit();
+                      }
+                    }}
+                  />
+                </div>
                 <Button 
                   onClick={handleAIEdit} 
                   disabled={isEditing || !editPrompt.trim()}
                   size="icon"
-                  className="h-11 w-11 rounded-xl shrink-0"
+                  className="h-11 w-11 rounded-lg shrink-0 bg-primary/20 border border-primary/30 hover:bg-primary/30 text-primary"
                 >
                   {isEditing ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -1005,26 +1076,40 @@ export const ImageEditor = ({
                   )}
                 </Button>
               </div>
-              <p className="text-[10px] text-muted-foreground mt-1.5 text-center">
-                Press Enter to send
+              <p className="text-[10px] font-mono text-muted-foreground mt-2 text-center">
+                <span className="text-primary">Enter</span> to execute • <span className="text-primary">Shift+Enter</span> for newline
               </p>
             </div>
           </div>
         </div>
 
-        {/* Preview Panel - Desktop always visible, Mobile conditional */}
+        {/* Preview Panel - Liquid Glass Canvas */}
         <div className={cn(
           "flex-1 min-w-0 flex flex-col",
           activeTab === "preview" ? "flex" : "hidden md:flex"
         )}>
-          <div className="flex flex-col h-full bg-card/50">
-            {/* Preview Header with Tools */}
-            <div className="flex items-center justify-between p-2 md:p-3 border-b border-border/50 bg-background/80 backdrop-blur-sm">
+          <div className="flex flex-col h-full bg-card/30 backdrop-blur-sm relative">
+            {/* Glass overlay effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/5 to-transparent pointer-events-none" />
+            
+            {/* Preview Header with Tools - Terminal Style */}
+            <div className="relative flex items-center justify-between p-2 md:p-3 border-b border-border/30 bg-background/60 backdrop-blur-xl">
               <div className="flex items-center gap-1 md:gap-2 overflow-x-auto">
+                {/* Tool Status Indicator */}
+                <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 mr-2 rounded bg-muted/50 border border-border/30">
+                  <span className={cn(
+                    "w-2 h-2 rounded-full",
+                    isCropping ? "bg-yellow-500 animate-pulse" : showTextTool ? "bg-blue-500 animate-pulse" : "bg-green-500"
+                  )} />
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                    {isCropping ? "crop" : showTextTool ? "text" : "ready"}
+                  </span>
+                </div>
+
                 <Button
                   variant={isCropping ? "default" : "outline"}
                   size="sm"
-                  className="text-xs h-8 shrink-0"
+                  className="text-xs h-8 shrink-0 font-mono border-border/30"
                   onClick={() => {
                     setIsCropping(!isCropping);
                     setCropArea(null);
@@ -1032,26 +1117,26 @@ export const ImageEditor = ({
                   }}
                 >
                   <Crop className="h-3 w-3 mr-1" />
-                  Crop
+                  crop
                 </Button>
                 
                 {/* Add Image Button */}
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-xs h-8 shrink-0"
+                  className="text-xs h-8 shrink-0 font-mono border-border/30"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isCropping}
                 >
                   <Upload className="h-3 w-3 mr-1" />
-                  Add Image
+                  +img
                 </Button>
 
                 {/* Add Text Button */}
                 <Button
                   variant={showTextTool ? "default" : "outline"}
                   size="sm"
-                  className="text-xs h-8 shrink-0"
+                  className="text-xs h-8 shrink-0 font-mono border-border/30"
                   onClick={() => {
                     setShowTextTool(!showTextTool);
                     setActiveTextId(null);
@@ -1059,84 +1144,93 @@ export const ImageEditor = ({
                   disabled={isCropping}
                 >
                   <Type className="h-3 w-3 mr-1" />
-                  Add Text
+                  +txt
                 </Button>
 
                 {isCropping && cropArea && cropArea.width > 10 && (
-                  <Button size="sm" className="text-xs h-8 shrink-0" onClick={applyCrop}>
-                    Apply
+                  <Button size="sm" className="text-xs h-8 shrink-0 font-mono" onClick={applyCrop}>
+                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                    apply
                   </Button>
                 )}
                 {isCropping && (
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="text-xs h-8 shrink-0"
+                    className="text-xs h-8 shrink-0 font-mono text-destructive hover:bg-destructive/10"
                     onClick={() => {
                       setIsCropping(false);
                       setCropArea(null);
                     }}
                   >
-                    Cancel
+                    <X className="h-3 w-3 mr-1" />
+                    cancel
                   </Button>
                 )}
 
                 {/* Overlay Controls */}
                 {(overlays.length > 0 || textOverlays.length > 0) && !isCropping && (
                   <>
-                    <div className="w-px h-6 bg-border mx-1" />
+                    <div className="w-px h-6 bg-border/30 mx-1" />
                     <Button
                       variant="default"
                       size="sm"
-                      className="text-xs h-8 shrink-0"
+                      className="text-xs h-8 shrink-0 font-mono bg-green-600/80 hover:bg-green-600 border-green-500/30"
                       onClick={handleMergeAndSave}
                     >
                       <Move className="h-3 w-3 mr-1" />
-                      Merge & Save
+                      merge
                     </Button>
                   </>
                 )}
               </div>
               
               <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleZoomOut}>
+                <div className="hidden sm:flex items-center gap-1 mr-2 px-2 py-0.5 rounded bg-muted/50 border border-border/30">
+                  <span className="text-[10px] font-mono text-muted-foreground">zoom:</span>
+                </div>
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded border border-border/30" onClick={handleZoomOut}>
                   <ZoomOut className="h-3.5 w-3.5" />
                 </Button>
-                <span className="text-xs text-muted-foreground w-10 text-center">
+                <span className="text-xs font-mono text-muted-foreground w-12 text-center">
                   {Math.round(zoom * 100)}%
                 </span>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleZoomIn}>
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded border border-border/30" onClick={handleZoomIn}>
                   <ZoomIn className="h-3.5 w-3.5" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleResetZoom}>
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded border border-border/30" onClick={handleResetZoom}>
                   <RotateCcw className="h-3.5 w-3.5" />
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs h-7 ml-1" onClick={handleDownload}>
+                <Button variant="outline" size="sm" className="text-xs h-7 ml-1 font-mono border-border/30" onClick={handleDownload}>
                   <Download className="h-3 w-3 mr-1" />
-                  <span className="hidden sm:inline">Save</span>
+                  <span className="hidden sm:inline">save</span>
                 </Button>
               </div>
             </div>
 
-            {/* Active Overlay Controls */}
+            {/* Active Overlay Controls - Terminal Style */}
             {activeOverlay && !isCropping && !showTextTool && (
-              <div className="flex items-center justify-center gap-2 p-2 bg-primary/10 border-b border-border/50">
-                <span className="text-xs text-muted-foreground">Selected overlay:</span>
+              <div className="relative flex items-center justify-center gap-2 p-2 bg-primary/5 border-b border-primary/20 backdrop-blur-sm">
+                <div className="flex items-center gap-1.5 text-xs font-mono text-primary">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <span>overlay selected</span>
+                </div>
+                <div className="w-px h-4 bg-border/30" />
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-7 w-7"
+                  className="h-7 w-7 border-border/30"
                   onClick={() => resizeOverlay(activeOverlay.id, -20)}
                 >
                   <Minus className="h-3 w-3" />
                 </Button>
-                <span className="text-xs w-16 text-center">
+                <span className="text-xs font-mono w-16 text-center text-muted-foreground">
                   {Math.round(activeOverlay.width)}px
                 </span>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-7 w-7"
+                  className="h-7 w-7 border-border/30"
                   onClick={() => resizeOverlay(activeOverlay.id, 20)}
                 >
                   <Plus className="h-3 w-3" />
@@ -1152,25 +1246,29 @@ export const ImageEditor = ({
               </div>
             )}
 
-            {/* Active Text Controls */}
+            {/* Active Text Controls - Terminal Style */}
             {activeText && !isCropping && !showTextTool && (
-              <div className="flex items-center justify-center gap-2 p-2 bg-primary/10 border-b border-border/50">
-                <span className="text-xs text-muted-foreground">Selected text:</span>
+              <div className="relative flex items-center justify-center gap-2 p-2 bg-blue-500/5 border-b border-blue-500/20 backdrop-blur-sm">
+                <div className="flex items-center gap-1.5 text-xs font-mono text-blue-500">
+                  <Type className="h-3 w-3" />
+                  <span>text selected</span>
+                </div>
+                <div className="w-px h-4 bg-border/30" />
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-7 w-7"
+                  className="h-7 w-7 border-border/30"
                   onClick={() => resizeText(activeText.id, -4)}
                 >
                   <Minus className="h-3 w-3" />
                 </Button>
-                <span className="text-xs w-16 text-center">
+                <span className="text-xs font-mono w-16 text-center text-muted-foreground">
                   {activeText.fontSize}px
                 </span>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-7 w-7"
+                  className="h-7 w-7 border-border/30"
                   onClick={() => resizeText(activeText.id, 4)}
                 >
                   <Plus className="h-3 w-3" />
@@ -1178,12 +1276,12 @@ export const ImageEditor = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 text-xs"
+                  className="h-7 text-xs font-mono border-border/30"
                   onClick={() => {
                     setShowTextTool(true);
                   }}
                 >
-                  Edit Style
+                  edit
                 </Button>
                 <Button
                   variant="destructive"
@@ -1198,7 +1296,7 @@ export const ImageEditor = ({
 
             {/* Text Tool Panel */}
             {showTextTool && !isCropping && (
-              <div className="border-b border-border/50 bg-background/95 backdrop-blur-sm max-h-[40vh] overflow-y-auto">
+              <div className="relative border-b border-border/30 bg-background/80 backdrop-blur-xl max-h-[40vh] overflow-y-auto">
                 <TextToolPanel
                   onAddText={handleAddTextOverlay}
                   selectedText={activeText}
@@ -1207,8 +1305,17 @@ export const ImageEditor = ({
               </div>
             )}
 
-            {/* Image Canvas */}
-            <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-[#0a0a0a]">
+            {/* Image Canvas - Dark Terminal Style */}
+            <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-[#080808] relative">
+              {/* Grid pattern overlay */}
+              <div 
+                className="absolute inset-0 opacity-20 pointer-events-none"
+                style={{
+                  backgroundImage: `linear-gradient(to right, hsl(var(--border) / 0.3) 1px, transparent 1px),
+                                    linear-gradient(to bottom, hsl(var(--border) / 0.3) 1px, transparent 1px)`,
+                  backgroundSize: '40px 40px'
+                }}
+              />
               <div 
                 ref={imageContainerRef}
                 className={cn(
