@@ -1,56 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Edit image using Pollinations AI (FREE - no API key required)
-async function editWithPollinations(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Attempting edit with Pollinations AI (FREE)...");
-  
-  // Construct an edit prompt that references the source image
-  const editPrompt = `Edit the following image according to this instruction: "${prompt}". 
-Apply the edit to this exact image: ${imageUrl}
-Make sure to preserve the original composition and only apply the requested changes.`;
-
-  const encodedPrompt = encodeURIComponent(editPrompt);
-  const seed = Math.floor(Math.random() * 1000000);
-  
-  // Use Pollinations image-to-image with flux model
-  const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=flux&seed=${seed}&nologo=true&enhance=true`;
-  
-  console.log("Pollinations edit URL constructed");
-  
-  const response = await fetch(pollinationsUrl, {
-    method: "GET",
-    headers: {
-      "Accept": "image/*"
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error(`Pollinations API error: ${response.status} ${response.statusText}`);
-  }
-
-  const contentType = response.headers.get("content-type");
-  if (!contentType?.startsWith("image/")) {
-    throw new Error("Pollinations did not return an image");
-  }
-
-  // Convert the image to base64 using Deno's standard library (avoids stack overflow)
-  const arrayBuffer = await response.arrayBuffer();
-  const base64 = base64Encode(arrayBuffer);
-  
-  console.log("Pollinations edit successful");
-  return `data:${contentType};base64,${base64}`;
-}
-
-// Edit image using Lovable AI Gateway (uses credits)
+// Edit image using Lovable AI Gateway (Gemini) - the only service that supports true image editing
 async function editWithLovableAI(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Attempting edit with Lovable AI (fallback, uses credits)...");
+  console.log("Editing image with Lovable AI (Gemini - supports true image editing)...");
   
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
@@ -68,14 +26,14 @@ async function editWithLovableAI(imageUrl: string, prompt: string): Promise<stri
       messages: [
         {
           role: "system",
-          content: "You are an image editor. ALWAYS output a modified version of the input image. Never ask questions or respond with text only. Apply the user's edit request directly to the image and return the edited image."
+          content: "You are an image editor. ALWAYS output a modified version of the input image. Never ask questions or respond with text only. Apply the user's edit request directly to the image and return the edited image. Preserve the original composition, style, and elements unless the user specifically asks to change them."
         },
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: `GENERATE AN EDITED IMAGE: Apply this edit to the image: "${prompt}". Output the modified image directly without asking questions. If the instruction is unclear, make your best interpretation and apply it.`
+              text: `GENERATE AN EDITED IMAGE: Apply this edit to the image: "${prompt}". Output the modified image directly without asking questions. Keep the original image's composition and style, only applying the specific changes requested.`
             },
             {
               type: "image_url",
@@ -143,37 +101,28 @@ serve(async (req) => {
     console.log("Editing image with prompt:", prompt);
 
     let editedImageData: string;
-    let serviceUsed: string;
 
-    // Try Pollinations AI first (FREE), fallback to Lovable AI
+    // Use Lovable AI for true image editing (Pollinations only does text-to-image, not editing)
     try {
-      editedImageData = await editWithPollinations(imageUrl, prompt);
-      serviceUsed = "Pollinations AI (FREE)";
-    } catch (pollinationsError) {
-      console.warn("Pollinations AI failed, falling back to Lovable AI:", pollinationsError);
-      
-      try {
-        editedImageData = await editWithLovableAI(imageUrl, prompt);
-        serviceUsed = "Lovable AI (fallback)";
-      } catch (lovableError: any) {
-        // Pass through rate limit and credit errors
-        if (lovableError.status === 429) {
-          return new Response(
-            JSON.stringify({ error: lovableError.message }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        if (lovableError.status === 402) {
-          return new Response(
-            JSON.stringify({ error: lovableError.message }),
-            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        throw lovableError;
+      editedImageData = await editWithLovableAI(imageUrl, prompt);
+    } catch (error: any) {
+      // Pass through rate limit and credit errors with proper status codes
+      if (error.status === 429) {
+        return new Response(
+          JSON.stringify({ error: error.message }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
+      if (error.status === 402) {
+        return new Response(
+          JSON.stringify({ error: error.message }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      throw error;
     }
 
-    console.log(`Image edited successfully using: ${serviceUsed}`);
+    console.log("Image edit completed successfully");
 
     // Upload the edited image to Supabase Storage
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -213,10 +162,10 @@ serve(async (req) => {
         .eq("id", projectId);
     }
 
-    console.log("Image edited and uploaded successfully:", publicUrl, "| Service:", serviceUsed);
+    console.log("Image edited and uploaded successfully:", publicUrl);
 
     return new Response(
-      JSON.stringify({ imageUrl: publicUrl, serviceUsed }),
+      JSON.stringify({ imageUrl: publicUrl }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
