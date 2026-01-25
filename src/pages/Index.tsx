@@ -33,6 +33,7 @@ const Index = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("chat");
   const [projects, setProjects] = useState<Project[]>([]);
+  const [showProDialog, setShowProDialog] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -137,10 +138,11 @@ const Index = () => {
 
     // Only check limits if user is logged in
     if (currentUserId && remainingPrompts !== null && remainingPrompts <= 0) {
+      setShowProDialog(true);
       toast.error(
         isPremium 
           ? "You've used all 25 daily credits. Come back tomorrow!" 
-          : "You've used your 2 free daily credits. Upgrade to Pro for 25 credits/day!",
+          : "You've used your free daily credits. Upgrade to Pro for more!",
         { duration: 5000 }
       );
       return;
@@ -409,7 +411,7 @@ const Index = () => {
         structuredData={homePageSchema}
       />
       <div className="min-h-screen flex flex-col md:flex-row">
-        <ProPlanDialog />
+        <ProPlanDialog open={showProDialog} onOpenChange={setShowProDialog} />
         {isGenerating && <SpaceBackground particleCount={450} />}
         
         <GlassSidebar

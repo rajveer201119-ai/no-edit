@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -10,33 +9,25 @@ import {
 import { Button } from "@/components/ui/button";
 import { Sparkles, X } from "lucide-react";
 
-export const ProPlanDialog = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface ProPlanDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export const ProPlanDialog = ({ open, onOpenChange }: ProPlanDialogProps) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Show popup 6 seconds after page load, only once per session
-    const hasSeenPopup = sessionStorage.getItem("hasSeenProPopup");
-    if (!hasSeenPopup) {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-        sessionStorage.setItem("hasSeenProPopup", "true");
-      }, 6000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
   const handleClose = () => {
-    setIsOpen(false);
+    onOpenChange(false);
   };
 
   const handleViewPricing = (region: "india" | "international") => {
-    setIsOpen(false);
+    onOpenChange(false);
     navigate(region === "india" ? "/pricing-india" : "/pricing-international");
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md glass-card border-2 border-primary/50">
         <button
           onClick={handleClose}
