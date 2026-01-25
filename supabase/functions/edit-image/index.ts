@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,7 +12,6 @@ async function editWithPollinations(imageUrl: string, prompt: string): Promise<s
   console.log("Attempting edit with Pollinations AI (FREE)...");
   
   // Construct an edit prompt that references the source image
-  // Pollinations uses the image URL directly in the prompt context
   const editPrompt = `Edit the following image according to this instruction: "${prompt}". 
 Apply the edit to this exact image: ${imageUrl}
 Make sure to preserve the original composition and only apply the requested changes.`;
@@ -40,10 +40,9 @@ Make sure to preserve the original composition and only apply the requested chan
     throw new Error("Pollinations did not return an image");
   }
 
-  // Convert the image to base64
-  const imageBlob = await response.blob();
-  const arrayBuffer = await imageBlob.arrayBuffer();
-  const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+  // Convert the image to base64 using Deno's standard library (avoids stack overflow)
+  const arrayBuffer = await response.arrayBuffer();
+  const base64 = base64Encode(arrayBuffer);
   
   console.log("Pollinations edit successful");
   return `data:${contentType};base64,${base64}`;
