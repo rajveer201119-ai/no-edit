@@ -3,16 +3,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Download, 
   Crop, 
-  Move, 
   Send, 
   Loader2, 
   RotateCcw,
   ZoomIn,
   ZoomOut,
-  X
+  X,
+  MessageSquare,
+  Image as ImageIcon,
+  Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -32,6 +35,13 @@ interface CropArea {
   height: number;
 }
 
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+}
+
 export const ImageEditor = ({ 
   projectId, 
   projectName, 
@@ -47,13 +57,27 @@ export const ImageEditor = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [activeTab, setActiveTab] = useState<"chat" | "preview">("preview");
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    {
+      id: "welcome",
+      role: "assistant",
+      content: `Welcome to the editor! Describe any changes you'd like to make to "${projectName}". For example: "make it darker", "add a border", or "change the background to blue".`,
+      timestamp: new Date()
+    }
+  ]);
   const imageContainerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
 
-  // Update current image when prop changes
   useEffect(() => {
     setCurrentImage(imageUrl);
   }, [imageUrl]);
+
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
 
   const getPointerPosition = (e: React.MouseEvent | React.TouchEvent) => {
     const rect = imageContainerRef.current!.getBoundingClientRect();
@@ -114,12 +138,10 @@ export const ImageEditor = ({
       const containerRect = imageContainerRef.current!.getBoundingClientRect();
       const imgRect = imgElement.getBoundingClientRect();
       
-      // Fetch the image as blob to bypass CORS issues
       const response = await fetch(currentImage);
       if (!response.ok) throw new Error("Failed to fetch image");
       const imageBlob = await response.blob();
       
-      // Create image from blob
       const blobUrl = URL.createObjectURL(imageBlob);
       const img = new Image();
       
@@ -129,11 +151,9 @@ export const ImageEditor = ({
         img.src = blobUrl;
       });
       
-      // Calculate scale between display and actual image size
       const scaleX = img.naturalWidth / imgRect.width;
       const scaleY = img.naturalHeight / imgRect.height;
       
-      // Calculate crop coordinates relative to image
       const offsetX = imgRect.left - containerRect.left;
       const offsetY = imgRect.top - containerRect.top;
       
@@ -142,14 +162,12 @@ export const ImageEditor = ({
       const cropWidth = Math.min(cropArea.width * scaleX, img.naturalWidth - cropX);
       const cropHeight = Math.min(cropArea.height * scaleY, img.naturalHeight - cropY);
       
-      // Cleanup blob URL
       URL.revokeObjectURL(blobUrl);
       
       if (cropWidth < 10 || cropHeight < 10) {
         throw new Error("Crop area too small");
       }
       
-      // Create canvas and crop
       const canvas = document.createElement('canvas');
       canvas.width = Math.floor(cropWidth);
       canvas.height = Math.floor(cropHeight);
@@ -170,7 +188,6 @@ export const ImageEditor = ({
         Math.floor(cropHeight)
       );
       
-      // Convert to blob
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob((b) => {
           if (b) resolve(b);
@@ -178,7 +195,6 @@ export const ImageEditor = ({
         }, "image/png");
       });
       
-      // Get current user ID for storage path (RLS requires userId as folder)
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         throw new Error("You must be logged in to crop images");
@@ -195,7 +211,6 @@ export const ImageEditor = ({
         .from("post-images")
         .getPublicUrl(fileName);
       
-      // Update project
       await supabase
         .from("projects")
         .update({ image_url: publicUrl, updated_at: new Date().toISOString() })
@@ -205,6 +220,14 @@ export const ImageEditor = ({
       onImageUpdate(publicUrl);
       setIsCropping(false);
       setCropArea(null);
+      
+      setChatMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: "✅ Image cropped successfully!",
+        timestamp: new Date()
+      }]);
+      
       toast.success("Image cropped successfully!");
     } catch (error: any) {
       console.error("Crop error:", error);
@@ -220,11 +243,27 @@ export const ImageEditor = ({
       return;
     }
 
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      content: editPrompt,
+      timestamp: new Date()
+    };
+    setChatMessages(prev => [...prev, userMessage]);
+    
+    const processingMessage: ChatMessage = {
+      id: (Date.now() + 1).toString(),
+      role: "assistant",
+      content: "✨ Processing your edit...",
+      timestamp: new Date()
+    };
+    setChatMessages(prev => [...prev, processingMessage]);
+    
     setIsEditing(true);
-    toast.loading("AI is editing your image...", { id: "ai-edit", duration: 120000 });
+    const prompt = editPrompt;
+    setEditPrompt("");
 
     try {
-      // Get current user ID for storage path (RLS requires userId as folder)
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         throw new Error("You must be logged in to edit images");
@@ -233,7 +272,7 @@ export const ImageEditor = ({
       const { data, error } = await supabase.functions.invoke("edit-image", {
         body: {
           imageUrl: currentImage,
-          prompt: editPrompt,
+          prompt: prompt,
           projectId,
           userId: user.id
         }
@@ -245,13 +284,25 @@ export const ImageEditor = ({
 
       setCurrentImage(data.imageUrl);
       onImageUpdate(data.imageUrl);
-      setEditPrompt("");
+      
+      setChatMessages(prev => prev.filter(m => m.id !== processingMessage.id).concat({
+        id: Date.now().toString(),
+        role: "assistant",
+        content: `✅ Done! I've applied "${prompt}" to your design. Want any more changes?`,
+        timestamp: new Date()
+      }));
+      
       toast.success("Image edited successfully!");
     } catch (error: any) {
       console.error("AI edit error:", error);
+      setChatMessages(prev => prev.filter(m => m.id !== processingMessage.id).concat({
+        id: Date.now().toString(),
+        role: "assistant",
+        content: `❌ Sorry, I couldn't apply that edit: ${error?.message || "Unknown error"}. Please try again.`,
+        timestamp: new Date()
+      }));
       toast.error(error?.message || "Failed to edit image");
     } finally {
-      toast.dismiss("ai-edit");
       setIsEditing(false);
     }
   };
@@ -284,75 +335,148 @@ export const ImageEditor = ({
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.25, 0.5));
   const handleResetZoom = () => setZoom(1);
 
-  return (
-    <div className="h-[calc(100vh-3.5rem)] md:h-screen flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between p-2 md:p-4 border-b border-white/10 flex-shrink-0">
-        <h2 className="text-sm md:text-lg font-semibold truncate max-w-[120px] md:max-w-none">{projectName}</h2>
-        <div className="flex items-center gap-1 md:gap-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleZoomOut} title="Zoom Out">
-            <ZoomOut className="h-4 w-4" />
+  // Chat Panel Component
+  const ChatPanel = () => (
+    <div className="flex flex-col h-full bg-background/95 backdrop-blur-xl">
+      {/* Chat Header */}
+      <div className="flex items-center gap-2 p-3 border-b border-border/50">
+        <Sparkles className="h-4 w-4 text-primary" />
+        <span className="text-sm font-medium">AI Editor</span>
+      </div>
+      
+      {/* Chat Messages */}
+      <ScrollArea className="flex-1 p-3" ref={chatScrollRef}>
+        <div className="space-y-3">
+          {chatMessages.map((message) => (
+            <div
+              key={message.id}
+              className={cn(
+                "flex",
+                message.role === "user" ? "justify-end" : "justify-start"
+              )}
+            >
+              <div
+                className={cn(
+                  "max-w-[85%] rounded-2xl px-3 py-2 text-sm",
+                  message.role === "user"
+                    ? "bg-primary text-primary-foreground rounded-br-md"
+                    : "bg-muted text-foreground rounded-bl-md"
+                )}
+              >
+                {message.content}
+              </div>
+            </div>
+          ))}
+          {isEditing && (
+            <div className="flex justify-start">
+              <div className="bg-muted rounded-2xl rounded-bl-md px-3 py-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+              </div>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+      
+      {/* Chat Input */}
+      <div className="p-3 border-t border-border/50">
+        <div className="flex gap-2">
+          <Textarea
+            value={editPrompt}
+            onChange={(e) => setEditPrompt(e.target.value)}
+            placeholder="Describe your edit..."
+            className="min-h-[44px] max-h-[120px] resize-none bg-muted/50 border-border/50 text-sm rounded-xl"
+            disabled={isEditing}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleAIEdit();
+              }
+            }}
+          />
+          <Button 
+            onClick={handleAIEdit} 
+            disabled={isEditing || !editPrompt.trim()}
+            size="icon"
+            className="h-11 w-11 rounded-xl shrink-0"
+          >
+            {isEditing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
           </Button>
-          <span className="text-xs md:text-sm text-muted-foreground w-10 md:w-12 text-center">
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-1.5 text-center">
+          Press Enter to send
+        </p>
+      </div>
+    </div>
+  );
+
+  // Preview Panel Component
+  const PreviewPanel = () => (
+    <div className="flex flex-col h-full bg-card/50">
+      {/* Preview Header with Tools */}
+      <div className="flex items-center justify-between p-2 md:p-3 border-b border-border/50 bg-background/80 backdrop-blur-sm">
+        <div className="flex items-center gap-1 md:gap-2 overflow-x-auto">
+          <Button
+            variant={isCropping ? "default" : "outline"}
+            size="sm"
+            className="text-xs h-8 shrink-0"
+            onClick={() => {
+              setIsCropping(!isCropping);
+              setCropArea(null);
+            }}
+          >
+            <Crop className="h-3 w-3 mr-1" />
+            Crop
+          </Button>
+          {isCropping && cropArea && cropArea.width > 10 && (
+            <Button size="sm" className="text-xs h-8 shrink-0" onClick={applyCrop}>
+              Apply
+            </Button>
+          )}
+          {isCropping && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-xs h-8 shrink-0"
+              onClick={() => {
+                setIsCropping(false);
+                setCropArea(null);
+              }}
+            >
+              Cancel
+            </Button>
+          )}
+        </div>
+        
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleZoomOut}>
+            <ZoomOut className="h-3.5 w-3.5" />
+          </Button>
+          <span className="text-xs text-muted-foreground w-10 text-center">
             {Math.round(zoom * 100)}%
           </span>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleZoomIn} title="Zoom In">
-            <ZoomIn className="h-4 w-4" />
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleZoomIn}>
+            <ZoomIn className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleResetZoom} title="Reset Zoom">
-            <RotateCcw className="h-4 w-4" />
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleResetZoom}>
+            <RotateCcw className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose} title="Close">
-            <X className="h-4 w-4" />
+          <Button variant="outline" size="sm" className="text-xs h-7 ml-1" onClick={handleDownload}>
+            <Download className="h-3 w-3 mr-1" />
+            <span className="hidden sm:inline">Save</span>
           </Button>
         </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex items-center gap-1 md:gap-2 p-2 md:p-3 border-b border-white/10 bg-background/50 flex-shrink-0 overflow-x-auto">
-        <Button
-          variant={isCropping ? "default" : "outline"}
-          size="sm"
-          className="text-xs md:text-sm h-8"
-          onClick={() => {
-            setIsCropping(!isCropping);
-            setCropArea(null);
-          }}
-        >
-          <Crop className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
-          Crop
-        </Button>
-        {isCropping && cropArea && cropArea.width > 10 && (
-          <Button size="sm" className="text-xs md:text-sm h-8" onClick={applyCrop}>
-            Apply
-          </Button>
-        )}
-        {isCropping && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="text-xs md:text-sm h-8"
-            onClick={() => {
-              setIsCropping(false);
-              setCropArea(null);
-            }}
-          >
-            Cancel
-          </Button>
-        )}
-        <div className="flex-1" />
-        <Button variant="outline" size="sm" className="text-xs md:text-sm h-8" onClick={handleDownload}>
-          <Download className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
-          <span className="hidden sm:inline">Download</span>
-        </Button>
-      </div>
-
-      {/* Image Area */}
-      <div className="flex-1 overflow-auto p-2 md:p-4 bg-muted/20 min-h-0">
+      {/* Image Canvas */}
+      <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-[#0a0a0a]">
         <div 
           ref={imageContainerRef}
           className={cn(
-            "relative mx-auto inline-block max-w-full",
+            "relative inline-block",
             isCropping && "cursor-crosshair select-none touch-none"
           )}
           onMouseDown={handlePointerDown}
@@ -367,7 +491,7 @@ export const ImageEditor = ({
           <img
             src={currentImage}
             alt={projectName}
-            className="max-w-full max-h-[40vh] md:max-h-[50vh] h-auto rounded-lg shadow-xl transition-transform object-contain"
+            className="max-w-full max-h-[60vh] md:max-h-[70vh] h-auto rounded-lg shadow-2xl transition-transform object-contain"
             style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
             draggable={false}
           />
@@ -376,7 +500,7 @@ export const ImageEditor = ({
           {isCropping && cropArea && (
             <>
               <div 
-                className="absolute inset-0 bg-black/50 pointer-events-none"
+                className="absolute inset-0 bg-black/60 pointer-events-none"
                 style={{
                   clipPath: `polygon(
                     0 0, 100% 0, 100% 100%, 0 100%, 0 0,
@@ -401,44 +525,72 @@ export const ImageEditor = ({
           )}
         </div>
       </div>
+    </div>
+  );
 
-      {/* AI Edit Input */}
-      <div className="p-2 md:p-4 border-t border-white/10 bg-background/80 backdrop-blur-xl flex-shrink-0">
-        <Card className="p-2 md:p-3 bg-background/50 border-white/10">
-          <div className="flex gap-2">
-            <Textarea
-              value={editPrompt}
-              onChange={(e) => setEditPrompt(e.target.value)}
-              placeholder="Describe edit... (e.g., 'make darker')"
-              className="min-h-[50px] md:min-h-[60px] resize-none bg-transparent border-none focus-visible:ring-0 text-sm"
-              disabled={isEditing}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleAIEdit();
-                }
-              }}
-            />
-            <Button 
-              onClick={handleAIEdit} 
-              disabled={isEditing || !editPrompt.trim()}
-              className="self-end h-10 w-10"
-              size="icon"
-            >
-              {isEditing ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-          <p className="text-[10px] md:text-xs text-muted-foreground mt-1 md:mt-2">
-            Enter to send • Shift+Enter for new line
-          </p>
-        </Card>
+  return (
+    <div className="h-[calc(100vh-3.5rem)] md:h-screen flex flex-col overflow-hidden bg-background">
+      {/* Header */}
+      <div className="flex items-center justify-between px-3 py-2 md:px-4 md:py-3 border-b border-border/50 bg-background/95 backdrop-blur-xl flex-shrink-0">
+        <h2 className="text-sm md:text-base font-semibold truncate max-w-[180px] md:max-w-none flex items-center gap-2">
+          <ImageIcon className="h-4 w-4 text-primary" />
+          {projectName}
+        </h2>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
+          <X className="h-4 w-4" />
+        </Button>
       </div>
-      
-      <canvas ref={canvasRef} className="hidden" />
+
+      {/* Mobile Tab Toggle */}
+      <div className="md:hidden flex border-b border-border/50 bg-background/95">
+        <button
+          onClick={() => setActiveTab("chat")}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors",
+            activeTab === "chat" 
+              ? "text-primary border-b-2 border-primary" 
+              : "text-muted-foreground"
+          )}
+        >
+          <MessageSquare className="h-4 w-4" />
+          Chat
+        </button>
+        <button
+          onClick={() => setActiveTab("preview")}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors",
+            activeTab === "preview" 
+              ? "text-primary border-b-2 border-primary" 
+              : "text-muted-foreground"
+          )}
+        >
+          <ImageIcon className="h-4 w-4" />
+          Preview
+        </button>
+      </div>
+
+      {/* Split Screen Layout */}
+      <div className="flex-1 flex min-h-0">
+        {/* Chat Panel - Desktop always visible, Mobile conditional */}
+        <div className={cn(
+          "w-full md:w-80 lg:w-96 md:border-r border-border/50 flex-shrink-0",
+          activeTab === "chat" ? "flex" : "hidden md:flex"
+        )}>
+          <div className="w-full">
+            <ChatPanel />
+          </div>
+        </div>
+
+        {/* Preview Panel - Desktop always visible, Mobile conditional */}
+        <div className={cn(
+          "flex-1 min-w-0",
+          activeTab === "preview" ? "flex" : "hidden md:flex"
+        )}>
+          <div className="w-full h-full">
+            <PreviewPanel />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
