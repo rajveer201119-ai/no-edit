@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -100,14 +101,55 @@ serve(async (req) => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: "Authentication required. Please sign in." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: "Invalid authentication. Please sign in again." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userId = claimsData.claims.sub;
+
+    // Check rate limits server-side
+    const { data: limitData, error: limitError } = await supabaseClient.rpc('check_generation_limit', {
+      user_id_param: userId
+    });
+
+    if (limitError || !limitData?.[0]?.can_generate) {
+      return new Response(
+        JSON.stringify({ error: "Daily generation limit reached. Upgrade to Pro for more generations." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { prompt, style, size, designType } = await req.json();
 
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
       return new Response(
         JSON.stringify({ error: "Please enter a description for your design." }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Input validation - limit prompt length
+    const sanitizedPrompt = prompt.trim().slice(0, 1000);
 
     // Get the design template based on type
     const template = designTemplates[designType] || designTemplates.default;
@@ -117,18 +159,18 @@ serve(async (req) => {
 
     // Build concise, optimized prompt for better text rendering
     const styledPrompt = [
-      prompt.trim(),
+      sanitizedPrompt,
       template,
       style ? `${style} aesthetic` : null,
       "8K ultra HD, sharp details",
     ].filter(Boolean).join(", ");
 
     console.log("Design generation request:", { 
+      userId: userId.substring(0, 8) + '...', // Log partial ID only
       designType, 
       style, 
       size, 
-      dimensions,
-      prompt: styledPrompt.slice(0, 200) 
+      dimensions
     });
 
     let imageUrl: string;
@@ -155,15 +197,39 @@ serve(async (req) => {
       }
     }
 
+    // Track usage after successful generation
+    await supabaseClient.rpc('increment_generation_usage', {
+      user_id_param: userId
+    });
+
     return new Response(JSON.stringify({ imageUrl, prompt: styledPrompt }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
-    console.error("Error in generate-image function:", error);
-    const msg = error instanceof Error ? error.message : String(error ?? "Unknown error");
+    // Generate error ID for support correlation
+    const errorId = crypto.randomUUID().substring(0, 8);
+    
+    // Safe server-side logging (no sensitive data)
+    console.error(`[${errorId}] Generation error:`, {
+      timestamp: new Date().toISOString(),
+      errorType: error?.constructor?.name || 'Unknown'
+    });
+
+    // Map to safe user-facing messages
+    let clientMessage = "Failed to generate image. Please try again.";
+    let statusCode = 500;
+
+    if (error?.message?.includes("Rate limit")) {
+      clientMessage = "Too many requests. Please try again in a moment.";
+      statusCode = 429;
+    } else if (error?.message?.includes("credits") || error?.message?.includes("402")) {
+      clientMessage = "Service temporarily unavailable. Please try again later.";
+      statusCode = 503;
+    }
+
     return new Response(
-      JSON.stringify({ error: msg || "Unexpected error. Please try again." }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: clientMessage, errorId }),
+      { status: statusCode, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

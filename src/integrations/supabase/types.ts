@@ -376,6 +376,8 @@ export type Database = {
         Returns: undefined
       }
       is_premium_user: { Args: { user_id_param: string }; Returns: boolean }
+      redeem_coupon: { Args: { code_input: string }; Returns: Json }
+      validate_coupon: { Args: { code_input: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"

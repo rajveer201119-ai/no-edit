@@ -82,7 +82,45 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, prompt, projectId, userId } = await req.json();
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: "Authentication required. Please sign in." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: "Invalid authentication. Please sign in again." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userId = claimsData.claims.sub;
+
+    // Check edit rate limits server-side
+    const { data: limitData, error: limitError } = await supabaseClient.rpc('check_edit_limit', {
+      user_id_param: userId
+    });
+
+    if (limitError || !limitData?.[0]?.can_edit) {
+      return new Response(
+        JSON.stringify({ error: "Daily edit limit reached. Upgrade to Pro for more edits." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { imageUrl, prompt, projectId } = await req.json();
 
     if (!imageUrl || !prompt) {
       return new Response(
@@ -90,21 +128,17 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    if (!userId) {
-      return new Response(
-        JSON.stringify({ error: "User ID is required for storage access" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
 
-    console.log("Editing image with prompt:", prompt);
+    // Input validation - limit prompt length
+    const sanitizedPrompt = prompt.trim().slice(0, 1000);
+
+    console.log("Editing image:", { userId: userId.substring(0, 8) + '...' });
 
     let editedImageData: string;
 
     // Use Lovable AI for true image editing (Pollinations only does text-to-image, not editing)
     try {
-      editedImageData = await editWithLovableAI(imageUrl, prompt);
+      editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
     } catch (error: any) {
       // Pass through rate limit and credit errors with proper status codes
       if (error.status === 429) {
@@ -123,6 +157,11 @@ serve(async (req) => {
     }
 
     console.log("Image edit completed successfully");
+
+    // Track edit usage after successful edit
+    await supabaseClient.rpc('increment_edit_usage', {
+      user_id_param: userId
+    });
 
     // Upload the edited image to Supabase Storage
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -168,11 +207,31 @@ serve(async (req) => {
       JSON.stringify({ imageUrl: publicUrl }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
-    console.error("Edit image error:", error);
+  } catch (error: any) {
+    // Generate error ID for support correlation
+    const errorId = crypto.randomUUID().substring(0, 8);
+    
+    // Safe server-side logging
+    console.error(`[${errorId}] Edit error:`, {
+      timestamp: new Date().toISOString(),
+      errorType: error?.constructor?.name || 'Unknown'
+    });
+
+    // Map to safe user-facing messages
+    let clientMessage = "Failed to edit image. Please try again.";
+    let statusCode = 500;
+
+    if (error?.message?.includes("Rate limit") || error?.status === 429) {
+      clientMessage = "Too many requests. Please try again in a moment.";
+      statusCode = 429;
+    } else if (error?.message?.includes("credits") || error?.status === 402) {
+      clientMessage = "Service temporarily unavailable. Please try again later.";
+      statusCode = 503;
+    }
+
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: clientMessage, errorId }),
+      { status: statusCode, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

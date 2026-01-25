@@ -6,6 +6,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { z } from "zod";
+
+// Validation schemas
+const emailSchema = z.string()
+  .trim()
+  .min(1, "Email is required")
+  .email("Invalid email address")
+  .max(255, "Email too long");
+
+const signInPasswordSchema = z.string()
+  .min(1, "Password is required");
+
+const signUpPasswordSchema = z.string()
+  .min(8, "Password must be at least 8 characters")
+  .max(128, "Password too long")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number");
 
 const Auth = () => {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -30,17 +48,38 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate email
+    const emailValidation = emailSchema.safeParse(email);
+    if (!emailValidation.success) {
+      toast.error(emailValidation.error.errors[0].message);
+      return;
+    }
+
+    // Validate password based on mode
+    const passwordSchema = mode === "signup" ? signUpPasswordSchema : signInPasswordSchema;
+    const passwordValidation = passwordSchema.safeParse(password);
+    if (!passwordValidation.success) {
+      toast.error(passwordValidation.error.errors[0].message);
+      return;
+    }
+
+    const validatedEmail = emailValidation.data.toLowerCase();
+    
     setLoading(true);
     try {
       if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({ 
+          email: validatedEmail, 
+          password 
+        });
         if (error) throw error;
         toast.success("Signed in successfully");
         navigate("/");
       } else {
         const redirectUrl = `${window.location.origin}/`;
         const { error } = await supabase.auth.signUp({
-          email,
+          email: validatedEmail,
           password,
           options: { emailRedirectTo: redirectUrl },
         });
