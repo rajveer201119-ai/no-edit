@@ -21,10 +21,12 @@ import {
   Move,
   Trash2,
   Plus,
-  Minus
+  Minus,
+  Type
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { TextToolPanel, TextOverlay } from "./TextToolPanel";
 
 interface ImageEditorProps {
   projectId: string;
@@ -91,6 +93,13 @@ export const ImageEditor = ({
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [isDraggingOverlay, setIsDraggingOverlay] = useState(false);
   const [overlayDragOffset, setOverlayDragOffset] = useState({ x: 0, y: 0 });
+  
+  // Text overlay state
+  const [textOverlays, setTextOverlays] = useState<TextOverlay[]>([]);
+  const [activeTextId, setActiveTextId] = useState<string | null>(null);
+  const [isDraggingText, setIsDraggingText] = useState(false);
+  const [textDragOffset, setTextDragOffset] = useState({ x: 0, y: 0 });
+  const [showTextTool, setShowTextTool] = useState(false);
   
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const chatScrollRef = useRef<HTMLDivElement>(null);
@@ -267,6 +276,107 @@ export const ImageEditor = ({
     }
   };
 
+  // Text overlay handlers
+  const handleAddTextOverlay = (text: TextOverlay) => {
+    setTextOverlays(prev => [...prev, text]);
+    setActiveTextId(text.id);
+    setShowTextTool(false);
+    toast.success("Text added! Drag to position it.");
+  };
+
+  const handleUpdateTextOverlay = (id: string, updates: Partial<TextOverlay>) => {
+    setTextOverlays(prev => prev.map(t => 
+      t.id === id ? { ...t, ...updates } : t
+    ));
+  };
+
+  const handleTextPointerDown = (e: React.MouseEvent | React.TouchEvent, textId: string) => {
+    e.stopPropagation();
+    if (isCropping) return;
+    
+    const text = textOverlays.find(t => t.id === textId);
+    if (!text) return;
+
+    setActiveTextId(textId);
+    setActiveOverlayId(null);
+    setIsDraggingText(true);
+
+    const rect = imageContainerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    let clientX: number, clientY: number;
+    if ('touches' in e) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    setTextDragOffset({
+      x: clientX - rect.left - text.x,
+      y: clientY - rect.top - text.y
+    });
+  };
+
+  const handleTextPointerMove = useCallback((e: MouseEvent | TouchEvent) => {
+    if (!isDraggingText || !activeTextId || !imageContainerRef.current) return;
+
+    const rect = imageContainerRef.current.getBoundingClientRect();
+    let clientX: number, clientY: number;
+    
+    if ('touches' in e) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    const newX = clientX - rect.left - textDragOffset.x;
+    const newY = clientY - rect.top - textDragOffset.y;
+
+    setTextOverlays(prev => prev.map(t => 
+      t.id === activeTextId 
+        ? { ...t, x: Math.max(0, newX), y: Math.max(0, newY) }
+        : t
+    ));
+  }, [isDraggingText, activeTextId, textDragOffset]);
+
+  const handleTextPointerUp = useCallback(() => {
+    setIsDraggingText(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDraggingText) {
+      window.addEventListener('mousemove', handleTextPointerMove);
+      window.addEventListener('mouseup', handleTextPointerUp);
+      window.addEventListener('touchmove', handleTextPointerMove);
+      window.addEventListener('touchend', handleTextPointerUp);
+      return () => {
+        window.removeEventListener('mousemove', handleTextPointerMove);
+        window.removeEventListener('mouseup', handleTextPointerUp);
+        window.removeEventListener('touchmove', handleTextPointerMove);
+        window.removeEventListener('touchend', handleTextPointerUp);
+      };
+    }
+  }, [isDraggingText, handleTextPointerMove, handleTextPointerUp]);
+
+  const removeTextOverlay = (textId: string) => {
+    setTextOverlays(prev => prev.filter(t => t.id !== textId));
+    if (activeTextId === textId) {
+      setActiveTextId(null);
+    }
+  };
+
+  const resizeText = (textId: string, delta: number) => {
+    setTextOverlays(prev => prev.map(t => {
+      if (t.id !== textId) return t;
+      const newSize = Math.max(12, Math.min(200, t.fontSize + delta));
+      return { ...t, fontSize: newSize };
+    }));
+  };
+
   const getPointerPosition = (e: React.MouseEvent | React.TouchEvent) => {
     const rect = imageContainerRef.current!.getBoundingClientRect();
     if ('touches' in e) {
@@ -342,7 +452,7 @@ export const ImageEditor = ({
     const scaleX = baseImg.naturalWidth / imgRect.width;
     const scaleY = baseImg.naturalHeight / imgRect.height;
 
-    // Draw overlays
+    // Draw image overlays
     for (const overlay of overlays) {
       const overlayImg = new Image();
       await new Promise<void>((resolve) => {
@@ -362,6 +472,72 @@ export const ImageEditor = ({
       const overlayH = overlay.height * scaleY;
 
       ctx.drawImage(overlayImg, overlayX, overlayY, overlayW, overlayH);
+    }
+
+    // Draw text overlays
+    const containerRect = imageContainerRef.current!.getBoundingClientRect();
+    const imgOffsetX = imgRect.left - containerRect.left;
+    const imgOffsetY = imgRect.top - containerRect.top;
+
+    for (const text of textOverlays) {
+      const textX = (text.x - imgOffsetX) * scaleX;
+      const textY = (text.y - imgOffsetY) * scaleY;
+      const scaledFontSize = text.fontSize * scaleX;
+
+      ctx.save();
+      ctx.globalAlpha = text.opacity;
+      ctx.font = `${text.fontStyle} ${text.fontWeight} ${scaledFontSize}px ${text.fontFamily}`;
+      ctx.textBaseline = "top";
+
+      if (text.gradient) {
+        // Parse gradient and create canvas gradient
+        const gradient = ctx.createLinearGradient(textX, textY, textX + ctx.measureText(text.text).width, textY);
+        // Simple gradient parsing for common gradients
+        if (text.gradient.includes("#EB8530") && text.gradient.includes("#E04724")) {
+          gradient.addColorStop(0, "#EB8530");
+          gradient.addColorStop(1, "#E04724");
+        } else if (text.gradient.includes("#8B5CF6") && text.gradient.includes("#EC4899")) {
+          gradient.addColorStop(0, "#8B5CF6");
+          gradient.addColorStop(1, "#EC4899");
+        } else if (text.gradient.includes("#3B82F6") && text.gradient.includes("#06B6D4")) {
+          gradient.addColorStop(0, "#3B82F6");
+          gradient.addColorStop(1, "#06B6D4");
+        } else if (text.gradient.includes("#10B981")) {
+          gradient.addColorStop(0, "#10B981");
+          gradient.addColorStop(1, "#14B8A6");
+        } else if (text.gradient.includes("#F59E0B") && text.gradient.includes("#FCD34D")) {
+          gradient.addColorStop(0, "#F59E0B");
+          gradient.addColorStop(1, "#FCD34D");
+        } else if (text.gradient.includes("rainbow") || text.gradient.includes("90deg")) {
+          gradient.addColorStop(0, "#EF4444");
+          gradient.addColorStop(0.25, "#F59E0B");
+          gradient.addColorStop(0.5, "#84CC16");
+          gradient.addColorStop(0.75, "#06B6D4");
+          gradient.addColorStop(1, "#8B5CF6");
+        } else {
+          // Fallback sunset gradient
+          gradient.addColorStop(0, "#F97316");
+          gradient.addColorStop(0.5, "#EF4444");
+          gradient.addColorStop(1, "#EC4899");
+        }
+        ctx.fillStyle = gradient;
+      } else {
+        ctx.fillStyle = text.color;
+      }
+
+      // Apply shadow if not gradient
+      if (!text.gradient && text.textShadow !== "none") {
+        const shadowMatch = text.textShadow.match(/(\d+)px\s+(\d+)px\s+(\d+)px/);
+        if (shadowMatch) {
+          ctx.shadowOffsetX = parseInt(shadowMatch[1]) * scaleX;
+          ctx.shadowOffsetY = parseInt(shadowMatch[2]) * scaleY;
+          ctx.shadowBlur = parseInt(shadowMatch[3]) * scaleX;
+          ctx.shadowColor = "rgba(0,0,0,0.5)";
+        }
+      }
+
+      ctx.fillText(text.text, textX, textY);
+      ctx.restore();
     }
 
     return new Promise((resolve, reject) => {
@@ -490,7 +666,7 @@ export const ImageEditor = ({
 
   // Merge overlays and save
   const handleMergeAndSave = async () => {
-    if (overlays.length === 0) {
+    if (overlays.length === 0 && textOverlays.length === 0) {
       toast.error("No overlays to merge");
       return;
     }
@@ -523,6 +699,9 @@ export const ImageEditor = ({
       onImageUpdate(publicUrl);
       setOverlays([]);
       setActiveOverlayId(null);
+      setTextOverlays([]);
+      setActiveTextId(null);
+      setShowTextTool(false);
       
       toast.success("Layers merged and saved!");
     } catch (error: any) {
@@ -654,8 +833,8 @@ export const ImageEditor = ({
       
       let blob: Blob;
       
-      // If there are overlays, flatten them first
-      if (overlays.length > 0) {
+      // If there are overlays or text overlays, flatten them first
+      if (overlays.length > 0 || textOverlays.length > 0) {
         blob = await flattenLayers();
       } else {
         const response = await fetch(currentImage);
@@ -685,6 +864,7 @@ export const ImageEditor = ({
   const handleResetZoom = () => setZoom(1);
 
   const activeOverlay = overlays.find(o => o.id === activeOverlayId);
+  const activeText = textOverlays.find(t => t.id === activeTextId);
 
   return (
     <div className="h-[calc(100vh-3.5rem)] md:h-screen flex flex-col overflow-hidden bg-background">
@@ -867,6 +1047,21 @@ export const ImageEditor = ({
                   Add Image
                 </Button>
 
+                {/* Add Text Button */}
+                <Button
+                  variant={showTextTool ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs h-8 shrink-0"
+                  onClick={() => {
+                    setShowTextTool(!showTextTool);
+                    setActiveTextId(null);
+                  }}
+                  disabled={isCropping}
+                >
+                  <Type className="h-3 w-3 mr-1" />
+                  Add Text
+                </Button>
+
                 {isCropping && cropArea && cropArea.width > 10 && (
                   <Button size="sm" className="text-xs h-8 shrink-0" onClick={applyCrop}>
                     Apply
@@ -887,7 +1082,7 @@ export const ImageEditor = ({
                 )}
 
                 {/* Overlay Controls */}
-                {overlays.length > 0 && !isCropping && (
+                {(overlays.length > 0 || textOverlays.length > 0) && !isCropping && (
                   <>
                     <div className="w-px h-6 bg-border mx-1" />
                     <Button
@@ -924,7 +1119,7 @@ export const ImageEditor = ({
             </div>
 
             {/* Active Overlay Controls */}
-            {activeOverlay && !isCropping && (
+            {activeOverlay && !isCropping && !showTextTool && (
               <div className="flex items-center justify-center gap-2 p-2 bg-primary/10 border-b border-border/50">
                 <span className="text-xs text-muted-foreground">Selected overlay:</span>
                 <Button
@@ -957,6 +1152,61 @@ export const ImageEditor = ({
               </div>
             )}
 
+            {/* Active Text Controls */}
+            {activeText && !isCropping && !showTextTool && (
+              <div className="flex items-center justify-center gap-2 p-2 bg-primary/10 border-b border-border/50">
+                <span className="text-xs text-muted-foreground">Selected text:</span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => resizeText(activeText.id, -4)}
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <span className="text-xs w-16 text-center">
+                  {activeText.fontSize}px
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => resizeText(activeText.id, 4)}
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => {
+                    setShowTextTool(true);
+                  }}
+                >
+                  Edit Style
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="h-7 w-7 ml-2"
+                  onClick={() => removeTextOverlay(activeText.id)}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+
+            {/* Text Tool Panel */}
+            {showTextTool && !isCropping && (
+              <div className="border-b border-border/50 bg-background/95 backdrop-blur-sm max-h-[40vh] overflow-y-auto">
+                <TextToolPanel
+                  onAddText={handleAddTextOverlay}
+                  selectedText={activeText}
+                  onUpdateText={handleUpdateTextOverlay}
+                />
+              </div>
+            )}
+
             {/* Image Canvas */}
             <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-[#0a0a0a]">
               <div 
@@ -974,8 +1224,9 @@ export const ImageEditor = ({
                 onTouchEnd={handlePointerUp}
                 onTouchCancel={handlePointerUp}
                 onClick={() => {
-                  if (!isDraggingOverlay && !isCropping) {
+                  if (!isDraggingOverlay && !isDraggingText && !isCropping) {
                     setActiveOverlayId(null);
+                    setActiveTextId(null);
                   }
                 }}
               >
@@ -1012,6 +1263,38 @@ export const ImageEditor = ({
                       className="w-full h-full object-contain pointer-events-none"
                       draggable={false}
                     />
+                  </div>
+                ))}
+
+                {/* Text Overlays */}
+                {textOverlays.map((text) => (
+                  <div
+                    key={text.id}
+                    className={cn(
+                      "absolute cursor-move select-none whitespace-nowrap",
+                      text.id === activeTextId && "ring-2 ring-primary ring-offset-2 ring-offset-transparent rounded"
+                    )}
+                    style={{
+                      left: text.x,
+                      top: text.y,
+                      fontFamily: text.fontFamily,
+                      fontSize: text.fontSize,
+                      fontWeight: text.fontWeight,
+                      fontStyle: text.fontStyle,
+                      color: text.gradient ? "transparent" : text.color,
+                      background: text.gradient || "transparent",
+                      backgroundClip: text.gradient ? "text" : "unset",
+                      WebkitBackgroundClip: text.gradient ? "text" : "unset",
+                      textShadow: text.gradient ? "none" : text.textShadow,
+                      opacity: text.opacity,
+                      transform: `scale(${zoom})`,
+                      transformOrigin: "top left",
+                      padding: "2px 4px",
+                    }}
+                    onMouseDown={(e) => handleTextPointerDown(e, text.id)}
+                    onTouchStart={(e) => handleTextPointerDown(e, text.id)}
+                  >
+                    {text.text}
                   </div>
                 ))}
                 
