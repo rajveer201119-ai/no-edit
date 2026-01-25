@@ -2,18 +2,21 @@ import { useEffect, useState, lazy, Suspense, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { DesignWorkspace } from "@/components/workspace";
+import { GradientButton } from "@/components/ui/gradient-button";
+import { Hero } from "@/components/Hero";
+import { AnimatedAIChat } from "@/components/AnimatedAIChat";
+import { Footer } from "@/components/Footer";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { GlassSidebar, type Project, type TabType } from "@/components/GlassSidebar";
+import { ImageEditor } from "@/components/ImageEditor";
 import { SEO, homePageSchema } from "@/components/SEO";
-import { Loader2, User, LogOut, Crown, Settings } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { SpaceBackground } from "@/components/ui/space-background";
 import { toast } from "sonner";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
+const Feed = lazy(() => import("@/components/Feed").then(mod => ({ default: mod.Feed })));
 
 export type ImageStyle = "ghibli" | "3d" | "animated" | "realistic" | "vintage" | "cyberpunk";
 export type ImageSize = "square" | "portrait" | "landscape";
@@ -22,42 +25,61 @@ const Index = () => {
   const [isAuthed, setIsAuthed] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [lastPrompt, setLastPrompt] = useState<string>("");
   const [remainingPrompts, setRemainingPrompts] = useState<number | null>(null);
   const [isPremium, setIsPremium] = useState(false);
-  const [currentProjectId, setCurrentProjectId] = useState<string | undefined>();
-  const [currentProjectName, setCurrentProjectName] = useState<string | undefined>();
+  const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>("chat");
+  const [projects, setProjects] = useState<Project[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthed(!!session);
       setCurrentUserId(session?.user?.id || null);
-      setUserEmail(session?.user?.email || null);
       if (session?.user) {
         checkAdminRole(session.user.id);
         fetchDailyLimit(session.user.id);
+        fetchProjects(session.user.id);
       } else {
         setIsAdmin(false);
         setRemainingPrompts(null);
+        setProjects([]);
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthed(!!session);
       setCurrentUserId(session?.user?.id || null);
-      setUserEmail(session?.user?.email || null);
       if (session?.user) {
         checkAdminRole(session.user.id);
         fetchDailyLimit(session.user.id);
+        fetchProjects(session.user.id);
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchProjects = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false });
+    
+    if (!error && data) {
+      setProjects(data);
+    }
+  };
+
+  const refreshProjects = useCallback(() => {
+    if (currentUserId) {
+      fetchProjects(currentUserId);
+    }
+  }, [currentUserId]);
 
   const fetchDailyLimit = async (userId: string) => {
     try {
@@ -93,7 +115,6 @@ const Index = () => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    toast.success("Signed out");
   };
 
   const getStyleFromCommand = (command?: string): ImageStyle => {
@@ -107,6 +128,8 @@ const Index = () => {
   };
 
   const handleGenerate = useCallback(async (prompt: string, command?: string) => {
+    // Allow generation without signup - auth is only required for editor
+
     if (!prompt.trim()) {
       toast.error("Please describe what you want to design");
       return;
@@ -126,6 +149,7 @@ const Index = () => {
     setIsGenerating(true);
     setGeneratedImage(null);
     setLastPrompt(prompt);
+    toast.loading("Creating your design...", { id: "generating", duration: 120000 });
 
     try {
       const style = getStyleFromCommand(command);
@@ -160,16 +184,23 @@ const Index = () => {
           .select()
           .single();
 
-        if (!projectError && newProject) {
-          setCurrentProjectId(newProject.id);
-          setCurrentProjectName(newProject.name);
+        if (projectError) {
+          console.error("Failed to create project:", projectError);
         }
 
         await fetchDailyLimit(currentUserId);
+        await fetchProjects(currentUserId);
+
+        // Open the project in editor tab
+        if (newProject) {
+          setActiveTab({ type: "project", project: newProject });
+          toast.success("Design created! Opening editor...");
+          return;
+        }
       }
 
       setGeneratedImage(imageUrl);
-      toast.success("Design created!");
+      toast.success("Design created! Sign in to save and edit.");
     } catch (error: any) {
       console.error("Generation error:", error);
       toast.error(
@@ -177,94 +208,248 @@ const Index = () => {
         { duration: 5000 }
       );
     } finally {
+      toast.dismiss("generating");
       setIsGenerating(false);
     }
-  }, [currentUserId, remainingPrompts, isPremium]);
+  }, [currentUserId, navigate, remainingPrompts, isPremium]);
 
-  const handleImageUpdate = (newUrl: string) => {
-    setGeneratedImage(newUrl);
+  const getImageBlob = async (imageUrl: string): Promise<Blob> => {
+    const resp = await fetch(imageUrl);
+    if (!resp.ok) throw new Error("Failed to fetch image");
+    return await resp.blob();
   };
+
+  const handleDownload = async () => {
+    if (!generatedImage) return;
+
+    try {
+      toast.loading("Preparing download...", { id: "download" });
+
+      const blob = await getImageBlob(generatedImage);
+      const url = URL.createObjectURL(blob);
+
+      const extension = blob.type === "image/jpeg" ? "jpg" : "png";
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `epic-design-${Date.now()}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success("Design downloaded!");
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to download design");
+    } finally {
+      toast.dismiss("download");
+    }
+  };
+
+  const handleSaveToFeed = async () => {
+    if (!generatedImage || !currentUserId) {
+      toast.error("Please sign in to save designs to the gallery");
+      return;
+    }
+
+    setIsSaving(true);
+    toast.loading("Saving to gallery...", { id: "saving" });
+
+    try {
+      const blob = await getImageBlob(generatedImage);
+      const extension = blob.type === "image/jpeg" ? "jpg" : "png";
+
+      const fileName = `${currentUserId}/${Date.now()}.${extension}`;
+      const { error: uploadError } = await supabase.storage
+        .from("post-images")
+        .upload(fileName, blob, { contentType: blob.type || "image/png" });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from("post-images").getPublicUrl(fileName);
+
+      const { error: postError } = await supabase.from("posts").insert({
+        user_id: currentUserId,
+        image_url: publicUrl,
+        content: lastPrompt,
+      });
+
+      if (postError) throw postError;
+
+      toast.success("Design saved to gallery!");
+      setGeneratedImage(null);
+      setLastPrompt("");
+    } catch (error) {
+      console.error("Save error:", error);
+      toast.error("Failed to save design to gallery");
+    } finally {
+      toast.dismiss("saving");
+      setIsSaving(false);
+    }
+  };
+
+  const handleProjectImageUpdate = (newImageUrl: string) => {
+    if (typeof activeTab === "object" && activeTab.type === "project") {
+      setActiveTab({
+        type: "project",
+        project: { ...activeTab.project, image_url: newImageUrl }
+      });
+      refreshProjects();
+    }
+  };
+
+  const renderContent = () => {
+    // Project editor tab - require auth
+    if (typeof activeTab === "object" && activeTab.type === "project") {
+      if (!isAuthed) {
+        return (
+          <div className="flex flex-col items-center justify-center h-full gap-4 p-4">
+            <p className="text-muted-foreground text-center">Sign in to access the editor</p>
+            <Button onClick={() => navigate("/auth")}>Sign In</Button>
+          </div>
+        );
+      }
+      
+      if (!activeTab.project.image_url) {
+        return (
+          <div className="flex items-center justify-center h-full text-muted-foreground">
+            No image to edit
+          </div>
+        );
+      }
+      
+      return (
+        <ImageEditor
+          projectId={activeTab.project.id}
+          projectName={activeTab.project.name}
+          imageUrl={activeTab.project.image_url}
+          onImageUpdate={handleProjectImageUpdate}
+          onClose={() => setActiveTab("chat")}
+        />
+      );
+    }
+
+    // Chat tab
+    if (activeTab === "chat") {
+      return (
+        <div className="flex flex-col min-h-full">
+          <AnnouncementBanner />
+          <Hero />
+          
+          <section aria-label="AI Design Generator Tool" className="mt-8 animate-fade-in pb-8">
+            <AnimatedAIChat 
+              onGenerate={handleGenerate}
+              isGenerating={isGenerating}
+              remainingPrompts={remainingPrompts}
+              isPremium={isPremium}
+            />
+          </section>
+          
+          {/* Show generated image for non-authenticated users */}
+          {generatedImage && !isAuthed && (
+            <div className="mt-8 mb-8 max-w-2xl mx-auto w-full px-4">
+              <Card className="p-4 glass-card border-white/10">
+                <img 
+                  src={generatedImage} 
+                  alt="Generated design" 
+                  className="w-full h-auto rounded-lg mb-4"
+                />
+                <div className="flex flex-col gap-2">
+                  <Button onClick={() => navigate("/auth")} className="w-full">
+                    Sign in to Save & Edit
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={async () => {
+                      const link = document.createElement("a");
+                      link.href = generatedImage;
+                      link.download = `epic-design-${Date.now()}.png`;
+                      link.click();
+                    }}
+                    className="w-full"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Feed tab
+    if (activeTab === "feed") {
+      return (
+        <section aria-label="Community Generated Designs" className="mt-8 animate-fade-in">
+          <Suspense fallback={
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          }>
+            <Feed />
+          </Suspense>
+        </section>
+      );
+    }
+
+    return null;
+  };
+
+  const isEditorMode = typeof activeTab === "object" && activeTab.type === "project";
 
   return (
     <>
       <SEO 
-        title="EPIC - AI Design Studio | Create Professional Designs by Talking"
-        description="AI-powered design studio for creators. Create stunning logos, social media graphics, banners, and posters just by describing what you want. No design skills needed."
-        keywords="AI design studio, design by talking, logo maker, social media graphics, banner maker, poster design, AI graphic design, no-code design"
+        title="EPIC - Design Generator for Non-Designers | Create Professional Designs Instantly"
+        description="AI-powered design generator for non-designers. Create stunning logos, social media graphics, banners, posters, and business cards instantly. No design skills needed."
+        keywords="AI design generator, design for non-designers, logo maker, social media graphics, banner maker, poster design, business card maker, AI graphic design"
         canonicalUrl="https://epic-ai-generator.lovable.app/"
         structuredData={homePageSchema}
       />
-      
-      <div className="h-screen flex flex-col bg-background overflow-hidden">
+      <div className="min-h-screen flex flex-col md:flex-row">
         <ProPlanDialog />
+        {isGenerating && <SpaceBackground particleCount={450} />}
         
-        {/* Top Header Bar */}
-        <header className="flex-shrink-0 h-14 border-b border-border/50 bg-background/95 backdrop-blur-xl flex items-center justify-between px-4 z-50">
-          <div className="flex items-center gap-3">
-            <h1 className="text-lg font-bold gradient-epic-text tracking-tight">EPIC</h1>
-            <span className="hidden sm:inline text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
-              AI Design Studio
-            </span>
-          </div>
+        <GlassSidebar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          isAuthed={isAuthed}
+          isAdmin={isAdmin}
+          currentUserId={currentUserId}
+          onSignOut={signOut}
+          onSignIn={() => navigate("/auth")}
+          onViewPlans={() => navigate("/pricing-india")}
+          onAdminClick={() => navigate("/admin")}
+          projects={projects}
+          onProjectsChange={refreshProjects}
+        />
+        
+        <div className="flex-1 ml-0 pt-14 md:pt-0 md:ml-20 lg:ml-64 flex flex-col min-h-screen overflow-x-hidden">
+          {!isEditorMode && (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+              <div className="absolute top-20 left-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+            </div>
+          )}
 
-          <div className="flex items-center gap-2">
-            {isAuthed ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 gap-2">
-                    <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-                      <User className="w-3.5 h-3.5 text-primary" />
-                    </div>
-                    <span className="hidden sm:inline text-xs truncate max-w-[120px]">
-                      {userEmail}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => navigate("/pricing-india")}>
-                    <Crown className="w-4 h-4 mr-2" />
-                    Upgrade to Pro
-                  </DropdownMenuItem>
-                  {isAdmin && (
-                    <DropdownMenuItem onClick={() => navigate("/admin")}>
-                      <Settings className="w-4 h-4 mr-2" />
-                      Admin Panel
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={signOut}>
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button 
-                variant="default" 
-                size="sm" 
-                className="h-8 text-xs"
-                onClick={() => navigate("/auth")}
-              >
-                Sign In
-              </Button>
-            )}
-          </div>
-        </header>
-
-        {/* Main Workspace */}
-        <main className="flex-1 overflow-hidden">
-          <DesignWorkspace
-            onGenerate={handleGenerate}
-            isGenerating={isGenerating}
-            generatedImage={generatedImage}
-            remainingPrompts={remainingPrompts}
-            isPremium={isPremium}
-            onUpgrade={() => navigate("/pricing-india")}
-            projectId={currentProjectId}
-            projectName={currentProjectName}
-            onImageUpdate={handleImageUpdate}
-          />
-        </main>
+          {isEditorMode ? (
+            <div className="flex-1 relative z-10">
+              {renderContent()}
+            </div>
+          ) : (
+            <>
+              <div className="relative z-10 container mx-auto px-4 py-8 flex-1">
+                <main>
+                  {renderContent()}
+                </main>
+              </div>
+              <Footer />
+            </>
+          )}
+        </div>
       </div>
     </>
   );
