@@ -1,5 +1,5 @@
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
-import { ShaderAnimation } from "@/components/ui/shader-animation";
+import { WebGLShader } from "@/components/ui/web-gl-shader";
 import epicLogo from "@/assets/epic-logo.png";
 
 const badges = [
@@ -24,13 +24,14 @@ export const Hero = () => {
       className="relative mx-auto w-full pt-24 md:pt-40 px-6 text-center md:px-8 
       min-h-[calc(100vh-40px)] overflow-hidden rounded-b-xl"
     >
-      {/* Shining Light Lines Background */}
-      <div className="absolute inset-0 -z-10">
-        <ShaderAnimation />
+      {/* Single Flowing Line Background */}
+      <div className="absolute inset-0 -z-20">
+        <WebGLShader />
       </div>
       
-      {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 -z-10 bg-black/30" />
+      {/* Glass Background Overlay */}
+      <div className="absolute inset-0 -z-10 bg-black/20 backdrop-blur-sm" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white/[0.03] to-transparent" />
 
       {/* Logo */}
       <div className="flex justify-center mb-4 md:mb-5 relative z-10">
@@ -70,8 +71,8 @@ export const Hero = () => {
         {badges.map((badge) => (
           <span 
             key={badge}
-            className="px-3 py-1 text-xs md:text-sm rounded-full border border-white/20 
-            bg-black/30 backdrop-blur-sm text-gray-300"
+            className="px-3 py-1 text-xs md:text-sm rounded-full border border-white/10 
+            bg-white/5 backdrop-blur-md text-gray-300"
           >
             {badge}
           </span>
