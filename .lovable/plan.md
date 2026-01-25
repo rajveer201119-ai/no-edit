@@ -1,92 +1,88 @@
 
+# Plan: Reduce Lovable AI Credit Usage in Image Editing
 
-# Plan: Switch to Pollinations AI for Image Generation
+## Problem Analysis
 
-## Overview
-Replace Lovable AI with Pollinations AI (free, no API key required) for **image generation only**, while keeping Lovable AI for the **image editing** feature. Pollinations AI now integrates with Flux models which have significantly improved text rendering.
+Currently, the `edit-image` edge function uses **Lovable AI (Gemini 2.5 Flash Image Preview)** for every image edit request. This consumes Lovable AI credits on each edit, which adds up quickly for users who make multiple modifications to their designs.
 
-## Changes Required
+The `generate-image` function already uses a **hybrid approach**: Pollinations AI (free) as the primary generator with Lovable AI as a fallback. We should apply the same pattern to image editing.
 
-### 1. Update Edge Function: `supabase/functions/generate-image/index.ts`
+## Solution: Hybrid Image Editing with Pollinations AI
 
-**Current State:**
-- Uses Lovable AI Gateway (`https://ai.gateway.lovable.dev/v1/chat/completions`)
-- Model: `google/gemini-2.5-flash-image-preview`
-- Consumes credits from your Lovable AI balance
+Pollinations AI recently deployed the **FLUX.2 `klein` model** specifically optimized for image-to-image editing tasks. This is completely free and requires no API key.
 
-**New Implementation:**
-- Use Pollinations AI (`https://image.pollinations.ai/prompt/`)
-- Model: Flux (default, best text rendering)
-- Completely free, no API key required
-
-**Key Changes:**
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│  BEFORE: Lovable AI (credit-based)                         │
-│  ─────────────────────────────────────                      │
-│  fetch("https://ai.gateway.lovable.dev/v1/chat/completions")│
-│  Authorization: Bearer ${LOVABLE_API_KEY}                   │
-│  Returns: base64 image in JSON response                     │
-└─────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────┐
-│  AFTER: Pollinations AI (free)                              │
-│  ────────────────────────────                               │
-│  fetch("https://image.pollinations.ai/prompt/${prompt}")    │
-│  No API key required                                        │
-│  Returns: Direct image URL                                  │
-└─────────────────────────────────────────────────────────────┘
++-------------------+     Fails?     +------------------+
+|  Pollinations AI  | ------------> |   Lovable AI     |
+|  (FLUX.2 klein)   |   Fallback    |   (Gemini)       |
+|      FREE         |               |   Uses Credits   |
++-------------------+               +------------------+
 ```
 
-**Technical Implementation:**
-1. Remove LOVABLE_API_KEY dependency for generation
-2. URL-encode the styled prompt
-3. Add Pollinations parameters for quality and model selection:
-   - `model=flux` - Best text rendering model
-   - `width/height` - Based on size parameter
-   - `nologo=true` - Remove watermark
-   - `enhance=true` - Better quality
-4. Return the direct image URL instead of base64
+## Implementation Steps
 
-### 2. Prompt Engineering Updates
+### Step 1: Update the `edit-image` Edge Function
 
-Keep the existing design templates but optimize for Pollinations/Flux:
-- Maintain text accuracy instructions
-- Simplify prompt format (Flux handles text better with cleaner prompts)
-- Add explicit quotes around text that needs exact spelling
+Modify `supabase/functions/edit-image/index.ts` to:
 
-### 3. Size Mapping
+1. **Add Pollinations image editing function** - Create a new function `editWithPollinations()` that uses the Pollinations image-to-image API with the `klein` model
+2. **Add Lovable AI fallback function** - Refactor existing Gemini code into `editWithLovableAI()` 
+3. **Implement try/fallback pattern** - Try Pollinations first; if it fails, fall back to Lovable AI
+4. **Add logging** - Log which service was used for each edit request
 
-| App Size | Pollinations Dimensions |
-|----------|-------------------------|
-| square | 1024x1024 |
-| portrait | 832x1216 |
-| landscape | 1216x832 |
+### Technical Details
 
-### 4. What Stays the Same
+**Pollinations Image Editing API:**
+- Endpoint: `https://image.pollinations.ai/prompt/{prompt}`
+- Parameters: `model=flux`, `seed`, `nologo=true`, plus the source image via the prompt context
+- For image-to-image: Pollinations accepts source images via URL reference in the prompt
 
-- **Image Editing**: Continues using Lovable AI (Gemini) via `edit-image` function
-- **Design Templates**: Same logo, social, banner, poster templates
-- **Style Options**: Same style aesthetic modifiers
-- **Error Handling**: Same 429/402 handling (though Pollinations rarely rate-limits)
+**Key Changes to `edit-image/index.ts`:**
 
-## Benefits
+```text
+Before:
+  1. Receive imageUrl + prompt
+  2. Call Lovable AI Gateway (consumes credits)
+  3. Upload result to storage
 
-| Aspect | Before (Lovable AI) | After (Pollinations AI) |
-|--------|---------------------|-------------------------|
-| **Cost** | Uses credits | Free |
-| **API Key** | Required | Not required |
-| **Rate Limits** | Strict | Relaxed |
-| **Text Accuracy** | Good (Gemini) | Good (Flux) |
-| **Speed** | Fast | Fast |
+After:
+  1. Receive imageUrl + prompt
+  2. Try Pollinations AI first (FREE)
+     - Construct edit prompt: "Edit this image: {prompt}. Source: {imageUrl}"
+     - Model: flux (klein variant)
+  3. If Pollinations fails -> Fallback to Lovable AI
+  4. Upload result to storage
+  5. Log which service was used
+```
 
-## File Changes Summary
+### Step 2: Handle Pollinations Image-to-Image Workflow
 
-| File | Action |
-|------|--------|
-| `supabase/functions/generate-image/index.ts` | Rewrite to use Pollinations AI |
+Since Pollinations works differently (URL-based generation), we need to:
+- Download the source image and convert to base64 if needed
+- Construct a descriptive prompt that references the original image context
+- Handle the response format (direct image URL vs base64)
 
-## Fallback Strategy
+### Step 3: Maintain Error Handling
 
-If Pollinations AI fails (rare), the function will return a clear error message asking the user to try again, rather than silently failing.
+- Keep all existing error handling for rate limits (429) and credits (402)
+- Add error handling for Pollinations failures
+- Ensure users see appropriate error messages regardless of which service is used
 
+## Expected Results
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Lovable AI Credits per Edit | 1 credit always | 0 credits (Pollinations) or 1 credit (fallback only) |
+| Estimated Credit Savings | 0% | 80-95% (most edits via free Pollinations) |
+| User Experience | Same | Same (transparent fallback) |
+
+## Files to Modify
+
+1. **`supabase/functions/edit-image/index.ts`** - Add Pollinations as primary editor, refactor Lovable AI as fallback
+
+## Notes
+
+- This mirrors the proven pattern already working in `generate-image`
+- No frontend changes required - the API contract remains the same
+- Users will see the same behavior but with significantly reduced credit consumption
+- Pollinations is community-driven and free, making it sustainable for high-volume usage
