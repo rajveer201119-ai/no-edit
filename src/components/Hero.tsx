@@ -51,9 +51,9 @@ export const Hero = () => {
         <img 
           src={epicLogo} 
           alt="EPIC Design Generator" 
-          className="w-14 h-14 md:w-20 md:h-20 drop-shadow-2xl"
-          width={80}
-          height={80}
+          className="w-20 h-20 md:w-28 md:h-28 drop-shadow-2xl"
+          width={112}
+          height={112}
           loading="eager"
         />
       </div>
