@@ -72,16 +72,16 @@ export const ImageEditor = ({
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
-  // Fetch credits on mount and after edits
+  // Fetch edit credits on mount and after edits
   const fetchCredits = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data } = await supabase.rpc("check_daily_limit", {
+        const { data } = await supabase.rpc("check_edit_limit", {
           user_id_param: user.id
         });
         if (data?.[0]) {
-          setRemainingCredits(data[0].remaining_prompts);
+          setRemainingCredits(data[0].remaining_edits);
           setIsPremium(data[0].is_premium);
         }
       }
@@ -268,6 +268,27 @@ export const ImageEditor = ({
       return;
     }
 
+    // Check edit limit before proceeding
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("You must be logged in to edit images");
+      return;
+    }
+
+    const { data: limitData } = await supabase.rpc("check_edit_limit", {
+      user_id_param: user.id
+    });
+
+    if (!limitData?.[0]?.can_edit) {
+      toast.error(
+        isPremium 
+          ? "You've used all 10 daily edit credits. Come back tomorrow!" 
+          : "You've used your 1 free daily edit. Upgrade to Pro for 10 edits/day!",
+        { duration: 5000 }
+      );
+      return;
+    }
+
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: "user",
@@ -289,10 +310,6 @@ export const ImageEditor = ({
     setEditPrompt("");
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error("You must be logged in to edit images");
-      }
       
       const { data, error } = await supabase.functions.invoke("edit-image", {
         body: {
@@ -316,6 +333,9 @@ export const ImageEditor = ({
         content: `✅ Done! I've applied "${prompt}" to your design. Want any more changes?`,
         timestamp: new Date()
       }));
+      
+      // Increment edit usage after successful edit
+      await supabase.rpc("increment_edit_usage", { user_id_param: user.id });
       
       // Refresh credits after successful edit
       fetchCredits();
@@ -448,7 +468,7 @@ export const ImageEditor = ({
                     : "bg-destructive/10 text-destructive"
                 )}>
                   <Zap className="h-3 w-3" />
-                  <span>{remainingCredits} {isPremium ? "/10" : "/1"}</span>
+                  <span>{remainingCredits} {isPremium ? "/10 edits" : "/1 edit"}</span>
                 </div>
               )}
             </div>

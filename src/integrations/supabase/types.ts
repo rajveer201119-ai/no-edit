@@ -239,6 +239,7 @@ export type Database = {
       }
       prompt_usage: {
         Row: {
+          action_type: string
           created_at: string | null
           id: string
           prompt_count: number
@@ -247,6 +248,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          action_type?: string
           created_at?: string | null
           id?: string
           prompt_count?: number
@@ -255,6 +257,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          action_type?: string
           created_at?: string | null
           id?: string
           prompt_count?: number
@@ -337,12 +340,36 @@ export type Database = {
           remaining_prompts: number
         }[]
       }
+      check_edit_limit: {
+        Args: { user_id_param: string }
+        Returns: {
+          can_edit: boolean
+          is_premium: boolean
+          remaining_edits: number
+        }[]
+      }
+      check_generation_limit: {
+        Args: { user_id_param: string }
+        Returns: {
+          can_generate: boolean
+          is_premium: boolean
+          remaining_prompts: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_edit_usage: {
+        Args: { user_id_param: string }
+        Returns: undefined
+      }
+      increment_generation_usage: {
+        Args: { user_id_param: string }
+        Returns: undefined
       }
       increment_prompt_usage: {
         Args: { user_id_param: string }
