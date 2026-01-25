@@ -5,13 +5,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Design-specific prompt templates for different design types
+// Design-specific prompt templates for different design types - optimized for text accuracy
 const designTemplates: Record<string, string> = {
-  logo: "Professional logo design, clean vector style, minimal and modern, scalable icon, brand identity, white or transparent background, centered composition",
-  social: "Social media graphic, eye-catching design, vibrant colors, modern layout, Instagram/Facebook ready, engaging visual",
-  banner: "Web banner design, wide format, professional marketing material, clean typography space, call-to-action ready, hero image style",
-  poster: "Poster design, high impact visual, print-ready quality, bold typography space, event promotional style, professional layout",
-  default: "Professional graphic design, clean and modern, high quality, visually appealing",
+  logo: "Minimalist professional logo, vector art style, clean lines, solid colors, centered on white background, NO text unless explicitly requested",
+  social: "Social media post graphic, bold modern design, vibrant saturated colors, clean layout with clear focal point",
+  banner: "Wide horizontal banner, professional marketing design, clean composition with space for text overlay",
+  poster: "High-impact poster design, bold visual hierarchy, print-quality, professional event style",
+  default: "Clean professional graphic design, modern aesthetic, high quality render",
 };
 
 // Size mapping for Pollinations API
@@ -115,14 +115,13 @@ serve(async (req) => {
     // Get dimensions based on size
     const dimensions = sizeMap[size] || sizeMap.square;
 
-    // Build optimized design prompt with explicit text accuracy instructions
+    // Build concise, optimized prompt for better text rendering
     const styledPrompt = [
-      prompt,
+      prompt.trim(),
       template,
-      style ? `${style} style aesthetic` : null,
-      "IMPORTANT: Render all text exactly as specified with perfect spelling",
-      "ultra high quality, professional, detailed, sharp text rendering",
-    ].filter(Boolean).join(". ");
+      style ? `${style} aesthetic` : null,
+      "8K ultra HD, sharp details",
+    ].filter(Boolean).join(", ");
 
     console.log("Design generation request:", { 
       designType, 
