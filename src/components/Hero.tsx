@@ -1,5 +1,4 @@
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
-import { LiquidGlassHeading } from "@/components/ui/liquid-glass-heading";
 import epicLogo from "@/assets/epic-logo.png";
 
 const badges = [
