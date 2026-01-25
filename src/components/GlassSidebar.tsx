@@ -198,14 +198,14 @@ export const GlassSidebar = ({
                   const isActive = isProjectActive(project.id);
                   
                   return (
-                    <button
+                    <div
                       key={project.id}
                       onClick={() => {
                         onTabChange({ type: "project", project });
                         setIsOpen(false);
                       }}
                       className={cn(
-                        "w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200",
+                        "w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer",
                         "hover:bg-white/10 group relative text-left",
                         isActive && [
                           "bg-primary/20 border border-primary/30"
@@ -235,7 +235,7 @@ export const GlassSidebar = ({
                       >
                         <Trash2 className="h-3 w-3 text-destructive" />
                       </button>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
