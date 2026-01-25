@@ -338,7 +338,7 @@ const Index = () => {
           <AnnouncementBanner />
           <Hero />
           
-          <section aria-label="AI Design Generator Tool" className="mt-8 animate-fade-in pb-8">
+          <section id="chat-section" aria-label="AI Design Generator Tool" className="mt-8 animate-fade-in pb-8">
             <AnimatedAIChat 
               onGenerate={handleGenerate}
               isGenerating={isGenerating}
