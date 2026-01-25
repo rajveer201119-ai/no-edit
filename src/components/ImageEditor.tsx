@@ -309,6 +309,28 @@ export const ImageEditor = ({
 
   const handleDownload = async () => {
     try {
+      // Check if user is premium before allowing download
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Please sign in to download images");
+        return;
+      }
+
+      const { data: limitData } = await supabase.rpc("check_daily_limit", {
+        user_id_param: user.id
+      });
+
+      if (!limitData?.[0]?.is_premium) {
+        toast.error("Upgrade to Pro to download your designs!", {
+          description: "Pro users get unlimited downloads and 10 edits per day.",
+          action: {
+            label: "Upgrade",
+            onClick: () => window.location.href = "/pricing"
+          }
+        });
+        return;
+      }
+
       toast.loading("Preparing download...", { id: "download" });
       
       const response = await fetch(currentImage);
