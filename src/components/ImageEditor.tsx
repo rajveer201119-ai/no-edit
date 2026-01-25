@@ -16,7 +16,12 @@ import {
   MessageSquare,
   Image as ImageIcon,
   Sparkles,
-  Zap
+  Zap,
+  Upload,
+  Move,
+  Trash2,
+  Plus,
+  Minus
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -41,6 +46,17 @@ interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+}
+
+interface ImageOverlay {
+  id: string;
+  src: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  originalWidth: number;
+  originalHeight: number;
 }
 
 export const ImageEditor = ({ 
@@ -69,8 +85,16 @@ export const ImageEditor = ({
   ]);
   const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
   const [isPremium, setIsPremium] = useState(false);
+  
+  // Overlay state
+  const [overlays, setOverlays] = useState<ImageOverlay[]>([]);
+  const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
+  const [isDraggingOverlay, setIsDraggingOverlay] = useState(false);
+  const [overlayDragOffset, setOverlayDragOffset] = useState({ x: 0, y: 0 });
+  
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const chatScrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch edit credits on mount and after edits
   const fetchCredits = useCallback(async () => {
@@ -103,6 +127,145 @@ export const ImageEditor = ({
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
   }, [chatMessages]);
+
+  // Handle file upload for overlays
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // Scale down if too large (max 200px initial size)
+        const maxSize = 200;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxSize || height > maxSize) {
+          const ratio = Math.min(maxSize / width, maxSize / height);
+          width = width * ratio;
+          height = height * ratio;
+        }
+
+        const newOverlay: ImageOverlay = {
+          id: Date.now().toString(),
+          src: event.target?.result as string,
+          x: 50,
+          y: 50,
+          width,
+          height,
+          originalWidth: img.width,
+          originalHeight: img.height
+        };
+        
+        setOverlays(prev => [...prev, newOverlay]);
+        setActiveOverlayId(newOverlay.id);
+        toast.success("Image added! Drag to position it.");
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+    
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Overlay drag handlers
+  const handleOverlayPointerDown = (e: React.MouseEvent | React.TouchEvent, overlayId: string) => {
+    e.stopPropagation();
+    if (isCropping) return;
+    
+    const overlay = overlays.find(o => o.id === overlayId);
+    if (!overlay) return;
+
+    setActiveOverlayId(overlayId);
+    setIsDraggingOverlay(true);
+
+    const rect = imageContainerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    let clientX: number, clientY: number;
+    if ('touches' in e) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    setOverlayDragOffset({
+      x: clientX - rect.left - overlay.x,
+      y: clientY - rect.top - overlay.y
+    });
+  };
+
+  const handleOverlayPointerMove = useCallback((e: MouseEvent | TouchEvent) => {
+    if (!isDraggingOverlay || !activeOverlayId || !imageContainerRef.current) return;
+
+    const rect = imageContainerRef.current.getBoundingClientRect();
+    let clientX: number, clientY: number;
+    
+    if ('touches' in e) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    const newX = clientX - rect.left - overlayDragOffset.x;
+    const newY = clientY - rect.top - overlayDragOffset.y;
+
+    setOverlays(prev => prev.map(o => 
+      o.id === activeOverlayId 
+        ? { ...o, x: Math.max(-o.width/2, newX), y: Math.max(-o.height/2, newY) }
+        : o
+    ));
+  }, [isDraggingOverlay, activeOverlayId, overlayDragOffset]);
+
+  const handleOverlayPointerUp = useCallback(() => {
+    setIsDraggingOverlay(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDraggingOverlay) {
+      window.addEventListener('mousemove', handleOverlayPointerMove);
+      window.addEventListener('mouseup', handleOverlayPointerUp);
+      window.addEventListener('touchmove', handleOverlayPointerMove);
+      window.addEventListener('touchend', handleOverlayPointerUp);
+      return () => {
+        window.removeEventListener('mousemove', handleOverlayPointerMove);
+        window.removeEventListener('mouseup', handleOverlayPointerUp);
+        window.removeEventListener('touchmove', handleOverlayPointerMove);
+        window.removeEventListener('touchend', handleOverlayPointerUp);
+      };
+    }
+  }, [isDraggingOverlay, handleOverlayPointerMove, handleOverlayPointerUp]);
+
+  const resizeOverlay = (overlayId: string, delta: number) => {
+    setOverlays(prev => prev.map(o => {
+      if (o.id !== overlayId) return o;
+      const aspectRatio = o.originalWidth / o.originalHeight;
+      const newWidth = Math.max(30, Math.min(800, o.width + delta));
+      const newHeight = newWidth / aspectRatio;
+      return { ...o, width: newWidth, height: newHeight };
+    }));
+  };
+
+  const removeOverlay = (overlayId: string) => {
+    setOverlays(prev => prev.filter(o => o.id !== overlayId));
+    if (activeOverlayId === overlayId) {
+      setActiveOverlayId(null);
+    }
+  };
 
   const getPointerPosition = (e: React.MouseEvent | React.TouchEvent) => {
     const rect = imageContainerRef.current!.getBoundingClientRect();
@@ -144,6 +307,69 @@ export const ImageEditor = ({
 
   const handlePointerUp = () => {
     setIsDragging(false);
+  };
+
+  // Composite and flatten layers for saving/downloading
+  const flattenLayers = async (): Promise<Blob> => {
+    const imgElement = imageContainerRef.current?.querySelector('img');
+    if (!imgElement) throw new Error("Image not found");
+
+    // Fetch base image
+    const response = await fetch(currentImage);
+    const imageBlob = await response.blob();
+    const blobUrl = URL.createObjectURL(imageBlob);
+    
+    const baseImg = new Image();
+    await new Promise<void>((resolve, reject) => {
+      baseImg.onload = () => resolve();
+      baseImg.onerror = () => reject(new Error("Failed to load base image"));
+      baseImg.src = blobUrl;
+    });
+    URL.revokeObjectURL(blobUrl);
+
+    // Create canvas at base image size
+    const canvas = document.createElement('canvas');
+    canvas.width = baseImg.naturalWidth;
+    canvas.height = baseImg.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error("Canvas context unavailable");
+
+    // Draw base image
+    ctx.drawImage(baseImg, 0, 0);
+
+    // Calculate scale from display to natural size
+    const imgRect = imgElement.getBoundingClientRect();
+    const scaleX = baseImg.naturalWidth / imgRect.width;
+    const scaleY = baseImg.naturalHeight / imgRect.height;
+
+    // Draw overlays
+    for (const overlay of overlays) {
+      const overlayImg = new Image();
+      await new Promise<void>((resolve) => {
+        overlayImg.onload = () => resolve();
+        overlayImg.onerror = () => resolve(); // Skip failed overlays
+        overlayImg.src = overlay.src;
+      });
+
+      const containerRect = imageContainerRef.current!.getBoundingClientRect();
+      const imgOffsetX = imgRect.left - containerRect.left;
+      const imgOffsetY = imgRect.top - containerRect.top;
+
+      // Calculate overlay position on the natural image
+      const overlayX = (overlay.x - imgOffsetX) * scaleX;
+      const overlayY = (overlay.y - imgOffsetY) * scaleY;
+      const overlayW = overlay.width * scaleX;
+      const overlayH = overlay.height * scaleY;
+
+      ctx.drawImage(overlayImg, overlayX, overlayY, overlayW, overlayH);
+    }
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error("Failed to create blob"));
+      }, "image/png");
+    });
   };
 
   const applyCrop = useCallback(async () => {
@@ -261,6 +487,51 @@ export const ImageEditor = ({
       toast.dismiss("crop");
     }
   }, [cropArea, currentImage, projectId, onImageUpdate]);
+
+  // Merge overlays and save
+  const handleMergeAndSave = async () => {
+    if (overlays.length === 0) {
+      toast.error("No overlays to merge");
+      return;
+    }
+
+    toast.loading("Merging layers...", { id: "merge" });
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("You must be logged in");
+
+      const blob = await flattenLayers();
+      
+      const fileName = `${user.id}/${Date.now()}-merged.png`;
+      const { error: uploadError } = await supabase.storage
+        .from("post-images")
+        .upload(fileName, blob, { contentType: "image/png" });
+      
+      if (uploadError) throw uploadError;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from("post-images")
+        .getPublicUrl(fileName);
+      
+      await supabase
+        .from("projects")
+        .update({ image_url: publicUrl, updated_at: new Date().toISOString() })
+        .eq("id", projectId);
+      
+      setCurrentImage(publicUrl);
+      onImageUpdate(publicUrl);
+      setOverlays([]);
+      setActiveOverlayId(null);
+      
+      toast.success("Layers merged and saved!");
+    } catch (error: any) {
+      console.error("Merge error:", error);
+      toast.error(error?.message || "Failed to merge layers");
+    } finally {
+      toast.dismiss("merge");
+    }
+  };
 
   const handleAIEdit = async () => {
     if (!editPrompt.trim()) {
@@ -381,8 +652,16 @@ export const ImageEditor = ({
 
       toast.loading("Preparing download...", { id: "download" });
       
-      const response = await fetch(currentImage);
-      const blob = await response.blob();
+      let blob: Blob;
+      
+      // If there are overlays, flatten them first
+      if (overlays.length > 0) {
+        blob = await flattenLayers();
+      } else {
+        const response = await fetch(currentImage);
+        blob = await response.blob();
+      }
+      
       const url = URL.createObjectURL(blob);
       
       const link = document.createElement("a");
@@ -405,8 +684,19 @@ export const ImageEditor = ({
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.25, 0.5));
   const handleResetZoom = () => setZoom(1);
 
+  const activeOverlay = overlays.find(o => o.id === activeOverlayId);
+
   return (
     <div className="h-[calc(100vh-3.5rem)] md:h-screen flex flex-col overflow-hidden bg-background">
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileUpload}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 md:px-4 md:py-3 border-b border-border/50 bg-background/95 backdrop-blur-xl flex-shrink-0">
         <h2 className="text-sm md:text-base font-semibold truncate max-w-[180px] md:max-w-none flex items-center gap-2">
@@ -558,11 +848,25 @@ export const ImageEditor = ({
                   onClick={() => {
                     setIsCropping(!isCropping);
                     setCropArea(null);
+                    setActiveOverlayId(null);
                   }}
                 >
                   <Crop className="h-3 w-3 mr-1" />
                   Crop
                 </Button>
+                
+                {/* Add Image Button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-8 shrink-0"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isCropping}
+                >
+                  <Upload className="h-3 w-3 mr-1" />
+                  Add Image
+                </Button>
+
                 {isCropping && cropArea && cropArea.width > 10 && (
                   <Button size="sm" className="text-xs h-8 shrink-0" onClick={applyCrop}>
                     Apply
@@ -580,6 +884,22 @@ export const ImageEditor = ({
                   >
                     Cancel
                   </Button>
+                )}
+
+                {/* Overlay Controls */}
+                {overlays.length > 0 && !isCropping && (
+                  <>
+                    <div className="w-px h-6 bg-border mx-1" />
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="text-xs h-8 shrink-0"
+                      onClick={handleMergeAndSave}
+                    >
+                      <Move className="h-3 w-3 mr-1" />
+                      Merge & Save
+                    </Button>
+                  </>
                 )}
               </div>
               
@@ -603,6 +923,40 @@ export const ImageEditor = ({
               </div>
             </div>
 
+            {/* Active Overlay Controls */}
+            {activeOverlay && !isCropping && (
+              <div className="flex items-center justify-center gap-2 p-2 bg-primary/10 border-b border-border/50">
+                <span className="text-xs text-muted-foreground">Selected overlay:</span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => resizeOverlay(activeOverlay.id, -20)}
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <span className="text-xs w-16 text-center">
+                  {Math.round(activeOverlay.width)}px
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => resizeOverlay(activeOverlay.id, 20)}
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="h-7 w-7 ml-2"
+                  onClick={() => removeOverlay(activeOverlay.id)}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+
             {/* Image Canvas */}
             <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-[#0a0a0a]">
               <div 
@@ -619,6 +973,11 @@ export const ImageEditor = ({
                 onTouchMove={handlePointerMove}
                 onTouchEnd={handlePointerUp}
                 onTouchCancel={handlePointerUp}
+                onClick={() => {
+                  if (!isDraggingOverlay && !isCropping) {
+                    setActiveOverlayId(null);
+                  }
+                }}
               >
                 <img
                   src={currentImage}
@@ -627,6 +986,34 @@ export const ImageEditor = ({
                   style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
                   draggable={false}
                 />
+                
+                {/* Overlay Images */}
+                {overlays.map((overlay) => (
+                  <div
+                    key={overlay.id}
+                    className={cn(
+                      "absolute cursor-move select-none",
+                      overlay.id === activeOverlayId && "ring-2 ring-primary ring-offset-2 ring-offset-transparent"
+                    )}
+                    style={{
+                      left: overlay.x,
+                      top: overlay.y,
+                      width: overlay.width,
+                      height: overlay.height,
+                      transform: `scale(${zoom})`,
+                      transformOrigin: "top left"
+                    }}
+                    onMouseDown={(e) => handleOverlayPointerDown(e, overlay.id)}
+                    onTouchStart={(e) => handleOverlayPointerDown(e, overlay.id)}
+                  >
+                    <img
+                      src={overlay.src}
+                      alt="Overlay"
+                      className="w-full h-full object-contain pointer-events-none"
+                      draggable={false}
+                    />
+                  </div>
+                ))}
                 
                 {/* Crop overlay */}
                 {isCropping && cropArea && (
