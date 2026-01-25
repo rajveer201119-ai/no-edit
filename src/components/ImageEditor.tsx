@@ -15,7 +15,8 @@ import {
   X,
   MessageSquare,
   Image as ImageIcon,
-  Sparkles
+  Sparkles,
+  Zap
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -66,8 +67,32 @@ export const ImageEditor = ({
       timestamp: new Date()
     }
   ]);
+  const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  // Fetch credits on mount and after edits
+  const fetchCredits = useCallback(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase.rpc("check_daily_limit", {
+          user_id_param: user.id
+        });
+        if (data?.[0]) {
+          setRemainingCredits(data[0].remaining_prompts);
+          setIsPremium(data[0].is_premium);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch credits:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCredits();
+  }, [fetchCredits]);
 
   useEffect(() => {
     setCurrentImage(imageUrl);
@@ -292,6 +317,9 @@ export const ImageEditor = ({
         timestamp: new Date()
       }));
       
+      // Refresh credits after successful edit
+      fetchCredits();
+      
       toast.success("Image edited successfully!");
     } catch (error: any) {
       console.error("AI edit error:", error);
@@ -406,10 +434,23 @@ export const ImageEditor = ({
           activeTab === "chat" ? "flex" : "hidden md:flex"
         )}>
           <div className="flex flex-col h-full bg-background/95 backdrop-blur-xl">
-            {/* Chat Header */}
-            <div className="flex items-center gap-2 p-3 border-b border-border/50">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">AI Editor</span>
+            {/* Chat Header with Credits */}
+            <div className="flex items-center justify-between p-3 border-b border-border/50">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">AI Editor</span>
+              </div>
+              {remainingCredits !== null && (
+                <div className={cn(
+                  "flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium",
+                  remainingCredits > 0 
+                    ? "bg-primary/10 text-primary" 
+                    : "bg-destructive/10 text-destructive"
+                )}>
+                  <Zap className="h-3 w-3" />
+                  <span>{remainingCredits} {isPremium ? "/10" : "/1"}</span>
+                </div>
+              )}
             </div>
             
             {/* Chat Messages */}
