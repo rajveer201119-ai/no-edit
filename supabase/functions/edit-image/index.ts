@@ -12,11 +12,18 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, prompt, projectId } = await req.json();
+    const { imageUrl, prompt, projectId, userId } = await req.json();
 
     if (!imageUrl || !prompt) {
       return new Response(
         JSON.stringify({ error: "Image URL and prompt are required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    if (!userId) {
+      return new Response(
+        JSON.stringify({ error: "User ID is required for storage access" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -96,7 +103,7 @@ serve(async (req) => {
     const base64Data = editedImageData.replace(/^data:image\/\w+;base64,/, "");
     const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
-    const fileName = `${projectId || "edited"}/${Date.now()}-edited.png`;
+    const fileName = `${userId}/${Date.now()}-edited.png`;
     
     const { error: uploadError } = await supabase.storage
       .from("post-images")
