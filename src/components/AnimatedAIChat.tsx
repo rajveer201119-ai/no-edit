@@ -33,16 +33,17 @@ function useAutoResizeTextarea({
                 return;
             }
 
-            textarea.style.height = `${minHeight}px`;
-            const newHeight = Math.max(
-                minHeight,
-                Math.min(
-                    textarea.scrollHeight,
-                    maxHeight ?? Number.POSITIVE_INFINITY
-                )
-            );
-
-            textarea.style.height = `${newHeight}px`;
+            // Use requestAnimationFrame to batch DOM reads/writes and avoid forced reflow
+            requestAnimationFrame(() => {
+                if (!textareaRef.current) return;
+                textareaRef.current.style.height = `${minHeight}px`;
+                const scrollHeight = textareaRef.current.scrollHeight;
+                const newHeight = Math.max(
+                    minHeight,
+                    Math.min(scrollHeight, maxHeight ?? Number.POSITIVE_INFINITY)
+                );
+                textareaRef.current.style.height = `${newHeight}px`;
+            });
         },
         [minHeight, maxHeight]
     );
