@@ -178,7 +178,13 @@ export const ImageEditor = ({
         }, "image/png");
       });
       
-      const fileName = `${projectId}/${Date.now()}-cropped.png`;
+      // Get current user ID for storage path (RLS requires userId as folder)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("You must be logged in to crop images");
+      }
+      
+      const fileName = `${user.id}/${Date.now()}-cropped.png`;
       const { error: uploadError } = await supabase.storage
         .from("post-images")
         .upload(fileName, blob, { contentType: "image/png" });
@@ -218,11 +224,18 @@ export const ImageEditor = ({
     toast.loading("AI is editing your image...", { id: "ai-edit", duration: 120000 });
 
     try {
+      // Get current user ID for storage path (RLS requires userId as folder)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("You must be logged in to edit images");
+      }
+      
       const { data, error } = await supabase.functions.invoke("edit-image", {
         body: {
           imageUrl: currentImage,
           prompt: editPrompt,
-          projectId
+          projectId,
+          userId: user.id
         }
       });
 
