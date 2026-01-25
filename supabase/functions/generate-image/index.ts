@@ -29,6 +29,11 @@ serve(async (req) => {
       );
     }
 
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
     // Get the design template based on type
     const template = designTemplates[designType] || designTemplates.default;
     
@@ -38,120 +43,68 @@ serve(async (req) => {
       size === "landscape" ? "landscape orientation, 16:9 aspect ratio" :
       "square orientation, 1:1 aspect ratio";
 
-    // Build optimized design prompt
+    // Build optimized design prompt with explicit text accuracy instructions
     const styledPrompt = [
-      prompt,
+      `Create this design with PERFECT spelling and text accuracy: ${prompt}`,
       template,
       style ? `${style} style aesthetic` : null,
-      "ultra high quality, professional, detailed, 8K resolution",
+      "CRITICAL: All text, names, words, numbers must be spelled EXACTLY as specified with NO spelling errors",
+      "ultra high quality, professional, detailed, sharp text rendering",
       sizeHint,
-    ].filter(Boolean).join(", ");
+    ].filter(Boolean).join(". ");
 
     console.log("Design generation request:", { designType, style, size, prompt: styledPrompt.slice(0, 200) });
 
-    // Map sizes to dimensions (multiples of 64)
-    const dims = size === "portrait"
-      ? { width: 512, height: 768 }
-      : size === "landscape"
-      ? { width: 768, height: 512 }
-      : { width: 640, height: 640 };
+    // Use Lovable AI Gateway with Gemini image model for better text rendering
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-image-preview",
+        messages: [
+          {
+            role: "user",
+            content: styledPrompt
+          }
+        ],
+        modalities: ["image", "text"]
+      }),
+    });
 
-    const sizeStr = `${dims.width}x${dims.height}`;
-
-    // Use Pollinations.ai directly for image generation (faster and more reliable)
-    const buildUrl = (opts: { size: string; model?: string; enhance?: boolean }) => {
-      const u = new URL(`https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}`);
-      u.searchParams.set("size", opts.size);
-      if (opts.model) u.searchParams.set("model", opts.model);
-      if (opts.enhance !== undefined) u.searchParams.set("enhance", String(opts.enhance));
-      u.searchParams.set("nologo", "true");
-      return u;
-    };
-
-    let url = buildUrl({ size: sizeStr, model: "flux", enhance: true });
-    console.log("Generating design via Pollinations:", url.toString().slice(0, 200));
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
-    
-    let imageResp: Response;
-    try {
-      imageResp = await fetch(url.toString(), { 
-        method: "GET", 
-        headers: { Accept: "image/*" },
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-    } catch (error: any) {
-      clearTimeout(timeoutId);
-      if (error.name === 'AbortError') {
+    if (!response.ok) {
+      if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Request timed out. Please try again with a simpler description." }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "Rate limit exceeded. Please wait a moment and try again." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      throw error;
-    }
-
-    // Fallback if primary fails
-    if (!imageResp.ok) {
-      const text = await imageResp.text().catch(() => "");
-      console.error("Pollinations error (primary):", imageResp.status, text.slice(0, 300));
-      
-      url = buildUrl({ size: "640x640", model: "flux", enhance: false });
-      console.log("Retrying Pollinations (fallback):", url.toString().slice(0, 200));
-      
-      const fallbackController = new AbortController();
-      const fallbackTimeout = setTimeout(() => fallbackController.abort(), 25000);
-      try {
-        imageResp = await fetch(url.toString(), { 
-          method: "GET", 
-          headers: { Accept: "image/*" },
-          signal: fallbackController.signal
-        });
-        clearTimeout(fallbackTimeout);
-      } catch (error: any) {
-        clearTimeout(fallbackTimeout);
-        if (error.name === 'AbortError') {
-          return new Response(
-            JSON.stringify({ error: "Request timed out. Please try a simpler prompt." }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        throw error;
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "AI credits exhausted. Please try again later." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
+      const errorText = await response.text();
+      console.error("AI gateway error:", response.status, errorText);
+      throw new Error("Failed to generate design");
     }
 
-    if (!imageResp.ok) {
-      const text = await imageResp.text().catch(() => "");
-      const status = imageResp.status;
-      console.error("Pollinations error (final):", status, text.slice(0, 300));
-      const humanMsg = status === 429
-        ? "Rate limit exceeded. Please wait a minute and try again."
-        : "Design service is busy. Please try again in a moment.";
-      return new Response(
-        JSON.stringify({ error: humanMsg }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    const data = await response.json();
+    console.log("AI response received");
 
-    const arrayBuffer = await imageResp.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
+    // Extract the generated image from the response
+    const generatedImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
     
-    // Convert to base64 safely in chunks
-    let binary = '';
-    const chunkSize = 8192;
-    for (let i = 0; i < uint8Array.length; i += chunkSize) {
-      const chunk = uint8Array.subarray(i, Math.min(i + chunkSize, uint8Array.length));
-      binary += String.fromCharCode.apply(null, Array.from(chunk));
+    if (!generatedImageUrl) {
+      console.error("No image in response:", JSON.stringify(data));
+      throw new Error("No image returned from AI");
     }
-    const base64 = btoa(binary);
-    
-    const contentType = imageResp.headers.get("content-type") ?? "image/png";
-    const imageUrl = `data:${contentType};base64,${base64}`;
 
-    console.log("Design generated successfully via Pollinations");
-    return new Response(JSON.stringify({ imageUrl, prompt: styledPrompt }), {
+    console.log("Design generated successfully via Lovable AI");
+    return new Response(JSON.stringify({ imageUrl: generatedImageUrl, prompt: styledPrompt }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
