@@ -6,10 +6,8 @@ import {
     ImageIcon,
     Figma,
     MonitorIcon,
-    Paperclip,
     XIcon,
     Sparkles,
-    Command,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import * as React from "react";
@@ -450,109 +448,64 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                         </AnimatePresence>
 
                         {/* Footer Actions */}
-                        <div className="relative p-4 border-t border-white/10 flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-2">
-                                <motion.button
-                                    type="button"
-                                    onClick={handleAttachFile}
-                                    whileTap={{ scale: 0.94 }}
-                                    className="p-2.5 text-white/50 hover:text-white hover:bg-white/10 rounded-xl transition-all relative group"
-                                >
-                                    <Paperclip className="w-4 h-4" />
-                                </motion.button>
-                                <motion.button
-                                    type="button"
-                                    data-command-button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setShowCommandPalette((prev) => !prev);
-                                    }}
-                                    whileTap={{ scale: 0.94 }}
-                                    className={cn(
-                                        "flex items-center gap-2 px-3 py-2 rounded-xl text-xs transition-all",
-                                        showCommandPalette
-                                            ? "bg-white/10 text-white"
-                                            : "text-white/50 hover:text-white hover:bg-white/5"
-                                    )}
-                                >
-                                    <Command className="w-3.5 h-3.5" />
-                                    <span>Commands</span>
-                                </motion.button>
-                            </div>
+                        <div className="relative p-4 border-t border-white/10 flex items-center justify-center">
+                            {/* Generate Button with Glass Effect */}
+                            <motion.button
+                                type="button"
+                                onClick={handleSendMessage}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                disabled={!value.trim() || externalIsGenerating}
+                                className={cn(
+                                    "relative px-8 py-3 rounded-xl text-sm font-medium transition-all overflow-hidden",
+                                    "flex items-center gap-2",
+                                    value.trim() && !externalIsGenerating
+                                        ? "text-white"
+                                        : "text-white/30 cursor-not-allowed"
+                                )}
+                            >
+                                {/* Button background */}
+                                <div className={cn(
+                                    "absolute inset-0 transition-all",
+                                    value.trim() && !externalIsGenerating
+                                        ? "bg-gradient-to-r from-rose-500/80 via-orange-500/80 to-amber-500/80"
+                                        : "bg-white/5"
+                                )} />
+                                
+                                {/* Glass overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10" />
+                                
+                                {/* Border */}
+                                <div className={cn(
+                                    "absolute inset-0 rounded-xl border transition-all",
+                                    value.trim() && !externalIsGenerating
+                                        ? "border-white/20"
+                                        : "border-white/5"
+                                )} />
 
-                            <div className="flex items-center gap-3">
-                                <AnimatePresence>
-                                    {recentCommand && (
-                                        <motion.div
-                                            className="text-xs text-green-400/80 flex items-center gap-1.5"
-                                            initial={{ opacity: 0, x: 10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, x: -10 }}
-                                        >
-                                            <Sparkles className="w-3 h-3" />
-                                            {recentCommand}
-                                        </motion.div>
+                                {/* Content */}
+                                <span className="relative z-10 flex items-center gap-2">
+                                    {externalIsGenerating ? (
+                                        <>
+                                            <motion.div
+                                                className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                                                animate={{ rotate: 360 }}
+                                                transition={{
+                                                    duration: 1,
+                                                    repeat: Infinity,
+                                                    ease: "linear",
+                                                }}
+                                            />
+                                            Generating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Sparkles className="w-4 h-4" />
+                                            Generate
+                                        </>
                                     )}
-                                </AnimatePresence>
-
-                                {/* Generate Button with Glass Effect */}
-                                <motion.button
-                                    type="button"
-                                    onClick={handleSendMessage}
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    disabled={!value.trim() || externalIsGenerating}
-                                    className={cn(
-                                        "relative px-5 py-2.5 rounded-xl text-sm font-medium transition-all overflow-hidden",
-                                        "flex items-center gap-2",
-                                        value.trim() && !externalIsGenerating
-                                            ? "text-white"
-                                            : "text-white/30 cursor-not-allowed"
-                                    )}
-                                >
-                                    {/* Button background */}
-                                    <div className={cn(
-                                        "absolute inset-0 transition-all",
-                                        value.trim() && !externalIsGenerating
-                                            ? "bg-gradient-to-r from-rose-500/80 via-orange-500/80 to-amber-500/80"
-                                            : "bg-white/5"
-                                    )} />
-                                    
-                                    {/* Glass overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10" />
-                                    
-                                    {/* Border */}
-                                    <div className={cn(
-                                        "absolute inset-0 rounded-xl border transition-all",
-                                        value.trim() && !externalIsGenerating
-                                            ? "border-white/20"
-                                            : "border-white/5"
-                                    )} />
-
-                                    {/* Content */}
-                                    <span className="relative z-10 flex items-center gap-2">
-                                        {externalIsGenerating ? (
-                                            <>
-                                                <motion.div
-                                                    className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
-                                                    animate={{ rotate: 360 }}
-                                                    transition={{
-                                                        duration: 1,
-                                                        repeat: Infinity,
-                                                        ease: "linear",
-                                                    }}
-                                                />
-                                                Generating...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Sparkles className="w-4 h-4" />
-                                                Generate
-                                            </>
-                                        )}
-                                    </span>
-                                </motion.button>
-                            </div>
+                                </span>
+                            </motion.button>
                         </div>
                     </motion.div>
 
