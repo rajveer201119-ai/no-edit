@@ -284,8 +284,8 @@ export function AnimatedAIChat({ onGenerate, isGenerating: externalIsGenerating,
                             transition={{ delay: 0.2, duration: 0.5 }}
                             className="inline-block"
                         >
-                            <h2 className="text-xl md:text-2xl font-medium tracking-tight text-white pb-1">
-                                What would you like to design?
+                        <h2 className="text-xl md:text-2xl font-medium tracking-tight text-white pb-1">
+                                EPIC CAN MAKE YOU DESIGNS.......
                             </h2>
                             <motion.div
                                 className="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
