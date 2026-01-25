@@ -1,4 +1,5 @@
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
+import { ShaderAnimation } from "@/components/ui/shader-animation";
 import epicLogo from "@/assets/epic-logo.png";
 
 const badges = [
@@ -21,29 +22,15 @@ export const Hero = () => {
   return (
     <section
       className="relative mx-auto w-full pt-24 md:pt-40 px-6 text-center md:px-8 
-      min-h-[calc(100vh-40px)] overflow-hidden 
-      bg-[linear-gradient(to_bottom,#fff,#ffffff_50%,#e8e8e8_88%)]  
-      dark:bg-[linear-gradient(to_bottom,#000,#0000_30%,#898e8e_78%,#ffffff_99%_50%)] 
-      rounded-b-xl"
+      min-h-[calc(100vh-40px)] overflow-hidden rounded-b-xl"
     >
-      {/* Grid BG */}
-      <div
-        className="absolute -z-10 inset-0 opacity-80 h-[600px] w-full 
-        bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] 
-        dark:bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)]
-        bg-[size:6rem_5rem] 
-        [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]"
-      />
-
-      {/* Radial Accent */}
-      <div
-        className="absolute left-1/2 top-[calc(100%-90px)] lg:top-[calc(100%-150px)] 
-        h-[500px] w-[700px] md:h-[500px] md:w-[1100px] lg:h-[750px] lg:w-[140%] 
-        -translate-x-1/2 rounded-[100%] bg-white dark:bg-black 
-        bg-[radial-gradient(closest-side,#fff_82%,#000000)] 
-        dark:bg-[radial-gradient(closest-side,#000_82%,#ffffff)] 
-        animate-fade-up"
-      />
+      {/* Shining Light Lines Background */}
+      <div className="absolute inset-0 -z-10">
+        <ShaderAnimation />
+      </div>
+      
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 -z-10 bg-black/30" />
 
       {/* Logo */}
       <div className="flex justify-center mb-4 md:mb-5 relative z-10">
@@ -62,10 +49,9 @@ export const Hero = () => {
       {/* Title */}
       <h1
         className="animate-fade-in -translate-y-4 text-balance 
-        bg-gradient-to-br from-black from-30% to-black/40 
+        bg-gradient-to-br from-white from-30% to-white/60 
         bg-clip-text py-4 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold leading-none tracking-tighter 
-        text-transparent opacity-0 
-        dark:from-white dark:to-white/40 relative z-10"
+        text-transparent opacity-0 relative z-10"
       >
         EPIC CAN MAKE YOU DESIGNS.......
       </h1>
@@ -73,7 +59,7 @@ export const Hero = () => {
       {/* Subtitle */}
       <p
         className="animate-fade-in mb-6 -translate-y-4 text-balance 
-        text-sm md:text-base lg:text-lg tracking-tight text-gray-600 dark:text-gray-400 
+        text-sm md:text-base lg:text-lg tracking-tight text-gray-300 
         opacity-0 max-w-xl mx-auto relative z-10 [animation-delay:200ms]"
       >
         Describe what you want. EPIC creates and edits logos, posters, and graphics — no tools, no layers, no learning curve.
@@ -84,8 +70,8 @@ export const Hero = () => {
         {badges.map((badge) => (
           <span 
             key={badge}
-            className="px-3 py-1 text-xs md:text-sm rounded-full border border-gray-300/50 dark:border-white/10 
-            bg-white/50 dark:bg-black/30 backdrop-blur-sm text-gray-600 dark:text-gray-400"
+            className="px-3 py-1 text-xs md:text-sm rounded-full border border-white/20 
+            bg-black/30 backdrop-blur-sm text-gray-300"
           >
             {badge}
           </span>
@@ -101,7 +87,7 @@ export const Hero = () => {
         >
           Start Designing Free
         </LiquidButton>
-        <p className="text-xs text-gray-500 dark:text-gray-500">
+        <p className="text-xs text-gray-400">
           Free forever. Upgrade anytime for ₹10/month.
         </p>
       </div>
