@@ -106,16 +106,6 @@ export const ImageEditor = ({
     toast.loading("Applying crop...", { id: "crop" });
 
     try {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error("Failed to load image"));
-        // Use a proxy or direct URL for CORS
-        img.src = currentImage;
-      });
-
       const imgElement = imageContainerRef.current!.querySelector('img');
       if (!imgElement) {
         throw new Error("Image element not found");
@@ -123,6 +113,21 @@ export const ImageEditor = ({
       
       const containerRect = imageContainerRef.current!.getBoundingClientRect();
       const imgRect = imgElement.getBoundingClientRect();
+      
+      // Fetch the image as blob to bypass CORS issues
+      const response = await fetch(currentImage);
+      if (!response.ok) throw new Error("Failed to fetch image");
+      const imageBlob = await response.blob();
+      
+      // Create image from blob
+      const blobUrl = URL.createObjectURL(imageBlob);
+      const img = new Image();
+      
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error("Failed to load image"));
+        img.src = blobUrl;
+      });
       
       // Calculate scale between display and actual image size
       const scaleX = img.naturalWidth / imgRect.width;
@@ -136,6 +141,9 @@ export const ImageEditor = ({
       const cropY = Math.max(0, (cropArea.y - offsetY) * scaleY);
       const cropWidth = Math.min(cropArea.width * scaleX, img.naturalWidth - cropX);
       const cropHeight = Math.min(cropArea.height * scaleY, img.naturalHeight - cropY);
+      
+      // Cleanup blob URL
+      URL.revokeObjectURL(blobUrl);
       
       if (cropWidth < 10 || cropHeight < 10) {
         throw new Error("Crop area too small");
