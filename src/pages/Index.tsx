@@ -83,7 +83,7 @@ const Index = () => {
 
   const fetchDailyLimit = async (userId: string) => {
     try {
-      const { data, error } = await supabase.rpc('check_daily_limit', {
+      const { data, error } = await supabase.rpc('check_generation_limit', {
         user_id_param: userId
       });
 
@@ -169,7 +169,7 @@ const Index = () => {
 
       // Track usage and create project only if logged in
       if (currentUserId) {
-        await supabase.rpc('increment_prompt_usage', { user_id_param: currentUserId });
+        await supabase.rpc('increment_generation_usage', { user_id_param: currentUserId });
 
         // Create a new project
         const projectName = prompt.slice(0, 50) + (prompt.length > 50 ? "..." : "");
