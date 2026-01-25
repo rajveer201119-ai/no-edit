@@ -35,7 +35,7 @@ serve(async (req) => {
 
     console.log("Editing image with prompt:", prompt);
 
-    // Use Lovable AI Gateway for image editing
+    // Use Lovable AI Gateway for image editing with explicit image generation instruction
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -46,11 +46,15 @@ serve(async (req) => {
         model: "google/gemini-2.5-flash-image-preview",
         messages: [
           {
+            role: "system",
+            content: "You are an image editor. ALWAYS output a modified version of the input image. Never ask questions or respond with text only. Apply the user's edit request directly to the image and return the edited image."
+          },
+          {
             role: "user",
             content: [
               {
                 type: "text",
-                text: `Edit this image according to these instructions: ${prompt}. Keep the overall composition but apply the requested changes.`
+                text: `GENERATE AN EDITED IMAGE: Apply this edit to the image: "${prompt}". Output the modified image directly without asking questions. If the instruction is unclear, make your best interpretation and apply it.`
               },
               {
                 type: "image_url",
