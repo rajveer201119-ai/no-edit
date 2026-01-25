@@ -8,10 +8,17 @@ const corsHeaders = {
 // Design-specific prompt templates for different design types
 const designTemplates: Record<string, string> = {
   logo: "Professional logo design, clean vector style, minimal and modern, scalable icon, brand identity, white or transparent background, centered composition",
-  social: "Social media graphic, eye-catching design, vibrant colors, modern layout, Instagram/Facebook ready, 1:1 aspect ratio, engaging visual",
+  social: "Social media graphic, eye-catching design, vibrant colors, modern layout, Instagram/Facebook ready, engaging visual",
   banner: "Web banner design, wide format, professional marketing material, clean typography space, call-to-action ready, hero image style",
   poster: "Poster design, high impact visual, print-ready quality, bold typography space, event promotional style, professional layout",
   default: "Professional graphic design, clean and modern, high quality, visually appealing",
+};
+
+// Size mapping for Pollinations API
+const sizeMap: Record<string, { width: number; height: number }> = {
+  square: { width: 1024, height: 1024 },
+  portrait: { width: 832, height: 1216 },
+  landscape: { width: 1216, height: 832 },
 };
 
 serve(async (req) => {
@@ -29,82 +36,64 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
-
     // Get the design template based on type
     const template = designTemplates[designType] || designTemplates.default;
     
-    // Build size hint
-    const sizeHint =
-      size === "portrait" ? "portrait orientation, 4:5 aspect ratio" :
-      size === "landscape" ? "landscape orientation, 16:9 aspect ratio" :
-      "square orientation, 1:1 aspect ratio";
+    // Get dimensions based on size
+    const dimensions = sizeMap[size] || sizeMap.square;
 
     // Build optimized design prompt with explicit text accuracy instructions
+    // Flux handles text better with cleaner, more direct prompts
     const styledPrompt = [
-      `Create this design with PERFECT spelling and text accuracy: ${prompt}`,
+      prompt,
       template,
       style ? `${style} style aesthetic` : null,
-      "CRITICAL: All text, names, words, numbers must be spelled EXACTLY as specified with NO spelling errors",
+      "IMPORTANT: Render all text exactly as specified with perfect spelling",
       "ultra high quality, professional, detailed, sharp text rendering",
-      sizeHint,
     ].filter(Boolean).join(". ");
 
-    console.log("Design generation request:", { designType, style, size, prompt: styledPrompt.slice(0, 200) });
+    console.log("Design generation request:", { 
+      designType, 
+      style, 
+      size, 
+      dimensions,
+      prompt: styledPrompt.slice(0, 200) 
+    });
 
-    // Use Lovable AI Gateway with Gemini image model for better text rendering
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
+    // Build Pollinations AI URL with parameters
+    // Using Flux model for best text rendering
+    const encodedPrompt = encodeURIComponent(styledPrompt);
+    const pollinationsUrl = new URL(`https://image.pollinations.ai/prompt/${encodedPrompt}`);
+    
+    // Add query parameters for quality and model
+    pollinationsUrl.searchParams.set("model", "flux");
+    pollinationsUrl.searchParams.set("width", dimensions.width.toString());
+    pollinationsUrl.searchParams.set("height", dimensions.height.toString());
+    pollinationsUrl.searchParams.set("nologo", "true");
+    pollinationsUrl.searchParams.set("enhance", "true");
+    pollinationsUrl.searchParams.set("seed", Math.floor(Math.random() * 1000000).toString());
+
+    console.log("Pollinations URL:", pollinationsUrl.toString().slice(0, 200));
+
+    // Fetch the image from Pollinations to verify it works
+    const response = await fetch(pollinationsUrl.toString(), {
+      method: "GET",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
+        "Accept": "image/*",
       },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: styledPrompt
-          }
-        ],
-        modalities: ["image", "text"]
-      }),
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please wait a moment and try again." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI credits exhausted. Please try again later." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      throw new Error("Failed to generate design");
+      console.error("Pollinations error:", response.status, await response.text());
+      throw new Error("Failed to generate design. Please try again.");
     }
 
-    const data = await response.json();
-    console.log("AI response received");
+    // Pollinations returns the image directly, but we need to return the URL
+    // The URL itself is the image (it's a GET endpoint that returns the image)
+    const imageUrl = pollinationsUrl.toString();
 
-    // Extract the generated image from the response
-    const generatedImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    
-    if (!generatedImageUrl) {
-      console.error("No image in response:", JSON.stringify(data));
-      throw new Error("No image returned from AI");
-    }
-
-    console.log("Design generated successfully via Lovable AI");
-    return new Response(JSON.stringify({ imageUrl: generatedImageUrl, prompt: styledPrompt }), {
+    console.log("Design generated successfully via Pollinations AI (Flux)");
+    return new Response(JSON.stringify({ imageUrl, prompt: styledPrompt }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
