@@ -22,8 +22,11 @@ export const ImageGenerator = () => {
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState<ImageStyle>("realistic");
   const [size, setSize] = useState<ImageSize>("square");
-  const [designType, setDesignType] = useState<DesignType>("default");
+  const [designType, setDesignType] = useState<DesignType | null>(null); // null = not selected
   const [isGenerating, setIsGenerating] = useState(false);
+  const [guestUsed, setGuestUsed] = useState(() => {
+    return localStorage.getItem('guestGenerationUsed') === 'true';
+  });
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -77,14 +80,22 @@ export const ImageGenerator = () => {
   };
 
   const handleGenerate = async () => {
-    if (!currentUserId) {
-      toast.error("Please sign up or sign in to generate images");
-      navigate("/auth");
+    // Validate design type is selected
+    if (!designType) {
+      toast.error("Please select a design type first");
       return;
     }
 
     if (!prompt.trim()) {
       toast.error("Please enter a description for your image");
+      return;
+    }
+
+    // Check if user is logged in or has guest credits
+    const isGuest = !currentUserId;
+    if (isGuest && guestUsed) {
+      toast.error("Sign up to generate more designs! You've used your free trial.");
+      navigate("/auth");
       return;
     }
 
@@ -107,6 +118,7 @@ export const ImageGenerator = () => {
           style,
           size,
           designType,
+          isGuest,
         },
       });
 
@@ -119,6 +131,12 @@ export const ImageGenerator = () => {
 
       setGeneratedImage(imageUrl);
       toast.success("Image generated successfully!");
+
+      // Mark guest usage in localStorage
+      if (isGuest) {
+        localStorage.setItem('guestGenerationUsed', 'true');
+        setGuestUsed(true);
+      }
 
       // Refresh daily limit after successful generation
       if (currentUserId) {

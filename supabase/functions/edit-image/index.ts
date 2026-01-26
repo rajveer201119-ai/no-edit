@@ -157,45 +157,7 @@ serve(async (req) => {
   }
 
   try {
-    // Verify authentication
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(
-        JSON.stringify({ error: "Authentication required. Please sign in." }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(
-        JSON.stringify({ error: "Invalid authentication. Please sign in again." }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const userId = claimsData.claims.sub;
-
-    // Check edit rate limits server-side
-    const { data: limitData, error: limitError } = await supabaseClient.rpc('check_edit_limit', {
-      user_id_param: userId
-    });
-
-    if (limitError || !limitData?.[0]?.can_edit) {
-      return new Response(
-        JSON.stringify({ error: "Daily edit limit reached. Upgrade to Pro for more edits." }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const { imageUrl, prompt, projectId } = await req.json();
+    const { imageUrl, prompt, projectId, isGuest } = await req.json();
 
     if (!imageUrl || !prompt) {
       return new Response(
@@ -204,10 +166,50 @@ serve(async (req) => {
       );
     }
 
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | null = null;
+    let supabaseClient: any = null;
+
+    // Handle authenticated users
+    if (authHeader?.startsWith('Bearer ')) {
+      supabaseClient = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+        { global: { headers: { Authorization: authHeader } } }
+      );
+
+      const token = authHeader.replace('Bearer ', '');
+      const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+      
+      if (!claimsError && claimsData?.claims?.sub) {
+        userId = claimsData.claims.sub;
+
+        // Check edit rate limits for authenticated users
+        const { data: limitData, error: limitError } = await supabaseClient.rpc('check_edit_limit', {
+          user_id_param: userId
+        });
+
+        if (limitError || !limitData?.[0]?.can_edit) {
+          return new Response(
+            JSON.stringify({ error: "Daily edit limit reached. Upgrade to Pro for more edits." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+    }
+
+    // For guest users (isGuest=true and no valid userId), allow one edit
+    if (!userId && !isGuest) {
+      return new Response(
+        JSON.stringify({ error: "Authentication required. Please sign in." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Input validation - limit prompt length
     const sanitizedPrompt = prompt.trim().slice(0, 1000);
 
-    console.log("Editing image:", { userId: userId.substring(0, 8) + '...' });
+    console.log("Editing image:", { userId: userId ? userId.substring(0, 8) + '...' : 'guest' });
 
     let editedImageData: string;
     let usedService: string;
@@ -242,10 +244,12 @@ serve(async (req) => {
 
     console.log(`Image edit completed via ${usedService}`);
 
-    // Track edit usage after successful edit
-    await supabaseClient.rpc('increment_edit_usage', {
-      user_id_param: userId
-    });
+    // Track edit usage after successful edit (only for authenticated users)
+    if (userId && supabaseClient) {
+      await supabaseClient.rpc('increment_edit_usage', {
+        user_id_param: userId
+      });
+    }
 
     // Upload the edited image to Supabase Storage
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;

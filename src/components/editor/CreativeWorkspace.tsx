@@ -62,6 +62,9 @@ export const CreativeWorkspace = ({
   // User state
   const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
   const [isPremium, setIsPremium] = useState(false);
+  const [guestEditUsed, setGuestEditUsed] = useState(() => {
+    return localStorage.getItem('guestEditUsed') === 'true';
+  });
 
   const currentVersion = versions.find((v) => v.id === currentVersionId) || versions[0];
 
@@ -107,20 +110,26 @@ export const CreativeWorkspace = ({
 
   // Handle AI edit
   const handleAIEdit = async (prompt: string) => {
-    // Check credits first
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error("Please sign in to edit images");
+    const isGuest = !user;
+
+    // Check if guest has already used their free edit
+    if (isGuest && guestEditUsed) {
+      toast.error("Sign up to edit more! You've used your free trial edit.");
+      setShowUpgradeDialog(true);
       return;
     }
 
-    const { data: limitData } = await supabase.rpc("check_edit_limit", {
-      user_id_param: user.id,
-    });
+    // For authenticated users, check credits
+    if (user) {
+      const { data: limitData } = await supabase.rpc("check_edit_limit", {
+        user_id_param: user.id,
+      });
 
-    if (!limitData?.[0]?.can_edit) {
-      setShowUpgradeDialog(true);
-      return;
+      if (!limitData?.[0]?.can_edit) {
+        setShowUpgradeDialog(true);
+        return;
+      }
     }
 
     // Add user message
@@ -139,7 +148,8 @@ export const CreativeWorkspace = ({
           imageUrl: currentVersion.imageUrl,
           prompt: prompt,
           projectId,
-          userId: user.id,
+          userId: user?.id,
+          isGuest,
         },
       });
 
@@ -168,9 +178,13 @@ export const CreativeWorkspace = ({
       };
       setMessages((prev) => [...prev, successMessage]);
 
-      // Increment usage and refresh credits
-      await supabase.rpc("increment_edit_usage", { user_id_param: user.id });
-      fetchCredits();
+      // Track guest usage or refresh credits for authenticated users
+      if (isGuest) {
+        localStorage.setItem('guestEditUsed', 'true');
+        setGuestEditUsed(true);
+      } else if (user) {
+        fetchCredits();
+      }
       
       toast.success("New version created!");
     } catch (error: any) {
