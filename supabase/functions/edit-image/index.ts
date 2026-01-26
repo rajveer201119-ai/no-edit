@@ -249,26 +249,13 @@ serve(async (req) => {
     let editedImageData: string;
     let usedService: string;
 
-    // Try Hugging Face first (FREE).
-    // IMPORTANT: We only use the paid Lovable AI fallback for *transient* HF failures
-    // (cold start / rate limit). This prevents burning credits when HF is misconfigured.
+    // Try Hugging Face first (FREE), fallback to Lovable AI (uses credits)
+    // NOTE: HF router endpoints have been returning 404; fallback keeps the editor working.
     try {
       editedImageData = await editWithHuggingFace(imageUrl, sanitizedPrompt);
-      usedService = "Hugging Face InstructPix2Pix (free)";
+      usedService = "Hugging Face (free)";
     } catch (hfError: any) {
       console.warn("Hugging Face failed, falling back to Lovable AI:", hfError.message);
-
-      const hfStatus = hfError?.status;
-      const isTransientHfFailure = hfStatus === 503 || hfStatus === 429;
-
-      if (!isTransientHfFailure) {
-        return new Response(
-          JSON.stringify({
-            error: "Free editor is unavailable right now (Hugging Face). Please try again in a moment.",
-          }),
-          { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
 
       try {
         editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
