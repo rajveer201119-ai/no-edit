@@ -68,7 +68,20 @@ export const CreativeWorkspace = ({
     setIsLoadingVersions(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      
+      // For guests, create a local-only version
+      if (!user) {
+        const initialVersion: ImageVersion = {
+          id: crypto.randomUUID(),
+          imageUrl: imageUrl,
+          prompt: "Original",
+          timestamp: new Date(),
+        };
+        setVersions([initialVersion]);
+        setCurrentVersionId(initialVersion.id);
+        setIsLoadingVersions(false);
+        return;
+      }
       
       setCurrentUserId(user.id);
       
@@ -94,9 +107,9 @@ export const CreativeWorkspace = ({
         setVersions(loadedVersions);
         setCurrentVersionId(loadedVersions[loadedVersions.length - 1].id);
       } else {
-        // Create initial version
+        // Create initial version with proper UUID
         const initialVersion: ImageVersion = {
-          id: "v1-" + Date.now(),
+          id: crypto.randomUUID(),
           imageUrl: imageUrl,
           prompt: "Original",
           timestamp: new Date(),
@@ -118,7 +131,7 @@ export const CreativeWorkspace = ({
       console.error("Error loading versions:", error);
       // Fallback to initial version
       const initialVersion: ImageVersion = {
-        id: "v1-" + Date.now(),
+        id: crypto.randomUUID(),
         imageUrl: imageUrl,
         prompt: "Original",
         timestamp: new Date(),
@@ -160,7 +173,7 @@ export const CreativeWorkspace = ({
       // Create a new version from manual edits
       const newVersionNumber = versions.length + 1;
       const newVersion: ImageVersion = {
-        id: `v${newVersionNumber}-${Date.now()}`,
+        id: crypto.randomUUID(),
         imageUrl: newImageUrl,
         prompt: "Manual edit",
         timestamp: new Date(),
@@ -248,7 +261,7 @@ export const CreativeWorkspace = ({
       // Create new version
       const newVersionNumber = versions.length + 1;
       const newVersion: ImageVersion = {
-        id: `v${newVersionNumber}-${Date.now()}`,
+        id: crypto.randomUUID(),
         imageUrl: data.imageUrl,
         prompt: prompt,
         timestamp: new Date(),
