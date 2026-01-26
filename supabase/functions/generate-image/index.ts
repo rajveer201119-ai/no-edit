@@ -6,39 +6,39 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Design-specific prompt templates - includes text rendering instructions
+// Design-specific prompt templates - PRECISE, detailed instructions for high-quality output
 const designTemplates: Record<string, { template: string; includesText: boolean }> = {
   logo: {
-    template: "Professional logo design, flat vector illustration, minimalist clean style, simple geometric shapes, solid colors on plain background, corporate branding, logo icon with company name text clearly rendered",
+    template: "PRECISE LOGO DESIGN: Create a professional, modern logo with clean vector-style graphics. Use minimalist geometric shapes, bold iconic symbol, flat design with 2-3 colors maximum. Corporate-grade quality, scalable design, centered composition on solid white or transparent background. The logo must be memorable, unique, and instantly recognizable.",
     includesText: true
   },
   social: {
-    template: "Social media post design with headline text and tagline, flat graphic illustration, bold readable typography, marketing visual with clear text hierarchy, abstract shapes background, Instagram/Facebook ready, text overlay prominently displayed",
+    template: "PRECISE SOCIAL MEDIA POST: Create a visually striking Instagram/Facebook post with perfect 1:1 composition. Use bold, eye-catching colors with high contrast. Include clear visual hierarchy with prominent headline text, engaging imagery, and professional layout. Modern gradient backgrounds with geometric accents. Marketing-ready, scroll-stopping design.",
     includesText: true
   },
   banner: {
-    template: "Wide horizontal banner design with headline and call-to-action text, flat illustration style, professional marketing graphic with readable typography, promotional text clearly visible, web banner ready",
+    template: "PRECISE WEB BANNER: Create a professional horizontal banner with 16:9 aspect ratio. Use clean, modern layout with bold headline on left/center, compelling visuals on right. High contrast colors, readable sans-serif typography, clear call-to-action area. Marketing-grade quality, web-optimized composition.",
     includesText: true
   },
   poster: {
-    template: "Event poster design with title, date and details text, flat graphic illustration, bold readable typography, print-quality artwork with clear text hierarchy, promotional poster with text overlay",
+    template: "PRECISE EVENT POSTER: Create a professional vertical poster with striking visual impact. Use bold typography hierarchy (title largest, details smaller), balanced composition, dramatic colors. Include space for event details, date, and venue. Print-ready quality, attention-grabbing from distance.",
     includesText: true
   },
   default: {
-    template: "Professional graphic design illustration, clean modern aesthetic, flat design style, abstract visual, clean vector-style artwork",
+    template: "PRECISE GRAPHIC DESIGN: Create a professional, modern graphic with clean aesthetics, balanced composition, and high-quality execution. Use appropriate colors and clear visual hierarchy.",
     includesText: false
   },
 };
 
-// Text generation prompts for different design types
+// PRECISE text generation prompts for typography
 const textPrompts: Record<string, string> = {
-  logo: "Include the brand/company name prominently. Make the text stylized to match the logo design.",
-  social: "Include a catchy headline (max 6 words), a supporting tagline, and a call-to-action. Make text bold and readable.",
-  banner: "Include a main headline, a brief subtitle, and a call-to-action button text. Text should be prominent and eye-catching.",
-  poster: "Include event title, date/time placeholder, location, and key details. Use bold headline with supporting text hierarchy.",
+  logo: "Render the brand name in stylized, legible typography that complements the icon. Text must be crisp and professional.",
+  social: "Include ONE bold headline (3-5 words max), optional subtitle. Typography must be large, readable, and perfectly aligned.",
+  banner: "Include main headline (5-7 words), brief subtitle, CTA text. All text must be crisp, properly kerned, and highly readable.",
+  poster: "Include event title prominently, date/time, location. Use clear typographic hierarchy. All text must be spelled correctly and legible.",
 };
 
-// Size mapping for Pollinations API
+// Size mapping for Pollinations API - optimized dimensions
 const sizeMap: Record<string, { width: number; height: number }> = {
   square: { width: 1024, height: 1024 },
   portrait: { width: 832, height: 1216 },
@@ -198,22 +198,24 @@ serve(async (req) => {
     // Get dimensions based on size
     const dimensions = sizeMap[size] || sizeMap.square;
 
-    // Build optimized prompt with text instructions for text-heavy designs
+    // Build PRECISE optimized prompt with strict quality instructions
     const promptParts = [
-      sanitizedPrompt,
+      `DESIGN REQUEST: ${sanitizedPrompt}`,
       template,
-      style ? `${style} aesthetic` : null,
+      style ? `Style: ${style} aesthetic with professional execution` : null,
     ];
     
     // Add text-specific instructions for designs that need text
     if (templateConfig.includesText && textPrompt) {
-      promptParts.push(textPrompt);
-      promptParts.push("Ensure all text is spelled correctly, legible, and prominently displayed");
+      promptParts.push(`TYPOGRAPHY: ${textPrompt}`);
+      promptParts.push("CRITICAL: All text must be spelled correctly, perfectly rendered, crisp, and highly legible");
     }
     
-    promptParts.push("8K ultra HD, sharp details, NO photorealistic human faces or AI avatars");
+    // Quality enforcement
+    promptParts.push("QUALITY: 8K ultra HD resolution, razor-sharp details, professional studio quality");
+    promptParts.push("RESTRICTIONS: NO photorealistic human faces, NO AI artifacts, NO blurry elements, NO watermarks");
     
-    const styledPrompt = promptParts.filter(Boolean).join(", ");
+    const styledPrompt = promptParts.filter(Boolean).join(". ");
 
     console.log("Design generation request:", { 
       userId: userId ? userId.substring(0, 8) + '...' : 'guest',
