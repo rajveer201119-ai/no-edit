@@ -1,88 +1,161 @@
 
-# Plan: Reduce Lovable AI Credit Usage in Image Editing
 
-## Problem Analysis
+# Plan: Reduce Lovable AI Credit Usage with Hugging Face Image Editing
 
-Currently, the `edit-image` edge function uses **Lovable AI (Gemini 2.5 Flash Image Preview)** for every image edit request. This consumes Lovable AI credits on each edit, which adds up quickly for users who make multiple modifications to their designs.
+## Problem Statement
 
-The `generate-image` function already uses a **hybrid approach**: Pollinations AI (free) as the primary generator with Lovable AI as a fallback. We should apply the same pattern to image editing.
+Every AI-powered image edit currently consumes Lovable AI credits via Gemini 2.5 Flash. Users are running out of credits quickly because each edit costs 1 credit, and there's no free alternative being used.
 
-## Solution: Hybrid Image Editing with Pollinations AI
+**Your previous suggestion (Pollinations AI) doesn't work** because it's a text-to-image generator that creates entirely new images instead of editing existing ones.
 
-Pollinations AI recently deployed the **FLUX.2 `klein` model** specifically optimized for image-to-image editing tasks. This is completely free and requires no API key.
+## Solution: Use Hugging Face's InstructPix2Pix Model
+
+Good news: You already have `HUGGING_FACE_ACCESS_TOKEN` configured in your secrets! We can use Hugging Face's **Inference API** with the `timbrooks/instruct-pix2pix` model, which:
+
+- ✅ Accepts an input image
+- ✅ Applies targeted edits based on text prompts
+- ✅ Preserves original composition
+- ✅ Is **free** within Hugging Face's rate limits (no cost per request)
 
 ```text
-+-------------------+     Fails?     +------------------+
-|  Pollinations AI  | ------------> |   Lovable AI     |
-|  (FLUX.2 klein)   |   Fallback    |   (Gemini)       |
-|      FREE         |               |   Uses Credits   |
-+-------------------+               +------------------+
+User Edit Request
+       │
+       ▼
+┌─────────────────────┐
+│   Hugging Face      │  ◄── Try first (FREE)
+│  InstructPix2Pix    │
+│  (img2img editing)  │
+└─────────────────────┘
+       │
+   Fails?
+       │
+       ▼
+┌─────────────────────┐
+│   Lovable AI        │  ◄── Fallback only
+│   (Gemini)          │      (uses credits)
+└─────────────────────┘
+       │
+       ▼
+   Return edited image
 ```
 
 ## Implementation Steps
 
-### Step 1: Update the `edit-image` Edge Function
+### Step 1: Add Hugging Face Editing Function
 
-Modify `supabase/functions/edit-image/index.ts` to:
+Create a new `editWithHuggingFace()` function in the edge function that:
 
-1. **Add Pollinations image editing function** - Create a new function `editWithPollinations()` that uses the Pollinations image-to-image API with the `klein` model
-2. **Add Lovable AI fallback function** - Refactor existing Gemini code into `editWithLovableAI()` 
-3. **Implement try/fallback pattern** - Try Pollinations first; if it fails, fall back to Lovable AI
-4. **Add logging** - Log which service was used for each edit request
+1. Downloads the source image as a blob
+2. Sends it to Hugging Face's inference API with the `timbrooks/instruct-pix2pix` model
+3. Receives the edited image back
+4. Converts to base64 for storage
 
-### Technical Details
-
-**Pollinations Image Editing API:**
-- Endpoint: `https://image.pollinations.ai/prompt/{prompt}`
-- Parameters: `model=flux`, `seed`, `nologo=true`, plus the source image via the prompt context
-- For image-to-image: Pollinations accepts source images via URL reference in the prompt
-
-**Key Changes to `edit-image/index.ts`:**
-
-```text
-Before:
-  1. Receive imageUrl + prompt
-  2. Call Lovable AI Gateway (consumes credits)
-  3. Upload result to storage
-
-After:
-  1. Receive imageUrl + prompt
-  2. Try Pollinations AI first (FREE)
-     - Construct edit prompt: "Edit this image: {prompt}. Source: {imageUrl}"
-     - Model: flux (klein variant)
-  3. If Pollinations fails -> Fallback to Lovable AI
-  4. Upload result to storage
-  5. Log which service was used
+**Technical Details:**
+```typescript
+async function editWithHuggingFace(
+  imageUrl: string, 
+  prompt: string
+): Promise<string> {
+  const HF_TOKEN = Deno.env.get("HUGGING_FACE_ACCESS_TOKEN");
+  
+  // Download source image
+  const imageResponse = await fetch(imageUrl);
+  const imageBlob = await imageResponse.blob();
+  
+  // Call Hugging Face img2img API
+  const response = await fetch(
+    "https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix",
+    {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${HF_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: {
+          image: await blobToBase64(imageBlob),
+          prompt: prompt,
+        },
+        parameters: {
+          guidance_scale: 7.5,
+          image_guidance_scale: 1.5,
+        }
+      }),
+    }
+  );
+  
+  // Response is the edited image as binary
+  const editedImageBlob = await response.blob();
+  return await blobToBase64(editedImageBlob);
+}
 ```
 
-### Step 2: Handle Pollinations Image-to-Image Workflow
+### Step 2: Implement Try/Fallback Pattern
 
-Since Pollinations works differently (URL-based generation), we need to:
-- Download the source image and convert to base64 if needed
-- Construct a descriptive prompt that references the original image context
-- Handle the response format (direct image URL vs base64)
+Update the main request handler:
 
-### Step 3: Maintain Error Handling
+```typescript
+let editedImageData: string;
+let usedService: string;
 
-- Keep all existing error handling for rate limits (429) and credits (402)
-- Add error handling for Pollinations failures
-- Ensure users see appropriate error messages regardless of which service is used
+try {
+  editedImageData = await editWithHuggingFace(imageUrl, sanitizedPrompt);
+  usedService = "Hugging Face (free)";
+  console.log("Edit completed via Hugging Face InstructPix2Pix");
+} catch (hfError) {
+  console.warn("Hugging Face failed, falling back to Lovable AI:", hfError);
+  editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
+  usedService = "Lovable AI (credits)";
+}
+```
+
+### Step 3: Handle Hugging Face Specifics
+
+- **Rate Limits**: HF free tier has rate limits (~30 requests/hour) - on rate limit, fallback to Lovable AI
+- **Model Loading**: First request may be slow (model cold start) - handle with timeout and fallback
+- **Response Format**: HF returns binary image directly, not JSON - convert appropriately
+
+### Step 4: Add Logging for Monitoring
+
+Log which service was used for each edit so you can track credit savings:
+
+```typescript
+console.log(`Edit completed via ${usedService}`);
+```
 
 ## Expected Results
 
 | Metric | Before | After |
 |--------|--------|-------|
-| Lovable AI Credits per Edit | 1 credit always | 0 credits (Pollinations) or 1 credit (fallback only) |
-| Estimated Credit Savings | 0% | 80-95% (most edits via free Pollinations) |
-| User Experience | Same | Same (transparent fallback) |
+| Primary Service | Lovable AI (always) | Hugging Face (free) |
+| Fallback Service | None | Lovable AI (when HF fails) |
+| Credits per Edit | 1 credit always | 0 credits (HF) or 1 credit (fallback) |
+| Estimated Savings | 0% | 70-90% (most edits via free HF) |
+
+## Why This Works (Unlike Pollinations)
+
+| Feature | Pollinations | Hugging Face InstructPix2Pix |
+|---------|--------------|------------------------------|
+| Accepts input image | ❌ No | ✅ Yes |
+| True image editing | ❌ No (generates new) | ✅ Yes (modifies original) |
+| Preserves composition | ❌ No | ✅ Yes |
+| Free to use | ✅ Yes | ✅ Yes (with rate limits) |
 
 ## Files to Modify
 
-1. **`supabase/functions/edit-image/index.ts`** - Add Pollinations as primary editor, refactor Lovable AI as fallback
+| File | Changes |
+|------|---------|
+| `supabase/functions/edit-image/index.ts` | Add `editWithHuggingFace()` function, implement try/fallback logic, add base64 conversion helper |
 
-## Notes
+## Limitations & Considerations
 
-- This mirrors the proven pattern already working in `generate-image`
-- No frontend changes required - the API contract remains the same
-- Users will see the same behavior but with significantly reduced credit consumption
-- Pollinations is community-driven and free, making it sustainable for high-volume usage
+1. **Hugging Face Rate Limits**: Free tier allows ~30 requests/hour. Heavy users may still hit Lovable AI fallback.
+
+2. **Model Cold Starts**: First request after inactivity may take 20-60 seconds while model loads. Consider showing a "warming up" message or implementing a timeout with fallback.
+
+3. **Edit Quality**: InstructPix2Pix is excellent for style changes and simple edits, but Gemini may still produce better results for complex, nuanced edits. Users always get a working result due to fallback.
+
+## No Frontend Changes Required
+
+The API contract remains identical - users won't notice any difference except their credits lasting much longer!
+
