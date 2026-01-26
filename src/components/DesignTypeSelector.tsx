@@ -6,6 +6,7 @@ interface DesignTypeSelectorProps {
   value: DesignType | null;
   onChange: (type: DesignType) => void;
   disabled?: boolean;
+  hasError?: boolean;
 }
 
 const designTypes: { value: DesignType; label: string; icon: React.ReactNode; description: string }[] = [
@@ -15,11 +16,16 @@ const designTypes: { value: DesignType; label: string; icon: React.ReactNode; de
   { value: "poster", label: "Poster", icon: <FileImage className="h-4 w-4" />, description: "Print design" },
 ];
 
-export const DesignTypeSelector = ({ value, onChange, disabled }: DesignTypeSelectorProps) => {
+export const DesignTypeSelector = ({ value, onChange, disabled, hasError }: DesignTypeSelectorProps) => {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium gradient-epic-text">Design Type</label>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+    <div className={cn("space-y-2", hasError && "animate-shake")}>
+      <label className={cn("text-sm font-medium", hasError ? "text-destructive" : "gradient-epic-text")}>
+        Design Type {hasError && <span className="text-destructive">*</span>}
+      </label>
+      <div className={cn(
+        "grid grid-cols-2 sm:grid-cols-4 gap-2 p-1 rounded-xl transition-all",
+        hasError && "ring-2 ring-destructive/50 bg-destructive/5"
+      )}>
         {designTypes.map((type) => (
           <button
             key={type.value}

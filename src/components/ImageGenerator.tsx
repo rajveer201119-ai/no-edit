@@ -23,6 +23,7 @@ export const ImageGenerator = () => {
   const [style, setStyle] = useState<ImageStyle>("realistic");
   const [size, setSize] = useState<ImageSize>("square");
   const [designType, setDesignType] = useState<DesignType | null>(null); // null = not selected
+  const [designTypeError, setDesignTypeError] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [guestUsed, setGuestUsed] = useState(() => {
     return localStorage.getItem('guestGenerationUsed') === 'true';
@@ -82,7 +83,10 @@ export const ImageGenerator = () => {
   const handleGenerate = async () => {
     // Validate design type is selected
     if (!designType) {
+      setDesignTypeError(true);
       toast.error("Please select a design type first");
+      // Reset error after animation
+      setTimeout(() => setDesignTypeError(false), 600);
       return;
     }
 
@@ -284,7 +288,7 @@ export const ImageGenerator = () => {
             </div>
           </div>
 
-          <DesignTypeSelector value={designType} onChange={setDesignType} disabled={isGenerating} />
+          <DesignTypeSelector value={designType} onChange={(type) => { setDesignType(type); setDesignTypeError(false); }} disabled={isGenerating} hasError={designTypeError} />
           <StyleSelector value={style} onChange={setStyle} disabled={isGenerating} />
           <SizeSelector value={size} onChange={setSize} disabled={isGenerating} />
 
