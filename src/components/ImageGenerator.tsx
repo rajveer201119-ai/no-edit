@@ -69,6 +69,15 @@ export const ImageGenerator = () => {
     }
   };
 
+  const resolveUserForGeneration = async (): Promise<{ userId: string | null; isGuest: boolean }> => {
+    // getSession() can be stale; getUser() verifies the session with the API.
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user?.id) {
+      return { userId: null, isGuest: true };
+    }
+    return { userId: data.user.id, isGuest: false };
+  };
+
   const handleUndo = () => {
     if (previousState) {
       setPrompt(previousState.prompt);
@@ -95,8 +104,8 @@ export const ImageGenerator = () => {
       return;
     }
 
-    // Check if user is logged in or has guest credits
-    const isGuest = !currentUserId;
+    // Resolve auth at the moment of generation (avoids stale/invalid sessions causing 401)
+    const { userId: authedUserId, isGuest } = await resolveUserForGeneration();
     if (isGuest && guestUsed) {
       toast.error("Sign up to generate more designs! You've used your free trial.");
       navigate("/auth");
@@ -143,8 +152,8 @@ export const ImageGenerator = () => {
       }
 
       // Refresh daily limit after successful generation
-      if (currentUserId) {
-        await fetchDailyLimit(currentUserId);
+      if (!isGuest && authedUserId) {
+        await fetchDailyLimit(authedUserId);
       }
     } catch (error: any) {
       console.error("Generation error:", error);
