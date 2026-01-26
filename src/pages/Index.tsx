@@ -210,7 +210,7 @@ const Index = () => {
       const size: ImageSize = designType === 'banner' ? 'landscape' : designType === 'poster' ? 'portrait' : 'square';
 
       const { data, error } = await supabase.functions.invoke("generate-image", {
-        body: { prompt, style, size, designType },
+        body: { prompt, style, size, designType, isGuest: !currentUserId },
       });
 
       if (error) throw error;
