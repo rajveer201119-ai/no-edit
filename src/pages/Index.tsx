@@ -2,14 +2,13 @@ import { useEffect, useState, lazy, Suspense, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { GradientButton } from "@/components/ui/gradient-button";
 import { Hero } from "@/components/Hero";
 import { AnimatedAIChat } from "@/components/AnimatedAIChat";
 import { Footer } from "@/components/Footer";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { GlassSidebar, type Project, type TabType } from "@/components/GlassSidebar";
-import { ImageEditor } from "@/components/ImageEditor";
+import { CreativeWorkspace } from "@/components/editor";
 import { SEO, homePageSchema } from "@/components/SEO";
 import { Download, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -321,7 +320,7 @@ const Index = () => {
       }
       
       return (
-        <ImageEditor
+        <CreativeWorkspace
           projectId={activeTab.project.id}
           projectName={activeTab.project.name}
           imageUrl={activeTab.project.image_url}
