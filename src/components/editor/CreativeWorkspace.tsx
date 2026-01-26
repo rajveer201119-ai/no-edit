@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChatPanel } from "./ChatPanel";
 import { PreviewPanel } from "./PreviewPanel";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
+import { useManualEditing } from "./useManualEditing";
 import { 
   ImageVersion, 
   ChatMessage, 
@@ -29,6 +30,9 @@ export const CreativeWorkspace = ({
   onImageUpdate,
   onClose,
 }: CreativeWorkspaceProps) => {
+  // Image container ref for manual editing
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+  
   // Version history
   const [versions, setVersions] = useState<ImageVersion[]>([
     {
@@ -60,6 +64,24 @@ export const CreativeWorkspace = ({
   const [isPremium, setIsPremium] = useState(false);
 
   const currentVersion = versions.find((v) => v.id === currentVersionId) || versions[0];
+
+  // Manual editing hook
+  const manualEditing = useManualEditing({
+    imageContainerRef,
+    currentImageUrl: currentVersion.imageUrl,
+    onImageUpdate: (newImageUrl: string) => {
+      // Create a new version from manual edits
+      const newVersion: ImageVersion = {
+        id: `v${versions.length + 1}-${Date.now()}`,
+        imageUrl: newImageUrl,
+        prompt: "Manual edit",
+        timestamp: new Date(),
+      };
+      setVersions((prev) => [...prev, newVersion]);
+      setCurrentVersionId(newVersion.id);
+      onImageUpdate(newImageUrl);
+    },
+  });
 
   // Fetch credits
   const fetchCredits = useCallback(async () => {
@@ -315,6 +337,32 @@ export const CreativeWorkspace = ({
             onSelectVersion={handleSelectVersion}
             onDownload={handleDownload}
             onUpgradeClick={() => setShowUpgradeDialog(true)}
+            // Manual editing props
+            isCropping={manualEditing.isCropping}
+            cropArea={manualEditing.cropArea}
+            overlays={manualEditing.overlays}
+            textOverlays={manualEditing.textOverlays}
+            activeOverlayId={manualEditing.activeOverlayId}
+            activeTextId={manualEditing.activeTextId}
+            showTextTool={manualEditing.showTextTool}
+            selectedText={manualEditing.selectedText}
+            onCropToggle={manualEditing.startCropping}
+            onCancelCrop={manualEditing.cancelCrop}
+            onApplyCrop={manualEditing.applyCrop}
+            onCropPointerDown={manualEditing.handleCropPointerDown}
+            onCropPointerMove={manualEditing.handleCropPointerMove}
+            onCropPointerUp={manualEditing.handleCropPointerUp}
+            onFileUpload={manualEditing.handleFileUpload}
+            onTextToolToggle={() => manualEditing.setShowTextTool(!manualEditing.showTextTool)}
+            onOverlayPointerDown={manualEditing.handleOverlayPointerDown}
+            onResizeOverlay={manualEditing.resizeOverlay}
+            onRemoveOverlay={manualEditing.removeOverlay}
+            onTextPointerDown={manualEditing.handleTextPointerDown}
+            onResizeText={manualEditing.resizeText}
+            onRemoveText={manualEditing.removeTextOverlay}
+            onAddText={manualEditing.handleAddTextOverlay}
+            onUpdateText={manualEditing.handleUpdateTextOverlay}
+            imageContainerRef={imageContainerRef}
           />
         </div>
       </div>
