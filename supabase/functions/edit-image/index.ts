@@ -260,7 +260,7 @@ serve(async (req) => {
     const base64Data = editedImageData.replace(/^data:image\/\w+;base64,/, "");
     const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
-    const fileName = `${userId}/${Date.now()}-edited.png`;
+    const fileName = `${userId || 'guest'}/${Date.now()}-edited.png`;
     
     const { error: uploadError } = await supabase.storage
       .from("post-images")
