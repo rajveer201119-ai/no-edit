@@ -11,7 +11,9 @@ import {
   LogIn,
   FolderOpen,
   Plus,
-  Trash2
+  Trash2,
+  PanelLeftClose,
+  PanelLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -41,6 +43,8 @@ interface GlassSidebarProps {
   onAdminClick: () => void;
   projects: Project[];
   onProjectsChange: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 export const GlassSidebar = ({
@@ -55,6 +59,8 @@ export const GlassSidebar = ({
   onAdminClick,
   projects,
   onProjectsChange,
+  isCollapsed = false,
+  onToggleCollapse,
 }: GlassSidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { isInstallable, promptInstall } = useInstallPrompt();
@@ -96,16 +102,32 @@ export const GlassSidebar = ({
 
   return (
     <>
-      {/* Mobile Menu Button */}
+      {/* Toggle Button - Always visible */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 p-2 rounded-xl md:hidden
-          backdrop-blur-xl bg-background/20 border border-white/10
-          shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.1)]
-          hover:bg-background/30 transition-all duration-300"
-        aria-label="Toggle menu"
+        onClick={() => {
+          if (window.innerWidth < 768) {
+            setIsOpen(!isOpen);
+          } else {
+            onToggleCollapse?.();
+          }
+        }}
+        className={cn(
+          "fixed top-4 z-50 p-2 rounded-xl",
+          "backdrop-blur-xl bg-background/20 border border-white/10",
+          "shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.1)]",
+          "hover:bg-background/30 transition-all duration-300",
+          isCollapsed ? "left-4" : "left-4 md:left-[76px] lg:left-[220px]"
+        )}
+        aria-label="Toggle sidebar"
       >
-        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        {isOpen ? (
+          <X className="h-5 w-5" />
+        ) : isCollapsed ? (
+          <PanelLeft className="h-5 w-5" />
+        ) : (
+          <PanelLeftClose className="h-5 w-5 hidden md:block" />
+        )}
+        <Menu className="h-5 w-5 md:hidden" />
       </button>
 
       {/* Mobile Overlay */}
@@ -119,12 +141,14 @@ export const GlassSidebar = ({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 h-full z-40 transition-transform duration-300 ease-out",
-          "w-64 md:w-20 lg:w-64",
+          "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-out",
           "backdrop-blur-2xl bg-background/10 border-r border-white/10",
           "shadow-[0_0_60px_-15px_rgba(139,92,246,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]",
+          // Mobile: slide in/out
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          // Desktop: show/hide based on collapse state
           "md:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          isCollapsed ? "md:w-0 md:border-r-0 md:opacity-0 md:pointer-events-none" : "w-64 md:w-20 lg:w-64"
         )}
       >
         {/* Glass effect overlay */}

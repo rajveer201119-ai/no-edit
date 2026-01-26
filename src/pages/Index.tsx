@@ -2,6 +2,7 @@ import { useEffect, useState, lazy, Suspense, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Hero } from "@/components/Hero";
 import { AnimatedAIChat } from "@/components/AnimatedAIChat";
 import { Footer } from "@/components/Footer";
@@ -33,7 +34,18 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>("chat");
   const [projects, setProjects] = useState<Project[]>([]);
   const [showProDialog, setShowProDialog] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    return localStorage.getItem('sidebarCollapsed') === 'true';
+  });
   const navigate = useNavigate();
+  
+  const handleToggleSidebar = () => {
+    setSidebarCollapsed(prev => {
+      const newVal = !prev;
+      localStorage.setItem('sidebarCollapsed', String(newVal));
+      return newVal;
+    });
+  };
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -425,9 +437,14 @@ const Index = () => {
           onAdminClick={() => navigate("/admin")}
           projects={projects}
           onProjectsChange={refreshProjects}
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={handleToggleSidebar}
         />
         
-        <div className="flex-1 ml-0 pt-14 md:pt-0 md:ml-20 lg:ml-64 flex flex-col min-h-screen overflow-x-hidden">
+        <div className={cn(
+          "flex-1 pt-14 md:pt-0 flex flex-col min-h-screen overflow-x-hidden transition-all duration-300",
+          sidebarCollapsed ? "md:ml-0" : "md:ml-20 lg:ml-64"
+        )}>
           {!isEditorMode && (
             <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
               <div className="absolute top-20 left-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
