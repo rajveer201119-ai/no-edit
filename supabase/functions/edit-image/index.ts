@@ -17,13 +17,15 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(binary);
 }
 
-// Edit image using Hugging Face (FREE - image-to-image editing via Inference Providers)
-async function editWithHuggingFace(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Hugging Face (free)...");
+// Edit image using Cloudflare Workers AI (FREE - 10,000 neurons/day)
+async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<string> {
+  console.log("Editing image with Cloudflare Workers AI (free)...");
   
-  const HF_TOKEN = Deno.env.get("HUGGING_FACE_ACCESS_TOKEN");
-  if (!HF_TOKEN) {
-    throw new Error("HUGGING_FACE_ACCESS_TOKEN is not configured");
+  const CF_ACCOUNT_ID = Deno.env.get("CLOUDFLARE_ACCOUNT_ID");
+  const CF_API_TOKEN = Deno.env.get("CLOUDFLARE_API_TOKEN");
+  
+  if (!CF_ACCOUNT_ID || !CF_API_TOKEN) {
+    throw new Error("Cloudflare credentials not configured");
   }
 
   // Download the source image
@@ -32,88 +34,53 @@ async function editWithHuggingFace(imageUrl: string, prompt: string): Promise<st
     throw new Error("Failed to download source image");
   }
   const imageBlob = await imageResponse.blob();
-  const imageBase64 = await blobToBase64(imageBlob);
+  const imageArrayBuffer = await imageBlob.arrayBuffer();
+  const imageBytes = [...new Uint8Array(imageArrayBuffer)];
 
-  // Use a model that is actively supported on the new Inference Providers router.
-  // Note: the legacy `timbrooks/instruct-pix2pix` endpoint has been returning 404 on the router.
-  const HF_MODEL_ID = "black-forest-labs/FLUX.1-Kontext-dev";
+  // Cloudflare Workers AI img2img endpoint
+  const cfEndpoint = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/runwayml/stable-diffusion-v1-5-img2img`;
 
-  // Hugging Face migrated endpoints can vary by task; try a small set before failing.
-  // (Some models require an explicit pipeline path and otherwise return 404.)
-  const hfEndpoints = [
-    // Explicit hf-inference provider routing
-    `https://router.huggingface.co/hf-inference/models/${HF_MODEL_ID}/pipeline/image-to-image`,
-    `https://router.huggingface.co/hf-inference/models/${HF_MODEL_ID}`,
+  const response = await fetch(cfEndpoint, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${CF_API_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      prompt: prompt,
+      image: imageBytes,
+      strength: 0.75, // Balance between original and new image
+      guidance: 7.5,
+      num_steps: 20,
+    }),
+  });
 
-    // Alternate router variants
-    `https://router.huggingface.co/models/${HF_MODEL_ID}/pipeline/image-to-image`,
-    `https://router.huggingface.co/models/${HF_MODEL_ID}`,
-  ];
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Cloudflare AI error:", response.status, errorText);
 
-  let lastStatus = 0;
-  let lastErrorText = "";
-
-  for (const endpoint of hfEndpoints) {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${HF_TOKEN}`,
-        "Content-Type": "application/json",
-        "x-use-cache": "false",
-      },
-      // New image-to-image spec: inputs is the base64 image, prompt is in parameters
-      body: JSON.stringify({
-        inputs: imageBase64,
-        parameters: {
-          prompt,
-          // Safe defaults; ignored when unsupported by the provider/model
-          guidance_scale: 7.5,
-          num_inference_steps: 20,
-        },
-      }),
-    });
-
-    if (response.ok) {
-      // Response is the edited image as binary
-      const editedImageBlob = await response.blob();
-      const editedBase64 = await blobToBase64(editedImageBlob);
-
-      console.log("Hugging Face edit successful");
-      return `data:image/png;base64,${editedBase64}`;
-    }
-
-    lastStatus = response.status;
-    lastErrorText = await response.text();
-    console.error("Hugging Face error:", response.status, lastErrorText, "endpoint:", endpoint);
-
-    // Try the next endpoint variant if this one isn't found
-    if (response.status === 404) {
-      continue;
-    }
-
-    // Check for model loading (503) - common cold start issue
-    if (response.status === 503) {
-      const error = new Error("Model is loading, please try again in a moment");
-      (error as any).status = 503;
-      throw error;
-    }
-    // Rate limit
     if (response.status === 429) {
-      const error = new Error("Hugging Face rate limit exceeded");
+      const error = new Error("Cloudflare rate limit exceeded");
       (error as any).status = 429;
       throw error;
     }
+    if (response.status === 401 || response.status === 403) {
+      const error = new Error("Cloudflare authentication failed");
+      (error as any).status = response.status;
+      throw error;
+    }
 
-    // For other non-transient HF errors, don't keep trying endpoints.
-    const error = new Error(`Hugging Face API failed: ${response.status}`);
+    const error = new Error(`Cloudflare AI failed: ${response.status}`);
     (error as any).status = response.status;
     throw error;
   }
 
-  const notFoundError = new Error(`Hugging Face API failed: ${lastStatus || 404}`);
-  (notFoundError as any).status = lastStatus || 404;
-  (notFoundError as any).details = lastErrorText;
-  throw notFoundError;
+  // Cloudflare returns the image directly as binary PNG
+  const editedImageBlob = await response.blob();
+  const editedBase64 = await blobToBase64(editedImageBlob);
+
+  console.log("Cloudflare Workers AI edit successful");
+  return `data:image/png;base64,${editedBase64}`;
 }
 
 // Fallback: Edit image using Lovable AI Gateway (Gemini) - uses credits
@@ -249,13 +216,12 @@ serve(async (req) => {
     let editedImageData: string;
     let usedService: string;
 
-    // Try Hugging Face first (FREE), fallback to Lovable AI (uses credits)
-    // NOTE: HF router endpoints have been returning 404; fallback keeps the editor working.
+    // Try Cloudflare Workers AI first (FREE - 10k neurons/day), fallback to Lovable AI (uses credits)
     try {
-      editedImageData = await editWithHuggingFace(imageUrl, sanitizedPrompt);
-      usedService = "Hugging Face (free)";
-    } catch (hfError: any) {
-      console.warn("Hugging Face failed, falling back to Lovable AI:", hfError.message);
+      editedImageData = await editWithCloudflareAI(imageUrl, sanitizedPrompt);
+      usedService = "Cloudflare Workers AI (free)";
+    } catch (cfError: any) {
+      console.warn("Cloudflare AI failed, falling back to Lovable AI:", cfError.message);
 
       try {
         editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
