@@ -101,45 +101,60 @@ serve(async (req) => {
   }
 
   try {
-    // Verify authentication
+    const { prompt, style, size, designType, isGuest } = await req.json();
+
+    // Validate design type is provided
+    if (!designType || designType === "default") {
+      return new Response(
+        JSON.stringify({ error: "Please select a design type (Logo, Social Post, Banner, or Poster)" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
+    let userId: string | null = null;
+
+    // Handle authenticated users
+    if (authHeader?.startsWith('Bearer ')) {
+      const supabaseClient = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+        { global: { headers: { Authorization: authHeader } } }
+      );
+
+      const token = authHeader.replace('Bearer ', '');
+      const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+      
+      if (!claimsError && claimsData?.claims?.sub) {
+        userId = claimsData.claims.sub;
+
+        // Check rate limits for authenticated users
+        const { data: limitData, error: limitError } = await supabaseClient.rpc('check_generation_limit', {
+          user_id_param: userId
+        });
+
+        if (limitError || !limitData?.[0]?.can_generate) {
+          return new Response(
+            JSON.stringify({ error: "Daily generation limit reached. Upgrade to Pro for more generations." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+    }
+
+    // For guest users (isGuest=true and no valid userId), allow one generation
+    // The client-side tracks this via localStorage
+    if (!userId && !isGuest) {
       return new Response(
         JSON.stringify({ error: "Authentication required. Please sign in." }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(
-        JSON.stringify({ error: "Invalid authentication. Please sign in again." }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // Guest mode: proceed without auth but log it
+    if (isGuest && !userId) {
+      console.log("Guest generation request");
     }
-
-    const userId = claimsData.claims.sub;
-
-    // Check rate limits server-side
-    const { data: limitData, error: limitError } = await supabaseClient.rpc('check_generation_limit', {
-      user_id_param: userId
-    });
-
-    if (limitError || !limitData?.[0]?.can_generate) {
-      return new Response(
-        JSON.stringify({ error: "Daily generation limit reached. Upgrade to Pro for more generations." }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const { prompt, style, size, designType } = await req.json();
 
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
       return new Response(
@@ -166,7 +181,7 @@ serve(async (req) => {
     ].filter(Boolean).join(", ");
 
     console.log("Design generation request:", { 
-      userId: userId.substring(0, 8) + '...', // Log partial ID only
+      userId: userId ? userId.substring(0, 8) + '...' : 'guest',
       designType, 
       style, 
       size, 
@@ -197,10 +212,18 @@ serve(async (req) => {
       }
     }
 
-    // Track usage after successful generation
-    await supabaseClient.rpc('increment_generation_usage', {
-      user_id_param: userId
-    });
+    // Track usage after successful generation (only for authenticated users)
+    if (userId) {
+      const authHeader = req.headers.get('Authorization');
+      const supabaseClient = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+        { global: { headers: { Authorization: authHeader! } } }
+      );
+      await supabaseClient.rpc('increment_generation_usage', {
+        user_id_param: userId
+      });
+    }
 
     return new Response(JSON.stringify({ imageUrl, prompt: styledPrompt }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

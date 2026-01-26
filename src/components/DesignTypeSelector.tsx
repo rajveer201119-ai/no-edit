@@ -3,7 +3,7 @@ import { DesignType } from "./ImageGenerator";
 import { Palette, Share2, LayoutTemplate, FileImage } from "lucide-react";
 
 interface DesignTypeSelectorProps {
-  value: DesignType;
+  value: DesignType | null;
   onChange: (type: DesignType) => void;
   disabled?: boolean;
 }
