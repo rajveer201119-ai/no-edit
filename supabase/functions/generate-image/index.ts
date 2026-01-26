@@ -6,36 +6,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Design-specific prompt templates - PRECISE, detailed instructions for high-quality output
-const designTemplates: Record<string, { template: string; includesText: boolean }> = {
-  logo: {
-    template: "PRECISE LOGO DESIGN: Create a professional, modern logo with clean vector-style graphics. Use minimalist geometric shapes, bold iconic symbol, flat design with 2-3 colors maximum. Corporate-grade quality, scalable design, centered composition on solid white or transparent background. The logo must be memorable, unique, and instantly recognizable.",
-    includesText: true
-  },
-  social: {
-    template: "PRECISE SOCIAL MEDIA POST: Create a visually striking Instagram/Facebook post with perfect 1:1 composition. Use bold, eye-catching colors with high contrast. Include clear visual hierarchy with prominent headline text, engaging imagery, and professional layout. Modern gradient backgrounds with geometric accents. Marketing-ready, scroll-stopping design.",
-    includesText: true
-  },
-  banner: {
-    template: "PRECISE WEB BANNER: Create a professional horizontal banner with 16:9 aspect ratio. Use clean, modern layout with bold headline on left/center, compelling visuals on right. High contrast colors, readable sans-serif typography, clear call-to-action area. Marketing-grade quality, web-optimized composition.",
-    includesText: true
-  },
-  poster: {
-    template: "PRECISE EVENT POSTER: Create a professional vertical poster with striking visual impact. Use bold typography hierarchy (title largest, details smaller), balanced composition, dramatic colors. Include space for event details, date, and venue. Print-ready quality, attention-grabbing from distance.",
-    includesText: true
-  },
-  default: {
-    template: "PRECISE GRAPHIC DESIGN: Create a professional, modern graphic with clean aesthetics, balanced composition, and high-quality execution. Use appropriate colors and clear visual hierarchy.",
-    includesText: false
-  },
-};
-
-// PRECISE text generation prompts for typography
-const textPrompts: Record<string, string> = {
-  logo: "Render the brand name in stylized, legible typography that complements the icon. Text must be crisp and professional.",
-  social: "Include ONE bold headline (3-5 words max), optional subtitle. Typography must be large, readable, and perfectly aligned.",
-  banner: "Include main headline (5-7 words), brief subtitle, CTA text. All text must be crisp, properly kerned, and highly readable.",
-  poster: "Include event title prominently, date/time, location. Use clear typographic hierarchy. All text must be spelled correctly and legible.",
+// Design-specific prompt templates - TEXT-FREE designs (user adds text manually)
+const designTemplates: Record<string, string> = {
+  logo: "PRECISE LOGO DESIGN: Create a professional, modern logo ICON ONLY with clean vector-style graphics. Use minimalist geometric shapes, bold iconic symbol, flat design with 2-3 colors maximum. Corporate-grade quality, scalable design, centered composition on solid white or transparent background. The logo must be memorable, unique, and instantly recognizable. DO NOT include any text, letters, words, or typography - icon/symbol only.",
+  social: "PRECISE SOCIAL MEDIA GRAPHIC: Create a visually striking Instagram/Facebook post background with perfect 1:1 composition. Use bold, eye-catching colors with high contrast. Include engaging imagery, modern gradient backgrounds with geometric accents. Marketing-ready, scroll-stopping visual design. DO NOT include any text, letters, words, numbers, or typography - visual elements only.",
+  banner: "PRECISE WEB BANNER BACKGROUND: Create a professional horizontal banner with 16:9 aspect ratio. Use clean, modern layout with compelling visuals and graphics. High contrast colors, dynamic composition. Marketing-grade quality, web-optimized visual design. DO NOT include any text, letters, words, or typography - visual/graphic elements only.",
+  poster: "PRECISE EVENT POSTER BACKGROUND: Create a professional vertical poster with striking visual impact. Use dramatic colors, balanced composition, eye-catching graphics and imagery. Print-ready quality, attention-grabbing visual design. DO NOT include any text, letters, words, numbers, dates, or typography - visual elements only.",
+  default: "PRECISE GRAPHIC DESIGN: Create a professional, modern graphic with clean aesthetics, balanced composition, and high-quality execution. Use appropriate colors and clear visual hierarchy. DO NOT include any text, letters, or typography.",
 };
 
 // Size mapping for Pollinations API - optimized dimensions
@@ -191,29 +168,22 @@ serve(async (req) => {
     const sanitizedPrompt = prompt.trim().slice(0, 1000);
 
     // Get the design template based on type
-    const templateConfig = designTemplates[designType] || designTemplates.default;
-    const template = templateConfig.template;
-    const textPrompt = textPrompts[designType] || "";
+    const template = designTemplates[designType] || designTemplates.default;
     
     // Get dimensions based on size
     const dimensions = sizeMap[size] || sizeMap.square;
 
-    // Build PRECISE optimized prompt with strict quality instructions
+    // Build PRECISE optimized prompt with strict quality instructions (NO TEXT)
     const promptParts = [
       `DESIGN REQUEST: ${sanitizedPrompt}`,
       template,
       style ? `Style: ${style} aesthetic with professional execution` : null,
+      // Explicit no-text instruction
+      "CRITICAL: Generate ONLY visual/graphic elements. DO NOT include any text, letters, words, numbers, dates, or typography anywhere in the design. The image must be completely text-free. Users will add text manually.",
+      // Quality enforcement
+      "QUALITY: 8K ultra HD resolution, razor-sharp details, professional studio quality",
+      "RESTRICTIONS: NO photorealistic human faces, NO AI artifacts, NO blurry elements, NO watermarks, NO text of any kind",
     ];
-    
-    // Add text-specific instructions for designs that need text
-    if (templateConfig.includesText && textPrompt) {
-      promptParts.push(`TYPOGRAPHY: ${textPrompt}`);
-      promptParts.push("CRITICAL: All text must be spelled correctly, perfectly rendered, crisp, and highly legible");
-    }
-    
-    // Quality enforcement
-    promptParts.push("QUALITY: 8K ultra HD resolution, razor-sharp details, professional studio quality");
-    promptParts.push("RESTRICTIONS: NO photorealistic human faces, NO AI artifacts, NO blurry elements, NO watermarks");
     
     const styledPrompt = promptParts.filter(Boolean).join(". ");
 
