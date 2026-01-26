@@ -6,13 +6,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Design-specific prompt templates for different design types - optimized for text accuracy
+// Design-specific prompt templates for different design types - optimized for correct output
 const designTemplates: Record<string, string> = {
-  logo: "Minimalist professional logo, vector art style, clean lines, solid colors, centered on white background, NO text unless explicitly requested",
-  social: "Social media post graphic, bold modern design, vibrant saturated colors, clean layout with clear focal point",
-  banner: "Wide horizontal banner, professional marketing design, clean composition with space for text overlay",
-  poster: "High-impact poster design, bold visual hierarchy, print-quality, professional event style",
-  default: "Clean professional graphic design, modern aesthetic, high quality render",
+  logo: "Professional logo design, flat vector illustration, minimalist clean style, simple geometric shapes, solid colors on plain background, corporate branding, NO photorealistic faces, NO human portraits, logo icon only",
+  social: "Social media post design, flat graphic illustration, bold typography layout, marketing visual, abstract shapes and patterns, NO photorealistic human faces, NO AI avatars, clean graphic design only",
+  banner: "Wide horizontal banner design, flat illustration style, professional marketing graphic, clean composition, abstract background, NO photorealistic portraits, graphic design only",
+  poster: "Event poster design, flat graphic illustration, bold visual hierarchy, print-quality artwork, abstract artistic style, NO photorealistic faces, professional graphic design",
+  default: "Professional graphic design illustration, clean modern aesthetic, flat design style, abstract visual, NO photorealistic human faces or portraits, clean vector-style artwork",
 };
 
 // Size mapping for Pollinations API
