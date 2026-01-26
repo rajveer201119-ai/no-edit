@@ -34,19 +34,22 @@ async function editWithHuggingFace(imageUrl: string, prompt: string): Promise<st
   const imageBlob = await imageResponse.blob();
   const imageBase64 = await blobToBase64(imageBlob);
 
-  // Call Hugging Face InstructPix2Pix API (using new router endpoint)
+  // Call Hugging Face InstructPix2Pix API using Inference API
   const response = await fetch(
-    "https://router.huggingface.co/hf-inference/models/timbrooks/instruct-pix2pix",
+    "https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix",
     {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${HF_TOKEN}`,
         "Content-Type": "application/json",
+        "x-use-cache": "false",
       },
       body: JSON.stringify({
-        inputs: imageBase64,
-        parameters: {
+        inputs: {
+          image: imageBase64,
           prompt: prompt,
+        },
+        parameters: {
           guidance_scale: 7.5,
           image_guidance_scale: 1.5,
         }
@@ -97,7 +100,7 @@ async function editWithLovableAI(imageUrl: string, prompt: string): Promise<stri
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash-image-preview",
+      model: "google/gemini-2.5-flash-image",
       messages: [
         {
           role: "system",
