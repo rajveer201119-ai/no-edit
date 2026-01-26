@@ -163,6 +163,15 @@ const Index = () => {
     return null;
   };
 
+  const resolveUserForGeneration = async (): Promise<{ userId: string | null; isGuest: boolean }> => {
+    // getSession() can be stale; getUser() verifies the session with the API.
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user?.id) {
+      return { userId: null, isGuest: true };
+    }
+    return { userId: data.user.id, isGuest: false };
+  };
+
   const handleGenerate = useCallback(async (prompt: string, command?: string) => {
     // Allow generation without signup - auth is only required for editor
 
@@ -171,12 +180,15 @@ const Index = () => {
       return;
     }
 
-    // Only check limits if user is logged in
-    if (currentUserId && remainingPrompts !== null && remainingPrompts <= 0) {
+    // Resolve auth at the moment of generation (avoids stale/invalid sessions causing 401)
+    const { userId: authedUserId, isGuest } = await resolveUserForGeneration();
+
+    // Only check limits if user is actually authenticated
+    if (!isGuest && authedUserId && remainingPrompts !== null && remainingPrompts <= 0) {
       setShowProDialog(true);
       toast.error(
-        isPremium 
-          ? "You've used all 25 daily credits. Come back tomorrow!" 
+        isPremium
+          ? "You've used all 25 daily credits. Come back tomorrow!"
           : "You've used your free daily credits. Upgrade to Pro for more!",
         { duration: 5000 }
       );
@@ -210,7 +222,7 @@ const Index = () => {
       const size: ImageSize = designType === 'banner' ? 'landscape' : designType === 'poster' ? 'portrait' : 'square';
 
       const { data, error } = await supabase.functions.invoke("generate-image", {
-        body: { prompt, style, size, designType, isGuest: !currentUserId },
+        body: { prompt, style, size, designType, isGuest },
       });
 
       if (error) throw error;
@@ -220,16 +232,16 @@ const Index = () => {
       const imageUrl = data.imageUrl as string | undefined;
       if (!imageUrl) throw new Error("Design generation failed");
 
-      // Track usage and create project only if logged in
-      if (currentUserId) {
-        await supabase.rpc('increment_generation_usage', { user_id_param: currentUserId });
+      // Track usage and create project only if logged in (and session is valid)
+      if (!isGuest && authedUserId) {
+        await supabase.rpc('increment_generation_usage', { user_id_param: authedUserId });
 
         // Create a new project
         const projectName = prompt.slice(0, 50) + (prompt.length > 50 ? "..." : "");
         const { data: newProject, error: projectError } = await supabase
           .from("projects")
           .insert({
-            user_id: currentUserId,
+            user_id: authedUserId,
             name: projectName,
             prompt: prompt,
             image_url: imageUrl
@@ -241,8 +253,8 @@ const Index = () => {
           console.error("Failed to create project:", projectError);
         }
 
-        await fetchDailyLimit(currentUserId);
-        await fetchProjects(currentUserId);
+        await fetchDailyLimit(authedUserId);
+        await fetchProjects(authedUserId);
 
         // Open the project in editor tab
         if (newProject) {
@@ -253,7 +265,7 @@ const Index = () => {
       }
 
       setGeneratedImage(imageUrl);
-      toast.success("Design created! Sign in to save and edit.");
+      toast.success(isGuest ? "Design created! Sign in to save and edit." : "Design created!");
     } catch (error: any) {
       console.error("Generation error:", error);
       toast.error(
