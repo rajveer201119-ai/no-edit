@@ -17,9 +17,9 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(binary);
 }
 
-// Edit image using Hugging Face InstructPix2Pix (FREE - true img2img editing)
+// Edit image using Hugging Face (FREE - image-to-image editing via Inference Providers)
 async function editWithHuggingFace(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Hugging Face InstructPix2Pix (free)...");
+  console.log("Editing image with Hugging Face (free)...");
   
   const HF_TOKEN = Deno.env.get("HUGGING_FACE_ACCESS_TOKEN");
   if (!HF_TOKEN) {
@@ -34,33 +34,63 @@ async function editWithHuggingFace(imageUrl: string, prompt: string): Promise<st
   const imageBlob = await imageResponse.blob();
   const imageBase64 = await blobToBase64(imageBlob);
 
-  // Call Hugging Face InstructPix2Pix API using Inference API
-  const response = await fetch(
-    "https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix",
-    {
+  // Use a model that is actively supported on the new Inference Providers router.
+  // Note: the legacy `timbrooks/instruct-pix2pix` endpoint has been returning 404 on the router.
+  const HF_MODEL_ID = "black-forest-labs/FLUX.1-Kontext-dev";
+
+  // Hugging Face migrated endpoints can vary by task; try a small set before failing.
+  // (Some models require an explicit pipeline path and otherwise return 404.)
+  const hfEndpoints = [
+    // Explicit hf-inference provider routing
+    `https://router.huggingface.co/hf-inference/models/${HF_MODEL_ID}/pipeline/image-to-image`,
+    `https://router.huggingface.co/hf-inference/models/${HF_MODEL_ID}`,
+
+    // Alternate router variants
+    `https://router.huggingface.co/models/${HF_MODEL_ID}/pipeline/image-to-image`,
+    `https://router.huggingface.co/models/${HF_MODEL_ID}`,
+  ];
+
+  let lastStatus = 0;
+  let lastErrorText = "";
+
+  for (const endpoint of hfEndpoints) {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${HF_TOKEN}`,
         "Content-Type": "application/json",
         "x-use-cache": "false",
       },
+      // New image-to-image spec: inputs is the base64 image, prompt is in parameters
       body: JSON.stringify({
-        inputs: {
-          image: imageBase64,
-          prompt: prompt,
-        },
+        inputs: imageBase64,
         parameters: {
+          prompt,
+          // Safe defaults; ignored when unsupported by the provider/model
           guidance_scale: 7.5,
-          image_guidance_scale: 1.5,
-        }
+          num_inference_steps: 20,
+        },
       }),
-    }
-  );
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Hugging Face error:", response.status, errorText);
-    
+    if (response.ok) {
+      // Response is the edited image as binary
+      const editedImageBlob = await response.blob();
+      const editedBase64 = await blobToBase64(editedImageBlob);
+
+      console.log("Hugging Face edit successful");
+      return `data:image/png;base64,${editedBase64}`;
+    }
+
+    lastStatus = response.status;
+    lastErrorText = await response.text();
+    console.error("Hugging Face error:", response.status, lastErrorText, "endpoint:", endpoint);
+
+    // Try the next endpoint variant if this one isn't found
+    if (response.status === 404) {
+      continue;
+    }
+
     // Check for model loading (503) - common cold start issue
     if (response.status === 503) {
       const error = new Error("Model is loading, please try again in a moment");
@@ -73,15 +103,17 @@ async function editWithHuggingFace(imageUrl: string, prompt: string): Promise<st
       (error as any).status = 429;
       throw error;
     }
-    throw new Error(`Hugging Face API failed: ${response.status}`);
+
+    // For other non-transient HF errors, don't keep trying endpoints.
+    const error = new Error(`Hugging Face API failed: ${response.status}`);
+    (error as any).status = response.status;
+    throw error;
   }
 
-  // Response is the edited image as binary
-  const editedImageBlob = await response.blob();
-  const editedBase64 = await blobToBase64(editedImageBlob);
-  
-  console.log("Hugging Face edit successful");
-  return `data:image/png;base64,${editedBase64}`;
+  const notFoundError = new Error(`Hugging Face API failed: ${lastStatus || 404}`);
+  (notFoundError as any).status = lastStatus || 404;
+  (notFoundError as any).details = lastErrorText;
+  throw notFoundError;
 }
 
 // Fallback: Edit image using Lovable AI Gateway (Gemini) - uses credits
@@ -217,13 +249,27 @@ serve(async (req) => {
     let editedImageData: string;
     let usedService: string;
 
-    // Try Hugging Face first (FREE), fallback to Lovable AI (uses credits)
+    // Try Hugging Face first (FREE).
+    // IMPORTANT: We only use the paid Lovable AI fallback for *transient* HF failures
+    // (cold start / rate limit). This prevents burning credits when HF is misconfigured.
     try {
       editedImageData = await editWithHuggingFace(imageUrl, sanitizedPrompt);
       usedService = "Hugging Face InstructPix2Pix (free)";
     } catch (hfError: any) {
       console.warn("Hugging Face failed, falling back to Lovable AI:", hfError.message);
-      
+
+      const hfStatus = hfError?.status;
+      const isTransientHfFailure = hfStatus === 503 || hfStatus === 429;
+
+      if (!isTransientHfFailure) {
+        return new Response(
+          JSON.stringify({
+            error: "Free editor is unavailable right now (Hugging Face). Please try again in a moment.",
+          }),
+          { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       try {
         editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
         usedService = "Lovable AI Gemini (credits)";
@@ -259,16 +305,39 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Convert base64 to blob
-    const base64Data = editedImageData.replace(/^data:image\/\w+;base64,/, "");
-    const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    // Convert edited image (data URL OR remote URL) into bytes for Storage upload.
+    let imageBytes: Uint8Array;
+    let contentType = "image/png";
+    let fileExt = "png";
+
+    if (editedImageData.startsWith("data:image/")) {
+      const match = editedImageData.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
+      if (match?.[1]) {
+        contentType = match[1];
+        fileExt = contentType.includes("jpeg") || contentType.includes("jpg") ? "jpg" : contentType.split("/")[1] || "png";
+      }
+
+      const base64Data = editedImageData.replace(/^data:image\/\w+[a-zA-Z0-9.+-]*;base64,/, "");
+      imageBytes = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
+    } else if (editedImageData.startsWith("http://") || editedImageData.startsWith("https://")) {
+      const remoteResp = await fetch(editedImageData);
+      if (!remoteResp.ok) {
+        throw new Error("Failed to download edited image");
+      }
+      const remoteBlob = await remoteResp.blob();
+      contentType = remoteBlob.type || remoteResp.headers.get("content-type") || contentType;
+      fileExt = contentType.includes("jpeg") || contentType.includes("jpg") ? "jpg" : contentType.split("/")[1] || "png";
+      imageBytes = new Uint8Array(await remoteBlob.arrayBuffer());
+    } else {
+      throw new Error("Unsupported edited image format");
+    }
     
-    const fileName = `${userId || 'guest'}/${Date.now()}-edited.png`;
+    const fileName = `${userId || 'guest'}/${Date.now()}-edited.${fileExt}`;
     
     const { error: uploadError } = await supabase.storage
       .from("post-images")
       .upload(fileName, imageBytes, {
-        contentType: "image/png",
+        contentType,
         upsert: false
       });
 
