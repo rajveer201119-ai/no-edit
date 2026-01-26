@@ -34,9 +34,9 @@ async function editWithHuggingFace(imageUrl: string, prompt: string): Promise<st
   const imageBlob = await imageResponse.blob();
   const imageBase64 = await blobToBase64(imageBlob);
 
-  // Call Hugging Face InstructPix2Pix API
+  // Call Hugging Face InstructPix2Pix API (using new router endpoint)
   const response = await fetch(
-    "https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix",
+    "https://router.huggingface.co/hf-inference/models/timbrooks/instruct-pix2pix",
     {
       method: "POST",
       headers: {
