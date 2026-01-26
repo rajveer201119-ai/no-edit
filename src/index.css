@@ -212,6 +212,10 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  #lovable-badge {
+    display: none !important;
+  }
+
   body {
     @apply bg-background text-foreground;
     min-height: 100vh;
