@@ -20,6 +20,7 @@ const Feed = lazy(() => import("@/components/Feed").then(mod => ({ default: mod.
 
 export type ImageStyle = "ghibli" | "3d" | "animated" | "realistic" | "vintage" | "cyberpunk";
 export type ImageSize = "square" | "portrait" | "landscape";
+export type DesignType = "logo" | "social" | "banner" | "poster";
 
 const Index = () => {
   const [isAuthed, setIsAuthed] = useState(false);
@@ -139,6 +140,29 @@ const Index = () => {
     }
   };
 
+  const getDesignTypeFromPrompt = (rawPrompt: string): DesignType | null => {
+    const p = rawPrompt.toLowerCase();
+
+    // Order matters: check more specific terms first
+    if (p.includes('logo')) return 'logo';
+    if (p.includes('banner') || p.includes('header')) return 'banner';
+    if (p.includes('poster') || p.includes('flyer')) return 'poster';
+    if (
+      p.includes('social') ||
+      p.includes('instagram') ||
+      p.includes('facebook') ||
+      p.includes('linkedin') ||
+      p.includes('twitter') ||
+      p.includes('x ') ||
+      p.includes('social post') ||
+      p.includes('post for')
+    ) {
+      return 'social';
+    }
+
+    return null;
+  };
+
   const handleGenerate = useCallback(async (prompt: string, command?: string) => {
     // Allow generation without signup - auth is only required for editor
 
@@ -165,9 +189,25 @@ const Index = () => {
     toast.loading("Creating your design...", { id: "generating", duration: 120000 });
 
     try {
-      const style = getStyleFromCommand(command);
-      const designType = command || 'default';
-      const size = command === 'banner' ? 'landscape' : command === 'poster' ? 'portrait' : 'square';
+      const normalizedCommand = command?.toLowerCase();
+      const commandDesignType: DesignType | null =
+        normalizedCommand === 'logo' ||
+        normalizedCommand === 'social' ||
+        normalizedCommand === 'banner' ||
+        normalizedCommand === 'poster'
+          ? (normalizedCommand as DesignType)
+          : null;
+
+      const designType: DesignType | null = commandDesignType ?? getDesignTypeFromPrompt(prompt);
+
+      // Avoid calling the edge function with an invalid designType (e.g. "default")
+      if (!designType) {
+        toast.error("Please specify a design type (logo, social post, banner, or poster)");
+        return;
+      }
+
+      const style = getStyleFromCommand(designType);
+      const size: ImageSize = designType === 'banner' ? 'landscape' : designType === 'poster' ? 'portrait' : 'square';
 
       const { data, error } = await supabase.functions.invoke("generate-image", {
         body: { prompt, style, size, designType },
