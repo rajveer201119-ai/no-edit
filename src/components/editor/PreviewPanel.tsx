@@ -109,8 +109,8 @@ export const PreviewPanel = ({
   return (
     <div className="flex flex-col h-full bg-[#0a0a0a]">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border/10 bg-background/40 backdrop-blur-sm">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between px-2 sm:px-4 py-2 sm:py-3 border-b border-border/10 bg-background/40 backdrop-blur-sm flex-wrap gap-2">
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Manual Tools */}
           <EditorToolbar
             isCropping={isCropping}
@@ -122,9 +122,9 @@ export const PreviewPanel = ({
             isDisabled={isProcessing}
           />
           
-          <div className="w-px h-6 bg-border/20" />
+          <div className="hidden sm:block w-px h-6 bg-border/20" />
           
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/30 border border-border/20">
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/30 border border-border/20">
             <span className="text-xs font-mono text-muted-foreground">v{currentIndex}</span>
             <span className="text-border/50">|</span>
             <span className="text-xs font-mono text-primary">{Math.round(zoom * 100)}%</span>
@@ -145,41 +145,43 @@ export const PreviewPanel = ({
             </Button>
           )}
           
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg hover:bg-muted/50"
-            onClick={handleZoomOut}
-          >
-            <ZoomOut className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg hover:bg-muted/50"
-            onClick={handleZoomIn}
-          >
-            <ZoomIn className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg hover:bg-muted/50"
-            onClick={handleResetZoom}
-          >
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          
-          <div className="w-px h-5 bg-border/20 mx-1" />
-          
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg hover:bg-muted/50"
-            onClick={() => setIsFullscreen(!isFullscreen)}
-          >
-            <Maximize2 className="h-4 w-4" />
-          </Button>
+          <div className="hidden sm:flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg hover:bg-muted/50"
+              onClick={handleZoomOut}
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg hover:bg-muted/50"
+              onClick={handleZoomIn}
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg hover:bg-muted/50"
+              onClick={handleResetZoom}
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+            
+            <div className="w-px h-5 bg-border/20 mx-1" />
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg hover:bg-muted/50"
+              onClick={() => setIsFullscreen(!isFullscreen)}
+            >
+              <Maximize2 className="h-4 w-4" />
+            </Button>
+          </div>
           
           <Button
             variant="outline"
@@ -192,15 +194,15 @@ export const PreviewPanel = ({
           >
             {!isPremium && <Lock className="h-3 w-3 mr-1.5" />}
             <Download className="h-3.5 w-3.5 mr-1.5" />
-            Save
+            Download
           </Button>
         </div>
       </div>
 
       {/* Main Area with Canvas and Text Tool */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Canvas Area */}
-        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-6">
+        <div className="flex-1 relative overflow-auto flex items-center justify-center p-4 sm:p-6">
           {/* Grid background */}
           <div 
             className="absolute inset-0 opacity-[0.03]"
@@ -226,11 +228,11 @@ export const PreviewPanel = ({
             </div>
           )}
 
-          {/* Image container with overlays */}
+          {/* Image container with overlays - centered */}
           <div
             ref={imageContainerRef}
             className={cn(
-              "relative transition-transform duration-300 ease-out select-none",
+              "relative transition-transform duration-300 ease-out select-none mx-auto",
               isProcessing && "opacity-50",
               isCropping && "cursor-crosshair"
             )}
@@ -245,7 +247,7 @@ export const PreviewPanel = ({
             <img
               src={currentVersion.imageUrl}
               alt="Current version"
-              className="max-w-full max-h-[60vh] rounded-lg shadow-2xl shadow-black/50 object-contain"
+              className="max-w-full max-h-[50vh] sm:max-h-[60vh] rounded-lg shadow-2xl shadow-black/50 object-contain block mx-auto"
               draggable={false}
             />
             
