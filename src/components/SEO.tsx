@@ -11,13 +11,13 @@ interface SEOProps {
   noIndex?: boolean;
 }
 
-const defaultOgImage = "https://storage.googleapis.com/gpt-engineer-file-uploads/kG5hIp7FM3biSpv5njI7csuUQ6O2/social-images/social-1759212279524-no-edit.lovable.app_.png";
-const baseUrl = "https://epic-ai-generator.lovable.app";
+const defaultOgImage = "https://no-edit.lovable.app/og.png";
+const baseUrl = "https://no-edit.lovable.app";
 
 export const SEO = ({
-  title = "EPIC - Design Generator for Non-Designers | Create Professional Designs Instantly",
-  description = "AI-powered design generator for non-designers. Create stunning logos, social media graphics, banners, posters, and business cards instantly. No design skills needed.",
-  keywords = "AI design generator, design for non-designers, logo maker, social media graphics, banner maker, poster design, business card maker, AI graphic design",
+  title = "EPIC — Generate AI Images Instantly",
+  description = "EPIC is a zero-edit AI image generator. Create stunning AI images instantly without prompts, editing, or design skills.",
+  keywords = "AI image generator, zero-edit AI, instant image generation, AI graphics, no-prompt image creator, beginner-friendly AI design",
   canonicalUrl = baseUrl,
   ogImage = defaultOgImage,
   ogType = "website",
@@ -69,23 +69,22 @@ export const homePageSchema = {
     {
       "@type": "WebApplication",
       "@id": `${baseUrl}/#webapp`,
-      "name": "EPIC Design Generator",
+      "name": "EPIC",
       "applicationCategory": "DesignApplication",
       "operatingSystem": "Any",
       "url": baseUrl,
-      "description": "AI-powered design generator for non-designers. Create logos, social media graphics, banners, posters, and business cards instantly.",
+      "description": "EPIC is a zero-edit AI image generator. Create stunning AI images instantly without prompts, editing, or design skills.",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
       "featureList": [
-        "Logo Design",
-        "Social Media Graphics",
-        "Banner Creation",
-        "Poster Design",
-        "Business Card Maker",
-        "Presentation Slides"
+        "One-click AI image generation",
+        "Zero editing required",
+        "No complex prompts",
+        "Instant downloads",
+        "Beginner-friendly interface"
       ]
     },
     {
@@ -102,7 +101,7 @@ export const homePageSchema = {
       "@type": "WebSite",
       "@id": `${baseUrl}/#website`,
       "url": baseUrl,
-      "name": "EPIC Design Generator",
+      "name": "EPIC",
       "publisher": {
         "@id": `${baseUrl}/#organization`
       }
@@ -113,8 +112,8 @@ export const homePageSchema = {
 export const pricingPageSchema = (currency: string, proPrice: number) => ({
   "@context": "https://schema.org",
   "@type": "Product",
-  "name": "EPIC Design Pro Plan",
-  "description": "Unlimited AI design generation with priority support and advanced features",
+  "name": "EPIC Pro Plan",
+  "description": "Unlimited AI image generation with priority support and advanced features",
   "brand": {
     "@type": "Brand",
     "name": "EPIC Design"
