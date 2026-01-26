@@ -6,9 +6,84 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Edit image using Lovable AI Gateway (Gemini) - the only service that supports true image editing
+// Helper to convert blob to base64
+async function blobToBase64(blob: Blob): Promise<string> {
+  const arrayBuffer = await blob.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+// Edit image using Hugging Face InstructPix2Pix (FREE - true img2img editing)
+async function editWithHuggingFace(imageUrl: string, prompt: string): Promise<string> {
+  console.log("Editing image with Hugging Face InstructPix2Pix (free)...");
+  
+  const HF_TOKEN = Deno.env.get("HUGGING_FACE_ACCESS_TOKEN");
+  if (!HF_TOKEN) {
+    throw new Error("HUGGING_FACE_ACCESS_TOKEN is not configured");
+  }
+
+  // Download the source image
+  const imageResponse = await fetch(imageUrl);
+  if (!imageResponse.ok) {
+    throw new Error("Failed to download source image");
+  }
+  const imageBlob = await imageResponse.blob();
+  const imageBase64 = await blobToBase64(imageBlob);
+
+  // Call Hugging Face InstructPix2Pix API
+  const response = await fetch(
+    "https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix",
+    {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${HF_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: imageBase64,
+        parameters: {
+          prompt: prompt,
+          guidance_scale: 7.5,
+          image_guidance_scale: 1.5,
+        }
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Hugging Face error:", response.status, errorText);
+    
+    // Check for model loading (503) - common cold start issue
+    if (response.status === 503) {
+      const error = new Error("Model is loading, please try again in a moment");
+      (error as any).status = 503;
+      throw error;
+    }
+    // Rate limit
+    if (response.status === 429) {
+      const error = new Error("Hugging Face rate limit exceeded");
+      (error as any).status = 429;
+      throw error;
+    }
+    throw new Error(`Hugging Face API failed: ${response.status}`);
+  }
+
+  // Response is the edited image as binary
+  const editedImageBlob = await response.blob();
+  const editedBase64 = await blobToBase64(editedImageBlob);
+  
+  console.log("Hugging Face edit successful");
+  return `data:image/png;base64,${editedBase64}`;
+}
+
+// Fallback: Edit image using Lovable AI Gateway (Gemini) - uses credits
 async function editWithLovableAI(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Lovable AI (Gemini - supports true image editing)...");
+  console.log("Editing image with Lovable AI (Gemini - fallback, uses credits)...");
   
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
@@ -135,28 +210,37 @@ serve(async (req) => {
     console.log("Editing image:", { userId: userId.substring(0, 8) + '...' });
 
     let editedImageData: string;
+    let usedService: string;
 
-    // Use Lovable AI for true image editing (Pollinations only does text-to-image, not editing)
+    // Try Hugging Face first (FREE), fallback to Lovable AI (uses credits)
     try {
-      editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
-    } catch (error: any) {
-      // Pass through rate limit and credit errors with proper status codes
-      if (error.status === 429) {
-        return new Response(
-          JSON.stringify({ error: error.message }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+      editedImageData = await editWithHuggingFace(imageUrl, sanitizedPrompt);
+      usedService = "Hugging Face InstructPix2Pix (free)";
+    } catch (hfError: any) {
+      console.warn("Hugging Face failed, falling back to Lovable AI:", hfError.message);
+      
+      try {
+        editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
+        usedService = "Lovable AI Gemini (credits)";
+      } catch (lovableError: any) {
+        // Pass through rate limit and credit errors with proper status codes
+        if (lovableError.status === 429) {
+          return new Response(
+            JSON.stringify({ error: lovableError.message }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        if (lovableError.status === 402) {
+          return new Response(
+            JSON.stringify({ error: lovableError.message }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        throw lovableError;
       }
-      if (error.status === 402) {
-        return new Response(
-          JSON.stringify({ error: error.message }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      throw error;
     }
 
-    console.log("Image edit completed successfully");
+    console.log(`Image edit completed via ${usedService}`);
 
     // Track edit usage after successful edit
     await supabaseClient.rpc('increment_edit_usage', {
@@ -214,7 +298,8 @@ serve(async (req) => {
     // Safe server-side logging
     console.error(`[${errorId}] Edit error:`, {
       timestamp: new Date().toISOString(),
-      errorType: error?.constructor?.name || 'Unknown'
+      errorType: error?.constructor?.name || 'Unknown',
+      message: error?.message || 'Unknown error'
     });
 
     // Map to safe user-facing messages
@@ -226,6 +311,9 @@ serve(async (req) => {
       statusCode = 429;
     } else if (error?.message?.includes("credits") || error?.status === 402) {
       clientMessage = "Service temporarily unavailable. Please try again later.";
+      statusCode = 503;
+    } else if (error?.message?.includes("Model is loading")) {
+      clientMessage = "AI model is warming up. Please try again in 30 seconds.";
       statusCode = 503;
     }
 
