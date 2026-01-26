@@ -6,13 +6,36 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Design-specific prompt templates for different design types - optimized for correct output
-const designTemplates: Record<string, string> = {
-  logo: "Professional logo design, flat vector illustration, minimalist clean style, simple geometric shapes, solid colors on plain background, corporate branding, NO photorealistic faces, NO human portraits, logo icon only",
-  social: "Social media post design, flat graphic illustration, bold typography layout, marketing visual, abstract shapes and patterns, NO photorealistic human faces, NO AI avatars, clean graphic design only",
-  banner: "Wide horizontal banner design, flat illustration style, professional marketing graphic, clean composition, abstract background, NO photorealistic portraits, graphic design only",
-  poster: "Event poster design, flat graphic illustration, bold visual hierarchy, print-quality artwork, abstract artistic style, NO photorealistic faces, professional graphic design",
-  default: "Professional graphic design illustration, clean modern aesthetic, flat design style, abstract visual, NO photorealistic human faces or portraits, clean vector-style artwork",
+// Design-specific prompt templates - includes text rendering instructions
+const designTemplates: Record<string, { template: string; includesText: boolean }> = {
+  logo: {
+    template: "Professional logo design, flat vector illustration, minimalist clean style, simple geometric shapes, solid colors on plain background, corporate branding, logo icon with company name text clearly rendered",
+    includesText: true
+  },
+  social: {
+    template: "Social media post design with headline text and tagline, flat graphic illustration, bold readable typography, marketing visual with clear text hierarchy, abstract shapes background, Instagram/Facebook ready, text overlay prominently displayed",
+    includesText: true
+  },
+  banner: {
+    template: "Wide horizontal banner design with headline and call-to-action text, flat illustration style, professional marketing graphic with readable typography, promotional text clearly visible, web banner ready",
+    includesText: true
+  },
+  poster: {
+    template: "Event poster design with title, date and details text, flat graphic illustration, bold readable typography, print-quality artwork with clear text hierarchy, promotional poster with text overlay",
+    includesText: true
+  },
+  default: {
+    template: "Professional graphic design illustration, clean modern aesthetic, flat design style, abstract visual, clean vector-style artwork",
+    includesText: false
+  },
+};
+
+// Text generation prompts for different design types
+const textPrompts: Record<string, string> = {
+  logo: "Include the brand/company name prominently. Make the text stylized to match the logo design.",
+  social: "Include a catchy headline (max 6 words), a supporting tagline, and a call-to-action. Make text bold and readable.",
+  banner: "Include a main headline, a brief subtitle, and a call-to-action button text. Text should be prominent and eye-catching.",
+  poster: "Include event title, date/time placeholder, location, and key details. Use bold headline with supporting text hierarchy.",
 };
 
 // Size mapping for Pollinations API
@@ -167,18 +190,29 @@ serve(async (req) => {
     const sanitizedPrompt = prompt.trim().slice(0, 1000);
 
     // Get the design template based on type
-    const template = designTemplates[designType] || designTemplates.default;
+    const templateConfig = designTemplates[designType] || designTemplates.default;
+    const template = templateConfig.template;
+    const textPrompt = textPrompts[designType] || "";
     
     // Get dimensions based on size
     const dimensions = sizeMap[size] || sizeMap.square;
 
-    // Build concise, optimized prompt for better text rendering
-    const styledPrompt = [
+    // Build optimized prompt with text instructions for text-heavy designs
+    const promptParts = [
       sanitizedPrompt,
       template,
       style ? `${style} aesthetic` : null,
-      "8K ultra HD, sharp details",
-    ].filter(Boolean).join(", ");
+    ];
+    
+    // Add text-specific instructions for designs that need text
+    if (templateConfig.includesText && textPrompt) {
+      promptParts.push(textPrompt);
+      promptParts.push("Ensure all text is spelled correctly, legible, and prominently displayed");
+    }
+    
+    promptParts.push("8K ultra HD, sharp details, NO photorealistic human faces or AI avatars");
+    
+    const styledPrompt = promptParts.filter(Boolean).join(", ");
 
     console.log("Design generation request:", { 
       userId: userId ? userId.substring(0, 8) + '...' : 'guest',
