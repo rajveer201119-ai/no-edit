@@ -34,15 +34,9 @@ export const CreativeWorkspace = ({
   const imageContainerRef = useRef<HTMLDivElement>(null);
   
   // Version history
-  const [versions, setVersions] = useState<ImageVersion[]>([
-    {
-      id: "v1-" + Date.now(),
-      imageUrl: imageUrl,
-      prompt: "Original",
-      timestamp: new Date(),
-    },
-  ]);
-  const [currentVersionId, setCurrentVersionId] = useState(versions[0].id);
+  const [versions, setVersions] = useState<ImageVersion[]>([]);
+  const [currentVersionId, setCurrentVersionId] = useState<string>("");
+  const [isLoadingVersions, setIsLoadingVersions] = useState(true);
   
   // Chat state
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -65,17 +59,108 @@ export const CreativeWorkspace = ({
   const [guestEditUsed, setGuestEditUsed] = useState(() => {
     return localStorage.getItem('guestEditUsed') === 'true';
   });
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const currentVersion = versions.find((v) => v.id === currentVersionId) || versions[0];
+
+  // Load versions from database
+  const loadVersions = useCallback(async () => {
+    setIsLoadingVersions(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      setCurrentUserId(user.id);
+      
+      // Fetch existing versions from database
+      const { data: savedVersions, error } = await supabase
+        .from("project_versions")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("version_number", { ascending: true });
+      
+      if (error) {
+        console.error("Failed to load versions:", error);
+      }
+      
+      if (savedVersions && savedVersions.length > 0) {
+        // Use saved versions
+        const loadedVersions: ImageVersion[] = savedVersions.map((v: any) => ({
+          id: v.id,
+          imageUrl: v.image_url,
+          prompt: v.prompt,
+          timestamp: new Date(v.created_at),
+        }));
+        setVersions(loadedVersions);
+        setCurrentVersionId(loadedVersions[loadedVersions.length - 1].id);
+      } else {
+        // Create initial version
+        const initialVersion: ImageVersion = {
+          id: "v1-" + Date.now(),
+          imageUrl: imageUrl,
+          prompt: "Original",
+          timestamp: new Date(),
+        };
+        setVersions([initialVersion]);
+        setCurrentVersionId(initialVersion.id);
+        
+        // Save initial version to database
+        await supabase.from("project_versions").insert({
+          id: initialVersion.id,
+          project_id: projectId,
+          user_id: user.id,
+          image_url: imageUrl,
+          prompt: "Original",
+          version_number: 1,
+        });
+      }
+    } catch (error) {
+      console.error("Error loading versions:", error);
+      // Fallback to initial version
+      const initialVersion: ImageVersion = {
+        id: "v1-" + Date.now(),
+        imageUrl: imageUrl,
+        prompt: "Original",
+        timestamp: new Date(),
+      };
+      setVersions([initialVersion]);
+      setCurrentVersionId(initialVersion.id);
+    } finally {
+      setIsLoadingVersions(false);
+    }
+  }, [projectId, imageUrl]);
+
+  useEffect(() => {
+    loadVersions();
+  }, [loadVersions]);
+
+  // Save new version to database
+  const saveVersion = useCallback(async (version: ImageVersion, versionNumber: number) => {
+    if (!currentUserId) return;
+    
+    try {
+      await supabase.from("project_versions").insert({
+        id: version.id,
+        project_id: projectId,
+        user_id: currentUserId,
+        image_url: version.imageUrl,
+        prompt: version.prompt,
+        version_number: versionNumber,
+      });
+    } catch (error) {
+      console.error("Failed to save version:", error);
+    }
+  }, [projectId, currentUserId]);
 
   // Manual editing hook
   const manualEditing = useManualEditing({
     imageContainerRef,
-    currentImageUrl: currentVersion.imageUrl,
-    onImageUpdate: (newImageUrl: string) => {
+    currentImageUrl: currentVersion?.imageUrl || imageUrl,
+    onImageUpdate: async (newImageUrl: string) => {
       // Create a new version from manual edits
+      const newVersionNumber = versions.length + 1;
       const newVersion: ImageVersion = {
-        id: `v${versions.length + 1}-${Date.now()}`,
+        id: `v${newVersionNumber}-${Date.now()}`,
         imageUrl: newImageUrl,
         prompt: "Manual edit",
         timestamp: new Date(),
@@ -83,6 +168,9 @@ export const CreativeWorkspace = ({
       setVersions((prev) => [...prev, newVersion]);
       setCurrentVersionId(newVersion.id);
       onImageUpdate(newImageUrl);
+      
+      // Auto-save to database
+      await saveVersion(newVersion, newVersionNumber);
     },
   });
 
@@ -158,8 +246,9 @@ export const CreativeWorkspace = ({
       if (!data?.imageUrl) throw new Error("No image returned");
 
       // Create new version
+      const newVersionNumber = versions.length + 1;
       const newVersion: ImageVersion = {
-        id: `v${versions.length + 1}-${Date.now()}`,
+        id: `v${newVersionNumber}-${Date.now()}`,
         imageUrl: data.imageUrl,
         prompt: prompt,
         timestamp: new Date(),
@@ -168,12 +257,17 @@ export const CreativeWorkspace = ({
       setVersions((prev) => [...prev, newVersion]);
       setCurrentVersionId(newVersion.id);
       onImageUpdate(data.imageUrl);
+      
+      // Auto-save to database
+      if (user) {
+        await saveVersion(newVersion, newVersionNumber);
+      }
 
       // Add success message
       const successMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: `✨ Done! Created version ${versions.length + 1}. Want any more changes?`,
+        content: `✨ Done! Created version ${newVersionNumber}. Automatically saved! Want any more changes?`,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, successMessage]);
@@ -186,7 +280,7 @@ export const CreativeWorkspace = ({
         fetchCredits();
       }
       
-      toast.success("New version created!");
+      toast.success("Version saved automatically!");
     } catch (error: any) {
       console.error("AI edit error:", error);
       
