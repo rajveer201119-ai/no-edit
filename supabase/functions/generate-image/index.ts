@@ -126,8 +126,9 @@ serve(async (req) => {
   try {
     const { prompt, style, size, designType, isGuest } = await req.json();
 
-    // Validate design type is provided
-    if (!designType || designType === "default") {
+    // Validate design type is provided and valid
+    const validDesignTypes = ["logo", "social", "banner", "poster"];
+    if (!designType || !validDesignTypes.includes(designType)) {
       return new Response(
         JSON.stringify({ error: "Please select a design type (Logo, Social Post, Banner, or Poster)" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
