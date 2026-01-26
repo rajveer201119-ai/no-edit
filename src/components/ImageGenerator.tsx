@@ -15,7 +15,7 @@ import { SpaceBackground } from "@/components/ui/space-background";
 
 export type ImageStyle = "ghibli" | "3d" | "animated" | "realistic" | "vintage" | "cyberpunk";
 export type ImageSize = "square" | "portrait" | "landscape";
-export type DesignType = "logo" | "social" | "banner" | "poster" | "default";
+export type DesignType = "logo" | "social" | "banner" | "poster";
 
 export const ImageGenerator = () => {
   const navigate = useNavigate();
