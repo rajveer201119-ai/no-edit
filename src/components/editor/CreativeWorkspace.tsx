@@ -242,9 +242,9 @@ export const CreativeWorkspace = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-background">
+    <div className="fixed inset-0 z-50 bg-background flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="h-12 flex items-center justify-between px-4 border-b border-border/20 bg-background/80 backdrop-blur-xl">
+      <div className="h-12 flex-shrink-0 flex items-center justify-between px-4 border-b border-border/20 bg-background/80 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           {/* Window controls */}
           <div className="flex items-center gap-1.5">
@@ -303,7 +303,7 @@ export const CreativeWorkspace = ({
       </div>
 
       {/* Main Content */}
-      <div className="flex h-[calc(100vh-48px)] md:h-[calc(100vh-48px)]">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Chat Panel */}
         <div
           className={cn(

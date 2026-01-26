@@ -10,16 +10,19 @@ import { toast } from "sonner";
 import { Loader2, Sparkles, Download, Upload, X, Zap } from "lucide-react";
 import { StyleSelector } from "./StyleSelector";
 import { SizeSelector } from "./SizeSelector";
+import { DesignTypeSelector } from "./DesignTypeSelector";
 import { SpaceBackground } from "@/components/ui/space-background";
 
 export type ImageStyle = "ghibli" | "3d" | "animated" | "realistic" | "vintage" | "cyberpunk";
 export type ImageSize = "square" | "portrait" | "landscape";
+export type DesignType = "logo" | "social" | "banner" | "poster" | "default";
 
 export const ImageGenerator = () => {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState<ImageStyle>("realistic");
   const [size, setSize] = useState<ImageSize>("square");
+  const [designType, setDesignType] = useState<DesignType>("default");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -103,6 +106,7 @@ export const ImageGenerator = () => {
           prompt: prompt.trim(),
           style,
           size,
+          designType,
         },
       });
 
@@ -262,6 +266,7 @@ export const ImageGenerator = () => {
             </div>
           </div>
 
+          <DesignTypeSelector value={designType} onChange={setDesignType} disabled={isGenerating} />
           <StyleSelector value={style} onChange={setStyle} disabled={isGenerating} />
           <SizeSelector value={size} onChange={setSize} disabled={isGenerating} />
 

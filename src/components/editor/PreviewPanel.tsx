@@ -107,7 +107,7 @@ export const PreviewPanel = ({
   const currentIndex = versions.findIndex(v => v.id === currentVersion.id) + 1;
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0a]">
+    <div className="flex flex-col h-full w-full bg-[#0a0a0a] overflow-hidden">
       {/* Toolbar */}
       <div className="flex items-center justify-between px-2 sm:px-4 py-2 sm:py-3 border-b border-border/10 bg-background/40 backdrop-blur-sm flex-wrap gap-2">
         <div className="flex items-center gap-2 sm:gap-3">
@@ -200,7 +200,7 @@ export const PreviewPanel = ({
       </div>
 
       {/* Main Area with Canvas and Text Tool */}
-      <div className="flex-1 flex overflow-hidden min-h-0">
+      <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Canvas Area */}
         <div className="flex-1 relative overflow-auto flex items-center justify-center p-4 sm:p-6">
           {/* Grid background */}
@@ -247,7 +247,8 @@ export const PreviewPanel = ({
             <img
               src={currentVersion.imageUrl}
               alt="Current version"
-              className="max-w-full max-h-[50vh] sm:max-h-[60vh] rounded-lg shadow-2xl shadow-black/50 object-contain block mx-auto"
+              className="max-w-full max-h-full rounded-lg shadow-2xl shadow-black/50 object-contain block mx-auto"
+              style={{ maxHeight: 'calc(100vh - 200px)' }}
               draggable={false}
             />
             
