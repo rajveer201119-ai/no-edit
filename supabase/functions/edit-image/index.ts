@@ -34,8 +34,8 @@ async function editWithSDXL(imageUrl: string, prompt: string): Promise<string> {
   const imageBlob = await imageResponse.blob();
   const imageBase64 = await blobToBase64(imageBlob);
 
-  // SDXL img2img endpoint via HF Router API
-  const hfEndpoint = "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-refiner-1.0";
+  // SDXL img2img endpoint via HF Inference API
+  const hfEndpoint = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0";
 
   // Preservation-focused prompt engineering
   const enhancedPrompt = `${prompt}, preserve original composition, maintain original style, subtle refinement, high quality, detailed, professional, realistic lighting, natural blending`;
