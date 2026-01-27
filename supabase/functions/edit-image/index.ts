@@ -17,76 +17,79 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(binary);
 }
 
-// Edit image using Cloudflare Workers AI (FREE - 10,000 neurons/day)
-async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Cloudflare Workers AI (free)...");
+// Edit image using Stable Diffusion XL via Hugging Face (FREE - high quality)
+async function editWithSDXL(imageUrl: string, prompt: string): Promise<string> {
+  console.log("Editing image with Stable Diffusion XL...");
   
-  const CF_ACCOUNT_ID = Deno.env.get("CLOUDFLARE_ACCOUNT_ID");
-  const CF_API_TOKEN = Deno.env.get("CLOUDFLARE_API_TOKEN");
-  
-  if (!CF_ACCOUNT_ID || !CF_API_TOKEN) {
-    throw new Error("Cloudflare credentials not configured");
+  const HF_TOKEN = Deno.env.get("HUGGING_FACE_ACCESS_TOKEN");
+  if (!HF_TOKEN) {
+    throw new Error("Hugging Face token not configured");
   }
 
-  // Download the source image
+  // Download and convert source image to base64
   const imageResponse = await fetch(imageUrl);
   if (!imageResponse.ok) {
     throw new Error("Failed to download source image");
   }
   const imageBlob = await imageResponse.blob();
-  const imageArrayBuffer = await imageBlob.arrayBuffer();
-  const imageBytes = [...new Uint8Array(imageArrayBuffer)];
+  const imageBase64 = await blobToBase64(imageBlob);
 
-  // Cloudflare Workers AI img2img endpoint
-  const cfEndpoint = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/runwayml/stable-diffusion-v1-5-img2img`;
+  // SDXL img2img endpoint via HF Router API
+  const hfEndpoint = "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-refiner-1.0";
 
-  // Enhanced prompt for better preservation of original image
-  const enhancedPrompt = `${prompt}, preserve original composition, maintain original style, subtle edit, high quality, detailed`;
+  // Preservation-focused prompt engineering
+  const enhancedPrompt = `${prompt}, preserve original composition, maintain original style, subtle refinement, high quality, detailed, professional, realistic lighting, natural blending`;
   
-  // Negative prompt to avoid drastic changes
-  const negativePrompt = "distorted, blurry, low quality, completely different, major changes, text, watermark, signature";
+  const negativePrompt = "distorted, blurry, low quality, different layout, major changes, text, watermark, signature, artifacts, over-stylization, hallucinated elements, unnecessary redesigns";
 
-  const response = await fetch(cfEndpoint, {
+  const response = await fetch(hfEndpoint, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${CF_API_TOKEN}`,
+      "Authorization": `Bearer ${HF_TOKEN}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      prompt: enhancedPrompt,
-      negative_prompt: negativePrompt,
-      image: imageBytes,
-      strength: 0.35, // Low strength to preserve more of the original image
-      guidance: 8.5,  // Higher guidance for better prompt adherence
-      num_steps: 20,  // Max allowed by Cloudflare
+      inputs: imageBase64,
+      parameters: {
+        prompt: enhancedPrompt,
+        negative_prompt: negativePrompt,
+        strength: 0.3,           // Conservative for preservation (~70% original retained)
+        guidance_scale: 7.5,     // Balanced prompt adherence
+        num_inference_steps: 30  // High quality output
+      }
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("Cloudflare AI error:", response.status, errorText);
+    console.error("SDXL error:", response.status, errorText);
 
     if (response.status === 429) {
-      const error = new Error("Cloudflare rate limit exceeded");
+      const error = new Error("Rate limit exceeded");
       (error as any).status = 429;
       throw error;
     }
+    if (response.status === 503) {
+      const error = new Error("Model is loading, please retry in 30 seconds");
+      (error as any).status = 503;
+      throw error;
+    }
     if (response.status === 401 || response.status === 403) {
-      const error = new Error("Cloudflare authentication failed");
+      const error = new Error("Hugging Face authentication failed");
       (error as any).status = response.status;
       throw error;
     }
 
-    const error = new Error(`Cloudflare AI failed: ${response.status}`);
+    const error = new Error(`SDXL failed: ${response.status}`);
     (error as any).status = response.status;
     throw error;
   }
 
-  // Cloudflare returns the image directly as binary PNG
-  const editedImageBlob = await response.blob();
-  const editedBase64 = await blobToBase64(editedImageBlob);
+  // HF returns image as binary blob
+  const editedBlob = await response.blob();
+  const editedBase64 = await blobToBase64(editedBlob);
 
-  console.log("Cloudflare Workers AI edit successful");
+  console.log("SDXL edit successful");
   return `data:image/png;base64,${editedBase64}`;
 }
 
@@ -223,12 +226,12 @@ serve(async (req) => {
     let editedImageData: string;
     let usedService: string;
 
-    // Try Cloudflare Workers AI first (FREE - 10k neurons/day), fallback to Lovable AI (uses credits)
+    // Try SDXL first (FREE via Hugging Face), fallback to Lovable AI (uses credits)
     try {
-      editedImageData = await editWithCloudflareAI(imageUrl, sanitizedPrompt);
-      usedService = "Cloudflare Workers AI (free)";
-    } catch (cfError: any) {
-      console.warn("Cloudflare AI failed, falling back to Lovable AI:", cfError.message);
+      editedImageData = await editWithSDXL(imageUrl, sanitizedPrompt);
+      usedService = "Stable Diffusion XL (free)";
+    } catch (sdxlError: any) {
+      console.warn("SDXL failed, falling back to Lovable AI:", sdxlError.message);
 
       try {
         editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
