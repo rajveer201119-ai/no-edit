@@ -498,10 +498,15 @@ export const CreativeWorkspace = ({
         const flattenedDataUrl = await flattenLayers();
         downloadUrl = flattenedDataUrl;
       } else {
-        // No overlays, download the base image
-        const response = await fetch(currentVersion.imageUrl);
-        const blob = await response.blob();
-        downloadUrl = URL.createObjectURL(blob);
+        // Check if it's a data URL (from merged layers) - use directly
+        if (currentVersion.imageUrl.startsWith("data:")) {
+          downloadUrl = currentVersion.imageUrl;
+        } else {
+          // Remote URL - fetch and create blob
+          const response = await fetch(currentVersion.imageUrl);
+          const blob = await response.blob();
+          downloadUrl = URL.createObjectURL(blob);
+        }
       }
 
       const link = document.createElement("a");
