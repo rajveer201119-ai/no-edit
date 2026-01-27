@@ -139,9 +139,13 @@ async function generateWithRunware(prompt: string, dimensions: { width: number; 
 
 // ============================================
 // SECONDARY: Pollinations AI (free, no API key)
+// With enhanced text-free enforcement
 // ============================================
 async function generateWithPollinations(styledPrompt: string, dimensions: { width: number; height: number }): Promise<string> {
-  const encodedPrompt = encodeURIComponent(styledPrompt);
+  // Add extra text-free emphasis for Pollinations
+  const enhancedPrompt = `${styledPrompt}. CRITICAL: Generate ONLY visual graphics with absolutely NO text, NO letters, NO words, NO numbers, NO typography, NO watermarks, NO signatures anywhere in the image.`;
+  
+  const encodedPrompt = encodeURIComponent(enhancedPrompt);
   const pollinationsUrl = new URL(`https://image.pollinations.ai/prompt/${encodedPrompt}`);
   
   pollinationsUrl.searchParams.set("model", "flux");
@@ -150,8 +154,10 @@ async function generateWithPollinations(styledPrompt: string, dimensions: { widt
   pollinationsUrl.searchParams.set("nologo", "true");
   pollinationsUrl.searchParams.set("enhance", "true");
   pollinationsUrl.searchParams.set("seed", Math.floor(Math.random() * 1000000).toString());
+  // Add negative prompt for Pollinations to explicitly exclude text
+  pollinationsUrl.searchParams.set("negative", "text, letters, words, typography, watermark, signature, logo text, brand name, writing, alphabet, numbers, digits, dates, captions, labels, titles, headlines, slogans, inscriptions, fonts, handwriting, printed text");
 
-  console.log("Trying Pollinations AI fallback...");
+  console.log("Trying Pollinations AI fallback with text-free enforcement...");
   
   const response = await fetch(pollinationsUrl.toString(), {
     method: "GET",
