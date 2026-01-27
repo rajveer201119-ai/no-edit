@@ -23,11 +23,12 @@ const sizeMap: Record<string, { width: number; height: number }> = {
 };
 
 // ============================================
-// PRIMARY: Runware API with FLUX Model
-// High-quality image generation
+// PRIMARY: Runware API with FLUX.1 Schnell Model
+// Fast, high-quality image generation
+// https://huggingface.co/black-forest-labs/FLUX.1-schnell
 // ============================================
 async function generateWithRunware(prompt: string, dimensions: { width: number; height: number }): Promise<string> {
-  console.log("Generating image with Runware API (FLUX)...");
+  console.log("Generating image with Runware API (FLUX.1 Schnell)...");
   
   const RUNWARE_API_KEY = Deno.env.get("RUNWARE_API_KEY");
   if (!RUNWARE_API_KEY) {
@@ -74,34 +75,35 @@ async function generateWithRunware(prompt: string, dimensions: { width: number; 
           if (response.data) {
             for (const item of response.data) {
               if (item.taskType === "authentication") {
-                console.log("Runware authenticated, starting image generation...");
+                console.log("Runware authenticated, starting FLUX.1 Schnell generation...");
                 isAuthenticated = true;
                 
-                // Step 2: Send image generation request with STRONG anti-text instructions
+                // Step 2: Send image generation request using FLUX.1 Schnell
+                // Schnell is optimized for speed with 4 steps and CFGScale of 1
                 const generateMessage = [{
                   taskType: "imageInference",
                   taskUUID,
-                  model: "runware:100@1", // FLUX model for text-to-image
+                  model: "runware:100@1", // FLUX.1 Schnell - fast, high-quality model
                   positivePrompt: prompt,
                   negativePrompt: "text, letters, words, typography, watermark, signature, logo text, brand name, writing, alphabet, numbers, digits, dates, captions, labels, titles, headlines, slogans, inscriptions, characters, symbols with letters, fonts, handwriting, printed text, any written content, blurry, low quality, distorted, artifacts, pixelated",
                   width: dimensions.width,
                   height: dimensions.height,
                   numberResults: 1,
                   outputFormat: "PNG",
-                  CFGScale: 7.5,
+                  CFGScale: 1, // Schnell works best with CFGScale of 1
                   scheduler: "FlowMatchEulerDiscreteScheduler",
-                  steps: 25,
+                  steps: 4, // Schnell is optimized for 4 steps
                   includeCost: true,
                 }];
                 
-                console.log("Sending generation request:", dimensions);
+                console.log("Sending FLUX.1 Schnell generation request:", dimensions);
                 ws.send(JSON.stringify(generateMessage));
               } else if (item.taskType === "imageInference" && item.taskUUID === taskUUID) {
                 clearTimeout(timeout);
                 ws.close();
                 
                 if (item.imageURL) {
-                  console.log("Runware generation successful! Cost:", item.cost || "N/A");
+                  console.log("FLUX.1 Schnell generation successful! Cost:", item.cost || "N/A");
                   resolve(item.imageURL);
                 } else {
                   reject(new Error("No image URL in Runware response"));
@@ -317,7 +319,7 @@ serve(async (req) => {
     // Try Runware first (high quality), fallback to Pollinations, then Lovable AI
     try {
       imageUrl = await generateWithRunware(styledPrompt, dimensions);
-      console.log("Design generated successfully via Runware API (FLUX)");
+      console.log("Design generated successfully via Runware API (FLUX.1 Schnell)");
     } catch (runwareError) {
       console.warn("Runware failed, trying Pollinations fallback:", runwareError);
       
