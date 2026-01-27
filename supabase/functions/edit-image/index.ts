@@ -17,85 +17,69 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(binary);
 }
 
-// Edit image using InstructPix2Pix via Hugging Face (FREE - true img2img)
-async function editWithInstructPix2Pix(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with InstructPix2Pix (true img2img)...");
+// PRIMARY: Edit image using Pollinations AI Kontext model (FREE - true img2img)
+// This is a completely free service that supports image-to-image editing
+async function editWithPollinationsKontext(imageUrl: string, prompt: string): Promise<string> {
+  console.log("Editing image with Pollinations AI Kontext (FREE img2img)...");
   
-  const HF_TOKEN = Deno.env.get("HUGGING_FACE_ACCESS_TOKEN");
+  // Pollinations Kontext endpoint for img2img
+  // Format: https://image.pollinations.ai/prompt/{prompt}?model=kontext&image={imageUrl}
+  const encodedPrompt = encodeURIComponent(prompt.trim());
+  const encodedImageUrl = encodeURIComponent(imageUrl);
   
-  if (!HF_TOKEN) {
-    throw new Error("Hugging Face token not configured");
-  }
-
-  // Download source image and convert to base64
-  console.log("Downloading source image...");
-  const imageResponse = await fetch(imageUrl);
-  if (!imageResponse.ok) {
-    throw new Error("Failed to download source image");
-  }
-  const imageBlob = await imageResponse.blob();
-  const imageBase64 = await blobToBase64(imageBlob);
-
-  // InstructPix2Pix - instruction-based image editing model
-  const hfEndpoint = "https://router.huggingface.co/hf-inference/models/timbrooks/instruct-pix2pix";
-
-  // Instruction-style prompt for Pix2Pix
-  const instruction = prompt.trim();
-
-  console.log("Sending source image + instruction to InstructPix2Pix...");
-  console.log("Instruction:", instruction);
+  const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=kontext&image=${encodedImageUrl}&width=1024&height=1024&nologo=true`;
   
-  const response = await fetch(hfEndpoint, {
-    method: "POST",
+  console.log("Pollinations Kontext URL created");
+  console.log("Prompt:", prompt.trim());
+  
+  // Fetch the edited image from Pollinations
+  const response = await fetch(pollinationsUrl, {
+    method: "GET",
     headers: {
-      "Authorization": `Bearer ${HF_TOKEN}`,
-      "Content-Type": "application/json",
+      "Accept": "image/*",
     },
-    body: JSON.stringify({
-      inputs: {
-        image: imageBase64,
-        prompt: instruction
-      },
-      parameters: {
-        image_guidance_scale: 1.5,  // How much to preserve original (higher = more preservation)
-        guidance_scale: 7.5,         // How closely to follow the instruction
-        num_inference_steps: 20      // Quality steps
-      }
-    }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("InstructPix2Pix error:", response.status, errorText);
+    console.error("Pollinations Kontext error:", response.status, errorText);
 
     if (response.status === 429) {
-      const error = new Error("Rate limit exceeded");
+      const error = new Error("Rate limit exceeded. Please try again in a moment.");
       (error as any).status = 429;
       throw error;
     }
     
-    if (response.status === 503) {
-      const error = new Error("Model is loading, please retry in 30 seconds");
+    if (response.status === 503 || response.status === 500) {
+      const error = new Error("Image editing service temporarily unavailable. Please try again.");
       (error as any).status = 503;
       throw error;
     }
 
-    const error = new Error(`InstructPix2Pix failed: ${response.status} - ${errorText}`);
+    const error = new Error(`Pollinations Kontext failed: ${response.status} - ${errorText}`);
     (error as any).status = response.status;
     throw error;
   }
 
-  // HF returns image as binary blob
+  // Get the image blob and convert to base64
   const editedBlob = await response.blob();
+  
+  // Validate we got an actual image
+  if (!editedBlob.type.startsWith("image/")) {
+    console.error("Pollinations returned non-image content type:", editedBlob.type);
+    throw new Error("Pollinations returned invalid content");
+  }
+  
   const editedBase64 = await blobToBase64(editedBlob);
 
-  console.log("InstructPix2Pix edit successful - source image was actually modified!");
+  console.log("Pollinations Kontext edit successful - source image was actually modified!");
   return `data:image/png;base64,${editedBase64}`;
 }
 
 // Fallback: Edit image using Lovable AI Gateway (Gemini) - uses credits
+// This is only used if useLovableAI is explicitly true
 async function editWithLovableAI(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Lovable AI (Gemini - fallback, uses credits)...");
+  console.log("Editing image with Lovable AI (Gemini - uses credits)...");
   
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
@@ -169,7 +153,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, prompt, projectId, isGuest } = await req.json();
+    const { imageUrl, prompt, projectId, isGuest, useLovableAI } = await req.json();
 
     if (!imageUrl || !prompt) {
       return new Response(
@@ -226,31 +210,26 @@ serve(async (req) => {
     let editedImageData: string;
     let usedService: string;
 
-    // Try InstructPix2Pix via HuggingFace first (FREE, true img2img), fallback to Lovable AI (uses credits)
-    try {
-      editedImageData = await editWithInstructPix2Pix(imageUrl, sanitizedPrompt);
-      usedService = "InstructPix2Pix via HuggingFace (free, true img2img)";
-    } catch (hfError: any) {
-      console.warn("InstructPix2Pix failed, falling back to Lovable AI:", hfError.message);
-
+    // If useLovableAI is explicitly true, use Lovable AI directly (for users who want to use credits)
+    if (useLovableAI === true) {
+      editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
+      usedService = "Lovable AI Gemini (credits)";
+    } else {
+      // Use Pollinations AI Kontext (FREE) - NO FALLBACK TO LOVABLE AI
       try {
-        editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
-        usedService = "Lovable AI Gemini (credits)";
-      } catch (lovableError: any) {
-        // Pass through rate limit and credit errors with proper status codes
-        if (lovableError.status === 429) {
-          return new Response(
-            JSON.stringify({ error: lovableError.message }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        if (lovableError.status === 402) {
-          return new Response(
-            JSON.stringify({ error: lovableError.message }),
-            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        throw lovableError;
+        editedImageData = await editWithPollinationsKontext(imageUrl, sanitizedPrompt);
+        usedService = "Pollinations AI Kontext (free, true img2img)";
+      } catch (pollinationsError: any) {
+        console.error("Pollinations AI failed:", pollinationsError.message);
+
+        // Return the error - NO FALLBACK TO LOVABLE AI
+        return new Response(
+          JSON.stringify({ 
+            error: pollinationsError.message || "Image editing service temporarily unavailable. Please try again.",
+            code: "POLLINATIONS_UNAVAILABLE"
+          }),
+          { status: pollinationsError.status || 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
     }
 
@@ -351,7 +330,7 @@ serve(async (req) => {
     } else if (error?.message?.includes("credits") || error?.status === 402) {
       clientMessage = "Service temporarily unavailable. Please try again later.";
       statusCode = 503;
-    } else if (error?.message?.includes("Model is loading")) {
+    } else if (error?.message?.includes("warming up")) {
       clientMessage = "AI model is warming up. Please try again in 30 seconds.";
       statusCode = 503;
     }
