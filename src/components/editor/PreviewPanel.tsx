@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -6,6 +6,8 @@ import { ImageVersion } from "./types";
 import { VersionHistory } from "./VersionHistory";
 import { EditorToolbar } from "./EditorToolbar";
 import { CanvasOverlays, ImageOverlay } from "./CanvasOverlays";
+import { MaskCanvas } from "./MaskCanvas";
+import { InpaintingPanel } from "./InpaintingPanel";
 import { TextToolPanel, TextOverlay } from "@/components/TextToolPanel";
 import { 
   Download, 
@@ -60,6 +62,8 @@ interface PreviewPanelProps {
   onAddText: (text: TextOverlay) => void;
   onUpdateText: (id: string, updates: Partial<TextOverlay>) => void;
   imageContainerRef: React.RefObject<HTMLDivElement>;
+  // Inpainting props
+  onInpaintEdit: (prompt: string, maskDataUrl: string) => void;
 }
 
 export const PreviewPanel = ({
@@ -96,13 +100,63 @@ export const PreviewPanel = ({
   onAddText,
   onUpdateText,
   imageContainerRef,
+  onInpaintEdit,
 }: PreviewPanelProps) => {
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  
+  // Inpainting state
+  const [isInpainting, setIsInpainting] = useState(false);
+  const [isDrawingMask, setIsDrawingMask] = useState(false);
+  const [maskDataUrl, setMaskDataUrl] = useState<string | null>(null);
+  const [imageDimensions, setImageDimensions] = useState({ width: 1024, height: 1024 });
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  // Get image dimensions when loaded
+  useEffect(() => {
+    const img = imageRef.current;
+    if (img && img.complete) {
+      setImageDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+    }
+  }, [currentVersion.imageUrl]);
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    setImageDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+  };
 
   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 0.25, 3));
   const handleZoomOut = () => setZoom((prev) => Math.max(prev - 0.25, 0.5));
   const handleResetZoom = () => setZoom(1);
+
+  const handleInpaintToggle = () => {
+    if (isInpainting) {
+      setIsInpainting(false);
+      setIsDrawingMask(false);
+      setMaskDataUrl(null);
+    } else {
+      setIsInpainting(true);
+      setIsDrawingMask(true);
+    }
+  };
+
+  const handleMaskComplete = (mask: string) => {
+    setMaskDataUrl(mask);
+    setIsDrawingMask(false);
+  };
+
+  const handleClearMask = () => {
+    setMaskDataUrl(null);
+    setIsDrawingMask(true);
+  };
+
+  const handleInpaint = (prompt: string, mask: string) => {
+    onInpaintEdit(prompt, mask);
+    // Close inpainting mode after submitting
+    setIsInpainting(false);
+    setIsDrawingMask(false);
+    setMaskDataUrl(null);
+  };
 
   const currentIndex = versions.findIndex(v => v.id === currentVersion.id) + 1;
 
@@ -115,8 +169,10 @@ export const PreviewPanel = ({
           <EditorToolbar
             isCropping={isCropping}
             showTextTool={showTextTool}
+            isInpainting={isInpainting}
             onCropToggle={onCropToggle}
             onTextToolToggle={onTextToolToggle}
+            onInpaintToggle={handleInpaintToggle}
             onFileUpload={onFileUpload}
             onCancelCrop={onCancelCrop}
             isDisabled={isProcessing}
@@ -245,12 +301,25 @@ export const PreviewPanel = ({
             onTouchEnd={isCropping ? onCropPointerUp : undefined}
           >
             <img
+              ref={imageRef}
               src={currentVersion.imageUrl}
               alt="Current version"
               className="max-w-full max-h-full rounded-lg shadow-2xl shadow-black/50 object-contain block mx-auto"
               style={{ maxHeight: 'calc(100vh - 200px)' }}
               draggable={false}
+              onLoad={handleImageLoad}
             />
+            
+            {/* Mask Drawing Canvas */}
+            {isDrawingMask && (
+              <MaskCanvas
+                imageUrl={currentVersion.imageUrl}
+                imageWidth={imageDimensions.width}
+                imageHeight={imageDimensions.height}
+                onMaskComplete={handleMaskComplete}
+                onCancel={handleInpaintToggle}
+              />
+            )}
             
             {/* Overlays */}
             <CanvasOverlays
@@ -295,6 +364,17 @@ export const PreviewPanel = ({
               />
             </ScrollArea>
           </div>
+        )}
+
+        {/* Inpainting Panel */}
+        {isInpainting && !isDrawingMask && (
+          <InpaintingPanel
+            maskDataUrl={maskDataUrl}
+            onInpaint={handleInpaint}
+            onClearMask={handleClearMask}
+            onClose={handleInpaintToggle}
+            isProcessing={isProcessing}
+          />
         )}
       </div>
 
