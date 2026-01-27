@@ -210,8 +210,8 @@ export const MaskCanvas = ({
 
   return (
     <div className="absolute inset-0 z-20 flex flex-col">
-      {/* Toolbar */}
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 p-2 rounded-xl bg-background/95 backdrop-blur-sm border border-border/50 shadow-lg">
+      {/* Toolbar - positioned below the main editor toolbar */}
+      <div className="absolute top-14 sm:top-2 left-1/2 -translate-x-1/2 z-30 flex flex-wrap items-center justify-center gap-2 p-2 rounded-xl bg-background/95 backdrop-blur-sm border border-border/50 shadow-lg max-w-[95vw]">
         {/* Tool selection */}
         <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50">
           <Button
