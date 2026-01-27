@@ -58,7 +58,7 @@ async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<s
       image: imageBytes,
       strength: 0.35, // Low strength to preserve more of the original image
       guidance: 8.5,  // Higher guidance for better prompt adherence
-      num_steps: 25,  // More steps for better quality
+      num_steps: 20,  // Max allowed by Cloudflare
     }),
   });
 
