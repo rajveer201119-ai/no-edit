@@ -40,6 +40,12 @@ async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<s
   // Cloudflare Workers AI img2img endpoint
   const cfEndpoint = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/runwayml/stable-diffusion-v1-5-img2img`;
 
+  // Enhanced prompt for better preservation of original image
+  const enhancedPrompt = `${prompt}, preserve original composition, maintain original style, subtle edit, high quality, detailed`;
+  
+  // Negative prompt to avoid drastic changes
+  const negativePrompt = "distorted, blurry, low quality, completely different, major changes, text, watermark, signature";
+
   const response = await fetch(cfEndpoint, {
     method: "POST",
     headers: {
@@ -47,11 +53,12 @@ async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<s
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      prompt: prompt,
+      prompt: enhancedPrompt,
+      negative_prompt: negativePrompt,
       image: imageBytes,
-      strength: 0.75, // Balance between original and new image
-      guidance: 7.5,
-      num_steps: 20,
+      strength: 0.35, // Low strength to preserve more of the original image
+      guidance: 8.5,  // Higher guidance for better prompt adherence
+      num_steps: 25,  // More steps for better quality
     }),
   });
 
