@@ -15,14 +15,129 @@ const designTemplates: Record<string, string> = {
   default: "PRECISE GRAPHIC DESIGN: Create a professional, modern graphic with clean aesthetics, balanced composition, and high-quality execution. Use appropriate colors and clear visual hierarchy. DO NOT include any text, letters, or typography.",
 };
 
-// Size mapping for Pollinations API - optimized dimensions
+// Size mapping for API - optimized dimensions
 const sizeMap: Record<string, { width: number; height: number }> = {
   square: { width: 1024, height: 1024 },
   portrait: { width: 832, height: 1216 },
   landscape: { width: 1216, height: 832 },
 };
 
-// Generate with Pollinations AI (free, no API key)
+// ============================================
+// PRIMARY: Runware API with FLUX Model
+// High-quality image generation
+// ============================================
+async function generateWithRunware(prompt: string, dimensions: { width: number; height: number }): Promise<string> {
+  console.log("Generating image with Runware API (FLUX)...");
+  
+  const RUNWARE_API_KEY = Deno.env.get("RUNWARE_API_KEY");
+  if (!RUNWARE_API_KEY) {
+    throw new Error("RUNWARE_API_KEY not configured");
+  }
+
+  const API_ENDPOINT = "wss://ws-api.runware.ai/v1";
+
+  return new Promise(async (resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error("Runware API timeout after 60s"));
+    }, 60000);
+
+    try {
+      const ws = new WebSocket(API_ENDPOINT);
+      
+      ws.onopen = () => {
+        console.log("WebSocket connected to Runware");
+        
+        // Step 1: Authenticate
+        const authMessage = [{
+          taskType: "authentication",
+          apiKey: RUNWARE_API_KEY,
+        }];
+        ws.send(JSON.stringify(authMessage));
+      };
+
+      let isAuthenticated = false;
+      const taskUUID = crypto.randomUUID();
+      
+      ws.onmessage = async (event) => {
+        try {
+          const response = JSON.parse(event.data);
+          console.log("Runware response:", JSON.stringify(response).substring(0, 500));
+          
+          if (response.error || response.errors) {
+            clearTimeout(timeout);
+            ws.close();
+            const errorMessage = response.errorMessage || response.errors?.[0]?.message || "Runware API error";
+            reject(new Error(errorMessage));
+            return;
+          }
+
+          if (response.data) {
+            for (const item of response.data) {
+              if (item.taskType === "authentication") {
+                console.log("Runware authenticated, starting image generation...");
+                isAuthenticated = true;
+                
+                // Step 2: Send image generation request
+                const generateMessage = [{
+                  taskType: "imageInference",
+                  taskUUID,
+                  model: "runware:100@1", // FLUX model for text-to-image
+                  positivePrompt: prompt,
+                  negativePrompt: "blurry, low quality, distorted, text, letters, words, typography, watermark, signature, artifacts, pixelated",
+                  width: dimensions.width,
+                  height: dimensions.height,
+                  numberResults: 1,
+                  outputFormat: "PNG",
+                  CFGScale: 7.5,
+                  scheduler: "FlowMatchEulerDiscreteScheduler",
+                  steps: 25,
+                  includeCost: true,
+                }];
+                
+                console.log("Sending generation request:", dimensions);
+                ws.send(JSON.stringify(generateMessage));
+              } else if (item.taskType === "imageInference" && item.taskUUID === taskUUID) {
+                clearTimeout(timeout);
+                ws.close();
+                
+                if (item.imageURL) {
+                  console.log("Runware generation successful! Cost:", item.cost || "N/A");
+                  resolve(item.imageURL);
+                } else {
+                  reject(new Error("No image URL in Runware response"));
+                }
+              }
+            }
+          }
+        } catch (parseError) {
+          console.error("Error parsing Runware response:", parseError);
+        }
+      };
+
+      ws.onerror = (error) => {
+        clearTimeout(timeout);
+        console.error("WebSocket error:", error);
+        reject(new Error("Runware WebSocket connection failed"));
+      };
+
+      ws.onclose = (event) => {
+        console.log("WebSocket closed:", event.code, event.reason);
+        if (!isAuthenticated) {
+          clearTimeout(timeout);
+          reject(new Error("Runware connection closed before completion"));
+        }
+      };
+
+    } catch (error) {
+      clearTimeout(timeout);
+      reject(error);
+    }
+  });
+}
+
+// ============================================
+// SECONDARY: Pollinations AI (free, no API key)
+// ============================================
 async function generateWithPollinations(styledPrompt: string, dimensions: { width: number; height: number }): Promise<string> {
   const encodedPrompt = encodeURIComponent(styledPrompt);
   const pollinationsUrl = new URL(`https://image.pollinations.ai/prompt/${encodedPrompt}`);
@@ -34,7 +149,7 @@ async function generateWithPollinations(styledPrompt: string, dimensions: { widt
   pollinationsUrl.searchParams.set("enhance", "true");
   pollinationsUrl.searchParams.set("seed", Math.floor(Math.random() * 1000000).toString());
 
-  console.log("Trying Pollinations AI...");
+  console.log("Trying Pollinations AI fallback...");
   
   const response = await fetch(pollinationsUrl.toString(), {
     method: "GET",
@@ -50,7 +165,9 @@ async function generateWithPollinations(styledPrompt: string, dimensions: { widt
   return pollinationsUrl.toString();
 }
 
-// Fallback to Lovable AI (Gemini) if Pollinations fails
+// ============================================
+// TERTIARY: Lovable AI (Gemini) fallback
+// ============================================
 async function generateWithLovableAI(styledPrompt: string): Promise<string> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
@@ -66,7 +183,7 @@ async function generateWithLovableAI(styledPrompt: string): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash-image-preview",
+      model: "google/gemini-2.5-flash-image",
       messages: [{ role: "user", content: styledPrompt }],
       modalities: ["image", "text"]
     }),
@@ -197,25 +314,32 @@ serve(async (req) => {
 
     let imageUrl: string;
 
-    // Try Pollinations first (free), fallback to Lovable AI
+    // Try Runware first (high quality), fallback to Pollinations, then Lovable AI
     try {
-      imageUrl = await generateWithPollinations(styledPrompt, dimensions);
-      console.log("Design generated successfully via Pollinations AI (Flux)");
-    } catch (pollinationsError) {
-      console.warn("Pollinations failed, trying Lovable AI fallback:", pollinationsError);
+      imageUrl = await generateWithRunware(styledPrompt, dimensions);
+      console.log("Design generated successfully via Runware API (FLUX)");
+    } catch (runwareError) {
+      console.warn("Runware failed, trying Pollinations fallback:", runwareError);
       
       try {
-        imageUrl = await generateWithLovableAI(styledPrompt);
-        console.log("Design generated successfully via Lovable AI (Gemini) fallback");
-      } catch (lovableError: any) {
-        // If it's a rate limit or credits error, pass it through
-        if (lovableError.message.includes("Rate limit") || lovableError.message.includes("credits")) {
-          return new Response(
-            JSON.stringify({ error: lovableError.message }),
-            { status: lovableError.message.includes("Rate limit") ? 429 : 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+        imageUrl = await generateWithPollinations(styledPrompt, dimensions);
+        console.log("Design generated successfully via Pollinations AI (Flux)");
+      } catch (pollinationsError) {
+        console.warn("Pollinations failed, trying Lovable AI fallback:", pollinationsError);
+        
+        try {
+          imageUrl = await generateWithLovableAI(styledPrompt);
+          console.log("Design generated successfully via Lovable AI (Gemini) fallback");
+        } catch (lovableError: any) {
+          // If it's a rate limit or credits error, pass it through
+          if (lovableError.message.includes("Rate limit") || lovableError.message.includes("credits")) {
+            return new Response(
+              JSON.stringify({ error: lovableError.message }),
+              { status: lovableError.message.includes("Rate limit") ? 429 : 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          throw new Error("All AI services failed. Please try again.");
         }
-        throw new Error("Both AI services failed. Please try again.");
       }
     }
 
