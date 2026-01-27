@@ -311,6 +311,110 @@ export const CreativeWorkspace = ({
     }
   };
 
+  // Handle inpainting edit (with mask)
+  const handleInpaintEdit = async (prompt: string, maskDataUrl: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const isGuest = !user;
+
+    // Check if guest has already used their free edit
+    if (isGuest && guestEditUsed) {
+      toast.error("Sign up to edit more! You've used your free trial edit.");
+      setShowUpgradeDialog(true);
+      return;
+    }
+
+    // For authenticated users, check credits
+    if (user) {
+      const { data: limitData } = await supabase.rpc("check_edit_limit", {
+        user_id_param: user.id,
+      });
+
+      if (!limitData?.[0]?.can_edit) {
+        setShowUpgradeDialog(true);
+        return;
+      }
+    }
+
+    // Add user message for inpainting
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      content: `[Inpainting] ${prompt}`,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setIsProcessing(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("edit-image", {
+        body: {
+          imageUrl: currentVersion.imageUrl,
+          prompt: prompt,
+          maskDataUrl: maskDataUrl,
+          projectId,
+          userId: user?.id,
+          isGuest,
+          isInpainting: true,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (!data?.imageUrl) throw new Error("No image returned");
+
+      // Create new version
+      const newVersionNumber = versions.length + 1;
+      const newVersion: ImageVersion = {
+        id: crypto.randomUUID(),
+        imageUrl: data.imageUrl,
+        prompt: `[Inpaint] ${prompt}`,
+        timestamp: new Date(),
+      };
+
+      setVersions((prev) => [...prev, newVersion]);
+      setCurrentVersionId(newVersion.id);
+      onImageUpdate(data.imageUrl);
+      
+      // Auto-save to database
+      if (user) {
+        await saveVersion(newVersion, newVersionNumber);
+      }
+
+      // Add success message
+      const successMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: `✨ Inpainting complete! Created version ${newVersionNumber}. The masked area has been edited.`,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, successMessage]);
+
+      // Track guest usage or refresh credits for authenticated users
+      if (isGuest) {
+        localStorage.setItem('guestEditUsed', 'true');
+        setGuestEditUsed(true);
+      } else if (user) {
+        fetchCredits();
+      }
+      
+      toast.success("Inpainting complete!");
+    } catch (error: any) {
+      console.error("Inpainting error:", error);
+      
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: `Sorry, inpainting failed: ${error?.message || "Unknown error"}. Please try again.`,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+      
+      toast.error(error?.message || "Failed to apply inpainting");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   // Handle quick action
   const handleAction = (action: ActionButton) => {
     if (action.isPremium && !isPremium) {
@@ -496,6 +600,7 @@ export const CreativeWorkspace = ({
             onAddText={manualEditing.handleAddTextOverlay}
             onUpdateText={manualEditing.handleUpdateTextOverlay}
             imageContainerRef={imageContainerRef}
+            onInpaintEdit={handleInpaintEdit}
           />
         </div>
       </div>

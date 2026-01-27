@@ -149,6 +149,134 @@ async function editWithRunware(imageUrl: string, prompt: string): Promise<string
   });
 }
 
+// ============================================
+// INPAINTING: Runware API with Mask Support
+// Uses FLUX Kontext for high-quality masked edits
+// ============================================
+async function inpaintWithRunware(imageUrl: string, maskDataUrl: string, prompt: string): Promise<string> {
+  console.log("Inpainting image with Runware API (FLUX Kontext + Mask)...");
+  
+  const RUNWARE_API_KEY = Deno.env.get("RUNWARE_API_KEY");
+  if (!RUNWARE_API_KEY) {
+    throw new Error("RUNWARE_API_KEY not configured");
+  }
+
+  const API_ENDPOINT = "wss://ws-api.runware.ai/v1";
+  
+  // Enhanced prompt for inpainting
+  const enhancedPrompt = `${prompt}, seamless blend, natural lighting, photorealistic, sharp details, 8K resolution`;
+  
+  console.log("Inpainting prompt:", enhancedPrompt);
+
+  return new Promise(async (resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error("Runware inpainting timeout after 90s"));
+    }, 90000);
+
+    try {
+      const ws = new WebSocket(API_ENDPOINT);
+      
+      ws.onopen = () => {
+        console.log("WebSocket connected to Runware for inpainting");
+        
+        const authMessage = [{
+          taskType: "authentication",
+          apiKey: RUNWARE_API_KEY,
+        }];
+        ws.send(JSON.stringify(authMessage));
+      };
+
+      let isAuthenticated = false;
+      const taskUUID = crypto.randomUUID();
+      
+      ws.onmessage = async (event) => {
+        try {
+          const response = JSON.parse(event.data);
+          console.log("Runware inpaint response:", JSON.stringify(response).substring(0, 500));
+          
+          if (response.error || response.errors) {
+            clearTimeout(timeout);
+            ws.close();
+            const errorMessage = response.errorMessage || response.errors?.[0]?.message || "Runware inpainting error";
+            reject(new Error(errorMessage));
+            return;
+          }
+
+          if (response.data) {
+            for (const item of response.data) {
+              if (item.taskType === "authentication") {
+                console.log("Runware authenticated, starting inpainting...");
+                isAuthenticated = true;
+                
+                // Inpainting request with mask
+                const inpaintMessage = [{
+                  taskType: "imageInference",
+                  taskUUID,
+                  model: "runware:101@1", // Flux Kontext
+                  positivePrompt: enhancedPrompt,
+                  negativePrompt: "blurry, artifacts, distorted, unnatural edges, seams visible",
+                  width: 1024,
+                  height: 1024,
+                  numberResults: 1,
+                  outputFormat: "PNG",
+                  CFGScale: 7.5,
+                  scheduler: "FlowMatchEulerDiscreteScheduler",
+                  steps: 30, // More steps for better inpainting
+                  strength: 0.85, // Higher strength for inpainting masked areas
+                  seedImage: imageUrl,
+                  maskImage: maskDataUrl, // Black/white mask
+                  includeCost: true,
+                }];
+                
+                console.log("Sending inpaint request with mask...");
+                ws.send(JSON.stringify(inpaintMessage));
+              } else if (item.taskType === "imageInference" && item.taskUUID === taskUUID) {
+                clearTimeout(timeout);
+                ws.close();
+                
+                if (item.imageURL) {
+                  console.log("Runware inpainting successful! Cost:", item.cost || "N/A");
+                  
+                  const imageResp = await fetch(item.imageURL);
+                  if (!imageResp.ok) {
+                    reject(new Error("Failed to download inpainted image from Runware"));
+                    return;
+                  }
+                  const imageBlob = await imageResp.blob();
+                  const base64 = await blobToBase64(imageBlob);
+                  resolve(`data:image/png;base64,${base64}`);
+                } else {
+                  reject(new Error("No image URL in Runware inpainting response"));
+                }
+              }
+            }
+          }
+        } catch (parseError) {
+          console.error("Error parsing Runware inpaint response:", parseError);
+        }
+      };
+
+      ws.onerror = (error) => {
+        clearTimeout(timeout);
+        console.error("WebSocket error during inpainting:", error);
+        reject(new Error("Runware inpainting connection failed"));
+      };
+
+      ws.onclose = (event) => {
+        console.log("Inpainting WebSocket closed:", event.code, event.reason);
+        if (!isAuthenticated) {
+          clearTimeout(timeout);
+          reject(new Error("Runware inpainting connection closed before completion"));
+        }
+      };
+
+    } catch (error) {
+      clearTimeout(timeout);
+      reject(error);
+    }
+  });
+}
+
 // Build enhanced prompt with embedded prompting rules
 function buildEnhancedPrompt(userPrompt: string): string {
   // Detect edit type for context-aware prompting
@@ -392,7 +520,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, prompt, projectId, isGuest, useLovableAI, useRunware } = await req.json();
+    const { imageUrl, prompt, projectId, isGuest, useLovableAI, useRunware, maskDataUrl, isInpainting } = await req.json();
 
     if (!imageUrl || !prompt) {
       return new Response(
@@ -441,13 +569,43 @@ serve(async (req) => {
 
     const sanitizedPrompt = prompt.trim().slice(0, 1000);
 
-    console.log("Editing image:", { userId: userId ? userId.substring(0, 8) + '...' : 'guest', prompt: sanitizedPrompt });
+    console.log("Editing image:", { 
+      userId: userId ? userId.substring(0, 8) + '...' : 'guest', 
+      prompt: sanitizedPrompt,
+      isInpainting: !!isInpainting,
+      hasMask: !!maskDataUrl
+    });
 
     let editedImageData: string;
     let usedService: string;
 
+    // Handle inpainting with mask
+    if (isInpainting && maskDataUrl) {
+      console.log("Processing inpainting request with mask...");
+      try {
+        editedImageData = await inpaintWithRunware(imageUrl, maskDataUrl, sanitizedPrompt);
+        usedService = "Runware FLUX Kontext Inpainting";
+      } catch (inpaintError: any) {
+        console.warn("Runware inpainting failed:", inpaintError.message);
+        // Fallback to regular edit with enhanced prompt
+        const inpaintPrompt = `In the masked area: ${sanitizedPrompt}. Keep all other areas exactly the same.`;
+        try {
+          editedImageData = await editWithLovableAI(imageUrl, inpaintPrompt);
+          usedService = "Lovable AI Gemini (inpainting fallback)";
+        } catch (fallbackError: any) {
+          console.error("Inpainting fallback failed:", fallbackError.message);
+          return new Response(
+            JSON.stringify({ 
+              error: fallbackError.message || "Inpainting failed. Please try again.",
+              code: "INPAINT_FAILED"
+            }),
+            { status: fallbackError.status || 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+    }
     // Strategy: Runware (primary) -> Pollinations -> Cloudflare -> Lovable AI
-    if (useLovableAI === true) {
+    else if (useLovableAI === true) {
       editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
       usedService = "Lovable AI Gemini (credits)";
     } else if (useRunware === true || Deno.env.get("RUNWARE_API_KEY")) {
