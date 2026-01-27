@@ -221,7 +221,7 @@ export const PreviewPanel = ({
   return (
     <div className="flex flex-col h-full w-full bg-[#0a0a0a] overflow-hidden">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-2 sm:px-4 py-2 sm:py-3 border-b border-border/10 bg-background/40 backdrop-blur-sm flex-wrap gap-2">
+      <div className="flex items-center justify-between px-2 sm:px-4 py-2 sm:py-3 border-b border-border/10 bg-background/95 backdrop-blur-sm flex-wrap gap-2 relative z-40 shrink-0">
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Manual Tools */}
           <EditorToolbar
