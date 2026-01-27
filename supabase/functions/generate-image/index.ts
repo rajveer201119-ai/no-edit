@@ -6,13 +6,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Design-specific prompt templates - TEXT-FREE designs only
+// Design-specific prompt templates - STRICTLY TEXT-FREE designs only
 const designTemplates: Record<string, string> = {
-  logo: "LOGO ICON DESIGN: Professional, modern logo ICON with clean vector-style graphics. Minimalist geometric shapes, bold iconic symbol, flat design with 2-3 colors maximum. Corporate-grade quality, scalable, centered on solid background. NO text, NO letters, NO words - pure icon/symbol only.",
-  social: "SOCIAL MEDIA GRAPHIC: Visually striking Instagram/Facebook post background with 1:1 composition. Bold eye-catching colors, high contrast, engaging imagery, modern gradient backgrounds with geometric accents. Marketing-ready visual. NO text, NO letters, NO typography.",
-  banner: "WEB BANNER BACKGROUND: Professional horizontal banner with 16:9 aspect ratio. Clean modern layout, compelling visuals, high contrast colors, dynamic composition. Marketing-grade quality. NO text, NO words, NO typography.",
-  poster: "EVENT POSTER BACKGROUND: Professional vertical poster with striking visual impact. Dramatic colors, balanced composition, eye-catching graphics. Print-ready quality. NO text, NO letters, NO numbers, NO dates.",
-  default: "GRAPHIC DESIGN: Professional modern graphic with clean aesthetics, balanced composition, high-quality execution. NO text, NO letters, NO typography.",
+  logo: "LOGO ICON DESIGN: Professional, modern logo ICON with clean vector-style graphics. Minimalist geometric shapes, bold iconic symbol, flat design with 2-3 colors maximum. Corporate-grade quality, scalable, centered on solid background. ABSOLUTELY NO TEXT - no letters, no words, no brand names, no initials, no typography whatsoever - pure visual icon/symbol ONLY.",
+  social: "SOCIAL MEDIA GRAPHIC: Visually striking Instagram/Facebook post background with 1:1 composition. Bold eye-catching colors, high contrast, engaging imagery, modern gradient backgrounds with geometric accents. Marketing-ready visual background. ABSOLUTELY NO TEXT - no letters, no words, no captions, no quotes, no hashtags, no typography of any kind.",
+  banner: "WEB BANNER BACKGROUND: Professional horizontal banner with 16:9 aspect ratio. Clean modern layout, compelling visuals, high contrast colors, dynamic composition. Marketing-grade quality background image. ABSOLUTELY NO TEXT - no headlines, no slogans, no words, no letters, no typography anywhere in the image.",
+  poster: "EVENT POSTER BACKGROUND: Professional vertical poster with striking visual impact. Dramatic colors, balanced composition, eye-catching graphics. Print-ready quality background. ABSOLUTELY NO TEXT - no titles, no dates, no event names, no letters, no numbers, no typography of any kind.",
+  default: "GRAPHIC DESIGN: Professional modern graphic with clean aesthetics, balanced composition, high-quality execution. ABSOLUTELY NO TEXT - no letters, no words, no typography whatsoever.",
 };
 
 // Size mapping - optimized dimensions
@@ -29,8 +29,8 @@ const sizeMap: Record<string, { width: number; height: number }> = {
 async function generateWithPollinations(styledPrompt: string, dimensions: { width: number; height: number }): Promise<string> {
   console.log("Generating image with Pollinations AI (FLUX model)...");
   
-  // Build text-free enforced prompt
-  const textFreePrompt = `${styledPrompt}. CRITICAL: Generate ONLY visual graphics. Absolutely NO text, NO letters, NO words, NO numbers, NO typography, NO watermarks, NO signatures, NO captions, NO labels anywhere in the image. Pure visual design only.`;
+  // Build STRICT text-free enforced prompt
+  const textFreePrompt = `${styledPrompt}. CRITICAL INSTRUCTION: This image must contain ZERO text. Do NOT generate any letters, words, numbers, typography, watermarks, signatures, captions, labels, brand names, titles, headlines, or any form of written content. Generate ONLY pure visual graphics, patterns, shapes, and imagery. The final image must be completely text-free.`;
   
   const encodedPrompt = encodeURIComponent(textFreePrompt);
   const pollinationsUrl = new URL(`https://image.pollinations.ai/prompt/${encodedPrompt}`);
@@ -42,8 +42,8 @@ async function generateWithPollinations(styledPrompt: string, dimensions: { widt
   pollinationsUrl.searchParams.set("nologo", "true");
   pollinationsUrl.searchParams.set("enhance", "true");
   pollinationsUrl.searchParams.set("seed", Math.floor(Math.random() * 1000000).toString());
-  // Negative prompt to exclude text
-  pollinationsUrl.searchParams.set("negative", "text, letters, words, typography, watermark, signature, logo text, brand name, writing, alphabet, numbers, digits, dates, captions, labels, titles, headlines, slogans, inscriptions, fonts, handwriting, printed text, any written content");
+  // Aggressive negative prompt to completely exclude ANY text
+  pollinationsUrl.searchParams.set("negative", "text, letters, words, alphabet, typography, watermark, signature, logo text, brand name, company name, writing, numbers, digits, dates, captions, labels, titles, headlines, slogans, inscriptions, fonts, handwriting, printed text, written content, initials, monogram, letterform, calligraphy, script, any readable characters");
 
   console.log("Pollinations URL generated, fetching image...");
   

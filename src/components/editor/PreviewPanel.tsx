@@ -440,21 +440,21 @@ export const PreviewPanel = ({
       <Sheet open={showTextTool && isMobile} onOpenChange={(open) => !open && onTextToolToggle()}>
         <SheetContent 
           side="bottom" 
-          className="max-h-[85vh] h-auto rounded-t-2xl flex flex-col p-0"
+          className="h-[85vh] rounded-t-2xl flex flex-col p-0"
           aria-describedby={undefined}
         >
           <SheetHeader className="px-4 py-3 border-b border-border/10 shrink-0">
             <SheetTitle>Text Tool</SheetTitle>
           </SheetHeader>
-          <ScrollArea className="flex-1 min-h-0">
-            <div className="p-4">
+          <div className="flex-1 overflow-y-auto overscroll-contain">
+            <div className="p-4 pb-8">
               <TextToolPanel
                 onAddText={onAddText}
                 selectedText={selectedText}
                 onUpdateText={onUpdateText}
               />
             </div>
-          </ScrollArea>
+          </div>
         </SheetContent>
       </Sheet>
 
