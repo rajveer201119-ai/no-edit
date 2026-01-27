@@ -6,16 +6,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Design-specific prompt templates - TEXT-FREE designs (user adds text manually)
+// Design-specific prompt templates - TEXT-FREE designs only
 const designTemplates: Record<string, string> = {
-  logo: "PRECISE LOGO DESIGN: Create a professional, modern logo ICON ONLY with clean vector-style graphics. Use minimalist geometric shapes, bold iconic symbol, flat design with 2-3 colors maximum. Corporate-grade quality, scalable design, centered composition on solid white or transparent background. The logo must be memorable, unique, and instantly recognizable. DO NOT include any text, letters, words, or typography - icon/symbol only.",
-  social: "PRECISE SOCIAL MEDIA GRAPHIC: Create a visually striking Instagram/Facebook post background with perfect 1:1 composition. Use bold, eye-catching colors with high contrast. Include engaging imagery, modern gradient backgrounds with geometric accents. Marketing-ready, scroll-stopping visual design. DO NOT include any text, letters, words, numbers, or typography - visual elements only.",
-  banner: "PRECISE WEB BANNER BACKGROUND: Create a professional horizontal banner with 16:9 aspect ratio. Use clean, modern layout with compelling visuals and graphics. High contrast colors, dynamic composition. Marketing-grade quality, web-optimized visual design. DO NOT include any text, letters, words, or typography - visual/graphic elements only.",
-  poster: "PRECISE EVENT POSTER BACKGROUND: Create a professional vertical poster with striking visual impact. Use dramatic colors, balanced composition, eye-catching graphics and imagery. Print-ready quality, attention-grabbing visual design. DO NOT include any text, letters, words, numbers, dates, or typography - visual elements only.",
-  default: "PRECISE GRAPHIC DESIGN: Create a professional, modern graphic with clean aesthetics, balanced composition, and high-quality execution. Use appropriate colors and clear visual hierarchy. DO NOT include any text, letters, or typography.",
+  logo: "LOGO ICON DESIGN: Professional, modern logo ICON with clean vector-style graphics. Minimalist geometric shapes, bold iconic symbol, flat design with 2-3 colors maximum. Corporate-grade quality, scalable, centered on solid background. NO text, NO letters, NO words - pure icon/symbol only.",
+  social: "SOCIAL MEDIA GRAPHIC: Visually striking Instagram/Facebook post background with 1:1 composition. Bold eye-catching colors, high contrast, engaging imagery, modern gradient backgrounds with geometric accents. Marketing-ready visual. NO text, NO letters, NO typography.",
+  banner: "WEB BANNER BACKGROUND: Professional horizontal banner with 16:9 aspect ratio. Clean modern layout, compelling visuals, high contrast colors, dynamic composition. Marketing-grade quality. NO text, NO words, NO typography.",
+  poster: "EVENT POSTER BACKGROUND: Professional vertical poster with striking visual impact. Dramatic colors, balanced composition, eye-catching graphics. Print-ready quality. NO text, NO letters, NO numbers, NO dates.",
+  default: "GRAPHIC DESIGN: Professional modern graphic with clean aesthetics, balanced composition, high-quality execution. NO text, NO letters, NO typography.",
 };
 
-// Size mapping for API - optimized dimensions
+// Size mapping - optimized dimensions
 const sizeMap: Record<string, { width: number; height: number }> = {
   square: { width: 1024, height: 1024 },
   portrait: { width: 832, height: 1216 },
@@ -23,212 +23,166 @@ const sizeMap: Record<string, { width: number; height: number }> = {
 };
 
 // ============================================
-// PRIMARY: Runware API with FLUX.1 Schnell Model
-// Fast, high-quality image generation
-// https://huggingface.co/black-forest-labs/FLUX.1-schnell
-// ============================================
-async function generateWithRunware(prompt: string, dimensions: { width: number; height: number }): Promise<string> {
-  console.log("Generating image with Runware API (FLUX.1 Schnell)...");
-  
-  const RUNWARE_API_KEY = Deno.env.get("RUNWARE_API_KEY");
-  if (!RUNWARE_API_KEY) {
-    throw new Error("RUNWARE_API_KEY not configured");
-  }
-
-  const API_ENDPOINT = "wss://ws-api.runware.ai/v1";
-
-  return new Promise(async (resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject(new Error("Runware API timeout after 60s"));
-    }, 60000);
-
-    try {
-      const ws = new WebSocket(API_ENDPOINT);
-      
-      ws.onopen = () => {
-        console.log("WebSocket connected to Runware");
-        
-        // Step 1: Authenticate
-        const authMessage = [{
-          taskType: "authentication",
-          apiKey: RUNWARE_API_KEY,
-        }];
-        ws.send(JSON.stringify(authMessage));
-      };
-
-      let isAuthenticated = false;
-      const taskUUID = crypto.randomUUID();
-      
-      ws.onmessage = async (event) => {
-        try {
-          const response = JSON.parse(event.data);
-          console.log("Runware response:", JSON.stringify(response).substring(0, 500));
-          
-          if (response.error || response.errors) {
-            clearTimeout(timeout);
-            ws.close();
-            const errorMessage = response.errorMessage || response.errors?.[0]?.message || "Runware API error";
-            reject(new Error(errorMessage));
-            return;
-          }
-
-          if (response.data) {
-            for (const item of response.data) {
-              if (item.taskType === "authentication") {
-                console.log("Runware authenticated, starting FLUX.1 Schnell generation...");
-                isAuthenticated = true;
-                
-                // Step 2: Send image generation request using FLUX.1 Schnell
-                // Schnell is optimized for speed with 4 steps and CFGScale of 1
-                const generateMessage = [{
-                  taskType: "imageInference",
-                  taskUUID,
-                  model: "runware:100@1", // FLUX.1 Schnell - fast, high-quality model
-                  positivePrompt: prompt,
-                  negativePrompt: "text, letters, words, typography, watermark, signature, logo text, brand name, writing, alphabet, numbers, digits, dates, captions, labels, titles, headlines, slogans, inscriptions, characters, symbols with letters, fonts, handwriting, printed text, any written content, blurry, low quality, distorted, artifacts, pixelated",
-                  width: dimensions.width,
-                  height: dimensions.height,
-                  numberResults: 1,
-                  outputFormat: "PNG",
-                  CFGScale: 1, // Schnell works best with CFGScale of 1
-                  scheduler: "FlowMatchEulerDiscreteScheduler",
-                  steps: 4, // Schnell is optimized for 4 steps
-                  includeCost: true,
-                }];
-                
-                console.log("Sending FLUX.1 Schnell generation request:", dimensions);
-                ws.send(JSON.stringify(generateMessage));
-              } else if (item.taskType === "imageInference" && item.taskUUID === taskUUID) {
-                clearTimeout(timeout);
-                ws.close();
-                
-                if (item.imageURL) {
-                  console.log("FLUX.1 Schnell generation successful! Cost:", item.cost || "N/A");
-                  resolve(item.imageURL);
-                } else {
-                  reject(new Error("No image URL in Runware response"));
-                }
-              }
-            }
-          }
-        } catch (parseError) {
-          console.error("Error parsing Runware response:", parseError);
-        }
-      };
-
-      ws.onerror = (error) => {
-        clearTimeout(timeout);
-        console.error("WebSocket error:", error);
-        reject(new Error("Runware WebSocket connection failed"));
-      };
-
-      ws.onclose = (event) => {
-        console.log("WebSocket closed:", event.code, event.reason);
-        if (!isAuthenticated) {
-          clearTimeout(timeout);
-          reject(new Error("Runware connection closed before completion"));
-        }
-      };
-
-    } catch (error) {
-      clearTimeout(timeout);
-      reject(error);
-    }
-  });
-}
-
-// ============================================
-// SECONDARY: Pollinations AI (free, no API key)
-// With enhanced text-free enforcement
+// PRIMARY: Pollinations AI (FREE, fast, reliable)
+// Uses FLUX model for high-quality generation
 // ============================================
 async function generateWithPollinations(styledPrompt: string, dimensions: { width: number; height: number }): Promise<string> {
-  // Add extra text-free emphasis for Pollinations
-  const enhancedPrompt = `${styledPrompt}. CRITICAL: Generate ONLY visual graphics with absolutely NO text, NO letters, NO words, NO numbers, NO typography, NO watermarks, NO signatures anywhere in the image.`;
+  console.log("Generating image with Pollinations AI (FLUX model)...");
   
-  const encodedPrompt = encodeURIComponent(enhancedPrompt);
+  // Build text-free enforced prompt
+  const textFreePrompt = `${styledPrompt}. CRITICAL: Generate ONLY visual graphics. Absolutely NO text, NO letters, NO words, NO numbers, NO typography, NO watermarks, NO signatures, NO captions, NO labels anywhere in the image. Pure visual design only.`;
+  
+  const encodedPrompt = encodeURIComponent(textFreePrompt);
   const pollinationsUrl = new URL(`https://image.pollinations.ai/prompt/${encodedPrompt}`);
   
+  // Set parameters for best quality
   pollinationsUrl.searchParams.set("model", "flux");
   pollinationsUrl.searchParams.set("width", dimensions.width.toString());
   pollinationsUrl.searchParams.set("height", dimensions.height.toString());
   pollinationsUrl.searchParams.set("nologo", "true");
   pollinationsUrl.searchParams.set("enhance", "true");
   pollinationsUrl.searchParams.set("seed", Math.floor(Math.random() * 1000000).toString());
-  // Add negative prompt for Pollinations to explicitly exclude text
-  pollinationsUrl.searchParams.set("negative", "text, letters, words, typography, watermark, signature, logo text, brand name, writing, alphabet, numbers, digits, dates, captions, labels, titles, headlines, slogans, inscriptions, fonts, handwriting, printed text");
+  // Negative prompt to exclude text
+  pollinationsUrl.searchParams.set("negative", "text, letters, words, typography, watermark, signature, logo text, brand name, writing, alphabet, numbers, digits, dates, captions, labels, titles, headlines, slogans, inscriptions, fonts, handwriting, printed text, any written content");
 
-  console.log("Trying Pollinations AI fallback with text-free enforcement...");
+  console.log("Pollinations URL generated, fetching image...");
   
-  const response = await fetch(pollinationsUrl.toString(), {
-    method: "GET",
-    headers: { "Accept": "image/*" },
-  });
+  // Fetch with timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 90000); // 90s timeout
+  
+  try {
+    const response = await fetch(pollinationsUrl.toString(), {
+      method: "GET",
+      headers: { "Accept": "image/*" },
+      signal: controller.signal,
+    });
+    
+    clearTimeout(timeoutId);
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Pollinations error:", response.status, errorText);
-    throw new Error(`Pollinations failed: ${response.status}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Pollinations error:", response.status, errorText);
+      
+      if (response.status === 429) {
+        const error = new Error("Rate limit exceeded. Please try again in a moment.");
+        (error as any).status = 429;
+        throw error;
+      }
+      
+      throw new Error(`Pollinations failed: ${response.status}`);
+    }
+
+    // Validate content type
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.startsWith("image/")) {
+      console.error("Pollinations returned non-image:", contentType);
+      throw new Error("Invalid response from Pollinations");
+    }
+
+    console.log("Pollinations AI generation successful!");
+    return pollinationsUrl.toString();
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === "AbortError") {
+      throw new Error("Pollinations request timed out. Please try again.");
+    }
+    throw error;
   }
-
-  return pollinationsUrl.toString();
 }
 
 // ============================================
-// TERTIARY: Lovable AI (Gemini) fallback
+// SECONDARY: Lovable AI (Gemini) - uses credits
 // ============================================
 async function generateWithLovableAI(styledPrompt: string): Promise<string> {
+  console.log("Generating image with Lovable AI (Gemini)...");
+  
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
-    throw new Error("LOVABLE_API_KEY not configured for fallback");
+    throw new Error("LOVABLE_API_KEY not configured");
   }
 
-  console.log("Falling back to Lovable AI (Gemini)...");
+  const textFreePrompt = `${styledPrompt}. IMPORTANT: Generate ONLY visual graphics with NO text, letters, words, or typography anywhere in the image.`;
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash-image",
-      messages: [{ role: "user", content: styledPrompt }],
-      modalities: ["image", "text"]
-    }),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
 
-  if (!response.ok) {
-    if (response.status === 429) {
-      throw new Error("Rate limit exceeded. Please wait and try again.");
+  try {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-image",
+        messages: [{ role: "user", content: textFreePrompt }],
+        modalities: ["image", "text"]
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        const error = new Error("Rate limit exceeded. Please try again later.");
+        (error as any).status = 429;
+        throw error;
+      }
+      if (response.status === 402) {
+        const error = new Error("AI credits exhausted. Please try again later.");
+        (error as any).status = 402;
+        throw error;
+      }
+      const errorText = await response.text();
+      console.error("Lovable AI error:", response.status, errorText);
+      throw new Error("Lovable AI generation failed");
     }
-    if (response.status === 402) {
-      throw new Error("AI credits exhausted. Please try again later.");
+
+    const data = await response.json();
+    const generatedImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    
+    if (!generatedImageUrl) {
+      console.error("No image in Lovable AI response:", JSON.stringify(data).substring(0, 500));
+      throw new Error("No image returned from Lovable AI");
     }
-    const errorText = await response.text();
-    console.error("Lovable AI error:", response.status, errorText);
-    throw new Error("Fallback AI also failed");
-  }
 
-  const data = await response.json();
-  const generatedImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-  
-  if (!generatedImageUrl) {
-    console.error("No image in Lovable AI response:", JSON.stringify(data));
-    throw new Error("No image returned from fallback AI");
+    console.log("Lovable AI generation successful!");
+    return generatedImageUrl;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === "AbortError") {
+      throw new Error("Lovable AI request timed out.");
+    }
+    throw error;
   }
-
-  return generatedImageUrl;
 }
 
+// ============================================
+// Main Handler
+// ============================================
 serve(async (req) => {
+  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { prompt, style, size, designType, isGuest } = await req.json();
+    // Parse and validate request body
+    let body: any;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid request body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-    // Validate design type is provided and valid
+    const { prompt, style, size, designType, isGuest } = body;
+
+    // Validate design type
     const validDesignTypes = ["logo", "social", "banner", "poster"];
     if (!designType || !validDesignTypes.includes(designType)) {
       return new Response(
@@ -237,51 +191,7 @@ serve(async (req) => {
       );
     }
 
-    const authHeader = req.headers.get('Authorization');
-    let userId: string | null = null;
-
-    // Handle authenticated users
-    if (authHeader?.startsWith('Bearer ')) {
-      const supabaseClient = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-        { global: { headers: { Authorization: authHeader } } }
-      );
-
-      const token = authHeader.replace('Bearer ', '');
-      const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
-      
-      if (!claimsError && claimsData?.claims?.sub) {
-        userId = claimsData.claims.sub;
-
-        // Check rate limits for authenticated users
-        const { data: limitData, error: limitError } = await supabaseClient.rpc('check_generation_limit', {
-          user_id_param: userId
-        });
-
-        if (limitError || !limitData?.[0]?.can_generate) {
-          return new Response(
-            JSON.stringify({ error: "Daily generation limit reached. Upgrade to Pro for more generations." }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-      }
-    }
-
-    // For guest users (isGuest=true and no valid userId), allow one generation
-    // The client-side tracks this via localStorage
-    if (!userId && !isGuest) {
-      return new Response(
-        JSON.stringify({ error: "Authentication required. Please sign in." }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Guest mode: proceed without auth but log it
-    if (isGuest && !userId) {
-      console.log("Guest generation request");
-    }
-
+    // Validate prompt
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
       return new Response(
         JSON.stringify({ error: "Please enter a description for your design." }),
@@ -289,25 +199,71 @@ serve(async (req) => {
       );
     }
 
-    // Input validation - limit prompt length
+    // Auth check
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | null = null;
+    let supabaseClient: any = null;
+
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        supabaseClient = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+          { global: { headers: { Authorization: authHeader } } }
+        );
+
+        const token = authHeader.replace('Bearer ', '');
+        const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+        
+        if (!claimsError && claimsData?.claims?.sub) {
+          userId = claimsData.claims.sub;
+
+          // Check rate limits
+          const { data: limitData, error: limitError } = await supabaseClient.rpc('check_generation_limit', {
+            user_id_param: userId
+          });
+
+          if (limitError) {
+            console.error("Rate limit check error:", limitError);
+          } else if (!limitData?.[0]?.can_generate) {
+            return new Response(
+              JSON.stringify({ error: "Daily generation limit reached. Upgrade to Pro for more generations." }),
+              { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
+      } catch (authError) {
+        console.error("Auth error:", authError);
+        // Continue as guest if auth fails
+      }
+    }
+
+    // Require auth or guest mode
+    if (!userId && !isGuest) {
+      return new Response(
+        JSON.stringify({ error: "Authentication required. Please sign in." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (isGuest && !userId) {
+      console.log("Guest generation request");
+    }
+
+    // Sanitize and limit prompt length
     const sanitizedPrompt = prompt.trim().slice(0, 1000);
 
-    // Get the design template based on type
+    // Get template and dimensions
     const template = designTemplates[designType] || designTemplates.default;
-    
-    // Get dimensions based on size
     const dimensions = sizeMap[size] || sizeMap.square;
 
-    // Build PRECISE optimized prompt with STRICT TEXT-FREE instructions
+    // Build final prompt with text-free enforcement
     const promptParts = [
       `DESIGN REQUEST: ${sanitizedPrompt}`,
       template,
       style ? `Style: ${style} aesthetic with professional execution` : null,
-      // STRICT no-text instruction - repeated for emphasis
-      "ABSOLUTELY NO TEXT: This design must contain ZERO text, letters, words, numbers, dates, typography, logos with text, brand names, watermarks, signatures, captions, labels, titles, slogans, or any written content whatsoever. Generate ONLY pure visual and graphic elements. The entire image must be completely text-free and typography-free.",
-      // Quality enforcement
-      "QUALITY: 8K ultra HD resolution, razor-sharp details, professional studio quality, clean minimalist design",
-      "RESTRICTIONS: NO text, NO letters, NO words, NO numbers, NO photorealistic human faces, NO AI artifacts, NO blurry elements, NO watermarks",
+      "QUALITY: 8K ultra HD, razor-sharp details, professional studio quality, clean design",
+      "RESTRICTIONS: NO text, NO letters, NO words, NO numbers, NO watermarks, NO AI artifacts",
     ];
     
     const styledPrompt = promptParts.filter(Boolean).join(". ");
@@ -322,71 +278,83 @@ serve(async (req) => {
 
     let imageUrl: string;
 
-    // Try Runware first (high quality), fallback to Pollinations, then Lovable AI
+    // PRIMARY: Pollinations AI, FALLBACK: Lovable AI
     try {
-      imageUrl = await generateWithRunware(styledPrompt, dimensions);
-      console.log("Design generated successfully via Runware API (FLUX.1 Schnell)");
-    } catch (runwareError) {
-      console.warn("Runware failed, trying Pollinations fallback:", runwareError);
+      imageUrl = await generateWithPollinations(styledPrompt, dimensions);
+      console.log("Design generated successfully via Pollinations AI (FLUX)");
+    } catch (pollinationsError: any) {
+      console.warn("Pollinations failed:", pollinationsError.message);
       
+      // Check if it's a rate limit error - pass through
+      if (pollinationsError.status === 429) {
+        return new Response(
+          JSON.stringify({ error: pollinationsError.message }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      // Fallback to Lovable AI
       try {
-        imageUrl = await generateWithPollinations(styledPrompt, dimensions);
-        console.log("Design generated successfully via Pollinations AI (Flux)");
-      } catch (pollinationsError) {
-        console.warn("Pollinations failed, trying Lovable AI fallback:", pollinationsError);
+        imageUrl = await generateWithLovableAI(styledPrompt);
+        console.log("Design generated successfully via Lovable AI (Gemini) fallback");
+      } catch (lovableError: any) {
+        console.error("All services failed:", lovableError.message);
         
-        try {
-          imageUrl = await generateWithLovableAI(styledPrompt);
-          console.log("Design generated successfully via Lovable AI (Gemini) fallback");
-        } catch (lovableError: any) {
-          // If it's a rate limit or credits error, pass it through
-          if (lovableError.message.includes("Rate limit") || lovableError.message.includes("credits")) {
-            return new Response(
-              JSON.stringify({ error: lovableError.message }),
-              { status: lovableError.message.includes("Rate limit") ? 429 : 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-          }
-          throw new Error("All AI services failed. Please try again.");
+        // Pass through specific errors
+        if (lovableError.status === 429 || lovableError.status === 402) {
+          return new Response(
+            JSON.stringify({ error: lovableError.message }),
+            { status: lovableError.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
         }
+        
+        return new Response(
+          JSON.stringify({ error: "Image generation service temporarily unavailable. Please try again." }),
+          { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
     }
 
-    // Track usage after successful generation (only for authenticated users)
-    if (userId) {
-      const authHeader = req.headers.get('Authorization');
-      const supabaseClient = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-        { global: { headers: { Authorization: authHeader! } } }
-      );
-      await supabaseClient.rpc('increment_generation_usage', {
-        user_id_param: userId
-      });
+    // Track usage after successful generation (authenticated users only)
+    if (userId && supabaseClient) {
+      try {
+        await supabaseClient.rpc('increment_generation_usage', {
+          user_id_param: userId
+        });
+      } catch (usageError) {
+        console.error("Usage tracking error:", usageError);
+        // Don't fail the request for usage tracking errors
+      }
     }
 
-    return new Response(JSON.stringify({ imageUrl, prompt: styledPrompt }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ imageUrl, prompt: styledPrompt }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+
   } catch (error: any) {
-    // Generate error ID for support correlation
+    // Generate error ID for debugging
     const errorId = crypto.randomUUID().substring(0, 8);
     
-    // Safe server-side logging (no sensitive data)
     console.error(`[${errorId}] Generation error:`, {
       timestamp: new Date().toISOString(),
-      errorType: error?.constructor?.name || 'Unknown'
+      message: error?.message || "Unknown error",
+      type: error?.constructor?.name || "Unknown"
     });
 
     // Map to safe user-facing messages
     let clientMessage = "Failed to generate image. Please try again.";
     let statusCode = 500;
 
-    if (error?.message?.includes("Rate limit")) {
+    if (error?.message?.includes("Rate limit") || error?.status === 429) {
       clientMessage = "Too many requests. Please try again in a moment.";
       statusCode = 429;
-    } else if (error?.message?.includes("credits") || error?.message?.includes("402")) {
+    } else if (error?.message?.includes("credits") || error?.status === 402) {
       clientMessage = "Service temporarily unavailable. Please try again later.";
       statusCode = 503;
+    } else if (error?.message?.includes("timeout")) {
+      clientMessage = "Request timed out. Please try again.";
+      statusCode = 504;
     }
 
     return new Response(
