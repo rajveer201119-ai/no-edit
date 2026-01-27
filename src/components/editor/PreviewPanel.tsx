@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { ImageVersion } from "./types";
 import { VersionHistory } from "./VersionHistory";
 import { EditorToolbar } from "./EditorToolbar";
@@ -104,6 +106,7 @@ export const PreviewPanel = ({
 }: PreviewPanelProps) => {
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const isMobile = useIsMobile();
   
   // Inpainting state
   const [isInpainting, setIsInpainting] = useState(false);
@@ -342,8 +345,8 @@ export const PreviewPanel = ({
           </div>
         </div>
 
-        {/* Text Tool Panel */}
-        {showTextTool && (
+        {/* Text Tool Panel - Desktop Sidebar */}
+        {showTextTool && !isMobile && (
           <div className="w-72 border-l border-border/10 bg-background/40 backdrop-blur-sm">
             <div className="flex items-center justify-between px-3 py-2 border-b border-border/10">
               <span className="text-sm font-medium">Text Tool</span>
@@ -366,8 +369,8 @@ export const PreviewPanel = ({
           </div>
         )}
 
-        {/* Inpainting Panel */}
-        {isInpainting && !isDrawingMask && (
+        {/* Inpainting Panel - Desktop Sidebar */}
+        {isInpainting && !isDrawingMask && !isMobile && (
           <InpaintingPanel
             maskDataUrl={maskDataUrl}
             onInpaint={handleInpaint}
@@ -377,6 +380,35 @@ export const PreviewPanel = ({
           />
         )}
       </div>
+
+      {/* Mobile Text Tool Sheet */}
+      <Sheet open={showTextTool && isMobile} onOpenChange={(open) => !open && onTextToolToggle()}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl">
+          <SheetHeader className="pb-2">
+            <SheetTitle>Text Tool</SheetTitle>
+          </SheetHeader>
+          <ScrollArea className="h-[calc(100%-60px)]">
+            <TextToolPanel
+              onAddText={onAddText}
+              selectedText={selectedText}
+              onUpdateText={onUpdateText}
+            />
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
+
+      {/* Mobile Inpainting Sheet */}
+      <Sheet open={isInpainting && !isDrawingMask && isMobile} onOpenChange={(open) => !open && handleInpaintToggle()}>
+        <SheetContent side="bottom" className="h-[60vh] rounded-t-2xl p-0">
+          <InpaintingPanel
+            maskDataUrl={maskDataUrl}
+            onInpaint={handleInpaint}
+            onClearMask={handleClearMask}
+            onClose={handleInpaintToggle}
+            isProcessing={isProcessing}
+          />
+        </SheetContent>
+      </Sheet>
 
       {/* Version History */}
       <VersionHistory
