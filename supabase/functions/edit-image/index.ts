@@ -58,7 +58,7 @@ async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<s
       negative_prompt: negativePrompt,
       strength: 0.35,        // Conservative - preserve ~65% of original
       guidance: 7.5,         // Balanced prompt adherence
-      num_steps: 25          // Good quality
+      num_steps: 20          // Cloudflare max is 20
     }),
   });
 
