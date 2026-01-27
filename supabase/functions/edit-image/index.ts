@@ -163,8 +163,8 @@ async function inpaintWithRunware(imageUrl: string, maskDataUrl: string, prompt:
 
   const API_ENDPOINT = "wss://ws-api.runware.ai/v1";
   
-  // Enhanced prompt for inpainting
-  const enhancedPrompt = `${prompt}, seamless blend, natural lighting, photorealistic, sharp details, 8K resolution`;
+  // Build smart prompt based on content type
+  const enhancedPrompt = buildInpaintingPrompt(prompt);
   
   console.log("Inpainting prompt:", enhancedPrompt);
 
@@ -303,6 +303,33 @@ function buildEnhancedPrompt(userPrompt: string): string {
   const qualityBoosters = "photorealistic, sharp details, natural lighting, 8K resolution, professional quality";
   
   return `${userPrompt}${contextualSuffix}, ${qualityBoosters}`;
+}
+
+// Build smart inpainting prompt - handles text separately from other content
+function buildInpaintingPrompt(userPrompt: string): string {
+  // Detect if user wants text/typography
+  const isTextRequest = /\btext\b|write|word|letter|font|typography|caption|title|headline|label|sign|logo|saying|quote/i.test(userPrompt);
+  
+  // Detect removal requests
+  const isRemoval = /remove|delete|erase|get rid of|clear|empty|clean|wipe/i.test(userPrompt);
+  
+  // Detect replacement requests
+  const isReplacement = /replace|swap|change|transform|convert|turn into/i.test(userPrompt);
+  
+  if (isTextRequest) {
+    // For text: AI models struggle with text, give simple clear instructions
+    // NOTE: We still try, but results may be poor - user should use Text Tool for reliable text
+    return `${userPrompt}, clean typography, high contrast, readable, sharp edges, centered in masked area`;
+  } else if (isRemoval) {
+    // For removal: focus on seamless fill
+    return `${userPrompt}, seamless background continuation, natural fill, matching surrounding area exactly, no artifacts`;
+  } else if (isReplacement) {
+    // For replacement: focus on the new content fitting naturally
+    return `${userPrompt}, seamless integration, matching lighting and perspective, natural appearance, high quality`;
+  } else {
+    // Default: general enhancement
+    return `${userPrompt}, seamless blend, natural lighting, sharp details, high quality`;
+  }
 }
 
 // ============================================
