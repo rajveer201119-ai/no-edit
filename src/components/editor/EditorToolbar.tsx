@@ -2,17 +2,19 @@ import { useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Crop, Type, Upload, X, Wand2 } from "lucide-react";
+import { Crop, Type, Upload, X, Wand2, Check } from "lucide-react";
 
 interface EditorToolbarProps {
   isCropping: boolean;
   showTextTool: boolean;
   isInpainting: boolean;
+  hasOverlays: boolean;
   onCropToggle: () => void;
   onTextToolToggle: () => void;
   onInpaintToggle: () => void;
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCancelCrop: () => void;
+  onMergeOverlays: () => void;
   isDisabled?: boolean;
 }
 
@@ -20,11 +22,13 @@ export const EditorToolbar = ({
   isCropping,
   showTextTool,
   isInpainting,
+  hasOverlays,
   onCropToggle,
   onTextToolToggle,
   onInpaintToggle,
   onFileUpload,
   onCancelCrop,
+  onMergeOverlays,
   isDisabled = false,
 }: EditorToolbarProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -130,6 +134,29 @@ export const EditorToolbar = ({
             Upload Image Overlay
           </TooltipContent>
         </Tooltip>
+
+        {/* Merge/Confirm Button - Only shows when there are overlays */}
+        {hasOverlays && (
+          <>
+            <div className="w-px h-5 bg-border/30 mx-1" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="default"
+                  size="icon"
+                  className="h-8 w-8 rounded-lg bg-green-600 hover:bg-green-700 text-white"
+                  onClick={onMergeOverlays}
+                  disabled={isDisabled}
+                >
+                  <Check className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs">
+                Merge & Save (Flatten Layers)
+              </TooltipContent>
+            </Tooltip>
+          </>
+        )}
       </div>
     </TooltipProvider>
   );
