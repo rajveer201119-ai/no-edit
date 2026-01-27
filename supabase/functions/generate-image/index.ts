@@ -77,13 +77,13 @@ async function generateWithRunware(prompt: string, dimensions: { width: number; 
                 console.log("Runware authenticated, starting image generation...");
                 isAuthenticated = true;
                 
-                // Step 2: Send image generation request
+                // Step 2: Send image generation request with STRONG anti-text instructions
                 const generateMessage = [{
                   taskType: "imageInference",
                   taskUUID,
                   model: "runware:100@1", // FLUX model for text-to-image
                   positivePrompt: prompt,
-                  negativePrompt: "blurry, low quality, distorted, text, letters, words, typography, watermark, signature, artifacts, pixelated",
+                  negativePrompt: "text, letters, words, typography, watermark, signature, logo text, brand name, writing, alphabet, numbers, digits, dates, captions, labels, titles, headlines, slogans, inscriptions, characters, symbols with letters, fonts, handwriting, printed text, any written content, blurry, low quality, distorted, artifacts, pixelated",
                   width: dimensions.width,
                   height: dimensions.height,
                   numberResults: 1,
@@ -290,16 +290,16 @@ serve(async (req) => {
     // Get dimensions based on size
     const dimensions = sizeMap[size] || sizeMap.square;
 
-    // Build PRECISE optimized prompt with strict quality instructions (NO TEXT)
+    // Build PRECISE optimized prompt with STRICT TEXT-FREE instructions
     const promptParts = [
       `DESIGN REQUEST: ${sanitizedPrompt}`,
       template,
       style ? `Style: ${style} aesthetic with professional execution` : null,
-      // Explicit no-text instruction
-      "CRITICAL: Generate ONLY visual/graphic elements. DO NOT include any text, letters, words, numbers, dates, or typography anywhere in the design. The image must be completely text-free. Users will add text manually.",
+      // STRICT no-text instruction - repeated for emphasis
+      "ABSOLUTELY NO TEXT: This design must contain ZERO text, letters, words, numbers, dates, typography, logos with text, brand names, watermarks, signatures, captions, labels, titles, slogans, or any written content whatsoever. Generate ONLY pure visual and graphic elements. The entire image must be completely text-free and typography-free.",
       // Quality enforcement
-      "QUALITY: 8K ultra HD resolution, razor-sharp details, professional studio quality",
-      "RESTRICTIONS: NO photorealistic human faces, NO AI artifacts, NO blurry elements, NO watermarks, NO text of any kind",
+      "QUALITY: 8K ultra HD resolution, razor-sharp details, professional studio quality, clean minimalist design",
+      "RESTRICTIONS: NO text, NO letters, NO words, NO numbers, NO photorealistic human faces, NO AI artifacts, NO blurry elements, NO watermarks",
     ];
     
     const styledPrompt = promptParts.filter(Boolean).join(". ");
