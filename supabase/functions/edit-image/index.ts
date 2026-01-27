@@ -17,9 +17,9 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(binary);
 }
 
-// Edit image using Stable Diffusion XL via Hugging Face (FREE - high quality)
-async function editWithSDXL(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Stable Diffusion XL...");
+// Edit image using FLUX.1 via Hugging Face (FREE - best quality for editing)
+async function editWithFLUX(imageUrl: string, prompt: string): Promise<string> {
+  console.log("Editing image with FLUX.1-dev...");
   
   const HF_TOKEN = Deno.env.get("HUGGING_FACE_ACCESS_TOKEN");
   if (!HF_TOKEN) {
@@ -34,14 +34,14 @@ async function editWithSDXL(imageUrl: string, prompt: string): Promise<string> {
   const imageBlob = await imageResponse.blob();
   const imageBase64 = await blobToBase64(imageBlob);
 
-  // SDXL img2img endpoint via HF Router API (new endpoint)
-  const hfEndpoint = "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0";
+  // FLUX.1-dev for high-quality image editing via HF Router API
+  const hfEndpoint = "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-dev";
 
-  // Preservation-focused prompt engineering
-  const enhancedPrompt = `${prompt}, preserve original composition, maintain original style, subtle refinement, high quality, detailed, professional, realistic lighting, natural blending`;
+  // FLUX-optimized prompt for editing - emphasize the specific change requested
+  const enhancedPrompt = `Edit this image: ${prompt}. Maintain the original composition, preserve existing elements, apply only the requested changes. High quality, professional result.`;
+
+  console.log("Sending request to FLUX API...");
   
-  const negativePrompt = "distorted, blurry, low quality, different layout, major changes, text, watermark, signature, artifacts, over-stylization, hallucinated elements, unnecessary redesigns";
-
   const response = await fetch(hfEndpoint, {
     method: "POST",
     headers: {
@@ -49,22 +49,19 @@ async function editWithSDXL(imageUrl: string, prompt: string): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      inputs: {
-        image: imageBase64,
-        prompt: enhancedPrompt
-      },
+      inputs: imageBase64,
       parameters: {
-        negative_prompt: negativePrompt,
-        strength: 0.3,           // Conservative for preservation (~70% original retained)
-        guidance_scale: 7.5,     // Balanced prompt adherence
-        num_inference_steps: 30  // High quality output
+        prompt: enhancedPrompt,
+        guidance_scale: 3.5,      // FLUX optimal guidance
+        num_inference_steps: 28,  // FLUX optimal steps
+        strength: 0.35            // Conservative for editing (~65% original retained)
       }
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("SDXL error:", response.status, errorText);
+    console.error("FLUX error:", response.status, errorText);
 
     if (response.status === 429) {
       const error = new Error("Rate limit exceeded");
@@ -82,7 +79,7 @@ async function editWithSDXL(imageUrl: string, prompt: string): Promise<string> {
       throw error;
     }
 
-    const error = new Error(`SDXL failed: ${response.status}`);
+    const error = new Error(`FLUX failed: ${response.status} - ${errorText}`);
     (error as any).status = response.status;
     throw error;
   }
@@ -91,7 +88,7 @@ async function editWithSDXL(imageUrl: string, prompt: string): Promise<string> {
   const editedBlob = await response.blob();
   const editedBase64 = await blobToBase64(editedBlob);
 
-  console.log("SDXL edit successful");
+  console.log("FLUX edit successful");
   return `data:image/png;base64,${editedBase64}`;
 }
 
@@ -228,12 +225,12 @@ serve(async (req) => {
     let editedImageData: string;
     let usedService: string;
 
-    // Try SDXL first (FREE via Hugging Face), fallback to Lovable AI (uses credits)
+    // Try FLUX first (FREE via Hugging Face), fallback to Lovable AI (uses credits)
     try {
-      editedImageData = await editWithSDXL(imageUrl, sanitizedPrompt);
-      usedService = "Stable Diffusion XL (free)";
-    } catch (sdxlError: any) {
-      console.warn("SDXL failed, falling back to Lovable AI:", sdxlError.message);
+      editedImageData = await editWithFLUX(imageUrl, sanitizedPrompt);
+      usedService = "FLUX.1-dev (free)";
+    } catch (fluxError: any) {
+      console.warn("FLUX failed, falling back to Lovable AI:", fluxError.message);
 
       try {
         editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
