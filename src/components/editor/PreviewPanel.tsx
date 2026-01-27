@@ -438,23 +438,33 @@ export const PreviewPanel = ({
 
       {/* Mobile Text Tool Sheet */}
       <Sheet open={showTextTool && isMobile} onOpenChange={(open) => !open && onTextToolToggle()}>
-        <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl">
-          <SheetHeader className="pb-2">
+        <SheetContent 
+          side="bottom" 
+          className="max-h-[85vh] h-auto rounded-t-2xl flex flex-col p-0"
+          aria-describedby={undefined}
+        >
+          <SheetHeader className="px-4 py-3 border-b border-border/10 shrink-0">
             <SheetTitle>Text Tool</SheetTitle>
           </SheetHeader>
-          <ScrollArea className="h-[calc(100%-60px)]">
-            <TextToolPanel
-              onAddText={onAddText}
-              selectedText={selectedText}
-              onUpdateText={onUpdateText}
-            />
+          <ScrollArea className="flex-1 min-h-0">
+            <div className="p-4">
+              <TextToolPanel
+                onAddText={onAddText}
+                selectedText={selectedText}
+                onUpdateText={onUpdateText}
+              />
+            </div>
           </ScrollArea>
         </SheetContent>
       </Sheet>
 
       {/* Mobile Inpainting Sheet */}
       <Sheet open={isInpainting && !isDrawingMask && isMobile} onOpenChange={(open) => !open && handleInpaintToggle()}>
-        <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl flex flex-col p-0">
+        <SheetContent 
+          side="bottom" 
+          className="max-h-[85vh] h-auto rounded-t-2xl flex flex-col p-0"
+          aria-describedby={undefined}
+        >
           <div className="flex items-center justify-between px-4 py-3 border-b border-border/10 shrink-0">
             <div className="flex items-center gap-2">
               <Wand2 className="h-4 w-4 text-primary" />
@@ -469,8 +479,8 @@ export const PreviewPanel = ({
               <X className="h-4 w-4" />
             </Button>
           </div>
-          <ScrollArea className="flex-1">
-            <div className="p-4 space-y-4">
+          <ScrollArea className="flex-1 min-h-0">
+            <div className="p-4 space-y-4 pb-8">
               {/* Mask preview */}
               {maskDataUrl && (
                 <div className="space-y-2">
@@ -489,7 +499,7 @@ export const PreviewPanel = ({
                     <img
                       src={maskDataUrl}
                       alt="Mask preview"
-                      className="w-full h-auto max-h-32 object-contain"
+                      className="w-full h-auto max-h-28 object-contain"
                     />
                   </div>
                 </div>
@@ -497,9 +507,9 @@ export const PreviewPanel = ({
 
               {/* No mask state */}
               {!maskDataUrl && (
-                <div className="text-center py-6">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-muted/50 flex items-center justify-center">
-                    <Wand2 className="h-6 w-6 text-muted-foreground" />
+                <div className="text-center py-4">
+                  <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-muted/50 flex items-center justify-center">
+                    <Wand2 className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <p className="text-sm text-muted-foreground">
                     Draw a mask on the image to select the area you want to edit
@@ -536,7 +546,7 @@ export const PreviewPanel = ({
               {/* Tips */}
               <div className="space-y-2 pt-2 border-t border-border/10">
                 <span className="text-xs text-muted-foreground">Tips</span>
-                <ul className="text-xs text-muted-foreground space-y-1.5">
+                <ul className="text-xs text-muted-foreground space-y-1">
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
                     Be specific about what you want
@@ -549,7 +559,7 @@ export const PreviewPanel = ({
               </div>
 
               {/* Text Warning */}
-              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <div className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
                 <p className="text-xs text-amber-500/90">
                   <strong>Note:</strong> AI models struggle with text. Use the <strong>Text Tool</strong> instead.
                 </p>
