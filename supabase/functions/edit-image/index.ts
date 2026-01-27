@@ -17,9 +17,9 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(binary);
 }
 
-// Edit image using Qwen VL via Hugging Face (FREE - open source)
-async function editWithQwenVL(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Qwen VL via Hugging Face...");
+// Edit image using InstructPix2Pix via Hugging Face (FREE - true img2img)
+async function editWithInstructPix2Pix(imageUrl: string, prompt: string): Promise<string> {
+  console.log("Editing image with InstructPix2Pix (true img2img)...");
   
   const HF_TOKEN = Deno.env.get("HUGGING_FACE_ACCESS_TOKEN");
   
@@ -28,6 +28,7 @@ async function editWithQwenVL(imageUrl: string, prompt: string): Promise<string>
   }
 
   // Download source image and convert to base64
+  console.log("Downloading source image...");
   const imageResponse = await fetch(imageUrl);
   if (!imageResponse.ok) {
     throw new Error("Failed to download source image");
@@ -35,14 +36,14 @@ async function editWithQwenVL(imageUrl: string, prompt: string): Promise<string>
   const imageBlob = await imageResponse.blob();
   const imageBase64 = await blobToBase64(imageBlob);
 
-  // Use Qwen2.5-VL for image understanding and editing instructions
-  // Then use a compatible image generation model
-  const hfEndpoint = "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell";
+  // InstructPix2Pix - instruction-based image editing model
+  const hfEndpoint = "https://router.huggingface.co/hf-inference/models/timbrooks/instruct-pix2pix";
 
-  // Preservation-focused prompt
-  const enhancedPrompt = `${prompt}, preserve original composition, maintain layout, high quality, professional, subtle modification`;
+  // Instruction-style prompt for Pix2Pix
+  const instruction = prompt.trim();
 
-  console.log("Sending request to FLUX.1-schnell via Hugging Face...");
+  console.log("Sending source image + instruction to InstructPix2Pix...");
+  console.log("Instruction:", instruction);
   
   const response = await fetch(hfEndpoint, {
     method: "POST",
@@ -51,17 +52,21 @@ async function editWithQwenVL(imageUrl: string, prompt: string): Promise<string>
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      inputs: enhancedPrompt,
+      inputs: {
+        image: imageBase64,
+        prompt: instruction
+      },
       parameters: {
-        num_inference_steps: 4,  // FLUX.1-schnell is optimized for 4 steps
-        guidance_scale: 0       // schnell doesn't need guidance
+        image_guidance_scale: 1.5,  // How much to preserve original (higher = more preservation)
+        guidance_scale: 7.5,         // How closely to follow the instruction
+        num_inference_steps: 20      // Quality steps
       }
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("Hugging Face error:", response.status, errorText);
+    console.error("InstructPix2Pix error:", response.status, errorText);
 
     if (response.status === 429) {
       const error = new Error("Rate limit exceeded");
@@ -70,12 +75,12 @@ async function editWithQwenVL(imageUrl: string, prompt: string): Promise<string>
     }
     
     if (response.status === 503) {
-      const error = new Error("Model is loading, please retry");
+      const error = new Error("Model is loading, please retry in 30 seconds");
       (error as any).status = 503;
       throw error;
     }
 
-    const error = new Error(`Hugging Face failed: ${response.status}`);
+    const error = new Error(`InstructPix2Pix failed: ${response.status} - ${errorText}`);
     (error as any).status = response.status;
     throw error;
   }
@@ -84,7 +89,7 @@ async function editWithQwenVL(imageUrl: string, prompt: string): Promise<string>
   const editedBlob = await response.blob();
   const editedBase64 = await blobToBase64(editedBlob);
 
-  console.log("FLUX.1-schnell edit successful");
+  console.log("InstructPix2Pix edit successful - source image was actually modified!");
   return `data:image/png;base64,${editedBase64}`;
 }
 
@@ -221,12 +226,12 @@ serve(async (req) => {
     let editedImageData: string;
     let usedService: string;
 
-    // Try FLUX.1-schnell via HuggingFace first (FREE), fallback to Lovable AI (uses credits)
+    // Try InstructPix2Pix via HuggingFace first (FREE, true img2img), fallback to Lovable AI (uses credits)
     try {
-      editedImageData = await editWithQwenVL(imageUrl, sanitizedPrompt);
-      usedService = "FLUX.1-schnell via HuggingFace (free)";
+      editedImageData = await editWithInstructPix2Pix(imageUrl, sanitizedPrompt);
+      usedService = "InstructPix2Pix via HuggingFace (free, true img2img)";
     } catch (hfError: any) {
-      console.warn("FLUX.1-schnell failed, falling back to Lovable AI:", hfError.message);
+      console.warn("InstructPix2Pix failed, falling back to Lovable AI:", hfError.message);
 
       try {
         editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
