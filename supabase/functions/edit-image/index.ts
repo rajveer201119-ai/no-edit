@@ -49,9 +49,11 @@ async function editWithSDXL(imageUrl: string, prompt: string): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      inputs: imageBase64,
+      inputs: {
+        image: imageBase64,
+        prompt: enhancedPrompt
+      },
       parameters: {
-        prompt: enhancedPrompt,
         negative_prompt: negativePrompt,
         strength: 0.3,           // Conservative for preservation (~70% original retained)
         guidance_scale: 7.5,     // Balanced prompt adherence
