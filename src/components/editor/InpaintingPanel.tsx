@@ -183,6 +183,13 @@ export const InpaintingPanel = ({
               </li>
             </ul>
           </div>
+
+          {/* Text Warning */}
+          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <p className="text-xs text-amber-500/90">
+              <strong>Note:</strong> AI models struggle with text/typography. For reliable text, use the <strong>Text Tool</strong> (T icon) instead of inpainting.
+            </p>
+          </div>
         </div>
       </ScrollArea>
     </div>
