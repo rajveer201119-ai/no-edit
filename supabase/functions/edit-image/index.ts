@@ -17,26 +17,183 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(binary);
 }
 
-// PRIMARY: Edit image using Pollinations AI Kontext model (100% FREE, no API key)
-// Uses FLUX Kontext for true instruction-based image editing
+// ============================================
+// PRIMARY: Runware API with FLUX Kontext Model
+// High-quality img2img editing with character consistency
+// Free tier supports 100+ daily edits
+// ============================================
+async function editWithRunware(imageUrl: string, prompt: string): Promise<string> {
+  console.log("Editing image with Runware API (FLUX Kontext)...");
+  
+  const RUNWARE_API_KEY = Deno.env.get("RUNWARE_API_KEY");
+  if (!RUNWARE_API_KEY) {
+    throw new Error("RUNWARE_API_KEY not configured");
+  }
+
+  const API_ENDPOINT = "wss://ws-api.runware.ai/v1";
+  
+  // Build enhanced prompt with quality boosters and preservation rules
+  const enhancedPrompt = buildEnhancedPrompt(prompt);
+  
+  console.log("Enhanced prompt:", enhancedPrompt);
+
+  // Use WebSocket for Runware API
+  return new Promise(async (resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error("Runware API timeout after 60s"));
+    }, 60000);
+
+    try {
+      const ws = new WebSocket(API_ENDPOINT);
+      
+      ws.onopen = () => {
+        console.log("WebSocket connected to Runware");
+        
+        // Step 1: Authenticate
+        const authMessage = [{
+          taskType: "authentication",
+          apiKey: RUNWARE_API_KEY,
+        }];
+        ws.send(JSON.stringify(authMessage));
+      };
+
+      let isAuthenticated = false;
+      const taskUUID = crypto.randomUUID();
+      
+      ws.onmessage = async (event) => {
+        try {
+          const response = JSON.parse(event.data);
+          console.log("Runware response:", JSON.stringify(response).substring(0, 500));
+          
+          if (response.error || response.errors) {
+            clearTimeout(timeout);
+            ws.close();
+            const errorMessage = response.errorMessage || response.errors?.[0]?.message || "Runware API error";
+            reject(new Error(errorMessage));
+            return;
+          }
+
+          if (response.data) {
+            for (const item of response.data) {
+              if (item.taskType === "authentication") {
+                console.log("Runware authenticated, starting image edit...");
+                isAuthenticated = true;
+                
+                // Step 2: Send image editing request
+                // Using imageInference with the source image for img2img
+                const editMessage = [{
+                  taskType: "imageInference",
+                  taskUUID,
+                  model: "runware:101@1", // Flux Kontext model
+                  positivePrompt: enhancedPrompt,
+                  negativePrompt: "blurry, distorted, low quality, text, watermark, signature, different composition, major changes to background",
+                  width: 1024,
+                  height: 1024,
+                  numberResults: 1,
+                  outputFormat: "PNG",
+                  CFGScale: 7.5,
+                  scheduler: "FlowMatchEulerDiscreteScheduler",
+                  steps: 25,
+                  strength: 0.35, // Conservative for preservation
+                  seedImage: imageUrl, // Source image for img2img
+                  includeCost: true,
+                }];
+                
+                console.log("Sending edit request with seedImage:", imageUrl.substring(0, 50) + "...");
+                ws.send(JSON.stringify(editMessage));
+              } else if (item.taskType === "imageInference" && item.taskUUID === taskUUID) {
+                clearTimeout(timeout);
+                ws.close();
+                
+                if (item.imageURL) {
+                  console.log("Runware edit successful! Cost:", item.cost || "N/A");
+                  
+                  // Download and convert to base64
+                  const imageResp = await fetch(item.imageURL);
+                  if (!imageResp.ok) {
+                    reject(new Error("Failed to download edited image from Runware"));
+                    return;
+                  }
+                  const imageBlob = await imageResp.blob();
+                  const base64 = await blobToBase64(imageBlob);
+                  resolve(`data:image/png;base64,${base64}`);
+                } else {
+                  reject(new Error("No image URL in Runware response"));
+                }
+              }
+            }
+          }
+        } catch (parseError) {
+          console.error("Error parsing Runware response:", parseError);
+        }
+      };
+
+      ws.onerror = (error) => {
+        clearTimeout(timeout);
+        console.error("WebSocket error:", error);
+        reject(new Error("Runware WebSocket connection failed"));
+      };
+
+      ws.onclose = (event) => {
+        console.log("WebSocket closed:", event.code, event.reason);
+        if (!isAuthenticated) {
+          clearTimeout(timeout);
+          reject(new Error("Runware connection closed before completion"));
+        }
+      };
+
+    } catch (error) {
+      clearTimeout(timeout);
+      reject(error);
+    }
+  });
+}
+
+// Build enhanced prompt with embedded prompting rules
+function buildEnhancedPrompt(userPrompt: string): string {
+  // Detect edit type for context-aware prompting
+  const isColorChange = /change|color|turn|make/i.test(userPrompt);
+  const isStyleChange = /style|artistic|paint|sketch|cartoon|anime/i.test(userPrompt);
+  const isRemoval = /remove|delete|erase|get rid of/i.test(userPrompt);
+  const isEnhance = /enhance|improve|better|sharper|cleaner|fix/i.test(userPrompt);
+  
+  let contextualSuffix = "";
+  
+  if (isColorChange) {
+    contextualSuffix = ", identical lighting and angle, keep face and body unchanged, preserve background exactly";
+  } else if (isStyleChange) {
+    contextualSuffix = ", maintain original composition and subject positioning, consistent character identity";
+  } else if (isRemoval) {
+    contextualSuffix = ", seamless background fill, natural lighting continuity";
+  } else if (isEnhance) {
+    contextualSuffix = ", preserve original style and composition, subtle refinement only";
+  } else {
+    contextualSuffix = ", preserve original composition, maintain layout";
+  }
+  
+  // Quality boosters embedded in prompt
+  const qualityBoosters = "photorealistic, sharp details, natural lighting, 8K resolution, professional quality";
+  
+  return `${userPrompt}${contextualSuffix}, ${qualityBoosters}`;
+}
+
+// ============================================
+// SECONDARY: Pollinations AI Kontext (FREE backup)
+// ============================================
 async function editWithPollinationsKontext(imageUrl: string, prompt: string): Promise<string> {
   console.log("Editing image with Pollinations AI Kontext (FREE)...");
   
-  // Encode prompt and image URL for the API
   const editPrompt = `${prompt}, preserve original composition, subtle modification`;
   const encodedPrompt = encodeURIComponent(editPrompt);
   const encodedImageUrl = encodeURIComponent(imageUrl);
   
-  // Pollinations Kontext API - true img2img editing
   const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=kontext&image=${encodedImageUrl}&width=1024&height=1024&nologo=true`;
   
   console.log("Pollinations Kontext URL:", pollinationsUrl.substring(0, 150) + "...");
 
   const response = await fetch(pollinationsUrl, {
     method: "GET",
-    headers: {
-      "Accept": "image/*",
-    },
+    headers: { "Accept": "image/*" },
   });
 
   if (!response.ok) {
@@ -56,7 +213,6 @@ async function editWithPollinationsKontext(imageUrl: string, prompt: string): Pr
 
   const contentType = response.headers.get("content-type") || "";
   
-  // Check if we got an actual image (not error page or redirect)
   if (!contentType.startsWith("image/")) {
     console.error("Pollinations returned non-image content:", contentType);
     throw new Error("Pollinations returned invalid content type");
@@ -64,7 +220,6 @@ async function editWithPollinationsKontext(imageUrl: string, prompt: string): Pr
 
   const editedBlob = await response.blob();
   
-  // Check blob size - if too small, it's likely an error image
   if (editedBlob.size < 5000) {
     console.error("Pollinations returned suspiciously small image:", editedBlob.size, "bytes");
     throw new Error("Pollinations returned invalid image");
@@ -76,49 +231,9 @@ async function editWithPollinationsKontext(imageUrl: string, prompt: string): Pr
   return `data:image/png;base64,${editedBase64}`;
 }
 
-// SECONDARY: Edit image using Pollinations Klein model (faster alternative)
-async function editWithPollinationsKlein(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Pollinations AI Klein (FREE)...");
-  
-  const editPrompt = `${prompt}, preserve original composition`;
-  const encodedPrompt = encodeURIComponent(editPrompt);
-  const encodedImageUrl = encodeURIComponent(imageUrl);
-  
-  // Klein model - optimized for faster generation
-  const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=flux&image=${encodedImageUrl}&width=1024&height=1024&nologo=true&enhance=true`;
-  
-  console.log("Pollinations Klein URL:", pollinationsUrl.substring(0, 150) + "...");
-
-  const response = await fetch(pollinationsUrl, {
-    method: "GET",
-    headers: {
-      "Accept": "image/*",
-    },
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Pollinations Klein error:", response.status, errorText);
-    throw new Error(`Pollinations Klein failed: ${response.status}`);
-  }
-
-  const contentType = response.headers.get("content-type") || "";
-  if (!contentType.startsWith("image/")) {
-    throw new Error("Pollinations Klein returned invalid content");
-  }
-
-  const editedBlob = await response.blob();
-  if (editedBlob.size < 5000) {
-    throw new Error("Pollinations Klein returned invalid image");
-  }
-  
-  const editedBase64 = await blobToBase64(editedBlob);
-  console.log("Pollinations Klein edit successful! Size:", editedBlob.size, "bytes");
-  return `data:image/png;base64,${editedBase64}`;
-}
-
-// TERTIARY: Edit image using Cloudflare Workers AI (FREE - true img2img)
-// Uses the stable-diffusion-v1-5-img2img model - has strict size limits
+// ============================================
+// TERTIARY: Cloudflare Workers AI (FREE, size-limited)
+// ============================================
 async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<string> {
   console.log("Editing image with Cloudflare Workers AI (img2img)...");
   
@@ -129,7 +244,6 @@ async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<s
     throw new Error("Cloudflare credentials not configured");
   }
 
-  // Download source image
   console.log("Downloading source image for Cloudflare...");
   const imageResponse = await fetch(imageUrl);
   if (!imageResponse.ok) {
@@ -139,7 +253,6 @@ async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<s
   const imageSizeBytes = imageArrayBuffer.byteLength;
   console.log("Source image size:", imageSizeBytes, "bytes");
   
-  // Cloudflare has strict size limits - skip if too large
   if (imageSizeBytes > 300000) {
     console.log("Image too large for Cloudflare AI (max ~300KB binary)");
     const error = new Error("IMAGE_TOO_LARGE");
@@ -149,7 +262,6 @@ async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<s
   
   const imageArray = Array.from(new Uint8Array(imageArrayBuffer));
 
-  // Cloudflare Workers AI endpoint for img2img
   const cfEndpoint = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/runwayml/stable-diffusion-v1-5-img2img`;
 
   console.log("Sending request to Cloudflare Workers AI...");
@@ -201,8 +313,9 @@ async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<s
   return `data:image/png;base64,${editedBase64}`;
 }
 
-// FALLBACK: Edit image using Lovable AI Gateway (Gemini) - uses credits
-// This is only used if useLovableAI is explicitly true or all free services fail
+// ============================================
+// FALLBACK: Lovable AI Gateway (Gemini) - uses credits
+// ============================================
 async function editWithLovableAI(imageUrl: string, prompt: string): Promise<string> {
   console.log("Editing image with Lovable AI (Gemini - uses credits)...");
   
@@ -233,9 +346,7 @@ async function editWithLovableAI(imageUrl: string, prompt: string): Promise<stri
             },
             {
               type: "image_url",
-              image_url: {
-                url: imageUrl
-              }
+              image_url: { url: imageUrl }
             }
           ]
         }
@@ -272,13 +383,16 @@ async function editWithLovableAI(imageUrl: string, prompt: string): Promise<stri
   return editedImageData;
 }
 
+// ============================================
+// Main Handler
+// ============================================
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { imageUrl, prompt, projectId, isGuest, useLovableAI } = await req.json();
+    const { imageUrl, prompt, projectId, isGuest, useLovableAI, useRunware } = await req.json();
 
     if (!imageUrl || !prompt) {
       return new Response(
@@ -305,7 +419,6 @@ serve(async (req) => {
       if (!claimsError && claimsData?.claims?.sub) {
         userId = claimsData.claims.sub;
 
-        // Check edit rate limits for authenticated users
         const { data: limitData, error: limitError } = await supabaseClient.rpc('check_edit_limit', {
           user_id_param: userId
         });
@@ -319,7 +432,6 @@ serve(async (req) => {
       }
     }
 
-    // For guest users (isGuest=true and no valid userId), allow one edit
     if (!userId && !isGuest) {
       return new Response(
         JSON.stringify({ error: "Authentication required. Please sign in." }),
@@ -327,7 +439,6 @@ serve(async (req) => {
       );
     }
 
-    // Input validation - limit prompt length
     const sanitizedPrompt = prompt.trim().slice(0, 1000);
 
     console.log("Editing image:", { userId: userId ? userId.substring(0, 8) + '...' : 'guest', prompt: sanitizedPrompt });
@@ -335,34 +446,31 @@ serve(async (req) => {
     let editedImageData: string;
     let usedService: string;
 
-    // Strategy: Use Pollinations Kontext (FREE) as primary
-    // Fallback chain: Kontext -> Klein -> Cloudflare -> Lovable AI
+    // Strategy: Runware (primary) -> Pollinations -> Cloudflare -> Lovable AI
     if (useLovableAI === true) {
       editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
       usedService = "Lovable AI Gemini (credits)";
-    } else {
-      // Try Pollinations Kontext first (best for img2img editing)
+    } else if (useRunware === true || Deno.env.get("RUNWARE_API_KEY")) {
+      // Try Runware first if API key is configured
       try {
-        editedImageData = await editWithPollinationsKontext(imageUrl, sanitizedPrompt);
-        usedService = "Pollinations Kontext (free)";
-      } catch (kontextError: any) {
-        console.warn("Pollinations Kontext failed:", kontextError.message);
+        editedImageData = await editWithRunware(imageUrl, sanitizedPrompt);
+        usedService = "Runware FLUX Kontext (high-quality)";
+      } catch (runwareError: any) {
+        console.warn("Runware failed:", runwareError.message);
         
-        // Try Pollinations with Flux model
+        // Fallback chain
         try {
-          editedImageData = await editWithPollinationsKlein(imageUrl, sanitizedPrompt);
-          usedService = "Pollinations Flux (free)";
-        } catch (kleinError: any) {
-          console.warn("Pollinations Flux failed:", kleinError.message);
+          editedImageData = await editWithPollinationsKontext(imageUrl, sanitizedPrompt);
+          usedService = "Pollinations Kontext (free)";
+        } catch (kontextError: any) {
+          console.warn("Pollinations Kontext failed:", kontextError.message);
           
-          // Try Cloudflare (for small images)
           try {
             editedImageData = await editWithCloudflareAI(imageUrl, sanitizedPrompt);
             usedService = "Cloudflare Workers AI (free)";
           } catch (cfError: any) {
             console.warn("Cloudflare AI failed:", cfError.message);
             
-            // Final fallback to Lovable AI
             try {
               editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
               usedService = "Lovable AI Gemini (fallback)";
@@ -370,7 +478,7 @@ serve(async (req) => {
               console.error("All services failed. Last error:", lovableError.message);
               return new Response(
                 JSON.stringify({ 
-                  error: lovableError.message || "Image editing service temporarily unavailable. Please try again.",
+                  error: lovableError.message || "Image editing service temporarily unavailable.",
                   code: "EDIT_FAILED"
                 }),
                 { status: lovableError.status || 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -379,15 +487,42 @@ serve(async (req) => {
           }
         }
       }
+    } else {
+      // No Runware key, start with Pollinations
+      try {
+        editedImageData = await editWithPollinationsKontext(imageUrl, sanitizedPrompt);
+        usedService = "Pollinations Kontext (free)";
+      } catch (kontextError: any) {
+        console.warn("Pollinations Kontext failed:", kontextError.message);
+        
+        try {
+          editedImageData = await editWithCloudflareAI(imageUrl, sanitizedPrompt);
+          usedService = "Cloudflare Workers AI (free)";
+        } catch (cfError: any) {
+          console.warn("Cloudflare AI failed:", cfError.message);
+          
+          try {
+            editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
+            usedService = "Lovable AI Gemini (fallback)";
+          } catch (lovableError: any) {
+            console.error("All services failed. Last error:", lovableError.message);
+            return new Response(
+              JSON.stringify({ 
+                error: lovableError.message || "Image editing service temporarily unavailable.",
+                code: "EDIT_FAILED"
+              }),
+              { status: lovableError.status || 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
+      }
     }
 
     console.log(`Image edit completed via ${usedService}`);
 
-    // Track edit usage after successful edit (only for authenticated users)
+    // Track edit usage after successful edit
     if (userId && supabaseClient) {
-      await supabaseClient.rpc('increment_edit_usage', {
-        user_id_param: userId
-      });
+      await supabaseClient.rpc('increment_edit_usage', { user_id_param: userId });
     }
 
     // Upload the edited image to Supabase Storage
@@ -395,7 +530,6 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Convert edited image (data URL OR remote URL) into bytes for Storage upload.
     let imageBytes: Uint8Array;
     let contentType = "image/png";
     let fileExt = "png";
@@ -406,14 +540,11 @@ serve(async (req) => {
         contentType = match[1];
         fileExt = contentType.includes("jpeg") || contentType.includes("jpg") ? "jpg" : contentType.split("/")[1] || "png";
       }
-
       const base64Data = editedImageData.replace(/^data:image\/\w+[a-zA-Z0-9.+-]*;base64,/, "");
       imageBytes = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
     } else if (editedImageData.startsWith("http://") || editedImageData.startsWith("https://")) {
       const remoteResp = await fetch(editedImageData);
-      if (!remoteResp.ok) {
-        throw new Error("Failed to download edited image");
-      }
+      if (!remoteResp.ok) throw new Error("Failed to download edited image");
       const remoteBlob = await remoteResp.blob();
       contentType = remoteBlob.type || remoteResp.headers.get("content-type") || contentType;
       fileExt = contentType.includes("jpeg") || contentType.includes("jpg") ? "jpg" : contentType.split("/")[1] || "png";
@@ -426,66 +557,43 @@ serve(async (req) => {
     
     const { error: uploadError } = await supabase.storage
       .from("post-images")
-      .upload(fileName, imageBytes, {
-        contentType,
-        upsert: false
-      });
+      .upload(fileName, imageBytes, { contentType, upsert: false });
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
       throw new Error("Failed to save edited image");
     }
 
-    const { data: { publicUrl } } = supabase.storage
-      .from("post-images")
-      .getPublicUrl(fileName);
+    const { data: { publicUrl } } = supabase.storage.from("post-images").getPublicUrl(fileName);
 
-    // Update project if projectId provided
     if (projectId) {
       await supabase
         .from("projects")
-        .update({ 
-          image_url: publicUrl, 
-          updated_at: new Date().toISOString() 
-        })
+        .update({ image_url: publicUrl, updated_at: new Date().toISOString() })
         .eq("id", projectId);
     }
 
     console.log("Image edited and uploaded successfully:", publicUrl);
 
     return new Response(
-      JSON.stringify({ imageUrl: publicUrl }),
+      JSON.stringify({ imageUrl: publicUrl, service: usedService }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    // Generate error ID for support correlation
     const errorId = crypto.randomUUID().substring(0, 8);
-    
-    // Safe server-side logging
     console.error(`[${errorId}] Edit error:`, {
       timestamp: new Date().toISOString(),
-      errorType: error?.constructor?.name || 'Unknown',
-      message: error?.message || 'Unknown error'
+      message: error?.message || "Unknown error"
     });
 
-    // Map to safe user-facing messages
-    let clientMessage = "Failed to edit image. Please try again.";
-    let statusCode = 500;
-
-    if (error?.message?.includes("Rate limit") || error?.status === 429) {
-      clientMessage = "Too many requests. Please try again in a moment.";
-      statusCode = 429;
-    } else if (error?.message?.includes("credits") || error?.status === 402) {
-      clientMessage = "Service temporarily unavailable. Please try again later.";
-      statusCode = 503;
-    } else if (error?.message?.includes("warming up")) {
-      clientMessage = "AI model is warming up. Please try again in 30 seconds.";
-      statusCode = 503;
-    }
+    const status = error?.status || 500;
+    const message = status === 500 
+      ? `An unexpected error occurred. Reference: ${errorId}`
+      : error?.message || "Failed to edit image";
 
     return new Response(
-      JSON.stringify({ error: clientMessage, errorId }),
-      { status: statusCode, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: message, errorId }),
+      { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
