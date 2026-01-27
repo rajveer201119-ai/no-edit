@@ -102,6 +102,7 @@ interface PreviewPanelProps {
   activeTextId: string | null;
   showTextTool: boolean;
   selectedText: TextOverlay | null;
+  hasOverlays: boolean;
   onCropToggle: () => void;
   onCancelCrop: () => void;
   onApplyCrop: () => void;
@@ -110,6 +111,7 @@ interface PreviewPanelProps {
   onCropPointerUp: () => void;
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onTextToolToggle: () => void;
+  onMergeOverlays: () => void;
   onOverlayPointerDown: (e: React.MouseEvent | React.TouchEvent, overlayId: string) => void;
   onResizeOverlay: (overlayId: string, delta: number) => void;
   onRemoveOverlay: (overlayId: string) => void;
@@ -140,6 +142,7 @@ export const PreviewPanel = ({
   activeTextId,
   showTextTool,
   selectedText,
+  hasOverlays,
   onCropToggle,
   onCancelCrop,
   onApplyCrop,
@@ -148,6 +151,7 @@ export const PreviewPanel = ({
   onCropPointerUp,
   onFileUpload,
   onTextToolToggle,
+  onMergeOverlays,
   onOverlayPointerDown,
   onResizeOverlay,
   onRemoveOverlay,
@@ -228,11 +232,13 @@ export const PreviewPanel = ({
             isCropping={isCropping}
             showTextTool={showTextTool}
             isInpainting={isInpainting}
+            hasOverlays={hasOverlays}
             onCropToggle={onCropToggle}
             onTextToolToggle={onTextToolToggle}
             onInpaintToggle={handleInpaintToggle}
             onFileUpload={onFileUpload}
             onCancelCrop={onCancelCrop}
+            onMergeOverlays={onMergeOverlays}
             isDisabled={isProcessing}
           />
           

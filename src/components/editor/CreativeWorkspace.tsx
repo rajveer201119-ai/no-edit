@@ -7,6 +7,7 @@ import { ChatPanel } from "./ChatPanel";
 import { PreviewPanel } from "./PreviewPanel";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
 import { useManualEditing } from "./useManualEditing";
+import { useFlattenLayers } from "./useFlattenLayers";
 import { 
   ImageVersion, 
   ChatMessage, 
@@ -186,6 +187,49 @@ export const CreativeWorkspace = ({
       await saveVersion(newVersion, newVersionNumber);
     },
   });
+
+  // Flatten layers hook for merging overlays
+  const { flattenLayers, hasOverlays } = useFlattenLayers({
+    imageContainerRef,
+    currentImageUrl: currentVersion?.imageUrl || imageUrl,
+    overlays: manualEditing.overlays,
+    textOverlays: manualEditing.textOverlays,
+  });
+
+  // Handle merge overlays (tick button)
+  const handleMergeOverlays = async () => {
+    if (!hasOverlays) return;
+    
+    try {
+      toast.loading("Merging layers...", { id: "merge" });
+      const flattenedDataUrl = await flattenLayers();
+      
+      // Create new version with flattened image
+      const newVersionNumber = versions.length + 1;
+      const newVersion: ImageVersion = {
+        id: crypto.randomUUID(),
+        imageUrl: flattenedDataUrl,
+        prompt: "Merged layers",
+        timestamp: new Date(),
+      };
+      
+      setVersions((prev) => [...prev, newVersion]);
+      setCurrentVersionId(newVersion.id);
+      onImageUpdate(flattenedDataUrl);
+      
+      // Clear overlays after merge
+      manualEditing.overlays.forEach((o) => manualEditing.removeOverlay(o.id));
+      manualEditing.textOverlays.forEach((t) => manualEditing.removeTextOverlay(t.id));
+      
+      // Auto-save to database
+      await saveVersion(newVersion, newVersionNumber);
+      
+      toast.success("Layers merged and saved!", { id: "merge" });
+    } catch (error) {
+      console.error("Merge error:", error);
+      toast.error("Failed to merge layers", { id: "merge" });
+    }
+  };
 
   // Fetch credits
   const fetchCredits = useCallback(async () => {
@@ -437,7 +481,7 @@ export const CreativeWorkspace = ({
     setMessages((prev) => [...prev, message]);
   };
 
-  // Handle download
+  // Handle download - includes text/image overlays if present
   const handleDownload = async () => {
     if (!isPremium) {
       setShowUpgradeDialog(true);
@@ -446,20 +490,35 @@ export const CreativeWorkspace = ({
 
     try {
       toast.loading("Preparing download...", { id: "download" });
-      const response = await fetch(currentVersion.imageUrl);
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
+      
+      let downloadUrl: string;
+      
+      // If there are overlays, flatten them into the image before download
+      if (hasOverlays) {
+        const flattenedDataUrl = await flattenLayers();
+        downloadUrl = flattenedDataUrl;
+      } else {
+        // No overlays, download the base image
+        const response = await fetch(currentVersion.imageUrl);
+        const blob = await response.blob();
+        downloadUrl = URL.createObjectURL(blob);
+      }
 
       const link = document.createElement("a");
-      link.href = url;
+      link.href = downloadUrl;
       link.download = `${projectName.replace(/\s+/g, "-")}-v${versions.indexOf(currentVersion) + 1}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      
+      // Only revoke if it's a blob URL (not a data URL)
+      if (downloadUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(downloadUrl);
+      }
 
       toast.success("Downloaded!");
     } catch (error) {
+      console.error("Download error:", error);
       toast.error("Failed to download");
     } finally {
       toast.dismiss("download");
@@ -583,6 +642,7 @@ export const CreativeWorkspace = ({
             activeTextId={manualEditing.activeTextId}
             showTextTool={manualEditing.showTextTool}
             selectedText={manualEditing.selectedText}
+            hasOverlays={hasOverlays}
             onCropToggle={manualEditing.startCropping}
             onCancelCrop={manualEditing.cancelCrop}
             onApplyCrop={manualEditing.applyCrop}
@@ -591,6 +651,7 @@ export const CreativeWorkspace = ({
             onCropPointerUp={manualEditing.handleCropPointerUp}
             onFileUpload={manualEditing.handleFileUpload}
             onTextToolToggle={() => manualEditing.setShowTextTool(!manualEditing.showTextTool)}
+            onMergeOverlays={handleMergeOverlays}
             onOverlayPointerDown={manualEditing.handleOverlayPointerDown}
             onResizeOverlay={manualEditing.resizeOverlay}
             onRemoveOverlay={manualEditing.removeOverlay}
