@@ -61,27 +61,42 @@ function buildInpaintingPrompt(userPrompt: string): string {
 }
 
 // ============================================
-// PRIMARY: Pollinations AI Kontext (FREE, reliable img2img)
-// Best quality for image editing without API key
+// PRIMARY: OmniGen-2 via fal.ai (Best quality img2img)
+// State-of-the-art unified model for image editing
 // ============================================
-async function editWithPollinationsKontext(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Pollinations AI Kontext (PRIMARY - FREE)...");
+async function editWithOmniGen2(imageUrl: string, prompt: string): Promise<string> {
+  console.log("Editing image with OmniGen-2 via fal.ai (PRIMARY)...");
   
+  const FAL_API_KEY = Deno.env.get("FAL_API_KEY");
+  if (!FAL_API_KEY) {
+    throw new Error("FAL_API_KEY is not configured");
+  }
+
   const enhancedPrompt = buildEnhancedPrompt(prompt);
-  const encodedPrompt = encodeURIComponent(enhancedPrompt);
-  const encodedImageUrl = encodeURIComponent(imageUrl);
   
-  const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=kontext&image=${encodedImageUrl}&width=1024&height=1024&nologo=true`;
-  
-  console.log("Pollinations Kontext URL generated...");
+  // OmniGen-2 uses a reference syntax for editing
+  // The prompt should reference the input image
+  const omniGenPrompt = `Edit the image: ${enhancedPrompt}`;
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout for img2img
+  const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
 
   try {
-    const response = await fetch(pollinationsUrl, {
-      method: "GET",
-      headers: { "Accept": "image/*" },
+    // fal.ai endpoint for OmniGen-2
+    const response = await fetch("https://fal.run/fal-ai/omnigen-v2", {
+      method: "POST",
+      headers: {
+        "Authorization": `Key ${FAL_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: omniGenPrompt,
+        input_image_urls: [imageUrl],
+        image_guidance_scale: 1.5, // Conservative for preservation (1.2-2.0 recommended)
+        text_guidance_scale: 5.0,  // Default text guidance
+        num_inference_steps: 50,   // High quality
+        seed: Math.floor(Math.random() * 2147483647), // Random seed for variety
+      }),
       signal: controller.signal,
     });
 
@@ -89,42 +104,41 @@ async function editWithPollinationsKontext(imageUrl: string, prompt: string): Pr
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Pollinations error:", response.status, errorText);
+      console.error("OmniGen-2 error:", response.status, errorText);
 
       if (response.status === 429) {
         const error = new Error("Rate limit exceeded. Please try again in a moment.");
         (error as any).status = 429;
         throw error;
       }
+      
+      if (response.status === 402 || response.status === 401) {
+        const error = new Error("API authentication failed or credits exhausted.");
+        (error as any).status = response.status;
+        throw error;
+      }
 
-      const error = new Error(`Pollinations failed: ${response.status}`);
+      const error = new Error(`OmniGen-2 failed: ${response.status}`);
       (error as any).status = response.status;
       throw error;
     }
 
-    const contentType = response.headers.get("content-type") || "";
+    const data = await response.json();
     
-    if (!contentType.startsWith("image/")) {
-      console.error("Pollinations returned non-image:", contentType);
-      throw new Error("Pollinations returned invalid content type");
+    // fal.ai returns images in the "images" array
+    const outputImage = data.images?.[0]?.url;
+    
+    if (!outputImage) {
+      console.error("No image in OmniGen-2 response:", JSON.stringify(data).substring(0, 200));
+      throw new Error("No edited image returned from OmniGen-2");
     }
 
-    const editedBlob = await response.blob();
-    
-    // Validate image size
-    if (editedBlob.size < 5000) {
-      console.error("Pollinations returned small image:", editedBlob.size, "bytes");
-      throw new Error("Pollinations returned invalid image");
-    }
-    
-    const editedBase64 = await blobToBase64(editedBlob);
-    
-    console.log("Pollinations Kontext edit successful! Size:", editedBlob.size, "bytes");
-    return `data:image/png;base64,${editedBase64}`;
+    console.log("OmniGen-2 edit successful!");
+    return outputImage;
   } catch (error: any) {
     clearTimeout(timeoutId);
     if (error.name === "AbortError") {
-      throw new Error("Pollinations request timed out. Please try again.");
+      throw new Error("OmniGen-2 request timed out. Please try again.");
     }
     throw error;
   }
@@ -135,7 +149,7 @@ async function editWithPollinationsKontext(imageUrl: string, prompt: string): Pr
 // Good fallback for smaller images
 // ============================================
 async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Cloudflare Workers AI...");
+  console.log("Editing image with Cloudflare Workers AI (FALLBACK)...");
   
   const CF_ACCOUNT_ID = Deno.env.get("CLOUDFLARE_ACCOUNT_ID");
   const CF_API_TOKEN = Deno.env.get("CLOUDFLARE_API_TOKEN");
@@ -242,7 +256,7 @@ async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<s
 // Most reliable but costs credits
 // ============================================
 async function editWithLovableAI(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Lovable AI (Gemini)...");
+  console.log("Editing image with Lovable AI (Gemini - FALLBACK)...");
   
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
@@ -462,18 +476,18 @@ serve(async (req) => {
         );
       }
     }
-    // Normal flow: Pollinations (primary) -> Cloudflare -> Lovable AI
+    // Normal flow: OmniGen-2 (primary) -> Cloudflare -> Lovable AI
     else {
       try {
-        editedImageData = await editWithPollinationsKontext(imageUrl, sanitizedPrompt);
-        usedService = "Pollinations Kontext (free)";
-      } catch (pollinationsError: any) {
-        console.warn("Pollinations failed:", pollinationsError.message);
+        editedImageData = await editWithOmniGen2(imageUrl, sanitizedPrompt);
+        usedService = "OmniGen-2 (fal.ai)";
+      } catch (omniGenError: any) {
+        console.warn("OmniGen-2 failed:", omniGenError.message);
         
         // Rate limit - pass through
-        if (pollinationsError.status === 429) {
+        if (omniGenError.status === 429) {
           return new Response(
-            JSON.stringify({ error: pollinationsError.message }),
+            JSON.stringify({ error: omniGenError.message }),
             { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
