@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback, useState } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -28,11 +29,16 @@ export const MaskCanvas = ({
   onCancel,
 }: MaskCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [mounted, setMounted] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [brushSize, setBrushSize] = useState(30);
   const [tool, setTool] = useState<"brush" | "eraser">("brush");
   const [history, setHistory] = useState<ImageData[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Initialize canvas
   useEffect(() => {
@@ -209,92 +215,106 @@ export const MaskCanvas = ({
   }, [onMaskComplete]);
 
   return (
-    <div className="absolute inset-0 z-20 flex flex-col">
-      {/* Toolbar - positioned below the main editor toolbar */}
-      <div className="absolute top-14 sm:top-2 left-1/2 -translate-x-1/2 z-30 flex flex-wrap items-center justify-center gap-2 p-2 rounded-xl bg-background/95 backdrop-blur-sm border border-border/50 shadow-lg max-w-[95vw]">
-        {/* Tool selection */}
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50">
-          <Button
-            size="icon"
-            variant={tool === "brush" ? "default" : "ghost"}
-            className="h-8 w-8"
-            onClick={() => setTool("brush")}
-          >
-            <Paintbrush className="h-4 w-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant={tool === "eraser" ? "default" : "ghost"}
-            className="h-8 w-8"
-            onClick={() => setTool("eraser")}
-          >
-            <Eraser className="h-4 w-4" />
-          </Button>
-        </div>
+    <div className="absolute inset-0 z-20">
+      {/* Floating UI (Portal)
+          Fixes mobile/zoom clipping: the editor scales the image container, which can cut off
+          absolutely-positioned toolbars. Portaling to <body> keeps this UI fully visible. */}
+      {mounted &&
+        createPortal(
+          <div className="fixed inset-x-0 top-[calc(env(safe-area-inset-top)+88px)] z-[70] pointer-events-none">
+            <div className="mx-auto w-fit max-w-[95vw] px-2">
+              <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-2 p-2 rounded-xl bg-background/95 backdrop-blur-sm border border-border/50 shadow-lg">
+                {/* Tool selection */}
+                <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50">
+                  <Button
+                    size="icon"
+                    variant={tool === "brush" ? "default" : "ghost"}
+                    className="h-8 w-8"
+                    onClick={() => setTool("brush")}
+                  >
+                    <Paintbrush className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant={tool === "eraser" ? "default" : "ghost"}
+                    className="h-8 w-8"
+                    onClick={() => setTool("eraser")}
+                  >
+                    <Eraser className="h-4 w-4" />
+                  </Button>
+                </div>
 
-        <div className="w-px h-6 bg-border/50" />
+                <div className="w-px h-6 bg-border/50" />
 
-        {/* Brush size */}
-        <div className="flex items-center gap-2">
-          <Circle className="h-3 w-3 text-muted-foreground" />
-          <Slider
-            value={[brushSize]}
-            onValueChange={([value]) => setBrushSize(value)}
-            min={5}
-            max={100}
-            step={5}
-            className="w-24"
-          />
-          <span className="text-xs text-muted-foreground w-8">{brushSize}px</span>
-        </div>
+                {/* Brush size */}
+                <div className="flex items-center gap-2">
+                  <Circle className="h-3 w-3 text-muted-foreground" />
+                  <Slider
+                    value={[brushSize]}
+                    onValueChange={([value]) => setBrushSize(value)}
+                    min={5}
+                    max={100}
+                    step={5}
+                    className="w-24"
+                  />
+                  <span className="text-xs text-muted-foreground w-8">{brushSize}px</span>
+                </div>
 
-        <div className="w-px h-6 bg-border/50" />
+                <div className="w-px h-6 bg-border/50" />
 
-        {/* Actions */}
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-8 w-8"
-          onClick={handleUndo}
-          disabled={historyIndex <= 0}
-        >
-          <Undo2 className="h-4 w-4" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-8 w-8"
-          onClick={handleClear}
-        >
-          <RotateCcw className="h-4 w-4" />
-        </Button>
+                {/* Actions */}
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8"
+                  onClick={handleUndo}
+                  disabled={historyIndex <= 0}
+                >
+                  <Undo2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8"
+                  onClick={handleClear}
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
 
-        <div className="w-px h-6 bg-border/50" />
+                <div className="w-px h-6 bg-border/50" />
 
-        {/* Apply/Cancel */}
-        <Button
-          size="sm"
-          variant="ghost"
-          className="h-8 text-destructive hover:text-destructive"
-          onClick={onCancel}
-        >
-          <X className="h-4 w-4 mr-1" />
-          Cancel
-        </Button>
-        <Button
-          size="sm"
-          className="h-8"
-          onClick={handleApply}
-        >
-          <Check className="h-4 w-4 mr-1" />
-          Apply Mask
-        </Button>
-      </div>
+                {/* Apply/Cancel */}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 text-destructive hover:text-destructive"
+                  onClick={onCancel}
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Cancel
+                </Button>
+                <Button size="sm" className="h-8" onClick={handleApply}>
+                  <Check className="h-4 w-4 mr-1" />
+                  Apply Mask
+                </Button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
 
-      {/* Help text */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-lg bg-background/95 backdrop-blur-sm border border-border/50 text-sm text-muted-foreground">
-        Draw over areas you want to <span className="text-primary font-medium">modify or remove</span>
-      </div>
+      {mounted &&
+        createPortal(
+          <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+16px)] z-[70] pointer-events-none">
+            <div className="mx-auto w-fit max-w-[95vw] px-2">
+              <div className="pointer-events-none px-4 py-2 rounded-lg bg-background/95 backdrop-blur-sm border border-border/50 text-sm text-muted-foreground text-center">
+                Draw over areas you want to{" "}
+                <span className="text-primary font-medium">modify or remove</span>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
 
       {/* Canvas overlay */}
       <canvas
