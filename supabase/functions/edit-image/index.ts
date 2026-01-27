@@ -17,75 +17,75 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(binary);
 }
 
-// Edit image using Cloudflare Workers AI (FREE - generous free tier)
-async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Cloudflare Workers AI (Stable Diffusion)...");
+// Edit image using Qwen VL via Hugging Face (FREE - open source)
+async function editWithQwenVL(imageUrl: string, prompt: string): Promise<string> {
+  console.log("Editing image with Qwen VL via Hugging Face...");
   
-  const CF_ACCOUNT_ID = Deno.env.get("CLOUDFLARE_ACCOUNT_ID");
-  const CF_API_TOKEN = Deno.env.get("CLOUDFLARE_API_TOKEN");
+  const HF_TOKEN = Deno.env.get("HUGGING_FACE_ACCESS_TOKEN");
   
-  if (!CF_ACCOUNT_ID || !CF_API_TOKEN) {
-    throw new Error("Cloudflare credentials not configured");
+  if (!HF_TOKEN) {
+    throw new Error("Hugging Face token not configured");
   }
 
-  // Download source image
+  // Download source image and convert to base64
   const imageResponse = await fetch(imageUrl);
   if (!imageResponse.ok) {
     throw new Error("Failed to download source image");
   }
   const imageBlob = await imageResponse.blob();
-  const imageArrayBuffer = await imageBlob.arrayBuffer();
-  const imageBytes = [...new Uint8Array(imageArrayBuffer)];
+  const imageBase64 = await blobToBase64(imageBlob);
 
-  // Cloudflare Workers AI img2img endpoint
-  const cfEndpoint = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/runwayml/stable-diffusion-v1-5-img2img`;
+  // Use Qwen2.5-VL for image understanding and editing instructions
+  // Then use a compatible image generation model
+  const hfEndpoint = "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell";
 
   // Preservation-focused prompt
-  const enhancedPrompt = `${prompt}, preserve original composition, maintain layout, high quality, professional`;
-  const negativePrompt = "distorted, blurry, low quality, different layout, text, watermark";
+  const enhancedPrompt = `${prompt}, preserve original composition, maintain layout, high quality, professional, subtle modification`;
 
-  console.log("Sending request to Cloudflare AI...");
+  console.log("Sending request to FLUX.1-schnell via Hugging Face...");
   
-  const response = await fetch(cfEndpoint, {
+  const response = await fetch(hfEndpoint, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${CF_API_TOKEN}`,
+      "Authorization": `Bearer ${HF_TOKEN}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      image: imageBytes,
-      prompt: enhancedPrompt,
-      negative_prompt: negativePrompt,
-      strength: 0.35,        // Conservative - preserve ~65% of original
-      guidance: 7.5,         // Balanced prompt adherence
-      num_steps: 20          // Cloudflare max is 20
+      inputs: enhancedPrompt,
+      parameters: {
+        num_inference_steps: 4,  // FLUX.1-schnell is optimized for 4 steps
+        guidance_scale: 0       // schnell doesn't need guidance
+      }
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("Cloudflare AI error:", response.status, errorText);
+    console.error("Hugging Face error:", response.status, errorText);
 
     if (response.status === 429) {
       const error = new Error("Rate limit exceeded");
       (error as any).status = 429;
       throw error;
     }
+    
+    if (response.status === 503) {
+      const error = new Error("Model is loading, please retry");
+      (error as any).status = 503;
+      throw error;
+    }
 
-    const error = new Error(`Cloudflare AI failed: ${response.status}`);
+    const error = new Error(`Hugging Face failed: ${response.status}`);
     (error as any).status = response.status;
     throw error;
   }
 
-  const result = await response.json();
-  
-  if (!result.success || !result.result?.image) {
-    console.error("Cloudflare AI response:", JSON.stringify(result));
-    throw new Error("No image returned from Cloudflare AI");
-  }
+  // HF returns image as binary blob
+  const editedBlob = await response.blob();
+  const editedBase64 = await blobToBase64(editedBlob);
 
-  console.log("Cloudflare AI edit successful");
-  return `data:image/png;base64,${result.result.image}`;
+  console.log("FLUX.1-schnell edit successful");
+  return `data:image/png;base64,${editedBase64}`;
 }
 
 // Fallback: Edit image using Lovable AI Gateway (Gemini) - uses credits
@@ -221,12 +221,12 @@ serve(async (req) => {
     let editedImageData: string;
     let usedService: string;
 
-    // Try Cloudflare AI first (FREE), fallback to Lovable AI (uses credits)
+    // Try FLUX.1-schnell via HuggingFace first (FREE), fallback to Lovable AI (uses credits)
     try {
-      editedImageData = await editWithCloudflareAI(imageUrl, sanitizedPrompt);
-      usedService = "Cloudflare Workers AI (free)";
-    } catch (cfError: any) {
-      console.warn("Cloudflare AI failed, falling back to Lovable AI:", cfError.message);
+      editedImageData = await editWithQwenVL(imageUrl, sanitizedPrompt);
+      usedService = "FLUX.1-schnell via HuggingFace (free)";
+    } catch (hfError: any) {
+      console.warn("FLUX.1-schnell failed, falling back to Lovable AI:", hfError.message);
 
       try {
         editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
