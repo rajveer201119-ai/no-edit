@@ -17,32 +17,51 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(binary);
 }
 
-// PRIMARY: Edit image using Pollinations AI Kontext model (FREE - true img2img)
-// This is a completely free service that supports image-to-image editing
-async function editWithPollinationsKontext(imageUrl: string, prompt: string): Promise<string> {
-  console.log("Editing image with Pollinations AI Kontext (FREE img2img)...");
+// PRIMARY: Edit image using Fal.ai via Hugging Face Router API (free tier available)
+// Uses FLUX.1-Kontext model for instruction-based image editing
+async function editWithFalAI(imageUrl: string, prompt: string): Promise<string> {
+  console.log("Editing image with Fal.ai via HF Router...");
   
-  // Pollinations Kontext endpoint for img2img
-  // Format: https://image.pollinations.ai/prompt/{prompt}?model=kontext&image={imageUrl}
-  const encodedPrompt = encodeURIComponent(prompt.trim());
-  const encodedImageUrl = encodeURIComponent(imageUrl);
-  
-  const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=kontext&image=${encodedImageUrl}&width=1024&height=1024&nologo=true`;
-  
-  console.log("Pollinations Kontext URL created");
-  console.log("Prompt:", prompt.trim());
-  
-  // Fetch the edited image from Pollinations
-  const response = await fetch(pollinationsUrl, {
-    method: "GET",
+  const HF_TOKEN = Deno.env.get("HUGGING_FACE_ACCESS_TOKEN");
+  if (!HF_TOKEN) {
+    throw new Error("Hugging Face token not configured");
+  }
+
+  // Download source image and convert to base64
+  console.log("Downloading source image...");
+  const imageResponse = await fetch(imageUrl);
+  if (!imageResponse.ok) {
+    throw new Error(`Failed to download source image: ${imageResponse.status}`);
+  }
+  const imageBlob = await imageResponse.blob();
+  const imageBase64 = await blobToBase64(imageBlob);
+  const mimeType = imageBlob.type || "image/png";
+  console.log("Source image downloaded, base64 length:", imageBase64.length);
+
+  // Use HF Router with fal-ai provider for image-to-image
+  // The fal-ai provider supports FLUX.1-Kontext for image editing
+  const hfEndpoint = "https://router.huggingface.co/fal-ai/fal-ai/flux-pro/v1.1";
+
+  console.log("Sending request to HF Router (fal-ai provider)...");
+  console.log("Prompt:", prompt);
+
+  const response = await fetch(hfEndpoint, {
+    method: "POST",
     headers: {
-      "Accept": "image/*",
+      "Authorization": `Bearer ${HF_TOKEN}`,
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify({
+      prompt: prompt,
+      image_url: `data:${mimeType};base64,${imageBase64}`,
+      image_size: "landscape_16_9",
+      output_format: "png"
+    }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("Pollinations Kontext error:", response.status, errorText);
+    console.error("HF Router/Fal error:", response.status, errorText);
 
     if (response.status === 429) {
       const error = new Error("Rate limit exceeded. Please try again in a moment.");
@@ -50,29 +69,122 @@ async function editWithPollinationsKontext(imageUrl: string, prompt: string): Pr
       throw error;
     }
     
-    if (response.status === 503 || response.status === 500) {
-      const error = new Error("Image editing service temporarily unavailable. Please try again.");
-      (error as any).status = 503;
+    if (response.status === 402 || response.status === 403 || response.status === 400) {
+      const error = new Error("FAL_PROVIDER_ERROR");
+      (error as any).status = response.status;
       throw error;
     }
 
-    const error = new Error(`Pollinations Kontext failed: ${response.status} - ${errorText}`);
+    const error = new Error(`Fal.ai failed: ${response.status} - ${errorText}`);
     (error as any).status = response.status;
     throw error;
   }
 
-  // Get the image blob and convert to base64
-  const editedBlob = await response.blob();
+  // Fal.ai returns JSON with image URLs
+  const data = await response.json();
+  console.log("Fal response type:", typeof data);
   
-  // Validate we got an actual image
-  if (!editedBlob.type.startsWith("image/")) {
-    console.error("Pollinations returned non-image content type:", editedBlob.type);
-    throw new Error("Pollinations returned invalid content");
+  // Extract image URL from response
+  const outputUrl = data.images?.[0]?.url || data.image?.url || data.output;
+  if (!outputUrl) {
+    console.error("Fal response:", JSON.stringify(data).substring(0, 500));
+    throw new Error("No output URL in Fal response");
+  }
+  
+  // Download the result
+  const resultResp = await fetch(outputUrl);
+  if (!resultResp.ok) {
+    throw new Error("Failed to download edited image from Fal");
+  }
+  const resultBlob = await resultResp.blob();
+  const resultBase64 = await blobToBase64(resultBlob);
+  
+  console.log("Fal.ai edit successful!");
+  return `data:image/png;base64,${resultBase64}`;
+}
+
+// SECONDARY: Edit image using Cloudflare Workers AI (FREE - true img2img)
+// Uses the stable-diffusion-v1-5-img2img model - has strict size limits
+async function editWithCloudflareAI(imageUrl: string, prompt: string): Promise<string> {
+  console.log("Editing image with Cloudflare Workers AI (img2img)...");
+  
+  const CF_ACCOUNT_ID = Deno.env.get("CLOUDFLARE_ACCOUNT_ID");
+  const CF_API_TOKEN = Deno.env.get("CLOUDFLARE_API_TOKEN");
+  
+  if (!CF_ACCOUNT_ID || !CF_API_TOKEN) {
+    throw new Error("Cloudflare credentials not configured");
+  }
+
+  // Download source image
+  console.log("Downloading source image...");
+  const imageResponse = await fetch(imageUrl);
+  if (!imageResponse.ok) {
+    throw new Error(`Failed to download source image: ${imageResponse.status}`);
+  }
+  const imageArrayBuffer = await imageResponse.arrayBuffer();
+  const imageSizeBytes = imageArrayBuffer.byteLength;
+  console.log("Source image size:", imageSizeBytes, "bytes");
+  
+  // Cloudflare has strict size limits - skip if too large
+  if (imageSizeBytes > 300000) {
+    console.log("Image too large for Cloudflare AI (max ~300KB binary)");
+    const error = new Error("IMAGE_TOO_LARGE");
+    (error as any).status = 413;
+    throw error;
+  }
+  
+  const imageArray = Array.from(new Uint8Array(imageArrayBuffer));
+
+  // Cloudflare Workers AI endpoint for img2img
+  const cfEndpoint = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/runwayml/stable-diffusion-v1-5-img2img`;
+
+  console.log("Sending request to Cloudflare Workers AI...");
+  console.log("Prompt:", prompt);
+
+  const response = await fetch(cfEndpoint, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${CF_API_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      image: imageArray,
+      prompt: prompt,
+      strength: 0.35,
+      num_steps: 20,
+      guidance: 7.5
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Cloudflare AI error:", response.status, errorText);
+
+    if (response.status === 429) {
+      const error = new Error("Rate limit exceeded.");
+      (error as any).status = 429;
+      throw error;
+    }
+    
+    if (response.status === 413) {
+      const error = new Error("IMAGE_TOO_LARGE");
+      (error as any).status = 413;
+      throw error;
+    }
+
+    const error = new Error(`Cloudflare AI failed: ${response.status}`);
+    (error as any).status = response.status;
+    throw error;
+  }
+
+  const editedBlob = await response.blob();
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.startsWith("image/")) {
+    throw new Error("Cloudflare returned invalid content");
   }
   
   const editedBase64 = await blobToBase64(editedBlob);
-
-  console.log("Pollinations Kontext edit successful - source image was actually modified!");
+  console.log("Cloudflare Workers AI img2img edit successful!");
   return `data:image/png;base64,${editedBase64}`;
 }
 
@@ -210,26 +322,41 @@ serve(async (req) => {
     let editedImageData: string;
     let usedService: string;
 
-    // If useLovableAI is explicitly true, use Lovable AI directly (for users who want to use credits)
+    // Strategy: Try Fal.ai first (free tier), then Cloudflare (for small images), then Lovable AI
+    // If useLovableAI is explicitly true, skip free services and use Lovable AI directly
     if (useLovableAI === true) {
       editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
       usedService = "Lovable AI Gemini (credits)";
     } else {
-      // Use Pollinations AI Kontext (FREE) - NO FALLBACK TO LOVABLE AI
+      // Try Fal.ai first (handles large images)
       try {
-        editedImageData = await editWithPollinationsKontext(imageUrl, sanitizedPrompt);
-        usedService = "Pollinations AI Kontext (free, true img2img)";
-      } catch (pollinationsError: any) {
-        console.error("Pollinations AI failed:", pollinationsError.message);
-
-        // Return the error - NO FALLBACK TO LOVABLE AI
-        return new Response(
-          JSON.stringify({ 
-            error: pollinationsError.message || "Image editing service temporarily unavailable. Please try again.",
-            code: "POLLINATIONS_UNAVAILABLE"
-          }),
-          { status: pollinationsError.status || 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        editedImageData = await editWithFalAI(imageUrl, sanitizedPrompt);
+        usedService = "Fal.ai via HF Router (free)";
+      } catch (falError: any) {
+        console.warn("Fal.ai failed:", falError.message);
+        
+        // Try Cloudflare next (for small images only)
+        try {
+          editedImageData = await editWithCloudflareAI(imageUrl, sanitizedPrompt);
+          usedService = "Cloudflare Workers AI (free)";
+        } catch (cfError: any) {
+          console.warn("Cloudflare AI also failed:", cfError.message);
+          
+          // Final fallback to Lovable AI
+          try {
+            editedImageData = await editWithLovableAI(imageUrl, sanitizedPrompt);
+            usedService = "Lovable AI Gemini (fallback)";
+          } catch (lovableError: any) {
+            console.error("All services failed. Last error:", lovableError.message);
+            return new Response(
+              JSON.stringify({ 
+                error: lovableError.message || "Image editing service temporarily unavailable. Please try again.",
+                code: "EDIT_FAILED"
+              }),
+              { status: lovableError.status || 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
       }
     }
 
