@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Type, Plus, Palette, Sparkles } from "lucide-react";
+import { Type, Plus, Palette, Sparkles, Zap } from "lucide-react";
 
 export interface TextOverlay {
   id: string;
@@ -83,6 +83,19 @@ const TEXT_SHADOWS = [
   { value: "glow-color", label: "Color Glow", css: "0 0 10px currentColor, 0 0 20px currentColor" },
 ];
 
+const TEXT_PRESETS = [
+  { text: "SALE 50% OFF", gradient: "linear-gradient(135deg, #EB8530, #E04724)", fontWeight: "900", shadow: "3px 3px 6px rgba(0,0,0,0.7)" },
+  { text: "COMING SOON", gradient: "linear-gradient(135deg, #8B5CF6, #EC4899)", fontWeight: "800", shadow: "2px 2px 4px rgba(0,0,0,0.5)" },
+  { text: "NEW ARRIVAL", gradient: "linear-gradient(135deg, #10B981, #14B8A6)", fontWeight: "700", shadow: "2px 2px 4px rgba(0,0,0,0.5)" },
+  { text: "LIMITED TIME", color: "#F59E0B", fontWeight: "800", shadow: "2px 2px 4px rgba(0,0,0,0.5)" },
+  { text: "SHOP NOW", gradient: "linear-gradient(135deg, #3B82F6, #06B6D4)", fontWeight: "700", shadow: "2px 2px 4px rgba(0,0,0,0.5)" },
+  { text: "FREE SHIPPING", color: "#10B981", fontWeight: "700", shadow: "1px 1px 2px rgba(0,0,0,0.3)" },
+  { text: "BUY 1 GET 1", gradient: "linear-gradient(135deg, #F97316, #EF4444, #EC4899)", fontWeight: "900", shadow: "3px 3px 6px rgba(0,0,0,0.7)" },
+  { text: "BEST SELLER", gradient: "linear-gradient(135deg, #F59E0B, #FCD34D)", fontWeight: "800", shadow: "2px 2px 4px rgba(0,0,0,0.5)" },
+  { text: "HOT DEAL", color: "#EF4444", fontWeight: "900", shadow: "3px 3px 6px rgba(0,0,0,0.7)" },
+  { text: "JOIN US", gradient: "linear-gradient(90deg, #EF4444, #F59E0B, #84CC16, #06B6D4, #8B5CF6)", fontWeight: "700", shadow: "2px 2px 4px rgba(0,0,0,0.5)" },
+];
+
 export const TextToolPanel = ({ onAddText, selectedText, onUpdateText }: TextToolPanelProps) => {
   const [newText, setNewText] = useState("Your Text Here");
   const [fontSize, setFontSize] = useState(48);
@@ -145,6 +158,38 @@ export const TextToolPanel = ({ onAddText, selectedText, onUpdateText }: TextToo
 
   return (
     <div className="space-y-4 p-3">
+      {/* Preset Templates */}
+      {!selectedText && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Zap className="h-3.5 w-3.5 text-muted-foreground" />
+            <Label className="text-xs text-muted-foreground">Quick Templates</Label>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {TEXT_PRESETS.map((preset, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  setNewText(preset.text);
+                  setFontWeight(preset.fontWeight);
+                  setTextShadow(preset.shadow);
+                  if (preset.gradient) {
+                    setGradient(preset.gradient);
+                  } else if (preset.color) {
+                    setColor(preset.color);
+                    setGradient(null);
+                  }
+                }}
+                className="px-2 py-1 text-[10px] rounded-md bg-muted/50 hover:bg-muted border border-border/50 transition-colors truncate max-w-[100px]"
+                title={preset.text}
+              >
+                {preset.text}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Add New Text Section */}
       {!selectedText && (
         <div className="space-y-2">
