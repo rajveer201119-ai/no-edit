@@ -102,7 +102,7 @@ export const GlassSidebar = ({
 
   return (
     <>
-      {/* Toggle Button - Always visible */}
+      {/* Toggle Button - Always visible, lower z-index than editor toolbars */}
       <button
         onClick={() => {
           if (window.innerWidth < 768) {
@@ -112,7 +112,7 @@ export const GlassSidebar = ({
           }
         }}
         className={cn(
-          "fixed top-4 z-50 p-2 rounded-xl",
+          "fixed top-4 z-30 p-2 rounded-xl",
           "backdrop-blur-xl bg-background/20 border border-white/10",
           "shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.1)]",
           "hover:bg-background/30 transition-all duration-300",
@@ -138,10 +138,10 @@ export const GlassSidebar = ({
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - lower z-index than editor toolbars */}
       <aside
         className={cn(
-          "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-out",
+          "fixed left-0 top-0 h-full z-20 transition-all duration-300 ease-out",
           "backdrop-blur-2xl bg-background/10 border-r border-white/10",
           "shadow-[0_0_60px_-15px_rgba(139,92,246,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]",
           // Mobile: slide in/out

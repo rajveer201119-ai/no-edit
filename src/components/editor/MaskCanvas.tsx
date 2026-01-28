@@ -215,13 +215,13 @@ export const MaskCanvas = ({
   }, [onMaskComplete]);
 
   return (
-    <div className="absolute inset-0 z-20">
+    <div className="absolute inset-0 z-50">
       {/* Floating UI (Portal)
           Fixes mobile/zoom clipping: the editor scales the image container, which can cut off
           absolutely-positioned toolbars. Portaling to <body> keeps this UI fully visible. */}
       {mounted &&
         createPortal(
-          <div className="fixed inset-x-0 top-[calc(env(safe-area-inset-top)+88px)] z-[70] pointer-events-none">
+          <div className="fixed inset-x-0 top-[calc(env(safe-area-inset-top)+88px)] z-[100] pointer-events-none">
             <div className="mx-auto w-fit max-w-[95vw] px-2">
               <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-2 p-2 rounded-xl bg-background/95 backdrop-blur-sm border border-border/50 shadow-lg">
                 {/* Tool selection */}
@@ -305,7 +305,7 @@ export const MaskCanvas = ({
 
       {mounted &&
         createPortal(
-          <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+16px)] z-[70] pointer-events-none">
+          <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+16px)] z-[100] pointer-events-none">
             <div className="mx-auto w-fit max-w-[95vw] px-2">
               <div className="pointer-events-none px-4 py-2 rounded-lg bg-background/95 backdrop-blur-sm border border-border/50 text-sm text-muted-foreground text-center">
                 Draw over areas you want to{" "}
@@ -316,11 +316,11 @@ export const MaskCanvas = ({
           document.body
         )}
 
-      {/* Canvas overlay */}
+      {/* Canvas overlay - ensure it captures all pointer events */}
       <canvas
         ref={canvasRef}
         className={cn(
-          "absolute inset-0 w-full h-full",
+          "absolute inset-0 w-full h-full z-10",
           tool === "brush" ? "cursor-crosshair" : "cursor-cell"
         )}
         style={{ touchAction: "none" }}
