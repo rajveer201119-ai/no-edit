@@ -491,6 +491,7 @@ const Index = () => {
           onProjectsChange={refreshProjects}
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={handleToggleSidebar}
+          isOverlayActive={isEditorMode}
         />
         
         <div className={cn(
