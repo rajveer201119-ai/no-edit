@@ -496,7 +496,8 @@ const Index = () => {
         
         <div className={cn(
           "flex-1 pt-14 md:pt-0 flex flex-col min-h-screen overflow-x-hidden transition-all duration-300",
-          sidebarCollapsed ? "md:ml-0" : "md:ml-20 lg:ml-64"
+          // Only apply margin when sidebar is visible (not collapsed, not in editor mode)
+          (!sidebarCollapsed && !isEditorMode) ? "md:ml-20 lg:ml-64" : "md:ml-0"
         )}>
           {!isEditorMode && (
             <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
