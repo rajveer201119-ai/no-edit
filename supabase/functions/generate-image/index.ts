@@ -7,12 +7,13 @@ const corsHeaders = {
 };
 
 // Design-specific prompt templates - STRICTLY TEXT-FREE designs only
+// CRITICAL: These templates MUST enforce zero text/typography output
 const designTemplates: Record<string, string> = {
-  logo: "LOGO ICON DESIGN: Professional, modern logo ICON with clean vector-style graphics. Minimalist geometric shapes, bold iconic symbol, flat design with 2-3 colors maximum. Corporate-grade quality, scalable, centered on solid background. ABSOLUTELY NO TEXT - no letters, no words, no brand names, no initials, no typography whatsoever - pure visual icon/symbol ONLY.",
-  social: "SOCIAL MEDIA GRAPHIC: Visually striking Instagram/Facebook post background with 1:1 composition. Bold eye-catching colors, high contrast, engaging imagery, modern gradient backgrounds with geometric accents. Marketing-ready visual background. ABSOLUTELY NO TEXT - no letters, no words, no captions, no quotes, no hashtags, no typography of any kind.",
-  banner: "WEB BANNER BACKGROUND: Professional horizontal banner with 16:9 aspect ratio. Clean modern layout, compelling visuals, high contrast colors, dynamic composition. Marketing-grade quality background image. ABSOLUTELY NO TEXT - no headlines, no slogans, no words, no letters, no typography anywhere in the image.",
-  poster: "EVENT POSTER BACKGROUND: Professional vertical poster with striking visual impact. Dramatic colors, balanced composition, eye-catching graphics. Print-ready quality background. ABSOLUTELY NO TEXT - no titles, no dates, no event names, no letters, no numbers, no typography of any kind.",
-  default: "GRAPHIC DESIGN: Professional modern graphic with clean aesthetics, balanced composition, high-quality execution. ABSOLUTELY NO TEXT - no letters, no words, no typography whatsoever.",
+  logo: "ABSTRACT LOGO ICON ONLY: Create a PURE SYMBOL/ICON design with geometric shapes, abstract forms, or stylized imagery. NO TEXT, NO LETTERS, NO INITIALS, NO MONOGRAMS, NO WORDMARKS. Only visual icon with clean vector aesthetic, 2-3 colors max, centered on solid background. Think Apple logo, Nike swoosh, Twitter bird - PURE ICON ONLY.",
+  social: "SOCIAL MEDIA VISUAL BACKGROUND: Create an eye-catching abstract background image with bold gradients, geometric patterns, or artistic imagery. This is a TEMPLATE BACKGROUND where text will be added later. Generate ONLY colors, shapes, patterns, illustrations - ABSOLUTELY ZERO TEXT, LETTERS, OR WORDS.",
+  banner: "WEB BANNER BACKGROUND IMAGE: Create a horizontal background with abstract visuals, gradients, or artistic elements. This is a TEMPLATE where text will be overlaid. Generate ONLY visual elements - NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY OF ANY KIND.",
+  poster: "POSTER BACKGROUND VISUAL: Create a vertical artistic background with dramatic colors and visual impact. This is a TEMPLATE for text overlay. Generate ONLY imagery and colors - ABSOLUTELY NO TEXT, NO LETTERS, NO NUMBERS, NO DATES, NO WORDS.",
+  default: "ABSTRACT GRAPHIC: Professional visual design with shapes, colors, and artistic elements. ZERO TEXT OR TYPOGRAPHY - only pure visual graphics.",
 };
 
 // Size mapping - optimized dimensions
@@ -29,8 +30,16 @@ const sizeMap: Record<string, { width: number; height: number }> = {
 async function generateWithPollinations(styledPrompt: string, dimensions: { width: number; height: number }): Promise<string> {
   console.log("Generating image with Pollinations AI (FLUX model)...");
   
-  // Build STRICT text-free enforced prompt
-  const textFreePrompt = `${styledPrompt}. CRITICAL INSTRUCTION: This image must contain ZERO text. Do NOT generate any letters, words, numbers, typography, watermarks, signatures, captions, labels, brand names, titles, headlines, or any form of written content. Generate ONLY pure visual graphics, patterns, shapes, and imagery. The final image must be completely text-free.`;
+  // Build STRICT text-free enforced prompt with maximum emphasis
+  const textFreePrompt = `${styledPrompt}. 
+
+MANDATORY RULES - FOLLOW EXACTLY:
+1. Generate ONLY visual graphics, abstract shapes, colors, patterns, icons, or imagery
+2. DO NOT include ANY text, letters, words, numbers, or typography
+3. DO NOT include ANY watermarks, signatures, labels, or captions
+4. DO NOT include ANY brand names, initials, monograms, or wordmarks
+5. The output must be 100% text-free - pure visual design only
+6. If the prompt mentions a name or brand, create an ABSTRACT SYMBOL to represent it, not text`;
   
   const encodedPrompt = encodeURIComponent(textFreePrompt);
   const pollinationsUrl = new URL(`https://image.pollinations.ai/prompt/${encodedPrompt}`);
@@ -42,8 +51,8 @@ async function generateWithPollinations(styledPrompt: string, dimensions: { widt
   pollinationsUrl.searchParams.set("nologo", "true");
   pollinationsUrl.searchParams.set("enhance", "true");
   pollinationsUrl.searchParams.set("seed", Math.floor(Math.random() * 1000000).toString());
-  // Aggressive negative prompt to completely exclude ANY text
-  pollinationsUrl.searchParams.set("negative", "text, letters, words, alphabet, typography, watermark, signature, logo text, brand name, company name, writing, numbers, digits, dates, captions, labels, titles, headlines, slogans, inscriptions, fonts, handwriting, printed text, written content, initials, monogram, letterform, calligraphy, script, any readable characters");
+  // Maximum aggressive negative prompt to completely exclude ANY text
+  pollinationsUrl.searchParams.set("negative", "text, letters, words, alphabet, typography, watermark, signature, logo text, brand name, company name, writing, numbers, digits, dates, captions, labels, titles, headlines, slogans, inscriptions, fonts, handwriting, printed text, written content, initials, monogram, letterform, calligraphy, script, any readable characters, wordmark, logotype, lettering, characters, symbols that look like letters, gibberish text, random letters, decorative text, artistic text, stylized text, embossed text, 3d text");
 
   console.log("Pollinations URL generated, fetching image...");
   
