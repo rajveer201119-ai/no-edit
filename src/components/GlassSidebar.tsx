@@ -45,6 +45,8 @@ interface GlassSidebarProps {
   onProjectsChange: () => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
+  /** When a full-screen overlay (e.g. editor) is open, hide/disable sidebar UI to prevent overlap. */
+  isOverlayActive?: boolean;
 }
 
 export const GlassSidebar = ({
@@ -61,9 +63,14 @@ export const GlassSidebar = ({
   onProjectsChange,
   isCollapsed = false,
   onToggleCollapse,
+  isOverlayActive = false,
 }: GlassSidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { isInstallable, promptInstall } = useInstallPrompt();
+
+  useEffect(() => {
+    if (isOverlayActive) setIsOpen(false);
+  }, [isOverlayActive]);
 
   const navItems = [
     { id: "chat" as const, label: "AI Chat", icon: MessageSquare },
@@ -112,28 +119,31 @@ export const GlassSidebar = ({
           }
         }}
         className={cn(
-          "fixed top-4 z-30 p-2 rounded-xl",
-          "backdrop-blur-xl bg-background/20 border border-white/10",
+          "fixed top-4 z-20 p-2 rounded-xl",
+          "backdrop-blur-lg bg-background/30 border border-white/10",
           "shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.1)]",
           "hover:bg-background/30 transition-all duration-300",
-          isCollapsed ? "left-4" : "left-4 md:left-[76px] lg:left-[220px]"
+          isCollapsed ? "left-4" : "left-4 md:left-[76px] lg:left-[220px]",
+          isOverlayActive && "opacity-0 pointer-events-none"
         )}
         aria-label="Toggle sidebar"
       >
-        {isOpen ? (
-          <X className="h-5 w-5" />
-        ) : isCollapsed ? (
-          <PanelLeft className="h-5 w-5" />
+        {/* Desktop icon */}
+        {isCollapsed ? (
+          <PanelLeft className="h-5 w-5 hidden md:block" />
         ) : (
           <PanelLeftClose className="h-5 w-5 hidden md:block" />
         )}
-        <Menu className="h-5 w-5 md:hidden" />
+
+        {/* Mobile icons (mutually exclusive) */}
+        <X className={cn("h-5 w-5 md:hidden", isOpen ? "block" : "hidden")} />
+        <Menu className={cn("h-5 w-5 md:hidden", isOpen ? "hidden" : "block")} />
       </button>
 
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 md:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -141,8 +151,8 @@ export const GlassSidebar = ({
       {/* Sidebar - lower z-index than editor toolbars */}
       <aside
         className={cn(
-          "fixed left-0 top-0 h-full z-20 transition-all duration-300 ease-out",
-          "backdrop-blur-2xl bg-background/10 border-r border-white/10",
+          "fixed left-0 top-0 h-full z-10 transition-all duration-300 ease-out",
+          "backdrop-blur-xl bg-background/20 border-r border-white/10",
           "shadow-[0_0_60px_-15px_rgba(139,92,246,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]",
           // Mobile: slide in/out
           isOpen ? "translate-x-0" : "-translate-x-full",
