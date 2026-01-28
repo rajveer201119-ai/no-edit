@@ -61,6 +61,87 @@ function buildInpaintingPrompt(userPrompt: string): string {
 }
 
 // ============================================
+// fal.ai Inpainting (SDXL-based, uses mask_url)
+// ============================================
+async function inpaintWithFalAI(imageUrl: string, maskDataUrl: string, prompt: string): Promise<string> {
+  console.log("Inpainting with fal.ai SDXL inpainting model...");
+  
+  const FAL_API_KEY = Deno.env.get("FAL_API_KEY");
+  if (!FAL_API_KEY) {
+    throw new Error("FAL_API_KEY is not configured");
+  }
+
+  const enhancedPrompt = buildInpaintingPrompt(prompt);
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 90000); // 90s timeout
+
+  try {
+    // fal.ai inpaint endpoint
+    const response = await fetch("https://fal.run/fal-ai/inpaint", {
+      method: "POST",
+      headers: {
+        "Authorization": `Key ${FAL_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model_name: "diffusers/stable-diffusion-xl-1.0-inpainting-0.1",
+        prompt: enhancedPrompt,
+        negative_prompt: "blurry, bad anatomy, extra limbs, text, watermark, signature, low quality",
+        image_url: imageUrl,
+        mask_url: maskDataUrl, // The mask data URL (base64 or remote URL)
+        num_inference_steps: 30,
+        guidance_scale: 7.5,
+        strength: 0.95,
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("fal.ai inpaint error:", response.status, errorText);
+
+      if (response.status === 429) {
+        const error = new Error("Rate limit exceeded. Please try again in a moment.");
+        (error as any).status = 429;
+        throw error;
+      }
+
+      if (response.status === 402 || response.status === 401) {
+        const error = new Error("API authentication failed or credits exhausted.");
+        (error as any).status = response.status;
+        throw error;
+      }
+
+      const error = new Error(`fal.ai inpaint failed: ${response.status}`);
+      (error as any).status = response.status;
+      throw error;
+    }
+
+    const data = await response.json();
+
+    // fal.ai returns images in the "images" array
+    const outputImage = data.images?.[0]?.url;
+
+    if (!outputImage) {
+      console.error("No image in fal.ai inpaint response:", JSON.stringify(data).substring(0, 200));
+      throw new Error("No inpainted image returned from fal.ai");
+    }
+
+    console.log("fal.ai inpainting successful!");
+    return outputImage;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === "AbortError") {
+      throw new Error("fal.ai inpaint request timed out. Please try again.");
+    }
+    throw error;
+  }
+}
+
+// ============================================
 // PRIMARY: OmniGen-2 via fal.ai (Best quality img2img)
 // State-of-the-art unified model for image editing
 // ============================================
@@ -442,23 +523,34 @@ serve(async (req) => {
     let editedImageData: string;
     let usedService: string;
 
-    // Handle inpainting with mask - use Lovable AI as it handles masks well
+    // Handle inpainting with mask
+    // Primary: fal.ai SDXL inpainting (uses real mask), Fallback: Lovable AI Gemini
     if (isInpainting && maskDataUrl) {
       console.log("Processing inpainting request...");
       const inpaintPrompt = buildInpaintingPrompt(sanitizedPrompt);
       
       try {
-        editedImageData = await editWithLovableAI(imageUrl, inpaintPrompt);
-        usedService = "Lovable AI Gemini (inpainting)";
-      } catch (inpaintError: any) {
-        console.error("Inpainting failed:", inpaintError.message);
-        return new Response(
-          JSON.stringify({ 
-            error: inpaintError.message || "Inpainting failed. Please try again.",
-            code: "INPAINT_FAILED"
-          }),
-          { status: inpaintError.status || 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        // Try fal.ai inpainting first (uses real mask for better results)
+        editedImageData = await inpaintWithFalAI(imageUrl, maskDataUrl, inpaintPrompt);
+        usedService = "fal.ai SDXL Inpainting";
+      } catch (falError: any) {
+        console.warn("fal.ai inpainting failed:", falError.message);
+        
+        // Fallback to Lovable AI if fal.ai fails
+        try {
+          console.log("Falling back to Lovable AI for inpainting...");
+          editedImageData = await editWithLovableAI(imageUrl, inpaintPrompt);
+          usedService = "Lovable AI Gemini (inpainting fallback)";
+        } catch (lovableError: any) {
+          console.error("All inpainting services failed:", lovableError.message);
+          return new Response(
+            JSON.stringify({ 
+              error: lovableError.message || "Inpainting failed. Please try again.",
+              code: "INPAINT_FAILED"
+            }),
+            { status: lovableError.status || 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
       }
     }
     // Direct Lovable AI request (user explicitly requested)
