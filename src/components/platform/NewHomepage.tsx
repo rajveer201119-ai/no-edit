@@ -56,7 +56,8 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration }: NewHomepa
       {/* CTAs */}
       <div className="flex flex-col sm:flex-row items-center gap-4 relative z-20 animate-fade-in [animation-delay:400ms]">
         <LiquidButton 
-          className="text-foreground border rounded-full min-w-[200px]" 
+          className="text-foreground border rounded-full min-w-[200px] min-h-[48px] cursor-pointer 
+          hover:scale-105 active:scale-95 transition-transform duration-200" 
           size="xl"
           onClick={onStartDesigning}
         >
@@ -65,7 +66,8 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration }: NewHomepa
         
         <button
           onClick={onBrowseInspiration}
-          className="text-sm text-gray-400 hover:text-white underline underline-offset-4 transition-colors"
+          className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4 
+          transition-colors duration-200 min-h-[44px] px-4 cursor-pointer"
         >
           Browse Inspiration
         </button>

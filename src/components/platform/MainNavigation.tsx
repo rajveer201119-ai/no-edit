@@ -1,5 +1,9 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Palette, Library, Lightbulb } from "lucide-react";
+import { Palette, Library, Lightbulb, Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export type MainTab = "create" | "library" | "inspire";
 
@@ -9,11 +13,95 @@ interface MainNavigationProps {
 }
 
 export const MainNavigation = ({ activeTab, onTabChange }: MainNavigationProps) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
+
   const tabs = [
     { id: "create" as const, label: "Create", icon: Palette },
     { id: "library" as const, label: "Library", icon: Library },
     { id: "inspire" as const, label: "Inspire", icon: Lightbulb },
   ];
+
+  const handleTabChange = (tab: MainTab) => {
+    onTabChange(tab);
+    setMobileMenuOpen(false);
+  };
+
+  // Desktop navigation
+  const DesktopNav = () => (
+    <div className="hidden md:flex items-center gap-1 bg-muted/30 rounded-full p-1">
+      {tabs.map((tab) => {
+        const Icon = tab.icon;
+        const isActive = activeTab === tab.id;
+
+        return (
+          <button
+            key={tab.id}
+            onClick={() => handleTabChange(tab.id)}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300",
+              "text-sm font-medium min-h-[44px]",
+              isActive
+                ? "bg-primary text-primary-foreground shadow-lg"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            )}
+          >
+            <Icon className="h-4 w-4" />
+            <span>{tab.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  // Mobile navigation (hamburger menu)
+  const MobileNav = () => (
+    <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+      <SheetTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden h-11 w-11"
+          aria-label="Open navigation menu"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="w-[280px] p-0">
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-border/30">
+            <h2 className="text-lg font-bold gradient-epic-text">EPIC</h2>
+          </div>
+
+          {/* Navigation Items */}
+          <nav className="flex flex-col p-4 gap-2">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                    "text-base font-medium min-h-[48px] w-full text-left",
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/30">
@@ -29,33 +117,16 @@ export const MainNavigation = ({ activeTab, onTabChange }: MainNavigationProps) 
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="flex items-center gap-1 bg-muted/30 rounded-full p-1">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
+          {/* Desktop Navigation */}
+          <DesktopNav />
 
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => onTabChange(tab.id)}
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300",
-                    "text-sm font-medium",
-                    isActive
-                      ? "bg-primary text-primary-foreground shadow-lg"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
-                </button>
-              );
-            })}
+          {/* Mobile Navigation (hamburger trigger) */}
+          <div className="md:hidden">
+            <MobileNav />
           </div>
 
-          {/* Spacer for balance */}
-          <div className="w-16" />
+          {/* Spacer for desktop balance (user menu fills this on the right) */}
+          <div className="hidden md:block w-16" />
         </div>
       </div>
     </nav>

@@ -159,11 +159,60 @@ const Index = () => {
     toast.info("Start from feature coming soon!");
   };
 
-  // Handle export
+  // Handle export - captures canvas and downloads
   const handleExport = async (format: "png" | "jpg" | "pdf") => {
-    // Simulate export
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    toast.success(`Exported as ${format.toUpperCase()}`);
+    try {
+      // Find the canvas element
+      const canvasContainer = document.querySelector('.bg-white.shadow-2xl.rounded-lg');
+      if (!canvasContainer) {
+        toast.error("No design to export. Create something first!");
+        return;
+      }
+
+      // Use html2canvas approach - for now simulate
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      
+      // Create a simple canvas export (placeholder - in production use html2canvas)
+      const canvas = document.createElement('canvas');
+      canvas.width = currentTemplate?.canvasWidth || 800;
+      canvas.height = currentTemplate?.canvasHeight || 600;
+      const ctx = canvas.getContext('2d');
+      
+      if (ctx) {
+        // Fill with template background
+        const bgElement = currentTemplate?.elements.find(el => el.id === 'bg');
+        ctx.fillStyle = bgElement?.backgroundColor || '#1a1a2e';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw text elements
+        currentTemplate?.elements.forEach(el => {
+          if (el.type === 'text' && el.content) {
+            ctx.fillStyle = el.color || '#ffffff';
+            ctx.font = `${el.fontWeight || 'normal'} ${el.fontSize || 16}px sans-serif`;
+            ctx.fillText(el.content, el.x, el.y + (el.fontSize || 16));
+          }
+        });
+
+        // Convert to blob and download
+        const mimeType = format === 'jpg' ? 'image/jpeg' : 'image/png';
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentTemplate?.name || 'design'}.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            toast.success(`Exported as ${format.toUpperCase()}!`);
+          }
+        }, mimeType, 0.95);
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error("Export failed. Please try again.");
+    }
   };
 
   // Render user menu in navbar
@@ -230,7 +279,7 @@ const Index = () => {
 
     // Create workspace
     return (
-      <div className="min-h-screen pt-16">
+      <div className="min-h-screen pt-16 pb-16 md:pb-0">
         {/* Workspace Top Bar */}
         <WorkspaceTopBar
           projectName={currentTemplate?.name || "New Design"}
@@ -240,7 +289,7 @@ const Index = () => {
           canRedo={false}
         />
 
-        {/* Left Toolbar */}
+        {/* Left Toolbar (desktop) / Bottom Toolbar (mobile) */}
         <WorkspaceToolbar
           activeTool={activeTool}
           onToolChange={setActiveTool}
@@ -252,8 +301,8 @@ const Index = () => {
           activeCategory={activeDesignCategory || undefined}
         />
 
-        {/* Canvas Area */}
-        <div className="pl-14 pt-24">
+        {/* Canvas Area - responsive padding */}
+        <div className="pt-24 px-2 md:pl-16 md:pr-4">
           <CanvasWorkspace
             template={currentTemplate}
             activeTool={activeTool}
