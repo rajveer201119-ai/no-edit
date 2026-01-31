@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Palette, Library, Lightbulb, Menu, X } from "lucide-react";
+import { Palette, Library, Lightbulb, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export type MainTab = "create" | "library" | "inspire";
@@ -61,44 +61,39 @@ export const MainNavigation = ({ activeTab, onTabChange }: MainNavigationProps) 
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden h-11 w-11"
+          className="md:hidden h-10 w-10 shrink-0"
           aria-label="Open navigation menu"
         >
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[280px] p-0">
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-border/30">
-            <h2 className="text-lg font-bold gradient-epic-text">EPIC</h2>
-          </div>
+      <SheetContent side="left" className="w-[280px] p-0">
+        <SheetHeader className="p-4 border-b border-border/30">
+          <SheetTitle className="text-lg font-bold gradient-epic-text text-left">EPIC</SheetTitle>
+        </SheetHeader>
+        <nav className="flex flex-col p-4 gap-2">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
 
-          {/* Navigation Items */}
-          <nav className="flex flex-col p-4 gap-2">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabChange(tab.id)}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
-                    "text-base font-medium min-h-[48px] w-full text-left",
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-foreground hover:bg-muted/50"
-                  )}
-                >
-                  <Icon className="h-5 w-5 flex-shrink-0" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-        </div>
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                  "text-base font-medium min-h-[48px] w-full text-left",
+                  isActive
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground hover:bg-muted/50"
+                )}
+              >
+                <Icon className="h-5 w-5 flex-shrink-0" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </nav>
       </SheetContent>
     </Sheet>
   );
@@ -106,9 +101,17 @@ export const MainNavigation = ({ activeTab, onTabChange }: MainNavigationProps) 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/30">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
+        <div className="flex items-center h-16 gap-4">
+          {/* Mobile Navigation (hamburger trigger) - LEFT */}
+          <div className="md:hidden shrink-0">
+            <MobileNav />
+          </div>
+
+          {/* Logo - LEFT on desktop, CENTER on mobile */}
+          <div className={cn(
+            "flex items-center gap-2 shrink-0",
+            isMobile && "flex-1 justify-center"
+          )}>
             <div className="relative">
               <div className="absolute inset-0 bg-primary/30 blur-xl rounded-full animate-pulse" />
               <h1 className="relative text-xl font-bold gradient-epic-text tracking-tight">
@@ -117,16 +120,16 @@ export const MainNavigation = ({ activeTab, onTabChange }: MainNavigationProps) 
             </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <DesktopNav />
-
-          {/* Mobile Navigation (hamburger trigger) */}
-          <div className="md:hidden">
-            <MobileNav />
+          {/* Desktop Navigation - CENTER */}
+          <div className="hidden md:flex flex-1 justify-center">
+            <DesktopNav />
           </div>
 
-          {/* Spacer for desktop balance (user menu fills this on the right) */}
-          <div className="hidden md:block w-16" />
+          {/* Spacer for mobile to balance the logo in center */}
+          <div className="md:hidden w-10 shrink-0" />
+
+          {/* Empty space for user menu on desktop - this is where the fixed user menu will visually align */}
+          <div className="hidden md:block w-[180px] shrink-0" />
         </div>
       </div>
     </nav>

@@ -69,101 +69,103 @@ export const WorkspaceTopBar = ({
   return (
     <TooltipProvider delayDuration={200}>
       <div className={cn(
-        "fixed top-16 right-0 h-12 bg-background/80 backdrop-blur-xl border-b border-border/30 z-30",
-        isMobile ? "left-0" : "left-14"
+        "fixed h-12 bg-background/90 backdrop-blur-xl border-b border-border/30 z-40",
+        isMobile ? "top-16 left-0 right-0" : "top-16 left-14 right-0"
       )}>
-        <div className="flex items-center justify-between h-full px-4">
+        <div className="flex items-center justify-between h-full px-3 md:px-4 gap-2">
           {/* Left: Project Name + Save Status */}
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-sm font-medium text-foreground truncate max-w-[100px] md:max-w-[200px]">
+          <div className="flex items-center gap-2 min-w-0 flex-shrink">
+            <span className="text-sm font-medium text-foreground truncate max-w-[80px] sm:max-w-[150px] md:max-w-[200px]">
               {projectName}
             </span>
             {isSaving ? (
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
                 <Loader2 className="h-3 w-3 animate-spin" />
                 <span className="hidden sm:inline">Saving...</span>
               </span>
             ) : showSaved ? (
-              <span className="flex items-center gap-1 text-xs text-green-500">
+              <span className="flex items-center gap-1 text-xs text-primary shrink-0">
                 <Check className="h-3 w-3" />
                 <span className="hidden sm:inline">Saved</span>
               </span>
             ) : null}
           </div>
 
-          {/* Center: Actions (desktop only) */}
-          {!isMobile && (
-            <div className="flex items-center gap-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={handleSave}
-                  >
-                    <Save className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Save</TooltipContent>
-              </Tooltip>
+          {/* Center: Actions */}
+          <div className="flex items-center gap-0.5 md:gap-1 shrink-0">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={handleSave}
+                >
+                  <Save className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Save</TooltipContent>
+            </Tooltip>
 
-              <div className="w-px h-4 bg-border/30 mx-1" />
+            <div className="w-px h-4 bg-border/30 mx-0.5 hidden sm:block" />
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={handleUndo}
-                  >
-                    <Undo className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Undo</TooltipContent>
-              </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={handleUndo}
+                >
+                  <Undo className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Undo</TooltipContent>
+            </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={handleRedo}
-                  >
-                    <Redo className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Redo</TooltipContent>
-              </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={handleRedo}
+                >
+                  <Redo className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Redo</TooltipContent>
+            </Tooltip>
 
-              <div className="w-px h-4 bg-border/30 mx-1" />
+            {!isMobile && (
+              <>
+                <div className="w-px h-4 bg-border/30 mx-1" />
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 gap-2" 
-                    onClick={handleResize}
-                  >
-                    <Maximize className="h-4 w-4" />
-                    <span className="hidden sm:inline">Resize</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Resize Canvas</TooltipContent>
-              </Tooltip>
-            </div>
-          )}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 gap-2" 
+                      onClick={handleResize}
+                    >
+                      <Maximize className="h-4 w-4" />
+                      <span className="hidden lg:inline">Resize</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Resize Canvas</TooltipContent>
+                </Tooltip>
+              </>
+            )}
+          </div>
 
           {/* Right: Export */}
           <Button
             onClick={onExport}
-            className="h-8 gap-2 bg-primary hover:bg-primary/90 min-h-[36px]"
+            className="h-8 gap-1.5 bg-primary hover:bg-primary/90 min-h-[36px] shrink-0 px-3"
           >
             <Download className="h-4 w-4" />
-            <span className={isMobile ? "hidden" : ""}>Export</span>
+            <span className="hidden sm:inline">Export</span>
           </Button>
         </div>
       </div>

@@ -2,18 +2,17 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Template, TemplateElement } from "./templates";
-import type { DesignCategory } from "./DesignTypeModal";
 import type { ToolType } from "./WorkspaceToolbar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Plus, Upload, X, Move } from "lucide-react";
+import { Plus, Upload, X, Move, GripVertical } from "lucide-react";
 
 interface CanvasWorkspaceProps {
   template: Template | null;
   activeTool: ToolType;
   onElementSelect?: (element: TemplateElement | null) => void;
-  onExportCanvas?: () => HTMLCanvasElement | null;
+  onTemplateChange?: (template: Template) => void;
+  initialImportedImage?: string | null;
 }
 
 interface ImportedImage {
@@ -29,6 +28,8 @@ export const CanvasWorkspace = ({
   template,
   activeTool,
   onElementSelect,
+  onTemplateChange,
+  initialImportedImage,
 }: CanvasWorkspaceProps) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -45,6 +46,7 @@ export const CanvasWorkspace = ({
   // Drag state for imported images
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
 
   // Load template elements
   useEffect(() => {
@@ -64,27 +66,47 @@ export const CanvasWorkspace = ({
     }
   }, [hasEdited]);
 
-  const handleElementClick = (elementId: string, e: React.MouseEvent) => {
+  // Handle initial imported image from Inspire tab
+  useEffect(() => {
+    if (initialImportedImage) {
+      const newImage: ImportedImage = {
+        id: `img-${Date.now()}`,
+        src: initialImportedImage,
+        x: 50,
+        y: 50,
+        width: 300,
+        height: 300,
+      };
+      setImportedImages([newImage]);
+      setSelectedImage(newImage.id);
+      toast.success("Image loaded! Drag to position.");
+    }
+  }, [initialImportedImage]);
+
+  const handleElementClick = (elementId: string, e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
     const element = elements.find((el) => el.id === elementId);
     
+    // Allow selection for select tool OR text tool
     if (activeTool === "select" || activeTool === "text") {
       setSelectedElement(elementId);
       setSelectedImage(null);
       onElementSelect?.(element || null);
       
-      // If text element and text tool, enable editing
-      if (element?.type === "text" && (activeTool === "text" || activeTool === "select")) {
+      // If text element, enable editing
+      if (element?.type === "text") {
         setEditingText(elementId);
       }
     }
   };
 
   const handleCanvasClick = () => {
-    setSelectedElement(null);
-    setSelectedImage(null);
-    setEditingText(null);
-    onElementSelect?.(null);
+    if (!isDragging) {
+      setSelectedElement(null);
+      setSelectedImage(null);
+      setEditingText(null);
+      onElementSelect?.(null);
+    }
   };
 
   const handleTextChange = (elementId: string, newContent: string) => {
@@ -158,60 +180,108 @@ export const CanvasWorkspace = ({
   };
 
   // Handle image selection
-  const handleImageClick = (imageId: string, e: React.MouseEvent) => {
+  const handleImageClick = (imageId: string, e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
-    setSelectedImage(imageId);
-    setSelectedElement(null);
+    if (activeTool === "select") {
+      setSelectedImage(imageId);
+      setSelectedElement(null);
+      setEditingText(null);
+    }
+  };
+
+  // Get client position from mouse or touch event
+  const getClientPos = (e: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent) => {
+    if ('touches' in e && e.touches.length > 0) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    if ('changedTouches' in e && e.changedTouches.length > 0) {
+      return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+    }
+    if ('clientX' in e) {
+      return { x: e.clientX, y: e.clientY };
+    }
+    return { x: 0, y: 0 };
   };
 
   // Handle image drag start
-  const handleImageMouseDown = (imageId: string, e: React.MouseEvent) => {
+  const handleImageDragStart = (imageId: string, e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
+    e.preventDefault();
+    
     const image = importedImages.find((img) => img.id === imageId);
     if (!image || activeTool !== "select") return;
 
+    const pos = getClientPos(e);
     setIsDragging(true);
     setSelectedImage(imageId);
+    setDragStartPos({ x: image.x, y: image.y });
     setDragOffset({
-      x: e.clientX - image.x,
-      y: e.clientY - image.y,
+      x: pos.x,
+      y: pos.y,
     });
   };
 
   // Handle image drag
   const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
+    (e: MouseEvent | TouchEvent) => {
       if (!isDragging || !selectedImage) return;
+      e.preventDefault();
+
+      const pos = getClientPos(e);
+      const deltaX = pos.x - dragOffset.x;
+      const deltaY = pos.y - dragOffset.y;
 
       setImportedImages((prev) =>
         prev.map((img) =>
           img.id === selectedImage
-            ? { ...img, x: e.clientX - dragOffset.x, y: e.clientY - dragOffset.y }
+            ? { 
+                ...img, 
+                x: dragStartPos.x + deltaX, 
+                y: dragStartPos.y + deltaY 
+              }
             : img
         )
       );
     },
-    [isDragging, selectedImage, dragOffset]
+    [isDragging, selectedImage, dragOffset, dragStartPos]
   );
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     if (isDragging) {
       setIsDragging(false);
       if (!hasEdited) {
         setHasEdited(true);
       }
     }
-  };
+  }, [isDragging, hasEdited]);
+
+  // Attach global event listeners for dragging
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleMouseMove, { passive: false });
+      document.addEventListener('touchend', handleMouseUp);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleMouseMove);
+        document.removeEventListener('touchend', handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   // Handle image removal
-  const handleRemoveImage = (imageId: string) => {
+  const handleRemoveImage = (imageId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     setImportedImages((prev) => prev.filter((img) => img.id !== imageId));
     setSelectedImage(null);
   };
 
   // Handle tool-specific actions
   useEffect(() => {
-    if (activeTool === "upload") {
+    if (activeTool === "upload" || activeTool === "image") {
       handleImportClick();
     } else if (activeTool === "enhance") {
       toast.info("AI Enhance - Feature coming soon!", { duration: 3000 });
@@ -223,14 +293,14 @@ export const CanvasWorkspace = ({
       toast.info("Shapes tool - Feature coming soon!", { duration: 2000 });
     } else if (activeTool === "elements") {
       toast.info("Elements library - Feature coming soon!", { duration: 2000 });
-    } else if (activeTool === "image") {
-      handleImportClick();
+    } else if (activeTool === "crop") {
+      toast.info("Crop tool - Feature coming soon!", { duration: 2000 });
     }
   }, [activeTool]);
 
   if (!template) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-muted/20 min-h-[60vh] p-4">
+      <div className="flex-1 flex flex-col items-center justify-center bg-muted/20 min-h-[50vh] p-4">
         <div className="text-center text-muted-foreground">
           <p className="text-lg mb-2">Start with a template or create freely.</p>
           <p className="text-sm mb-6">Select a design type from the Quick Start strip above.</p>
@@ -243,7 +313,7 @@ export const CanvasWorkspace = ({
             className="hidden"
           />
           
-          <Button variant="outline" className="gap-2" onClick={handleImportClick}>
+          <Button variant="outline" className="gap-2 min-h-[44px]" onClick={handleImportClick}>
             <Upload className="h-4 w-4" />
             Import Your Design
           </Button>
@@ -253,8 +323,11 @@ export const CanvasWorkspace = ({
   }
 
   // Calculate scale to fit canvas in viewport
-  const maxWidth = isMobile ? window.innerWidth - 32 : 600;
-  const maxHeight = isMobile ? window.innerHeight * 0.6 : 500;
+  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 800;
+  const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 600;
+  
+  const maxWidth = isMobile ? viewportWidth - 32 : Math.min(viewportWidth - 200, 700);
+  const maxHeight = isMobile ? viewportHeight * 0.5 : Math.min(viewportHeight - 300, 550);
   const scaleX = maxWidth / template.canvasWidth;
   const scaleY = maxHeight / template.canvasHeight;
   const scale = Math.min(scaleX, scaleY, 1);
@@ -263,12 +336,9 @@ export const CanvasWorkspace = ({
     <div
       className={cn(
         "flex-1 flex items-center justify-center bg-muted/10 p-4 overflow-auto",
-        isMobile && "pb-20" // Account for bottom toolbar
+        isMobile && "pb-24" // Account for bottom toolbar
       )}
       onClick={handleCanvasClick}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
     >
       <input
         ref={fileInputRef}
@@ -292,7 +362,7 @@ export const CanvasWorkspace = ({
         <Button
           variant="outline"
           size="sm"
-          className="absolute -top-10 right-0 z-10 gap-1 text-xs"
+          className="absolute -top-10 right-0 z-10 gap-1 text-xs min-h-[36px]"
           onClick={handleImportClick}
         >
           <Plus className="h-3 w-3" />
@@ -302,7 +372,7 @@ export const CanvasWorkspace = ({
         {/* Canvas */}
         <div
           ref={canvasRef}
-          className="relative bg-white shadow-2xl rounded-lg overflow-hidden"
+          className="relative bg-white shadow-2xl rounded-lg overflow-hidden select-none"
           style={{
             width: template.canvasWidth * scale,
             height: template.canvasHeight * scale,
@@ -343,10 +413,12 @@ export const CanvasWorkspace = ({
                   key={element.id}
                   style={style}
                   className={cn(
-                    "cursor-pointer transition-all flex items-start",
-                    isSelected && "ring-2 ring-primary ring-offset-1"
+                    "cursor-text transition-all flex items-start",
+                    isSelected && "ring-2 ring-primary ring-offset-1",
+                    (activeTool === "text" || activeTool === "select") && "hover:ring-2 hover:ring-primary/50"
                   )}
                   onClick={(e) => handleElementClick(element.id, e)}
+                  onTouchEnd={(e) => handleElementClick(element.id, e)}
                 >
                   {isEditing ? (
                     <textarea
@@ -354,13 +426,15 @@ export const CanvasWorkspace = ({
                       value={element.content || ""}
                       onChange={(e) => handleTextChange(element.id, e.target.value)}
                       onBlur={handleTextBlur}
-                      className="w-full h-full bg-transparent border-none outline-none resize-none"
+                      className="w-full h-full bg-transparent border-none outline-none resize-none p-0"
                       style={{
                         color: element.color,
                         fontSize: (element.fontSize || 16) * scale,
                         fontWeight: element.fontWeight || "normal",
                         lineHeight: 1.2,
+                        caretColor: element.color,
                       }}
+                      onClick={(e) => e.stopPropagation()}
                     />
                   ) : (
                     <span
@@ -390,8 +464,9 @@ export const CanvasWorkspace = ({
               <div
                 key={img.id}
                 className={cn(
-                  "absolute cursor-move group",
-                  isSelected && "ring-2 ring-primary ring-offset-2"
+                  "absolute group touch-none",
+                  isSelected && "ring-2 ring-primary ring-offset-2",
+                  activeTool === "select" && "cursor-move"
                 )}
                 style={{
                   left: img.x,
@@ -400,7 +475,8 @@ export const CanvasWorkspace = ({
                   height: img.height,
                 }}
                 onClick={(e) => handleImageClick(img.id, e)}
-                onMouseDown={(e) => handleImageMouseDown(img.id, e)}
+                onMouseDown={(e) => handleImageDragStart(img.id, e)}
+                onTouchStart={(e) => handleImageDragStart(img.id, e)}
               >
                 <img
                   src={img.src}
@@ -412,21 +488,20 @@ export const CanvasWorkspace = ({
                 {/* Remove button */}
                 {isSelected && (
                   <button
-                    className="absolute -top-3 -right-3 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveImage(img.id);
-                    }}
+                    className="absolute -top-3 -right-3 bg-destructive text-destructive-foreground rounded-full p-1.5 shadow-lg z-10"
+                    onClick={(e) => handleRemoveImage(img.id, e)}
                   >
                     <X className="h-3 w-3" />
                   </button>
                 )}
 
-                {/* Move indicator */}
+                {/* Drag handle indicator */}
                 {isSelected && (
-                  <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Move className="h-3 w-3 inline mr-1" />
-                    Drag to move
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-1">
+                      <GripVertical className="h-3 w-3" />
+                      Drag to move
+                    </div>
                   </div>
                 )}
               </div>
@@ -436,21 +511,4 @@ export const CanvasWorkspace = ({
       </div>
     </div>
   );
-};
-
-// Export function to get canvas as image - will be wired to top bar
-export const exportCanvasAsImage = (
-  canvasRef: React.RefObject<HTMLDivElement>,
-  format: "png" | "jpg" = "png"
-): Promise<string | null> => {
-  return new Promise((resolve) => {
-    if (!canvasRef.current) {
-      resolve(null);
-      return;
-    }
-
-    // Use html2canvas or similar library in production
-    // For now, return a simple implementation
-    resolve(null);
-  });
 };

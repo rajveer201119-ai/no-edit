@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { LogIn, LogOut, Shield, Sparkles, Download } from "lucide-react";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import {
   MainNavigation,
@@ -31,6 +32,7 @@ import {
 const Index = () => {
   const navigate = useNavigate();
   const { isInstallable, promptInstall } = useInstallPrompt();
+  const isMobile = useIsMobile();
 
   // Auth state
   const [isAuthed, setIsAuthed] = useState(false);
@@ -46,6 +48,7 @@ const Index = () => {
   const [activeDesignCategory, setActiveDesignCategory] = useState<DesignCategory | null>(null);
   const [currentTemplate, setCurrentTemplate] = useState<Template | null>(null);
   const [activeTool, setActiveTool] = useState<ToolType>("select");
+  const [importedImageUrl, setImportedImageUrl] = useState<string | null>(null);
 
   // Export state
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -152,11 +155,34 @@ const Index = () => {
     toast.info("Remix feature coming soon! For now, start fresh.");
   };
 
-  // Handle start from inspire
+  // Handle start from inspire - opens image in workspace
   const handleStartFrom = (imageUrl: string) => {
+    // Set a blank canvas template
+    const blankTemplate: Template = {
+      id: "imported-design",
+      name: "Imported Design",
+      category: "custom" as DesignCategory,
+      thumbnailUrl: "",
+      canvasWidth: 800,
+      canvasHeight: 800,
+      elements: [
+        {
+          id: "bg",
+          type: "shape",
+          x: 0,
+          y: 0,
+          width: 800,
+          height: 800,
+          backgroundColor: "#1a1a2e",
+        },
+      ],
+    };
+    
+    setCurrentTemplate(blankTemplate);
+    setImportedImageUrl(imageUrl);
     setActiveTab("create");
     setShowHomepage(false);
-    toast.info("Start from feature coming soon!");
+    toast.success("Image loaded in editor! Drag to position.");
   };
 
   // Handle export - captures canvas and downloads
@@ -215,21 +241,23 @@ const Index = () => {
     }
   };
 
-  // Render user menu in navbar
+  // Render user menu in navbar - compact for mobile
   const renderUserMenu = () => (
-    <div className="flex items-center gap-2">
-      {isInstallable && (
-        <Button variant="ghost" size="icon" onClick={promptInstall} title="Install App">
+    <div className="flex items-center gap-1 md:gap-2">
+      {isInstallable && !isMobile && (
+        <Button variant="ghost" size="icon" onClick={promptInstall} title="Install App" className="h-9 w-9">
           <Download className="h-4 w-4" />
         </Button>
       )}
       
-      <Button variant="ghost" size="icon" onClick={() => setShowProDialog(true)} title="View Plans">
-        <Sparkles className="h-4 w-4" />
-      </Button>
+      {!isMobile && (
+        <Button variant="ghost" size="icon" onClick={() => setShowProDialog(true)} title="View Plans" className="h-9 w-9">
+          <Sparkles className="h-4 w-4" />
+        </Button>
+      )}
 
-      {isAdmin && (
-        <Button variant="ghost" size="icon" onClick={() => navigate("/admin")} title="Admin">
+      {isAdmin && !isMobile && (
+        <Button variant="ghost" size="icon" onClick={() => navigate("/admin")} title="Admin" className="h-9 w-9">
           <Shield className="h-4 w-4" />
         </Button>
       )}
@@ -237,13 +265,18 @@ const Index = () => {
       <ThemeToggle />
 
       {isAuthed ? (
-        <Button variant="ghost" size="icon" onClick={signOut} title="Sign Out">
+        <Button variant="ghost" size="icon" onClick={signOut} title="Sign Out" className="h-9 w-9">
           <LogOut className="h-4 w-4" />
         </Button>
       ) : (
-        <Button variant="ghost" size="sm" onClick={() => navigate("/auth")} className="gap-2">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate("/auth")} 
+          className="gap-1.5 h-9 px-2 md:px-3"
+        >
           <LogIn className="h-4 w-4" />
-          <span className="hidden sm:inline">Sign In</span>
+          <span className="hidden sm:inline text-sm">Sign In</span>
         </Button>
       )}
     </div>
@@ -277,9 +310,13 @@ const Index = () => {
       );
     }
 
-    // Create workspace
+    // Create workspace - pt values to account for stacked bars
+    // Navbar: h-16 (64px) at top-0
+    // WorkspaceTopBar: h-12 (48px) at top-16
+    // QuickStartStrip: h-11 (44px) at top-28
+    // Total top offset: 64 + 48 + 44 = 156px
     return (
-      <div className="min-h-screen pt-16 pb-16 md:pb-0">
+      <div className="min-h-screen pt-[156px] pb-20 md:pb-4">
         {/* Workspace Top Bar */}
         <WorkspaceTopBar
           projectName={currentTemplate?.name || "New Design"}
@@ -301,11 +338,12 @@ const Index = () => {
           activeCategory={activeDesignCategory || undefined}
         />
 
-        {/* Canvas Area - responsive padding */}
-        <div className="pt-24 px-2 md:pl-16 md:pr-4">
+        {/* Canvas Area - responsive padding for left toolbar */}
+        <div className="px-2 md:pl-16 md:pr-4">
           <CanvasWorkspace
             template={currentTemplate}
             activeTool={activeTool}
+            initialImportedImage={importedImageUrl}
           />
         </div>
       </div>
@@ -336,8 +374,8 @@ const Index = () => {
           }}
         />
 
-        {/* User Menu - Absolute positioned in navbar */}
-        <div className="fixed top-0 right-4 h-16 flex items-center z-50">
+        {/* User Menu - Fixed in navbar area */}
+        <div className="fixed top-0 right-2 md:right-4 h-16 flex items-center z-50">
           {renderUserMenu()}
         </div>
 
