@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Palette, Library, Lightbulb, Menu } from "lucide-react";
+import { Palette, Library, Lightbulb, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -39,7 +39,7 @@ export const MainNavigation = ({ activeTab, onTabChange }: MainNavigationProps) 
             key={tab.id}
             onClick={() => handleTabChange(tab.id)}
             className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300",
+              "flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300",
               "text-sm font-medium min-h-[44px]",
               isActive
                 ? "bg-primary text-primary-foreground shadow-lg"
@@ -69,7 +69,7 @@ export const MainNavigation = ({ activeTab, onTabChange }: MainNavigationProps) 
       </SheetTrigger>
       <SheetContent side="left" className="w-[280px] p-0">
         <SheetHeader className="p-4 border-b border-border/30">
-          <SheetTitle className="text-lg font-bold gradient-epic-text text-left">EPIC</SheetTitle>
+          <SheetTitle className="text-xl font-bold gradient-epic-text text-left">EPIC</SheetTitle>
         </SheetHeader>
         <nav className="flex flex-col p-4 gap-2">
           {tabs.map((tab) => {
@@ -81,8 +81,8 @@ export const MainNavigation = ({ activeTab, onTabChange }: MainNavigationProps) 
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
-                  "text-base font-medium min-h-[48px] w-full text-left",
+                  "flex items-center gap-3 px-4 py-4 rounded-xl transition-all duration-200",
+                  "text-base font-medium min-h-[56px] w-full text-left",
                   isActive
                     ? "bg-primary text-primary-foreground"
                     : "text-foreground hover:bg-muted/50"
@@ -128,8 +128,8 @@ export const MainNavigation = ({ activeTab, onTabChange }: MainNavigationProps) 
           {/* Spacer for mobile to balance the logo in center */}
           <div className="md:hidden w-10 shrink-0" />
 
-          {/* Empty space for user menu on desktop - this is where the fixed user menu will visually align */}
-          <div className="hidden md:block w-[180px] shrink-0" />
+          {/* Empty space for user menu on desktop */}
+          <div className="hidden md:block w-[200px] shrink-0" />
         </div>
       </div>
     </nav>

@@ -59,7 +59,7 @@ export const WorkspaceToolbar = ({
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border/30 safe-area-pb">
         <ScrollArea className="w-full">
-          <div className="flex items-center gap-1.5 p-2 min-w-max px-3">
+          <div className="flex items-center gap-2 p-2 min-w-max px-4">
             {tools.map((tool) => {
               const Icon = tool.icon;
               const isActive = activeTool === tool.id;
@@ -70,7 +70,7 @@ export const WorkspaceToolbar = ({
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-14 min-w-[52px] flex-col gap-1 rounded-xl transition-all duration-200 px-2",
+                    "h-14 min-w-[56px] flex-col gap-1.5 rounded-xl transition-all duration-200 px-3",
                     isActive
                       ? "bg-primary/20 text-primary ring-1 ring-primary/30"
                       : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
@@ -79,7 +79,7 @@ export const WorkspaceToolbar = ({
                   disabled={disabled}
                 >
                   <Icon className="h-5 w-5" />
-                  <span className="text-[10px] leading-none whitespace-nowrap">
+                  <span className="text-[10px] leading-none whitespace-nowrap font-medium">
                     {tool.label}
                   </span>
                 </Button>
@@ -95,8 +95,8 @@ export const WorkspaceToolbar = ({
   // Desktop: Vertical fixed sidebar
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="fixed left-0 top-16 bottom-0 w-14 bg-background/90 backdrop-blur-xl border-r border-border/30 z-40">
-        <div className="flex flex-col items-center gap-1 p-2 pt-16">
+      <div className="fixed left-0 top-28 bottom-0 w-16 bg-background/90 backdrop-blur-xl border-r border-border/30 z-40">
+        <div className="flex flex-col items-center gap-2 p-3">
           {tools.map((tool) => {
             const Icon = tool.icon;
             const isActive = activeTool === tool.id;
@@ -108,7 +108,7 @@ export const WorkspaceToolbar = ({
                     variant="ghost"
                     size="icon"
                     className={cn(
-                      "h-10 w-10 rounded-xl transition-all duration-200",
+                      "h-11 w-11 rounded-xl transition-all duration-200",
                       isActive
                         ? "bg-primary/20 text-primary ring-1 ring-primary/30"
                         : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
@@ -119,7 +119,7 @@ export const WorkspaceToolbar = ({
                     <Icon className="h-5 w-5" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="text-xs">
+                <TooltipContent side="right" className="text-xs font-medium">
                   {tool.label}
                 </TooltipContent>
               </Tooltip>

@@ -1,126 +1,97 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Save,
+  Undo2,
+  Redo2,
+  Download,
+  Loader2,
+  Check,
+  FileDown,
+} from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { toast } from "sonner";
-import { Save, Undo, Redo, Maximize, Download, Check, Loader2 } from "lucide-react";
 
 interface WorkspaceTopBarProps {
   projectName?: string;
-  onSave?: () => void;
+  isSaving?: boolean;
+  saveStatus?: "saved" | "saving" | "unsaved";
+  onExport?: () => void;
   onUndo?: () => void;
   onRedo?: () => void;
-  onResize?: () => void;
-  onExport?: () => void;
-  isSaving?: boolean;
+  onSaveProject?: () => void;
   canUndo?: boolean;
   canRedo?: boolean;
 }
 
 export const WorkspaceTopBar = ({
   projectName = "Untitled Design",
-  onSave,
+  isSaving = false,
+  saveStatus = "saved",
+  onExport,
   onUndo,
   onRedo,
-  onResize,
-  onExport,
-  isSaving = false,
+  onSaveProject,
   canUndo = false,
   canRedo = false,
 }: WorkspaceTopBarProps) => {
   const isMobile = useIsMobile();
-  const [showSaved, setShowSaved] = useState(false);
 
-  const handleSave = () => {
-    if (onSave) {
-      onSave();
-    } else {
-      setShowSaved(true);
-      toast.success("Design saved!");
-      setTimeout(() => setShowSaved(false), 2000);
+  const SaveStatusIndicator = () => {
+    if (saveStatus === "saving" || isSaving) {
+      return (
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Loader2 className="h-3 w-3 animate-spin" />
+          <span className="hidden sm:inline">Saving...</span>
+        </span>
+      );
     }
-  };
-
-  const handleUndo = () => {
-    if (onUndo) {
-      onUndo();
-    } else {
-      toast.info("Undo - Coming soon!");
+    if (saveStatus === "saved") {
+      return (
+        <span className="flex items-center gap-1.5 text-xs text-primary">
+          <Check className="h-3 w-3" />
+          <span className="hidden sm:inline">Saved</span>
+        </span>
+      );
     }
-  };
-
-  const handleRedo = () => {
-    if (onRedo) {
-      onRedo();
-    } else {
-      toast.info("Redo - Coming soon!");
-    }
-  };
-
-  const handleResize = () => {
-    if (onResize) {
-      onResize();
-    } else {
-      toast.info("Resize canvas - Coming soon!");
-    }
+    return (
+      <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <span className="w-2 h-2 bg-accent rounded-full" />
+        <span className="hidden sm:inline">Unsaved</span>
+      </span>
+    );
   };
 
   return (
     <TooltipProvider delayDuration={200}>
       <div className={cn(
         "fixed h-12 bg-background/90 backdrop-blur-xl border-b border-border/30 z-40",
-        isMobile ? "top-16 left-0 right-0" : "top-16 left-14 right-0"
+        isMobile ? "top-16 left-0 right-0" : "top-16 left-16 right-0"
       )}>
-        <div className="flex items-center justify-between h-full px-3 md:px-4 gap-2">
-          {/* Left: Project Name + Save Status */}
-          <div className="flex items-center gap-2 min-w-0 flex-shrink">
-            <span className="text-sm font-medium text-foreground truncate max-w-[80px] sm:max-w-[150px] md:max-w-[200px]">
+        <div className="h-full px-3 md:px-4 flex items-center justify-between gap-3">
+          {/* Left: Project Info */}
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <span className="font-medium text-sm truncate max-w-[100px] md:max-w-[200px]">
               {projectName}
             </span>
-            {isSaving ? (
-              <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-                <Loader2 className="h-3 w-3 animate-spin" />
-                <span className="hidden sm:inline">Saving...</span>
-              </span>
-            ) : showSaved ? (
-              <span className="flex items-center gap-1 text-xs text-primary shrink-0">
-                <Check className="h-3 w-3" />
-                <span className="hidden sm:inline">Saved</span>
-              </span>
-            ) : null}
+            <SaveStatusIndicator />
           </div>
 
-          {/* Center: Actions */}
-          <div className="flex items-center gap-0.5 md:gap-1 shrink-0">
+          {/* Center: Undo/Redo */}
+          <div className="flex items-center gap-1">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8"
-                  onClick={handleSave}
+                  className="h-9 w-9"
+                  onClick={onUndo}
+                  disabled={!canUndo}
                 >
-                  <Save className="h-4 w-4" />
+                  <Undo2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Save</TooltipContent>
-            </Tooltip>
-
-            <div className="w-px h-4 bg-border/30 mx-0.5 hidden sm:block" />
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={handleUndo}
-                >
-                  <Undo className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Undo</TooltipContent>
+              <TooltipContent>Undo (Ctrl+Z)</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -128,45 +99,46 @@ export const WorkspaceTopBar = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8"
-                  onClick={handleRedo}
+                  className="h-9 w-9"
+                  onClick={onRedo}
+                  disabled={!canRedo}
                 >
-                  <Redo className="h-4 w-4" />
+                  <Redo2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Redo</TooltipContent>
+              <TooltipContent>Redo (Ctrl+Shift+Z)</TooltipContent>
             </Tooltip>
+          </div>
 
-            {!isMobile && (
-              <>
-                <div className="w-px h-4 bg-border/30 mx-1" />
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 gap-2" 
-                      onClick={handleResize}
-                    >
-                      <Maximize className="h-4 w-4" />
-                      <span className="hidden lg:inline">Resize</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Resize Canvas</TooltipContent>
-                </Tooltip>
-              </>
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2 flex-1 justify-end">
+            {onSaveProject && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={onSaveProject}
+                  >
+                    <FileDown className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Save Project (.epic)</TooltipContent>
+              </Tooltip>
             )}
-          </div>
 
-          {/* Right: Export */}
-          <Button
-            onClick={onExport}
-            className="h-8 gap-1.5 bg-primary hover:bg-primary/90 min-h-[36px] shrink-0 px-3"
-          >
-            <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">Export</span>
-          </Button>
+            <Button
+              onClick={onExport}
+              className={cn(
+                "gap-2 h-9 px-3 md:px-4 min-h-[40px]",
+                "bg-primary hover:bg-primary/90"
+              )}
+            >
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline font-medium">Export</span>
+            </Button>
+          </div>
         </div>
       </div>
     </TooltipProvider>
