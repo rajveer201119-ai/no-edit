@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +59,33 @@ const libraryCategories = [
   { id: "minimal", label: "Minimal Collection" },
 ];
 
+// Simple fuzzy search function
+const fuzzyMatch = (query: string, text: string): boolean => {
+  const lowerQuery = query.toLowerCase().trim();
+  const lowerText = text.toLowerCase();
+  
+  if (!lowerQuery) return true;
+  if (lowerText.includes(lowerQuery)) return true;
+  
+  // Typo tolerance - check if most characters match
+  const words = lowerQuery.split(" ");
+  return words.every(word => {
+    if (lowerText.includes(word)) return true;
+    // Allow 1 character difference for words > 3 chars
+    if (word.length > 3) {
+      for (let i = 0; i < lowerText.length - word.length + 1; i++) {
+        const substr = lowerText.slice(i, i + word.length);
+        let diff = 0;
+        for (let j = 0; j < word.length; j++) {
+          if (word[j] !== substr[j]) diff++;
+        }
+        if (diff <= 1) return true;
+      }
+    }
+    return false;
+  });
+};
+
 export const LibraryTab = ({ onUseTemplate }: LibraryTabProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedPrompt, setCopiedPrompt] = useState<string | null>(null);
@@ -74,14 +101,39 @@ export const LibraryTab = ({ onUseTemplate }: LibraryTabProps) => {
     }
   };
 
-  // Group templates by category for display
-  const templatesByCategory: Record<string, Template[]> = {
-    trending: templates.slice(0, 3),
-    startup: templates.filter((t) => t.category === "poster"),
-    ads: templates.filter((t) => t.category === "instagram"),
-    premium: templates.filter((t) => t.category === "youtube"),
-    minimal: templates.filter((t) => t.category === "logo"),
-  };
+  // Group and filter templates by category
+  const templatesByCategory: Record<string, Template[]> = useMemo(() => {
+    const base = {
+      trending: templates.slice(0, 3),
+      startup: templates.filter((t) => t.category === "poster"),
+      ads: templates.filter((t) => t.category === "instagram"),
+      premium: templates.filter((t) => t.category === "youtube"),
+      minimal: templates.filter((t) => t.category === "logo"),
+    };
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      return Object.fromEntries(
+        Object.entries(base).map(([key, temps]) => [
+          key,
+          temps.filter((t) =>
+            fuzzyMatch(searchQuery, `${t.name} ${t.category}`)
+          ),
+        ])
+      );
+    }
+    return base;
+  }, [searchQuery]);
+
+  // Filter prompts
+  const filteredPrompts = useMemo(() => {
+    if (!searchQuery.trim()) return aiPrompts;
+    return aiPrompts.filter((p) =>
+      fuzzyMatch(searchQuery, `${p.title} ${p.description} ${p.tool}`)
+    );
+  }, [searchQuery]);
+
+  const hasResults = Object.values(templatesByCategory).some((t) => t.length > 0) || filteredPrompts.length > 0;
 
   return (
     <div className="min-h-screen pt-20 pb-12">
@@ -104,10 +156,18 @@ export const LibraryTab = ({ onUseTemplate }: LibraryTabProps) => {
               placeholder="Search templates..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-12"
             />
           </div>
         </div>
+
+        {/* Empty State */}
+        {!hasResults && (
+          <div className="text-center py-16">
+            <p className="text-muted-foreground text-lg mb-2">No templates found</p>
+            <p className="text-sm text-muted-foreground">Try a different search term</p>
+          </div>
+        )}
 
         {/* Template Categories */}
         {libraryCategories.map((category) => {
@@ -124,7 +184,7 @@ export const LibraryTab = ({ onUseTemplate }: LibraryTabProps) => {
                 {categoryTemplates.map((template) => (
                   <div
                     key={template.id}
-                    className="group relative bg-muted/30 rounded-xl overflow-hidden border border-border/30 hover:border-primary/50 transition-all"
+                    className="group relative bg-muted/30 rounded-xl overflow-hidden border border-border/30 hover:border-primary/50 transition-all hover:shadow-lg"
                   >
                     {/* Template Preview - Simple color representation */}
                     <div
@@ -143,7 +203,7 @@ export const LibraryTab = ({ onUseTemplate }: LibraryTabProps) => {
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <Button
                         onClick={() => onUseTemplate(template)}
-                        className="bg-primary hover:bg-primary/90"
+                        className="bg-primary hover:bg-primary/90 min-h-[44px]"
                       >
                         Use Template
                       </Button>
@@ -164,63 +224,65 @@ export const LibraryTab = ({ onUseTemplate }: LibraryTabProps) => {
         })}
 
         {/* AI Prompt Vault */}
-        <section className="mt-16 pt-8 border-t border-border/30">
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-1">
-              Prompts for External AI Tools
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Use with Midjourney, DALL·E, and other AI image generators
-            </p>
-          </div>
+        {filteredPrompts.length > 0 && (
+          <section className="mt-16 pt-8 border-t border-border/30">
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold mb-1">
+                Prompts for External AI Tools
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Use with Midjourney, DALL·E, and other AI image generators
+              </p>
+            </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {aiPrompts.map((prompt) => (
-              <div
-                key={prompt.id}
-                className="bg-muted/30 rounded-xl p-4 border border-border/30"
-              >
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div>
-                    <h3 className="font-medium">{prompt.title}</h3>
-                    <p className="text-xs text-muted-foreground">{prompt.description}</p>
-                  </div>
-                  <span className="text-[10px] px-2 py-0.5 bg-primary/20 text-primary rounded-full whitespace-nowrap">
-                    {prompt.tool}
-                  </span>
-                </div>
-
-                <div className="bg-background/50 rounded-lg p-3 mt-3 text-xs text-muted-foreground font-mono">
-                  {prompt.prompt}
-                </div>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full mt-3 gap-2"
-                  onClick={() => handleCopyPrompt(prompt.id, prompt.prompt)}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredPrompts.map((prompt) => (
+                <div
+                  key={prompt.id}
+                  className="bg-muted/30 rounded-xl p-4 border border-border/30 hover:border-border/50 transition-all"
                 >
-                  {copiedPrompt === prompt.id ? (
-                    <>
-                      <Check className="h-3 w-3" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" />
-                      Copy Prompt
-                    </>
-                  )}
-                </Button>
-              </div>
-            ))}
-          </div>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div>
+                      <h3 className="font-medium">{prompt.title}</h3>
+                      <p className="text-xs text-muted-foreground">{prompt.description}</p>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 bg-primary/20 text-primary rounded-full whitespace-nowrap">
+                      {prompt.tool}
+                    </span>
+                  </div>
 
-          <p className="text-center text-xs text-muted-foreground mt-6 flex items-center justify-center gap-1">
-            <ExternalLink className="h-3 w-3" />
-            These prompts are designed for external AI tools, not EPIC's internal AI
-          </p>
-        </section>
+                  <div className="bg-background/50 rounded-lg p-3 mt-3 text-xs text-muted-foreground font-mono break-words">
+                    {prompt.prompt}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-3 gap-2 min-h-[44px]"
+                    onClick={() => handleCopyPrompt(prompt.id, prompt.prompt)}
+                  >
+                    {copiedPrompt === prompt.id ? (
+                      <>
+                        <Check className="h-3 w-3" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3 w-3" />
+                        Copy Prompt
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-center text-xs text-muted-foreground mt-6 flex items-center justify-center gap-1">
+              <ExternalLink className="h-3 w-3" />
+              These prompts are designed for external AI tools, not EPIC's internal AI
+            </p>
+          </section>
+        )}
       </div>
     </div>
   );

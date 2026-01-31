@@ -316,7 +316,7 @@ const Index = () => {
     // QuickStartStrip: h-11 (44px) at top-28
     // Total top offset: 64 + 48 + 44 = 156px
     return (
-      <div className="min-h-screen pt-[156px] pb-20 md:pb-4">
+      <div className="min-h-screen pt-40 pb-20 md:pb-4">
         {/* Workspace Top Bar */}
         <WorkspaceTopBar
           projectName={currentTemplate?.name || "New Design"}
@@ -339,7 +339,7 @@ const Index = () => {
         />
 
         {/* Canvas Area - responsive padding for left toolbar */}
-        <div className="px-2 md:pl-16 md:pr-4">
+        <div className="px-2 md:pl-20 md:pr-4">
           <CanvasWorkspace
             template={currentTemplate}
             activeTool={activeTool}
