@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Loader2, Shuffle, Layout, Play, Copy, Check } from "lucide-react";
+import { Loader2, Shuffle, Play, Copy, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Template } from "./templates";
@@ -148,19 +148,22 @@ export const InspireTab = ({ onRemix, onUseLayout, onStartFrom }: InspireTabProp
     handleCopyPrompt(item);
   };
 
-  // Handle start from click
+  // Handle start from click - opens in editor
   const handleStartFromClick = (item: FeedItem) => {
     if (item.imageUrl) {
+      // Pass the image URL to open in the workspace
       onStartFrom(item.imageUrl);
+      toast.success("Opening in editor...");
     } else {
-      // No image, copy prompt instead
+      // No image available, copy prompt instead
       handleCopyPrompt(item);
+      toast.info("No image available. Prompt copied instead!");
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center pt-16">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -203,7 +206,7 @@ export const InspireTab = ({ onRemix, onUseLayout, onStartFrom }: InspireTabProp
         </div>
 
         {/* Feed Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredItems.map((item) => (
             <div
               key={item.id}
@@ -218,9 +221,9 @@ export const InspireTab = ({ onRemix, onUseLayout, onStartFrom }: InspireTabProp
                   loading="lazy"
                 />
               ) : (
-                <div className="w-full aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                  <span className="text-muted-foreground text-sm text-center px-4">
-                    {item.prompt.slice(0, 50)}...
+                <div className="w-full aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center p-4">
+                  <span className="text-muted-foreground text-sm text-center line-clamp-4">
+                    {item.prompt.slice(0, 100)}...
                   </span>
                 </div>
               )}
@@ -247,7 +250,7 @@ export const InspireTab = ({ onRemix, onUseLayout, onStartFrom }: InspireTabProp
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full max-w-[200px] gap-2 min-h-[44px]"
+                  className="w-full max-w-[200px] gap-2 min-h-[44px] bg-white/10 border-white/30 text-white hover:bg-white/20"
                   onClick={() => handleStartFromClick(item)}
                 >
                   <Play className="h-4 w-4" />
@@ -294,7 +297,7 @@ export const InspireTab = ({ onRemix, onUseLayout, onStartFrom }: InspireTabProp
             </DialogDescription>
           </DialogHeader>
           
-          <div className="bg-muted/50 rounded-lg p-4 text-sm font-mono">
+          <div className="bg-muted/50 rounded-lg p-4 text-sm font-mono break-words">
             {selectedPrompt?.prompt}
           </div>
           

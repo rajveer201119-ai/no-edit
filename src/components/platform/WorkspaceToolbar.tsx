@@ -35,16 +35,16 @@ interface WorkspaceToolbarProps {
 }
 
 const tools = [
-  { id: "select" as const, label: "Select / Move", icon: MousePointer2 },
+  { id: "select" as const, label: "Select", icon: MousePointer2 },
   { id: "text" as const, label: "Text", icon: Type },
   { id: "image" as const, label: "Image", icon: ImageIcon },
   { id: "upload" as const, label: "Upload", icon: Upload },
   { id: "crop" as const, label: "Crop", icon: Crop },
   { id: "shapes" as const, label: "Shapes", icon: Shapes },
-  { id: "elements" as const, label: "Elements / Icons", icon: Layers },
-  { id: "background" as const, label: "Background", icon: PaintBucket },
+  { id: "elements" as const, label: "Elements", icon: Layers },
+  { id: "background" as const, label: "BG", icon: PaintBucket },
   { id: "effects" as const, label: "Effects", icon: Sparkles },
-  { id: "enhance" as const, label: "Enhance (AI)", icon: Wand2 },
+  { id: "enhance" as const, label: "AI", icon: Wand2 },
 ];
 
 export const WorkspaceToolbar = ({
@@ -57,9 +57,9 @@ export const WorkspaceToolbar = ({
   // Mobile: Horizontal scrollable strip at bottom
   if (isMobile) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-t border-border/30 safe-area-pb">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border/30 safe-area-pb">
         <ScrollArea className="w-full">
-          <div className="flex items-center gap-1 p-2 min-w-max">
+          <div className="flex items-center gap-1.5 p-2 min-w-max px-3">
             {tools.map((tool) => {
               const Icon = tool.icon;
               const isActive = activeTool === tool.id;
@@ -70,7 +70,7 @@ export const WorkspaceToolbar = ({
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-12 min-w-[56px] flex-col gap-1 rounded-xl transition-all duration-200 px-2",
+                    "h-14 min-w-[52px] flex-col gap-1 rounded-xl transition-all duration-200 px-2",
                     isActive
                       ? "bg-primary/20 text-primary ring-1 ring-primary/30"
                       : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
@@ -78,9 +78,9 @@ export const WorkspaceToolbar = ({
                   onClick={() => onToolChange(tool.id)}
                   disabled={disabled}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-5 w-5" />
                   <span className="text-[10px] leading-none whitespace-nowrap">
-                    {tool.label.split(" ")[0]}
+                    {tool.label}
                   </span>
                 </Button>
               );
@@ -96,7 +96,7 @@ export const WorkspaceToolbar = ({
   return (
     <TooltipProvider delayDuration={200}>
       <div className="fixed left-0 top-16 bottom-0 w-14 bg-background/90 backdrop-blur-xl border-r border-border/30 z-40">
-        <div className="flex flex-col items-center gap-1 p-2 pt-4">
+        <div className="flex flex-col items-center gap-1 p-2 pt-16">
           {tools.map((tool) => {
             const Icon = tool.icon;
             const isActive = activeTool === tool.id;
