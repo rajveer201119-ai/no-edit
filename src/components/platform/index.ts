@@ -8,4 +8,4 @@ export { LibraryTab } from "./LibraryTab";
 export { InspireTab } from "./InspireTab";
 export { NewHomepage } from "./NewHomepage";
 export { ExportDialog } from "./ExportDialog";
-export { templates, getTemplatesByCategory, getRandomTemplate, type Template, type TemplateElement } from "./templates";
+export { templates, getTemplatesByCategory, getRandomTemplate, searchTemplates, getAllTemplates, type Template, type TemplateElement } from "./templates";
