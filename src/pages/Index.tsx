@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -29,9 +29,6 @@ import {
   getRandomTemplate,
 } from "@/components/platform";
 
-import { useExportCanvas } from "@/components/platform/editor/useExportCanvas";
-import { Layer, CanvasState } from "@/components/platform/editor/types";
-
 const Index = () => {
   const navigate = useNavigate();
   const { isInstallable, promptInstall } = useInstallPrompt();
@@ -53,26 +50,12 @@ const Index = () => {
   const [activeTool, setActiveTool] = useState<ToolType>("select");
   const [importedImageUrl, setImportedImageUrl] = useState<string | null>(null);
 
-  // Canvas state from workspace
-  const [canvasLayers, setCanvasLayers] = useState<Layer[]>([]);
-  const [canvasWidth, setCanvasWidth] = useState(800);
-  const [canvasHeight, setCanvasHeight] = useState(600);
-  const [canUndo, setCanUndo] = useState(false);
-  const [canRedo, setCanRedo] = useState(false);
-
   // Export state
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showProDialog, setShowProDialog] = useState(false);
 
   // Workspace meta
-  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
-  
-  // Export hook
-  const { downloadExport } = useExportCanvas();
-
-  // Undo/redo callbacks from workspace
-  const undoRef = useRef<(() => void) | null>(null);
-  const redoRef = useRef<(() => void) | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Auth listeners
   useEffect(() => {
@@ -136,8 +119,6 @@ const Index = () => {
     const template = getRandomTemplate(category);
     if (template) {
       setCurrentTemplate(template);
-      setCanvasWidth(template.canvasWidth);
-      setCanvasHeight(template.canvasHeight);
       toast.success("Template loaded! Tap any text to edit.");
     } else {
       toast.info("No templates available. Start from scratch!");
@@ -153,8 +134,6 @@ const Index = () => {
     if (template) {
       setCurrentTemplate(template);
       setActiveDesignCategory(category);
-      setCanvasWidth(template.canvasWidth);
-      setCanvasHeight(template.canvasHeight);
       toast.success("Template swapped!");
     }
   };
@@ -163,36 +142,14 @@ const Index = () => {
   const handleUseTemplate = (template: Template) => {
     setCurrentTemplate(template);
     setActiveDesignCategory(template.category);
-    setCanvasWidth(template.canvasWidth);
-    setCanvasHeight(template.canvasHeight);
     setActiveTab("create");
     setShowHomepage(false);
     toast.success("Template loaded!");
   };
 
-  // Handle loading design from history
-  const handleLoadDesign = (state: CanvasState) => {
-    setCanvasLayers(state.layers);
-    setCanvasWidth(state.width);
-    setCanvasHeight(state.height);
-    setActiveTab("create");
-    setShowHomepage(false);
-    // Create a blank template to trigger workspace rendering
-    const blankTemplate: Template = {
-      id: "loaded-design",
-      name: "Loaded Design",
-      category: "custom" as DesignCategory,
-      thumbnailUrl: "",
-      canvasWidth: state.width,
-      canvasHeight: state.height,
-      elements: [],
-    };
-    setCurrentTemplate(blankTemplate);
-    toast.success("Design loaded!");
-  };
-
   // Handle remix from inspire
   const handleRemix = (imageUrl: string, prompt: string) => {
+    // For now, just switch to create tab
     setActiveTab("create");
     setShowHomepage(false);
     toast.info("Remix feature coming soon! For now, start fresh.");
@@ -200,6 +157,7 @@ const Index = () => {
 
   // Handle start from inspire - opens image in workspace
   const handleStartFrom = (imageUrl: string) => {
+    // Set a blank canvas template
     const blankTemplate: Template = {
       id: "imported-design",
       name: "Imported Design",
@@ -227,37 +185,63 @@ const Index = () => {
     toast.success("Image loaded in editor! Drag to position.");
   };
 
-  // Handle export using layer-based system
+  // Handle export - captures canvas and downloads
   const handleExport = async (format: "png" | "jpg" | "pdf") => {
-    // Get canvas layers from localStorage (set by CanvasWorkspace)
-    const savedState = localStorage.getItem("epic_project_state");
-    if (!savedState) {
-      toast.error("No design to export. Create something first!");
-      return;
-    }
-
     try {
-      const state = JSON.parse(savedState) as CanvasState;
-      
-      if (!state.layers || state.layers.length === 0) {
+      // Find the canvas element
+      const canvasContainer = document.querySelector('.bg-white.shadow-2xl.rounded-lg');
+      if (!canvasContainer) {
         toast.error("No design to export. Create something first!");
         return;
       }
 
-      await downloadExport(
-        state.layers,
-        state.width,
-        state.height,
-        { format, quality: 0.95, scale: 2 },
-        currentTemplate?.name || "design"
-      );
+      // Use html2canvas approach - for now simulate
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      
+      // Create a simple canvas export (placeholder - in production use html2canvas)
+      const canvas = document.createElement('canvas');
+      canvas.width = currentTemplate?.canvasWidth || 800;
+      canvas.height = currentTemplate?.canvasHeight || 600;
+      const ctx = canvas.getContext('2d');
+      
+      if (ctx) {
+        // Fill with template background
+        const bgElement = currentTemplate?.elements.find(el => el.id === 'bg');
+        ctx.fillStyle = bgElement?.backgroundColor || '#1a1a2e';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw text elements
+        currentTemplate?.elements.forEach(el => {
+          if (el.type === 'text' && el.content) {
+            ctx.fillStyle = el.color || '#ffffff';
+            ctx.font = `${el.fontWeight || 'normal'} ${el.fontSize || 16}px sans-serif`;
+            ctx.fillText(el.content, el.x, el.y + (el.fontSize || 16));
+          }
+        });
+
+        // Convert to blob and download
+        const mimeType = format === 'jpg' ? 'image/jpeg' : 'image/png';
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentTemplate?.name || 'design'}.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            toast.success(`Exported as ${format.toUpperCase()}!`);
+          }
+        }, mimeType, 0.95);
+      }
     } catch (error) {
-      console.error("Export error:", error);
+      console.error('Export error:', error);
       toast.error("Export failed. Please try again.");
     }
   };
 
-  // Render user menu in navbar
+  // Render user menu in navbar - compact for mobile
   const renderUserMenu = () => (
     <div className="flex items-center gap-1 md:gap-2">
       {isInstallable && !isMobile && (
@@ -298,7 +282,7 @@ const Index = () => {
     </div>
   );
 
-  // Render content based on active tab
+  // Determine what content to render
   const renderContent = () => {
     // Show homepage first
     if (showHomepage && activeTab === "create") {
@@ -312,12 +296,7 @@ const Index = () => {
 
     // Library tab
     if (activeTab === "library") {
-      return (
-        <LibraryTab
-          onUseTemplate={handleUseTemplate}
-          onLoadDesign={handleLoadDesign}
-        />
-      );
+      return <LibraryTab onUseTemplate={handleUseTemplate} />;
     }
 
     // Inspire tab
@@ -331,18 +310,20 @@ const Index = () => {
       );
     }
 
-    // Create workspace
+    // Create workspace - pt values to account for stacked bars
+    // Navbar: h-16 (64px) at top-0
+    // WorkspaceTopBar: h-12 (48px) at top-16
+    // QuickStartStrip: h-11 (44px) at top-28
+    // Total top offset: 64 + 48 + 44 = 156px
     return (
       <div className="min-h-screen pt-40 pb-20 md:pb-4">
         {/* Workspace Top Bar */}
         <WorkspaceTopBar
           projectName={currentTemplate?.name || "New Design"}
-          saveStatus={saveStatus}
+          isSaving={isSaving}
           onExport={() => setShowExportDialog(true)}
-          onUndo={() => undoRef.current?.()}
-          onRedo={() => redoRef.current?.()}
-          canUndo={canUndo}
-          canRedo={canRedo}
+          canUndo={false}
+          canRedo={false}
         />
 
         {/* Left Toolbar (desktop) / Bottom Toolbar (mobile) */}
@@ -357,15 +338,12 @@ const Index = () => {
           activeCategory={activeDesignCategory || undefined}
         />
 
-        {/* Canvas Area */}
+        {/* Canvas Area - responsive padding for left toolbar */}
         <div className="px-2 md:pl-20 md:pr-4">
           <CanvasWorkspace
             template={currentTemplate}
             activeTool={activeTool}
             initialImportedImage={importedImageUrl}
-            onSaveStatusChange={setSaveStatus}
-            onCanUndo={setCanUndo}
-            onCanRedo={setCanRedo}
           />
         </div>
       </div>
@@ -396,7 +374,7 @@ const Index = () => {
           }}
         />
 
-        {/* User Menu */}
+        {/* User Menu - Fixed in navbar area */}
         <div className="fixed top-0 right-2 md:right-4 h-16 flex items-center z-50">
           {renderUserMenu()}
         </div>

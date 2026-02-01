@@ -1,8 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { FileText, Instagram, Youtube, Hexagon, Maximize, Award, Presentation } from "lucide-react";
+import { FileText, Instagram, Youtube, Hexagon, Maximize } from "lucide-react";
 
-export type DesignCategory = "poster" | "instagram" | "youtube" | "logo" | "certificate" | "presentation" | "custom";
+export type DesignCategory = "poster" | "instagram" | "youtube" | "logo" | "custom";
 
 interface DesignTypeModalProps {
   open: boolean;
@@ -40,20 +40,6 @@ const designTypes = [
     color: "from-blue-500 to-cyan-500",
   },
   {
-    id: "certificate" as const,
-    label: "Certificate",
-    description: "Professional achievements & awards",
-    icon: Award,
-    color: "from-amber-500 to-orange-500",
-  },
-  {
-    id: "presentation" as const,
-    label: "Presentation",
-    description: "Slides & pitch decks",
-    icon: Presentation,
-    color: "from-green-500 to-emerald-500",
-  },
-  {
     id: "custom" as const,
     label: "Custom Size",
     description: "Start with custom dimensions",
@@ -72,7 +58,7 @@ export const DesignTypeModal = ({ open, onOpenChange, onSelect }: DesignTypeModa
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-3 py-4 max-h-[60vh] overflow-y-auto">
+        <div className="grid gap-3 py-4">
           {designTypes.map((type) => {
             const Icon = type.icon;
 

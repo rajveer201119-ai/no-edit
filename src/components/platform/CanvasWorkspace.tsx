@@ -2,14 +2,17 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ZoomIn,
   ZoomOut,
   Maximize2,
   Layers,
+  Upload,
+  Search,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Template, TemplateElement } from "./templates";
@@ -29,8 +32,6 @@ import {
   CropToolPanel,
   BackgroundPanel,
   CanvasRenderer,
-  ElementsToolPanel,
-  UploadModal,
 } from "./editor";
 
 interface CanvasWorkspaceProps {
@@ -62,7 +63,6 @@ export const CanvasWorkspace = ({
   const [zoom, setZoom] = useState(100);
   const [showLayerPanel, setShowLayerPanel] = useState(!isMobile);
   const [showToolPanel, setShowToolPanel] = useState(false);
-  const [showUploadModal, setShowUploadModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Layer manager hook
@@ -251,39 +251,60 @@ export const CanvasWorkspace = ({
     onZoomReset: () => setZoom(100),
   });
 
-  // Handle file upload from modal
-  const handleImageUpload = useCallback((imageData: string, fileName: string, dimensions: { width: number; height: number }) => {
-    const maxSize = 400;
-    let width = dimensions.width;
-    let height = dimensions.height;
-    
-    if (width > maxSize || height > maxSize) {
-      const ratio = Math.min(maxSize / width, maxSize / height);
-      width = width * ratio;
-      height = height * ratio;
+  // Handle file upload
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.match(/^image\/(png|jpe?g|webp)$/)) {
+      toast.error("Please upload PNG, JPG, or WEBP files only");
+      return;
     }
 
-    const newLayer: ImageLayer = {
-      id: `image-${Date.now()}`,
-      type: "image",
-      name: fileName.slice(0, 20),
-      x: (canvasState.width - width) / 2,
-      y: (canvasState.height - height) / 2,
-      width,
-      height,
-      rotation: 0,
-      opacity: 1,
-      locked: false,
-      visible: true,
-      zIndex: canvasState.layers.length,
-      src: imageData,
-      originalWidth: dimensions.width,
-      originalHeight: dimensions.height,
-    };
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSize = 400;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxSize || height > maxSize) {
+          const ratio = Math.min(maxSize / width, maxSize / height);
+          width = width * ratio;
+          height = height * ratio;
+        }
 
-    addLayer(newLayer);
-    selectLayer(newLayer.id);
-  }, [canvasState, addLayer, selectLayer]);
+        const newLayer: ImageLayer = {
+          id: `image-${Date.now()}`,
+          type: "image",
+          name: file.name.slice(0, 20),
+          x: (canvasState.width - width) / 2,
+          y: (canvasState.height - height) / 2,
+          width,
+          height,
+          rotation: 0,
+          opacity: 1,
+          locked: false,
+          visible: true,
+          zIndex: canvasState.layers.length,
+          src: event.target?.result as string,
+          originalWidth: img.width,
+          originalHeight: img.height,
+        };
+
+        addLayer(newLayer);
+        selectLayer(newLayer.id);
+        toast.success("Image imported!");
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   // Add text layer
   const handleAddText = useCallback((x?: number, y?: number) => {
@@ -345,74 +366,6 @@ export const CanvasWorkspace = ({
     toast.success(`${newLayer.name} added!`);
   }, [canvasState, addLayer, selectLayer]);
 
-  // Add icon as shape
-  const handleAddIcon = useCallback((iconName: string, _svgPath: string) => {
-    const newLayer: ShapeLayer = {
-      id: `icon-${Date.now()}`,
-      type: "shape",
-      name: iconName,
-      x: canvasState.width / 2 - 40,
-      y: canvasState.height / 2 - 40,
-      width: 80,
-      height: 80,
-      rotation: 0,
-      opacity: 1,
-      locked: false,
-      visible: true,
-      zIndex: canvasState.layers.length,
-      shapeType: "rectangle",
-      fillColor: "#3b82f6",
-      strokeColor: "transparent",
-      strokeWidth: 0,
-      borderRadius: 12,
-    };
-
-    addLayer(newLayer);
-    selectLayer(newLayer.id);
-  }, [canvasState, addLayer, selectLayer]);
-
-  // Add graphic
-  const handleAddGraphic = useCallback((graphicType: string) => {
-    const isCircle = graphicType.includes("circle") || graphicType.includes("blob");
-    const colors: Record<string, string> = {
-      "badge-circle": "#3b82f6",
-      "badge-ribbon": "#ef4444",
-      "banner-wave": "#10b981",
-      "divider-line": "#6b7280",
-      "divider-dots": "#6b7280",
-      "frame-simple": "#1f2937",
-      "frame-rounded": "#1f2937",
-      "callout-arrow": "#f59e0b",
-      "blob-1": "#8b5cf6",
-      "blob-2": "#ec4899",
-      "gradient-circle": "#6366f1",
-      "gradient-rect": "#14b8a6",
-    };
-
-    const newLayer: ShapeLayer = {
-      id: `graphic-${Date.now()}`,
-      type: "shape",
-      name: graphicType,
-      x: canvasState.width / 2 - 60,
-      y: canvasState.height / 2 - 60,
-      width: 120,
-      height: 120,
-      rotation: 0,
-      opacity: 1,
-      locked: false,
-      visible: true,
-      zIndex: canvasState.layers.length,
-      shapeType: isCircle ? "circle" : "rectangle",
-      fillColor: colors[graphicType] || "#3b82f6",
-      strokeColor: "transparent",
-      strokeWidth: 0,
-      borderRadius: isCircle ? 60 : 16,
-    };
-
-    addLayer(newLayer);
-    selectLayer(newLayer.id);
-  }, [canvasState, addLayer, selectLayer]);
-
   // Handle canvas click for text tool
   const handleCanvasClick = useCallback((x: number, y: number) => {
     if (activeTool === "text") {
@@ -432,7 +385,7 @@ export const CanvasWorkspace = ({
   // Trigger tool-specific actions
   useEffect(() => {
     if (activeTool === "upload" || activeTool === "image") {
-      setShowUploadModal(true);
+      fileInputRef.current?.click();
     } else if (activeTool === "enhance") {
       toast.info("AI Enhance - Feature coming soon!", { duration: 3000 });
     } else if (activeTool === "effects") {
@@ -472,13 +425,6 @@ export const CanvasWorkspace = ({
                 updateLayer(selectedLayer.id, updates);
               }
             }}
-          />
-        );
-      case "elements":
-        return (
-          <ElementsToolPanel
-            onAddIcon={handleAddIcon}
-            onAddGraphic={handleAddGraphic}
           />
         );
       case "crop":
@@ -523,28 +469,31 @@ export const CanvasWorkspace = ({
           <p className="text-lg mb-2">Start with a template or create freely.</p>
           <p className="text-sm mb-6">Select a design type from the Quick Start strip above.</p>
           
-          <Button variant="outline" className="gap-2 min-h-[44px]" onClick={() => setShowUploadModal(true)}>
-            <Layers className="h-4 w-4" />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          
+          <Button variant="outline" className="gap-2 min-h-[44px]" onClick={() => fileInputRef.current?.click()}>
+            <Upload className="h-4 w-4" />
             Import Your Design
           </Button>
         </div>
-
-        <UploadModal
-          open={showUploadModal}
-          onOpenChange={setShowUploadModal}
-          onImageUpload={handleImageUpload}
-        />
       </div>
     );
   }
 
   return (
     <div className={cn("flex flex-col h-full", isMobile && "pb-24")}>
-      {/* Upload Modal */}
-      <UploadModal
-        open={showUploadModal}
-        onOpenChange={setShowUploadModal}
-        onImageUpload={handleImageUpload}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        onChange={handleFileUpload}
+        className="hidden"
       />
 
       {/* Zoom Controls */}
