@@ -1,0 +1,411 @@
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import {
+  Star,
+  Heart,
+  Circle,
+  Square,
+  Triangle,
+  Hexagon,
+  Pentagon,
+  Octagon,
+  ArrowRight,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  Check,
+  X,
+  Plus,
+  Minus,
+  AlertTriangle,
+  Info,
+  HelpCircle,
+  MessageCircle,
+  MessageSquare,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Clock,
+  User,
+  Users,
+  Home,
+  Settings,
+  Search,
+  Bookmark,
+  Flag,
+  Award,
+  Zap,
+  Sun,
+  Moon,
+  Cloud,
+  Flame,
+  Droplet,
+  Leaf,
+  Music,
+  Camera,
+  Video,
+  Mic,
+  Headphones,
+  Wifi,
+  Battery,
+  Globe,
+  Lock,
+  Unlock,
+  Eye,
+  EyeOff,
+  Bell,
+  Gift,
+  ShoppingCart,
+  CreditCard,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  BarChart,
+  PieChart,
+  Activity,
+  Target,
+  Crosshair,
+  Compass,
+  Navigation,
+  Send,
+  Share2,
+  Download,
+  Upload,
+  ExternalLink,
+  Link,
+  Paperclip,
+  File,
+  FileText,
+  Folder,
+  Image,
+  Type,
+  Bold,
+  Italic,
+  Underline,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  List,
+  CheckSquare,
+  Smile,
+  Frown,
+  Meh,
+  ThumbsUp,
+  ThumbsDown,
+  Coffee,
+  Utensils,
+  Briefcase,
+  GraduationCap,
+  Book,
+  Lightbulb,
+  Rocket,
+  Sparkles,
+  Crown,
+  Trophy,
+} from "lucide-react";
+import { useState } from "react";
+
+interface ElementsToolPanelProps {
+  onAddIcon: (iconName: string, svgPath: string) => void;
+  onAddGraphic: (graphicType: string) => void;
+}
+
+interface IconItem {
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  category: string;
+}
+
+// Icon library
+const iconLibrary: IconItem[] = [
+  // Basic
+  { name: "Star", icon: Star, category: "basic" },
+  { name: "Heart", icon: Heart, category: "basic" },
+  { name: "Circle", icon: Circle, category: "basic" },
+  { name: "Square", icon: Square, category: "basic" },
+  { name: "Triangle", icon: Triangle, category: "basic" },
+  { name: "Hexagon", icon: Hexagon, category: "basic" },
+  { name: "Pentagon", icon: Pentagon, category: "basic" },
+  { name: "Octagon", icon: Octagon, category: "basic" },
+  
+  // Arrows
+  { name: "ArrowRight", icon: ArrowRight, category: "arrows" },
+  { name: "ArrowUp", icon: ArrowUp, category: "arrows" },
+  { name: "ArrowDown", icon: ArrowDown, category: "arrows" },
+  { name: "ArrowLeft", icon: ArrowLeft, category: "arrows" },
+  { name: "Navigation", icon: Navigation, category: "arrows" },
+  { name: "Send", icon: Send, category: "arrows" },
+  { name: "Share", icon: Share2, category: "arrows" },
+  { name: "ExternalLink", icon: ExternalLink, category: "arrows" },
+  
+  // Status
+  { name: "Check", icon: Check, category: "status" },
+  { name: "X", icon: X, category: "status" },
+  { name: "Plus", icon: Plus, category: "status" },
+  { name: "Minus", icon: Minus, category: "status" },
+  { name: "AlertTriangle", icon: AlertTriangle, category: "status" },
+  { name: "Info", icon: Info, category: "status" },
+  { name: "HelpCircle", icon: HelpCircle, category: "status" },
+  
+  // Communication
+  { name: "MessageCircle", icon: MessageCircle, category: "communication" },
+  { name: "MessageSquare", icon: MessageSquare, category: "communication" },
+  { name: "Mail", icon: Mail, category: "communication" },
+  { name: "Phone", icon: Phone, category: "communication" },
+  { name: "Bell", icon: Bell, category: "communication" },
+  
+  // Location
+  { name: "MapPin", icon: MapPin, category: "location" },
+  { name: "Globe", icon: Globe, category: "location" },
+  { name: "Compass", icon: Compass, category: "location" },
+  { name: "Home", icon: Home, category: "location" },
+  
+  // Time
+  { name: "Calendar", icon: Calendar, category: "time" },
+  { name: "Clock", icon: Clock, category: "time" },
+  
+  // People
+  { name: "User", icon: User, category: "people" },
+  { name: "Users", icon: Users, category: "people" },
+  { name: "Smile", icon: Smile, category: "people" },
+  { name: "Frown", icon: Frown, category: "people" },
+  { name: "Meh", icon: Meh, category: "people" },
+  
+  // Interface
+  { name: "Settings", icon: Settings, category: "interface" },
+  { name: "Search", icon: Search, category: "interface" },
+  { name: "Bookmark", icon: Bookmark, category: "interface" },
+  { name: "Flag", icon: Flag, category: "interface" },
+  { name: "Lock", icon: Lock, category: "interface" },
+  { name: "Unlock", icon: Unlock, category: "interface" },
+  { name: "Eye", icon: Eye, category: "interface" },
+  { name: "EyeOff", icon: EyeOff, category: "interface" },
+  
+  // Weather
+  { name: "Sun", icon: Sun, category: "weather" },
+  { name: "Moon", icon: Moon, category: "weather" },
+  { name: "Cloud", icon: Cloud, category: "weather" },
+  { name: "Flame", icon: Flame, category: "weather" },
+  { name: "Droplet", icon: Droplet, category: "weather" },
+  { name: "Leaf", icon: Leaf, category: "weather" },
+  
+  // Media
+  { name: "Music", icon: Music, category: "media" },
+  { name: "Camera", icon: Camera, category: "media" },
+  { name: "Video", icon: Video, category: "media" },
+  { name: "Mic", icon: Mic, category: "media" },
+  { name: "Headphones", icon: Headphones, category: "media" },
+  { name: "Image", icon: Image, category: "media" },
+  
+  // Tech
+  { name: "Wifi", icon: Wifi, category: "tech" },
+  { name: "Battery", icon: Battery, category: "tech" },
+  { name: "Download", icon: Download, category: "tech" },
+  { name: "Upload", icon: Upload, category: "tech" },
+  { name: "Link", icon: Link, category: "tech" },
+  { name: "Paperclip", icon: Paperclip, category: "tech" },
+  
+  // Files
+  { name: "File", icon: File, category: "files" },
+  { name: "FileText", icon: FileText, category: "files" },
+  { name: "Folder", icon: Folder, category: "files" },
+  
+  // Commerce
+  { name: "Gift", icon: Gift, category: "commerce" },
+  { name: "ShoppingCart", icon: ShoppingCart, category: "commerce" },
+  { name: "CreditCard", icon: CreditCard, category: "commerce" },
+  { name: "DollarSign", icon: DollarSign, category: "commerce" },
+  
+  // Analytics
+  { name: "TrendingUp", icon: TrendingUp, category: "analytics" },
+  { name: "TrendingDown", icon: TrendingDown, category: "analytics" },
+  { name: "BarChart", icon: BarChart, category: "analytics" },
+  { name: "PieChart", icon: PieChart, category: "analytics" },
+  { name: "Activity", icon: Activity, category: "analytics" },
+  { name: "Target", icon: Target, category: "analytics" },
+  
+  // Text
+  { name: "Type", icon: Type, category: "text" },
+  { name: "Bold", icon: Bold, category: "text" },
+  { name: "Italic", icon: Italic, category: "text" },
+  { name: "AlignLeft", icon: AlignLeft, category: "text" },
+  { name: "AlignCenter", icon: AlignCenter, category: "text" },
+  { name: "AlignRight", icon: AlignRight, category: "text" },
+  { name: "List", icon: List, category: "text" },
+  { name: "CheckSquare", icon: CheckSquare, category: "text" },
+  
+  // Gestures
+  { name: "ThumbsUp", icon: ThumbsUp, category: "gestures" },
+  { name: "ThumbsDown", icon: ThumbsDown, category: "gestures" },
+  
+  // Objects
+  { name: "Coffee", icon: Coffee, category: "objects" },
+  { name: "Utensils", icon: Utensils, category: "objects" },
+  { name: "Briefcase", icon: Briefcase, category: "objects" },
+  { name: "GraduationCap", icon: GraduationCap, category: "objects" },
+  { name: "Book", icon: Book, category: "objects" },
+  { name: "Lightbulb", icon: Lightbulb, category: "objects" },
+  
+  // Special
+  { name: "Award", icon: Award, category: "special" },
+  { name: "Zap", icon: Zap, category: "special" },
+  { name: "Rocket", icon: Rocket, category: "special" },
+  { name: "Sparkles", icon: Sparkles, category: "special" },
+  { name: "Crown", icon: Crown, category: "special" },
+  { name: "Trophy", icon: Trophy, category: "special" },
+  { name: "Crosshair", icon: Crosshair, category: "special" },
+];
+
+// Graphics/Decorations
+const graphicItems = [
+  { id: "badge-circle", name: "Circle Badge", color: "#3b82f6" },
+  { id: "badge-ribbon", name: "Ribbon", color: "#ef4444" },
+  { id: "banner-wave", name: "Wave Banner", color: "#10b981" },
+  { id: "divider-line", name: "Line Divider", color: "#6b7280" },
+  { id: "divider-dots", name: "Dots Divider", color: "#6b7280" },
+  { id: "frame-simple", name: "Simple Frame", color: "#1f2937" },
+  { id: "frame-rounded", name: "Rounded Frame", color: "#1f2937" },
+  { id: "callout-arrow", name: "Arrow Callout", color: "#f59e0b" },
+  { id: "blob-1", name: "Blob Shape 1", color: "#8b5cf6" },
+  { id: "blob-2", name: "Blob Shape 2", color: "#ec4899" },
+  { id: "gradient-circle", name: "Gradient Circle", color: "#6366f1" },
+  { id: "gradient-rect", name: "Gradient Rectangle", color: "#14b8a6" },
+];
+
+const categories = [
+  "all",
+  "basic",
+  "arrows",
+  "status",
+  "communication",
+  "people",
+  "interface",
+  "media",
+  "commerce",
+  "special",
+];
+
+export const ElementsToolPanel = ({ onAddIcon, onAddGraphic }: ElementsToolPanelProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  const filteredIcons = iconLibrary.filter((icon) => {
+    const matchesSearch = icon.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || icon.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const handleAddIcon = (item: IconItem) => {
+    // Generate SVG path for the icon
+    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${item.name}</svg>`;
+    onAddIcon(item.name, svgContent);
+    toast.success(`${item.name} icon added!`);
+  };
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-4 space-y-4">
+        {/* Search */}
+        <div className="space-y-2">
+          <Label className="text-xs font-medium">Search Elements</Label>
+          <Input
+            type="text"
+            placeholder="Search icons..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-9"
+          />
+        </div>
+
+        <Tabs defaultValue="icons" className="w-full">
+          <TabsList className="w-full grid grid-cols-2">
+            <TabsTrigger value="icons">Icons</TabsTrigger>
+            <TabsTrigger value="graphics">Graphics</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="icons" className="mt-4 space-y-4">
+            {/* Category Filter */}
+            <ScrollArea className="w-full">
+              <div className="flex gap-2 pb-2">
+                {categories.map((cat) => (
+                  <Button
+                    key={cat}
+                    variant={selectedCategory === cat ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 text-xs capitalize whitespace-nowrap"
+                    onClick={() => setSelectedCategory(cat)}
+                  >
+                    {cat}
+                  </Button>
+                ))}
+              </div>
+            </ScrollArea>
+
+            {/* Icons Grid */}
+            <div className="grid grid-cols-5 gap-2">
+              {filteredIcons.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Button
+                    key={item.name}
+                    variant="outline"
+                    size="icon"
+                    className="h-10 w-10 hover:bg-primary/10 hover:border-primary/30"
+                    onClick={() => handleAddIcon(item)}
+                    title={item.name}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </Button>
+                );
+              })}
+            </div>
+
+            {filteredIcons.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No icons found. Try a different search.
+              </p>
+            )}
+          </TabsContent>
+
+          <TabsContent value="graphics" className="mt-4 space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              {graphicItems.map((item) => (
+                <Button
+                  key={item.id}
+                  variant="outline"
+                  className="h-20 flex flex-col gap-2 hover:bg-primary/10 hover:border-primary/30"
+                  onClick={() => {
+                    onAddGraphic(item.id);
+                    toast.success(`${item.name} added!`);
+                  }}
+                >
+                  <div
+                    className={cn(
+                      "w-8 h-8 rounded",
+                      item.id.includes("circle") && "rounded-full",
+                      item.id.includes("blob") && "rounded-[40%_60%_60%_40%/40%_40%_60%_60%]"
+                    )}
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span className="text-xs">{item.name}</span>
+                </Button>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        <div className="pt-4 border-t border-border/30">
+          <p className="text-xs text-muted-foreground text-center">
+            Click any element to add it to your canvas. Elements can be resized, rotated, and recolored.
+          </p>
+        </div>
+      </div>
+    </ScrollArea>
+  );
+};
