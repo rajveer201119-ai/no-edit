@@ -108,17 +108,19 @@ import {
   Sparkles,
   Crown,
   Trophy,
+  LucideIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
+import * as ReactDOMServer from "react-dom/server";
 
 interface ElementsToolPanelProps {
-  onAddIcon: (iconName: string, svgPath: string) => void;
+  onAddIcon: (iconName: string, svgContent: string, IconComponent: LucideIcon) => void;
   onAddGraphic: (graphicType: string) => void;
 }
 
 interface IconItem {
   name: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   category: string;
 }
 
@@ -291,9 +293,52 @@ const categories = [
   "special",
 ];
 
+// Generate SVG string from Lucide icon component
+const generateSvgString = (IconComponent: LucideIcon, color: string = "#000000"): string => {
+  try {
+    const svgString = ReactDOMServer.renderToStaticMarkup(
+      <IconComponent 
+        width={64} 
+        height={64} 
+        color={color}
+        strokeWidth={2}
+      />
+    );
+    return svgString;
+  } catch {
+    // Fallback SVG
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>`;
+  }
+};
+
+// Memoized icon button component for performance
+const IconButton = memo(({ 
+  item, 
+  onAdd 
+}: { 
+  item: IconItem; 
+  onAdd: (item: IconItem) => void 
+}) => {
+  const Icon = item.icon;
+  return (
+    <Button
+      variant="outline"
+      size="icon"
+      className="h-10 w-10 hover:bg-primary/10 hover:border-primary/30 transition-all"
+      onClick={() => onAdd(item)}
+      title={item.name}
+    >
+      <Icon className="h-5 w-5" />
+    </Button>
+  );
+});
+
+IconButton.displayName = "IconButton";
+
 export const ElementsToolPanel = ({ onAddIcon, onAddGraphic }: ElementsToolPanelProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isAdding, setIsAdding] = useState(false);
 
   const filteredIcons = iconLibrary.filter((icon) => {
     const matchesSearch = icon.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -301,12 +346,32 @@ export const ElementsToolPanel = ({ onAddIcon, onAddGraphic }: ElementsToolPanel
     return matchesSearch && matchesCategory;
   });
 
-  const handleAddIcon = (item: IconItem) => {
-    // Generate SVG path for the icon
-    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${item.name}</svg>`;
-    onAddIcon(item.name, svgContent);
-    toast.success(`${item.name} icon added!`);
-  };
+  const handleAddIcon = useCallback((item: IconItem) => {
+    if (isAdding) return;
+    setIsAdding(true);
+    
+    try {
+      // Generate actual SVG content from the icon component
+      const svgContent = generateSvgString(item.icon, "#3b82f6");
+      onAddIcon(item.name, svgContent, item.icon);
+      toast.success(`${item.name} added to canvas!`);
+    } catch (error) {
+      console.error("Failed to add icon:", error);
+      toast.error(`Failed to add ${item.name}. Please try again.`);
+    } finally {
+      setTimeout(() => setIsAdding(false), 100);
+    }
+  }, [onAddIcon, isAdding]);
+
+  const handleAddGraphic = useCallback((item: typeof graphicItems[0]) => {
+    try {
+      onAddGraphic(item.id);
+      toast.success(`${item.name} added to canvas!`);
+    } catch (error) {
+      console.error("Failed to add graphic:", error);
+      toast.error(`Failed to add ${item.name}. Please try again.`);
+    }
+  }, [onAddGraphic]);
 
   return (
     <ScrollArea className="h-full">
@@ -349,27 +414,22 @@ export const ElementsToolPanel = ({ onAddIcon, onAddGraphic }: ElementsToolPanel
 
             {/* Icons Grid */}
             <div className="grid grid-cols-5 gap-2">
-              {filteredIcons.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Button
-                    key={item.name}
-                    variant="outline"
-                    size="icon"
-                    className="h-10 w-10 hover:bg-primary/10 hover:border-primary/30"
-                    onClick={() => handleAddIcon(item)}
-                    title={item.name}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </Button>
-                );
-              })}
+              {filteredIcons.map((item) => (
+                <IconButton 
+                  key={item.name} 
+                  item={item} 
+                  onAdd={handleAddIcon}
+                />
+              ))}
             </div>
 
             {filteredIcons.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                No icons found. Try a different search.
-              </p>
+              <div className="text-center py-8">
+                <Search className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  No icons found. Try a different search.
+                </p>
+              </div>
             )}
           </TabsContent>
 
@@ -379,15 +439,12 @@ export const ElementsToolPanel = ({ onAddIcon, onAddGraphic }: ElementsToolPanel
                 <Button
                   key={item.id}
                   variant="outline"
-                  className="h-20 flex flex-col gap-2 hover:bg-primary/10 hover:border-primary/30"
-                  onClick={() => {
-                    onAddGraphic(item.id);
-                    toast.success(`${item.name} added!`);
-                  }}
+                  className="h-20 flex flex-col gap-2 hover:bg-primary/10 hover:border-primary/30 transition-all"
+                  onClick={() => handleAddGraphic(item)}
                 >
                   <div
                     className={cn(
-                      "w-8 h-8 rounded",
+                      "w-8 h-8 rounded transition-transform hover:scale-110",
                       item.id.includes("circle") && "rounded-full",
                       item.id.includes("blob") && "rounded-[40%_60%_60%_40%/40%_40%_60%_60%]"
                     )}

@@ -8,4 +8,5 @@ export { LibraryTab } from "./LibraryTab";
 export { InspireTab } from "./InspireTab";
 export { NewHomepage } from "./NewHomepage";
 export { ExportDialog } from "./ExportDialog";
+export { LandingCredibility } from "./LandingCredibility";
 export { templates, getTemplatesByCategory, getRandomTemplate, searchTemplates, getAllTemplates, type Template, type TemplateElement } from "./templates";

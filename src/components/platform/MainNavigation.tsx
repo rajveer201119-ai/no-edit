@@ -1,22 +1,32 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Palette, Library, Lightbulb, Menu, X } from "lucide-react";
+import { Palette, Library, Lightbulb, Menu, Home, Sparkles, Shield, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-export type MainTab = "create" | "library" | "inspire";
+export type MainTab = "home" | "create" | "library" | "inspire";
 
 interface MainNavigationProps {
   activeTab: MainTab;
   onTabChange: (tab: MainTab) => void;
+  isAdmin?: boolean;
+  onAdminClick?: () => void;
+  onProClick?: () => void;
 }
 
-export const MainNavigation = ({ activeTab, onTabChange }: MainNavigationProps) => {
+export const MainNavigation = ({ 
+  activeTab, 
+  onTabChange,
+  isAdmin,
+  onAdminClick,
+  onProClick,
+}: MainNavigationProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const tabs = [
+    { id: "home" as const, label: "Home", icon: Home },
     { id: "create" as const, label: "Create", icon: Palette },
     { id: "library" as const, label: "Library", icon: Library },
     { id: "inspire" as const, label: "Inspire", icon: Lightbulb },
@@ -93,6 +103,44 @@ export const MainNavigation = ({ activeTab, onTabChange }: MainNavigationProps) 
               </button>
             );
           })}
+          
+          {/* Divider */}
+          <div className="h-px bg-border/50 my-2" />
+          
+          {/* Pro Plan Button - Mobile */}
+          <button
+            onClick={() => {
+              onProClick?.();
+              setMobileMenuOpen(false);
+            }}
+            className={cn(
+              "flex items-center gap-3 px-4 py-4 rounded-xl transition-all duration-200",
+              "text-base font-medium min-h-[56px] w-full text-left",
+              "text-amber-500 hover:bg-amber-500/10 border border-amber-500/30"
+            )}
+          >
+            <Crown className="h-5 w-5 flex-shrink-0" />
+            <span>Upgrade to Pro</span>
+            <Sparkles className="h-4 w-4 ml-auto" />
+          </button>
+          
+          {/* Admin Button - Mobile (only if admin) */}
+          {isAdmin && (
+            <button
+              onClick={() => {
+                onAdminClick?.();
+                setMobileMenuOpen(false);
+              }}
+              className={cn(
+                "flex items-center gap-3 px-4 py-4 rounded-xl transition-all duration-200",
+                "text-base font-medium min-h-[56px] w-full text-left",
+                "text-foreground hover:bg-muted/50"
+              )}
+            >
+              <Shield className="h-5 w-5 flex-shrink-0" />
+              <span>Admin Panel</span>
+            </button>
+          )}
         </nav>
       </SheetContent>
     </Sheet>

@@ -6,8 +6,9 @@ import { SEO, homePageSchema } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { NotificationBell } from "@/components/NotificationBell";
 import { Button } from "@/components/ui/button";
-import { LogIn, LogOut, Shield, Sparkles, Download } from "lucide-react";
+import { LogIn, LogOut, Shield, Sparkles, Download, Crown } from "lucide-react";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -25,6 +26,7 @@ import {
   InspireTab,
   NewHomepage,
   ExportDialog,
+  LandingCredibility,
   Template,
   getRandomTemplate,
 } from "@/components/platform";
@@ -43,7 +45,7 @@ const Index = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   // Navigation state
-  const [activeTab, setActiveTab] = useState<MainTab>("create");
+  const [activeTab, setActiveTab] = useState<MainTab>("home");
   const [showHomepage, setShowHomepage] = useState(true);
 
   // Create workspace state
@@ -120,6 +122,7 @@ const Index = () => {
   const handleStartDesigning = () => {
     setShowHomepage(false);
     setShowDesignTypeModal(true);
+    setActiveTab("create");
   };
 
   // Handle browsing inspiration
@@ -227,6 +230,20 @@ const Index = () => {
     toast.success("Image loaded in editor! Drag to position.");
   };
 
+  // Handle tab change with proper routing
+  const handleTabChange = (tab: MainTab) => {
+    setActiveTab(tab);
+    
+    if (tab === "home") {
+      setShowHomepage(true);
+    } else if (tab === "create" && !currentTemplate) {
+      setShowDesignTypeModal(true);
+      setShowHomepage(false);
+    } else {
+      setShowHomepage(false);
+    }
+  };
+
   // Handle export using layer-based system
   const handleExport = async (format: "png" | "jpg" | "pdf") => {
     // Get canvas layers from localStorage (set by CanvasWorkspace)
@@ -266,17 +283,26 @@ const Index = () => {
         </Button>
       )}
       
-      {!isMobile && (
-        <Button variant="ghost" size="icon" onClick={() => setShowProDialog(true)} title="View Plans" className="h-9 w-9">
-          <Sparkles className="h-4 w-4" />
-        </Button>
-      )}
+      {/* Pro Button - visible on all screens */}
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={() => setShowProDialog(true)} 
+        title="View Plans" 
+        className="h-9 w-9 text-amber-500 hover:text-amber-400"
+      >
+        <Crown className="h-4 w-4" />
+      </Button>
 
-      {isAdmin && !isMobile && (
+      {/* Admin Button - visible on all screens if admin */}
+      {isAdmin && (
         <Button variant="ghost" size="icon" onClick={() => navigate("/admin")} title="Admin" className="h-9 w-9">
           <Shield className="h-4 w-4" />
         </Button>
       )}
+
+      {/* Notification Bell */}
+      <NotificationBell />
 
       <ThemeToggle />
 
@@ -300,13 +326,16 @@ const Index = () => {
 
   // Render content based on active tab
   const renderContent = () => {
-    // Show homepage first
-    if (showHomepage && activeTab === "create") {
+    // Show homepage for home tab
+    if (activeTab === "home" || showHomepage) {
       return (
-        <NewHomepage
-          onStartDesigning={handleStartDesigning}
-          onBrowseInspiration={handleBrowseInspiration}
-        />
+        <>
+          <NewHomepage
+            onStartDesigning={handleStartDesigning}
+            onBrowseInspiration={handleBrowseInspiration}
+          />
+          <LandingCredibility onStartDesigning={handleStartDesigning} />
+        </>
       );
     }
 
@@ -386,14 +415,10 @@ const Index = () => {
         {/* Main Navigation */}
         <MainNavigation
           activeTab={activeTab}
-          onTabChange={(tab) => {
-            setActiveTab(tab);
-            if (tab === "create" && !currentTemplate) {
-              setShowHomepage(true);
-            } else {
-              setShowHomepage(false);
-            }
-          }}
+          onTabChange={handleTabChange}
+          isAdmin={isAdmin}
+          onAdminClick={() => navigate("/admin")}
+          onProClick={() => setShowProDialog(true)}
         />
 
         {/* User Menu */}
@@ -405,7 +430,7 @@ const Index = () => {
         <main>{renderContent()}</main>
 
         {/* Footer - only on homepage */}
-        {showHomepage && <Footer />}
+        {(showHomepage || activeTab === "home") && <Footer />}
 
         {/* Modals */}
         <DesignTypeModal
