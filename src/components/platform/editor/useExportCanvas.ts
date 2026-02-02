@@ -1,5 +1,6 @@
 import { useCallback, useRef } from "react";
-import { Layer, TextLayer, ShapeLayer, ImageLayer, BackgroundLayer } from "./types";
+import { Layer, TextLayer, ShapeLayer, ImageLayer, BackgroundLayer, IconLayer } from "./types";
+import { getIconComponent } from "./IconRenderer";
 import { toast } from "sonner";
 
 interface ExportOptions {
@@ -172,6 +173,86 @@ export function useExportCanvas() {
             ctx.closePath();
             ctx.fill();
             break;
+        }
+        break;
+      }
+
+      case "icon": {
+        const iconLayer = layer as IconLayer;
+        const IconComponent = getIconComponent(iconLayer.iconName);
+        
+        if (IconComponent) {
+          // For icons, we draw a simple representation using canvas
+          const x = layer.x * scale;
+          const y = layer.y * scale;
+          const w = layer.width * scale;
+          const h = layer.height * scale;
+          const iconSize = Math.min(w, h) * 0.8;
+          const centerX = x + w / 2;
+          const centerY = y + h / 2;
+          
+          // Draw icon as a styled shape (since we can't render React components directly)
+          ctx.strokeStyle = iconLayer.color;
+          ctx.lineWidth = iconLayer.strokeWidth * scale;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          
+          // Draw a simple icon representation based on the icon name
+          ctx.beginPath();
+          const iconName = iconLayer.iconName.toLowerCase();
+          
+          if (iconName.includes("star")) {
+            // Draw star
+            const outerRadius = iconSize / 2;
+            const innerRadius = outerRadius * 0.4;
+            for (let i = 0; i < 10; i++) {
+              const radius = i % 2 === 0 ? outerRadius : innerRadius;
+              const angle = (i * Math.PI) / 5 - Math.PI / 2;
+              const px = centerX + Math.cos(angle) * radius;
+              const py = centerY + Math.sin(angle) * radius;
+              if (i === 0) ctx.moveTo(px, py);
+              else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+            ctx.stroke();
+          } else if (iconName.includes("heart")) {
+            // Draw heart
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY + iconSize * 0.3);
+            ctx.bezierCurveTo(centerX - iconSize * 0.5, centerY - iconSize * 0.2, centerX - iconSize * 0.5, centerY - iconSize * 0.5, centerX, centerY - iconSize * 0.2);
+            ctx.bezierCurveTo(centerX + iconSize * 0.5, centerY - iconSize * 0.5, centerX + iconSize * 0.5, centerY - iconSize * 0.2, centerX, centerY + iconSize * 0.3);
+            ctx.stroke();
+          } else if (iconName.includes("circle")) {
+            ctx.arc(centerX, centerY, iconSize / 2, 0, Math.PI * 2);
+            ctx.stroke();
+          } else if (iconName.includes("square") || iconName.includes("rectangle")) {
+            const size = iconSize * 0.8;
+            ctx.rect(centerX - size / 2, centerY - size / 2, size, size);
+            ctx.stroke();
+          } else if (iconName.includes("arrow")) {
+            // Draw arrow
+            ctx.moveTo(centerX - iconSize / 3, centerY);
+            ctx.lineTo(centerX + iconSize / 3, centerY);
+            ctx.moveTo(centerX + iconSize / 6, centerY - iconSize / 6);
+            ctx.lineTo(centerX + iconSize / 3, centerY);
+            ctx.lineTo(centerX + iconSize / 6, centerY + iconSize / 6);
+            ctx.stroke();
+          } else if (iconName.includes("check")) {
+            ctx.moveTo(centerX - iconSize / 3, centerY);
+            ctx.lineTo(centerX - iconSize / 10, centerY + iconSize / 4);
+            ctx.lineTo(centerX + iconSize / 3, centerY - iconSize / 4);
+            ctx.stroke();
+          } else {
+            // Default: draw a circle with the first letter
+            ctx.arc(centerX, centerY, iconSize / 2, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.fillStyle = iconLayer.color;
+            ctx.font = `bold ${iconSize * 0.5}px sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(iconLayer.iconName[0].toUpperCase(), centerX, centerY);
+          }
         }
         break;
       }

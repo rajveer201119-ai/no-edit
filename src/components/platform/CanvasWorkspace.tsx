@@ -20,6 +20,7 @@ import {
   ShapeLayer,
   ImageLayer,
   BackgroundLayer,
+  IconLayer as IconLayerType,
   useLayerManager,
   useExportCanvas,
   useKeyboardShortcuts,
@@ -32,6 +33,7 @@ import {
   ElementsToolPanel,
   UploadModal,
 } from "./editor";
+import { LucideIcon } from "lucide-react";
 
 interface CanvasWorkspaceProps {
   template: Template | null;
@@ -345,11 +347,11 @@ export const CanvasWorkspace = ({
     toast.success(`${newLayer.name} added!`);
   }, [canvasState, addLayer, selectLayer]);
 
-  // Add icon as shape
-  const handleAddIcon = useCallback((iconName: string, _svgPath: string) => {
-    const newLayer: ShapeLayer = {
+  // Add icon as proper icon layer
+  const handleAddIcon = useCallback((iconName: string, _svgPath: string, _IconComponent?: LucideIcon) => {
+    const newLayer: IconLayerType = {
       id: `icon-${Date.now()}`,
-      type: "shape",
+      type: "icon",
       name: iconName,
       x: canvasState.width / 2 - 40,
       y: canvasState.height / 2 - 40,
@@ -360,11 +362,9 @@ export const CanvasWorkspace = ({
       locked: false,
       visible: true,
       zIndex: canvasState.layers.length,
-      shapeType: "rectangle",
-      fillColor: "#3b82f6",
-      strokeColor: "transparent",
-      strokeWidth: 0,
-      borderRadius: 12,
+      iconName: iconName,
+      color: "#3b82f6",
+      strokeWidth: 2,
     };
 
     addLayer(newLayer);

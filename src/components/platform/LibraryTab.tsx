@@ -17,42 +17,168 @@ interface LibraryTabProps {
   currentCanvasState?: CanvasState;
 }
 
-// Prompt vault for external AI tools
+// Prompt vault for external AI tools - expanded library
 const aiPrompts = [
+  // Marketing Prompts
   {
     id: "midjourney-logo",
     title: "Minimalist Tech Logo",
     description: "Clean geometric logo for modern brands",
     prompt: "minimalist logo design, geometric shapes, tech startup, clean lines, vector style, flat design, professional, on white background --ar 1:1",
     tool: "Midjourney / DALL-E",
+    category: "Marketing",
   },
+  {
+    id: "marketing-social-ad",
+    title: "Social Media Ad",
+    description: "Eye-catching promotional graphics",
+    prompt: "professional social media advertisement, bold typography, vibrant colors, product showcase, marketing layout, modern design, instagram ad format, clean composition --ar 1:1",
+    tool: "Midjourney / DALL-E",
+    category: "Marketing",
+  },
+  {
+    id: "marketing-banner",
+    title: "Website Banner",
+    description: "Hero section banner design",
+    prompt: "website hero banner, gradient background, professional typography, call to action button, modern SaaS design, clean layout, 16:9 aspect ratio, corporate style",
+    tool: "DALL-E / Midjourney",
+    category: "Marketing",
+  },
+  
+  // Event Poster Prompts
   {
     id: "midjourney-poster",
     title: "Event Poster Gradient",
     description: "Vibrant gradient event poster",
     prompt: "event poster design, bold typography, gradient background from purple to pink, modern layout, concert style, high contrast text, professional design --ar 2:3",
     tool: "Midjourney / DALL-E",
+    category: "Events",
   },
   {
-    id: "dalle-product",
-    title: "Product Photography",
-    description: "Studio-quality product shots",
-    prompt: "professional product photography, soft lighting, gradient background, minimalist style, commercial quality, centered composition, high resolution",
-    tool: "DALL-E / Midjourney",
+    id: "event-music-festival",
+    title: "Music Festival Poster",
+    description: "Dynamic music event artwork",
+    prompt: "music festival poster, neon lights, dark background, bold artist names, electric atmosphere, concert vibes, stage lighting effects, vibrant colors --ar 2:3",
+    tool: "Midjourney",
+    category: "Events",
   },
+  {
+    id: "event-conference",
+    title: "Conference Poster",
+    description: "Professional conference design",
+    prompt: "tech conference poster, geometric shapes, professional blue color scheme, speaker headshots placeholder, clean modern layout, corporate event style --ar 2:3",
+    tool: "DALL-E / Midjourney",
+    category: "Events",
+  },
+  {
+    id: "event-workshop",
+    title: "Workshop Flyer",
+    description: "Educational workshop promotion",
+    prompt: "workshop flyer design, minimalist style, educational theme, light background, organized sections, registration info area, professional typography --ar 2:3",
+    tool: "DALL-E",
+    category: "Events",
+  },
+  
+  // Social Media Prompts
   {
     id: "midjourney-social",
     title: "Social Media Abstract",
     description: "Abstract backgrounds for posts",
     prompt: "abstract background design, flowing shapes, soft gradients, pastel colors, modern aesthetic, instagram style, square format --ar 1:1",
     tool: "Midjourney",
+    category: "Social Media",
   },
+  {
+    id: "social-quote-card",
+    title: "Quote Card Background",
+    description: "Inspirational quote backdrop",
+    prompt: "minimalist quote background, soft gradient, elegant texture, warm tones, inspiring atmosphere, space for text overlay, instagram post format --ar 1:1",
+    tool: "DALL-E",
+    category: "Social Media",
+  },
+  {
+    id: "social-story-template",
+    title: "Story Template BG",
+    description: "Instagram story backgrounds",
+    prompt: "instagram story background, vertical format, trendy colors, abstract shapes, modern aesthetic, space for text and stickers, mobile friendly --ar 9:16",
+    tool: "Midjourney",
+    category: "Social Media",
+  },
+  {
+    id: "social-carousel",
+    title: "Carousel Slide BG",
+    description: "Educational carousel slides",
+    prompt: "instagram carousel background, clean minimal design, professional colors, subtle gradient, space for text content, educational style, consistent theme --ar 1:1",
+    tool: "DALL-E / Midjourney",
+    category: "Social Media",
+  },
+  
+  // Business & Startup Prompts
+  {
+    id: "dalle-product",
+    title: "Product Photography",
+    description: "Studio-quality product shots",
+    prompt: "professional product photography, soft lighting, gradient background, minimalist style, commercial quality, centered composition, high resolution",
+    tool: "DALL-E / Midjourney",
+    category: "Business",
+  },
+  {
+    id: "business-pitch-deck",
+    title: "Pitch Deck Slide",
+    description: "Investor presentation visuals",
+    prompt: "pitch deck slide background, professional corporate design, subtle gradient, modern business aesthetic, clean layout space, startup presentation style --ar 16:9",
+    tool: "DALL-E",
+    category: "Business",
+  },
+  {
+    id: "business-team-banner",
+    title: "Team Page Banner",
+    description: "About us section visual",
+    prompt: "team page banner, abstract professional background, corporate blue tones, modern office aesthetic, space for team photos, company culture vibes --ar 16:9",
+    tool: "Midjourney",
+    category: "Business",
+  },
+  {
+    id: "business-app-mockup",
+    title: "App Store Mockup",
+    description: "Mobile app promotional graphics",
+    prompt: "app store screenshot mockup, floating phone design, gradient background, app UI showcase, professional marketing visual, clean modern style --ar 2:3",
+    tool: "DALL-E / Midjourney",
+    category: "Business",
+  },
+  
+  // Thumbnail Prompts
   {
     id: "dalle-thumbnail",
     title: "YouTube Thumbnail BG",
     description: "Attention-grabbing backgrounds",
     prompt: "dynamic background for youtube thumbnail, bold colors, diagonal lines, energetic, eye-catching, 16:9 aspect ratio, professional content creator style",
     tool: "DALL-E / Midjourney",
+    category: "Thumbnails",
+  },
+  {
+    id: "thumbnail-tutorial",
+    title: "Tutorial Thumbnail",
+    description: "Educational content thumbnails",
+    prompt: "youtube tutorial thumbnail background, clean professional look, tech aesthetic, subtle code patterns, space for face and text, educational vibes --ar 16:9",
+    tool: "Midjourney",
+    category: "Thumbnails",
+  },
+  {
+    id: "thumbnail-vlog",
+    title: "Vlog Thumbnail",
+    description: "Lifestyle vlog backgrounds",
+    prompt: "vlog thumbnail background, warm inviting colors, lifestyle aesthetic, blurred lifestyle imagery, space for face overlay, friendly casual vibe --ar 16:9",
+    tool: "DALL-E",
+    category: "Thumbnails",
+  },
+  {
+    id: "thumbnail-gaming",
+    title: "Gaming Thumbnail",
+    description: "Gaming content visuals",
+    prompt: "gaming youtube thumbnail background, neon colors, dark theme, action lines, explosive effects, high energy gaming aesthetic, esports style --ar 16:9",
+    tool: "Midjourney",
+    category: "Thumbnails",
   },
 ];
 
@@ -130,13 +256,26 @@ export const LibraryTab = ({ onUseTemplate, onLoadDesign, currentCanvasState }: 
     return filtered;
   }, [searchQuery, selectedCategory]);
 
+  // Get unique prompt categories
+  const promptCategories = ["all", ...Array.from(new Set(aiPrompts.map(p => p.category)))];
+  const [selectedPromptCategory, setSelectedPromptCategory] = useState("all");
+
   // Filter prompts
   const filteredPrompts = useMemo(() => {
-    if (!searchQuery.trim()) return aiPrompts;
-    return aiPrompts.filter((p) =>
-      fuzzyMatch(searchQuery, `${p.title} ${p.description} ${p.tool}`)
-    );
-  }, [searchQuery]);
+    let filtered = aiPrompts;
+    
+    if (selectedPromptCategory !== "all") {
+      filtered = filtered.filter(p => p.category === selectedPromptCategory);
+    }
+    
+    if (searchQuery.trim()) {
+      filtered = filtered.filter((p) =>
+        fuzzyMatch(searchQuery, `${p.title} ${p.description} ${p.tool} ${p.category}`)
+      );
+    }
+    
+    return filtered;
+  }, [searchQuery, selectedPromptCategory]);
 
   return (
     <div className="min-h-screen pt-20 pb-12">
@@ -267,9 +406,26 @@ export const LibraryTab = ({ onUseTemplate, onLoadDesign, currentCanvasState }: 
               </p>
             </div>
 
+            {/* Category Filter for Prompts */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {promptCategories.map((cat) => (
+                <Button
+                  key={cat}
+                  variant={selectedPromptCategory === cat ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedPromptCategory(cat)}
+                  className="h-9 capitalize"
+                >
+                  {cat === "all" ? "All Prompts" : cat}
+                </Button>
+              ))}
+            </div>
+
             {filteredPrompts.length === 0 ? (
               <div className="text-center py-16">
+                <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
                 <p className="text-muted-foreground">No prompts match your search</p>
+                <p className="text-sm text-muted-foreground mt-1">Try a different category or search term</p>
               </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -56,7 +56,15 @@ export interface ShapeLayer extends BaseLayer {
   borderRadius?: number;
 }
 
-export type Layer = BackgroundLayer | ImageLayer | TextLayer | ShapeLayer;
+// Icon layer - renders Lucide icons on canvas
+export interface IconLayer extends BaseLayer {
+  type: "icon";
+  iconName: string;
+  color: string;
+  strokeWidth: number;
+}
+
+export type Layer = BackgroundLayer | ImageLayer | TextLayer | ShapeLayer | IconLayer;
 
 export interface CanvasState {
   width: number;

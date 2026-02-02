@@ -12,3 +12,4 @@ export { CanvasRenderer } from "./CanvasRenderer";
 export { ElementsToolPanel } from "./ElementsToolPanel";
 export { HistoryPanel, useDesignHistory, type HistoryItem } from "./HistoryPanel";
 export { UploadModal } from "./UploadModal";
+export { IconLayerRenderer, getIconComponent, isValidIconName } from "./IconRenderer";

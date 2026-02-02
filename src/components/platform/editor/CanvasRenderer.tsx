@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { Layer, TextLayer, ShapeLayer, ImageLayer } from "./types";
+import { Layer, TextLayer, ShapeLayer, ImageLayer, IconLayer } from "./types";
+import { IconLayerRenderer } from "./IconRenderer";
 
 interface CanvasRendererProps {
   width: number;
@@ -551,6 +552,37 @@ export const CanvasRenderer = ({
                 </g>
               )}
             </svg>
+        {isSelected && !layer.locked && renderResizeHandles(layer)}
+          </div>
+        );
+      }
+
+      case "icon": {
+        const iconLayer = layer as IconLayer;
+        return (
+          <div
+            key={layer.id}
+            className={cn(
+              "cursor-move",
+              isSelected && "ring-2 ring-primary ring-offset-1"
+            )}
+            style={baseStyle}
+            onClick={(e) => {
+              e.stopPropagation();
+              onLayerSelect(layer.id);
+            }}
+            onMouseDown={(e) => handleDragStart(layer.id, e)}
+            onTouchStart={(e) => handleDragStart(layer.id, e)}
+          >
+            <IconLayerRenderer
+              iconName={iconLayer.iconName}
+              width={layer.width * scale}
+              height={layer.height * scale}
+              color={iconLayer.color}
+              strokeWidth={iconLayer.strokeWidth}
+              rotation={0}
+              opacity={1}
+            />
             {isSelected && !layer.locked && renderResizeHandles(layer)}
           </div>
         );
