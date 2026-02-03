@@ -3,13 +3,15 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Copy, Check, ExternalLink, Clock, Grid3X3, Sparkles } from "lucide-react";
+import { Search, Copy, Check, ExternalLink, Clock, Grid3X3, Sparkles, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { templates, searchTemplates } from "./templates";
 import type { DesignCategory } from "./DesignTypeModal";
 import type { Template } from "./templates";
 import { HistoryPanel, type HistoryItem } from "./editor/HistoryPanel";
 import type { CanvasState } from "./editor/types";
+import { TemplateCard } from "./TemplatePreview";
+import { PromptStatusBadge, type PromptStatus } from "./CommunityPrompts";
 
 interface LibraryTabProps {
   onUseTemplate: (template: Template) => void;
@@ -342,44 +344,18 @@ export const LibraryTab = ({ onUseTemplate, onLoadDesign, currentCanvasState }: 
             {/* Templates Grid */}
             {filteredTemplates.length === 0 ? (
               <div className="text-center py-16">
+                <Grid3X3 className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
                 <p className="text-muted-foreground text-lg mb-2">No templates found</p>
                 <p className="text-sm text-muted-foreground">Try a different search or category</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {filteredTemplates.map((template) => (
-                  <div
+                  <TemplateCard
                     key={template.id}
-                    className="group relative bg-muted/30 rounded-xl overflow-hidden border border-border/30 hover:border-primary/50 transition-all hover:shadow-lg"
-                  >
-                    {/* Template Preview */}
-                    <div
-                      className="aspect-square flex items-center justify-center p-4"
-                      style={{
-                        backgroundColor: template.elements[0]?.backgroundColor || "#1a1a2e",
-                      }}
-                    >
-                      <span className="text-white/90 text-sm font-medium text-center line-clamp-2">
-                        {template.name}
-                      </span>
-                    </div>
-
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Button
-                        onClick={() => onUseTemplate(template)}
-                        className="min-h-[44px]"
-                      >
-                        Use Template
-                      </Button>
-                    </div>
-
-                    {/* Template Info */}
-                    <div className="p-3">
-                      <p className="text-sm font-medium truncate">{template.name}</p>
-                      <p className="text-xs text-muted-foreground capitalize">{template.category}</p>
-                    </div>
-                  </div>
+                    template={template}
+                    onUse={() => onUseTemplate(template)}
+                  />
                 ))}
               </div>
             )}

@@ -13,3 +13,12 @@ export { ElementsToolPanel } from "./ElementsToolPanel";
 export { HistoryPanel, useDesignHistory, type HistoryItem } from "./HistoryPanel";
 export { UploadModal } from "./UploadModal";
 export { IconLayerRenderer, getIconComponent, isValidIconName } from "./IconRenderer";
+
+// New editor features
+export { DesignScore, calculateScore, type ScoreBreakdown } from "./DesignScore";
+export { PromptAnalyzer, analyzePrompt, type PromptAnalysis, type PromptDifficulty } from "./PromptAnalyzer";
+export { DesignIntentSelector, getIntentRecommendations, type DesignIntent } from "./DesignIntentSelector";
+export { ZeroEditMode, ZeroEditOutput } from "./ZeroEditMode";
+export { AIReasoningOverlay, AIReasoningToggle } from "./AIReasoningOverlay";
+export { RemixLineage, RemixBadge, useRemixHistory, type RemixNode } from "./RemixLineage";
+export { DesignMistakeDetector, detectMistakes, type DesignMistake } from "./DesignMistakeDetector";
