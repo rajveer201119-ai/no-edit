@@ -10,3 +10,7 @@ export { NewHomepage } from "./NewHomepage";
 export { ExportDialog } from "./ExportDialog";
 export { LandingCredibility } from "./LandingCredibility";
 export { templates, getTemplatesByCategory, getRandomTemplate, searchTemplates, getAllTemplates, type Template, type TemplateElement } from "./templates";
+
+// New platform features
+export { NichePresets, HomePresetButtons, presets, type NichePreset } from "./NichePresets";
+export { CommunityPromptCard, PromptStatusBadge, useCommunityPrompts, type CommunityPrompt, type PromptStatus } from "./CommunityPrompts";
