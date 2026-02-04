@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check, Sparkles, Shield, MessageCircle, User, Mail } from "lucide-react";
+import { Check, Crown, Zap, Shield, MessageCircle, User, Mail } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,18 +24,18 @@ const PricingInternational = () => {
 
   const handleEmailClick = () => {
     const email = "rajveer201119@gmail.com";
-    const subject = encodeURIComponent("EPIC Pro Plan Upgrade Request (International - $1/month)");
-    const body = encodeURIComponent("Hi,\n\nI would like to upgrade to EPIC Pro Plan (International - $1/month).\n\nPlease let me know the payment details.\n\nThank you!");
+    const subject = encodeURIComponent("EPIC Creator Mode Upgrade Request (International - $1/month)");
+    const body = encodeURIComponent("Hi,\n\nI would like to upgrade to EPIC Creator Mode (International - $1/month).\n\nPlease let me know the payment details.\n\nThank you!");
     window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
   };
 
   return (
     <>
       <SEO 
-        title="Pricing - EPIC AI Image Generator | $1/month Pro Plan"
-        description="Get EPIC Pro Plan for just $1/month. Generate 25 AI images per day with Ghibli, 3D, Realistic, Cyberpunk styles. Free plan available with 2 images daily."
-        keywords="AI image generator pricing, EPIC pricing, cheap AI art generator, AI image generator price, pro plan, affordable AI art"
-        canonicalUrl="https://epic-ai-generator.lovable.app/pricing-international"
+        title="Pricing - EPIC Creator Mode | $1/month"
+        description="Get EPIC Creator Mode for just $1/month. Generate 25 designs per day with HD export. Free plan available with 2 designs daily."
+        keywords="AI design generator pricing, EPIC pricing, cheap AI design, Creator Mode, affordable AI design"
+        canonicalUrl="https://no-edit.lovable.app/pricing-international"
         ogType="product"
         structuredData={pricingPageSchema("USD", 1)}
       />
@@ -99,42 +99,46 @@ const PricingInternational = () => {
               </div>
             </Card>
 
-            {/* Pro Plan */}
+            {/* Creator Mode */}
             <Card className="p-8 border-2 border-primary/50 bg-background/10 backdrop-blur-2xl relative overflow-hidden">
               <div className="absolute top-4 right-4">
-                <span className="gradient-epic px-3 py-1 rounded-full text-sm font-semibold text-primary-foreground">
+                <span className="gradient-epic px-3 py-1 rounded-full text-sm font-semibold text-primary-foreground flex items-center gap-1">
+                  <Crown className="h-3 w-3" />
                   Popular
                 </span>
               </div>
 
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-bold mb-2 gradient-epic-text">Pro Plan</h2>
+                  <h2 className="text-2xl font-bold mb-2 gradient-epic-text flex items-center gap-2">
+                    <Crown className="h-5 w-5" />
+                    Creator Mode
+                  </h2>
                   <div className="text-4xl font-bold mb-1 text-foreground">$1</div>
-                  <p className="text-muted-foreground mb-4">per month</p>
-                  <p className="text-sm text-primary">12x more images!</p>
+                  <p className="text-muted-foreground mb-2">per month</p>
+                  <p className="text-sm text-primary font-medium">Less than $0.04/day!</p>
                 </div>
 
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="font-semibold text-foreground">25 images per day</span>
+                    <span className="font-semibold text-foreground">25 designs per day</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="text-foreground">All AI styles available</span>
+                    <span className="text-foreground">HD export quality</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="text-foreground">Save to feed</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="text-foreground">Download images</span>
+                    <span className="text-foreground">All premium templates</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
                     <span className="text-foreground">Priority generation</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
+                    <span className="text-foreground">Early access to features</span>
                   </li>
                 </ul>
 
@@ -142,8 +146,8 @@ const PricingInternational = () => {
                   className="w-full gradient-epic hover:opacity-90"
                   onClick={handleUpgradeClick}
                 >
-                  <Sparkles className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Upgrade to Pro
+                  <Zap className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Unlock Creator Mode
                 </Button>
               </div>
             </Card>
@@ -200,8 +204,9 @@ const PricingInternational = () => {
         <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
           <DialogContent className="sm:max-w-md max-w-[95vw] border border-border/30 bg-background/90 backdrop-blur-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl sm:text-2xl gradient-epic-text">
-                Upgrade to Pro
+              <DialogTitle className="text-xl sm:text-2xl gradient-epic-text flex items-center gap-2">
+                <Crown className="h-5 w-5" />
+                Unlock Creator Mode
               </DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground">
                 Contact the founder to get started

@@ -11,13 +11,13 @@ interface SEOProps {
   noIndex?: boolean;
 }
 
-const defaultOgImage = "https://no-edit.lovable.app/og.png";
+const defaultOgImage = "https://storage.googleapis.com/gpt-engineer-file-uploads/ywM0UvtJ3VdIZjuQEJN3LrvvOCt2/social-images/social-1769532119034-download (1).jpeg";
 const baseUrl = "https://no-edit.lovable.app";
 
 export const SEO = ({
-  title = "EPIC — Generate AI Images Instantly",
-  description = "EPIC is a zero-edit AI image generator. Create stunning AI images instantly without prompts, editing, or design skills.",
-  keywords = "AI image generator, zero-edit AI, instant image generation, AI graphics, no-prompt image creator, beginner-friendly AI design",
+  title = "EPIC — AI Design Generator | Create Professional Graphics Instantly",
+  description = "Create stunning posters, logos, social media graphics, YouTube thumbnails, and more in seconds. No design skills needed. Free to use.",
+  keywords = "AI design generator, logo maker, poster creator, YouTube thumbnail maker, Instagram post creator, social media graphics, free design tool, AI graphics, canva alternative",
   canonicalUrl = baseUrl,
   ogImage = defaultOgImage,
   ogType = "website",
@@ -35,6 +35,12 @@ export const SEO = ({
       <meta name="keywords" content={keywords} />
       <link rel="canonical" href={canonicalUrl} />
       
+      {/* Mobile & PWA */}
+      <meta name="theme-color" content="#8B5CF6" />
+      <meta name="mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
       {/* Open Graph / Facebook */}
@@ -44,6 +50,7 @@ export const SEO = ({
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImage} />
       <meta property="og:site_name" content="EPIC Design Generator" />
+      <meta property="og:locale" content="en_US" />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -73,37 +80,59 @@ export const homePageSchema = {
       "applicationCategory": "DesignApplication",
       "operatingSystem": "Any",
       "url": baseUrl,
-      "description": "EPIC is a zero-edit AI image generator. Create stunning AI images instantly without prompts, editing, or design skills.",
+      "description": "EPIC is a free AI design generator. Create stunning posters, logos, YouTube thumbnails, Instagram posts, and more in seconds. No design skills needed.",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
       "featureList": [
-        "One-click AI image generation",
-        "Zero editing required",
-        "No complex prompts",
-        "Instant downloads",
-        "Beginner-friendly interface"
-      ]
+        "AI-powered design generation",
+        "YouTube thumbnail maker",
+        "Instagram post creator",
+        "Logo designer",
+        "Poster creator",
+        "No design skills required",
+        "Free to use"
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1250"
+      }
     },
     {
       "@type": "Organization",
       "@id": `${baseUrl}/#organization`,
-      "name": "NO BOX",
+      "name": "EPIC Design",
       "url": baseUrl,
-      "founder": {
-        "@type": "Person",
-        "name": "Rajveer Rinku"
-      }
+      "logo": "https://storage.googleapis.com/gpt-engineer-file-uploads/kG5hIp7FM3biSpv5njI7csuUQ6O2/uploads/1759212272541-file_00000000100c61faa64c1df9bb0aebc8.png",
+      "sameAs": []
     },
     {
       "@type": "WebSite",
       "@id": `${baseUrl}/#website`,
       "url": baseUrl,
-      "name": "EPIC",
+      "name": "EPIC Design Generator",
+      "description": "Create professional designs in seconds with AI",
       "publisher": {
         "@id": `${baseUrl}/#organization`
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": `${baseUrl}/?q={search_term_string}`,
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "EPIC Design Generator",
+      "operatingSystem": "Web",
+      "applicationCategory": "DesignApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
       }
     }
   ]

@@ -5,10 +5,12 @@ import { toast } from "sonner";
 import { SEO, homePageSchema } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
 import { ProPlanDialog } from "@/components/ProPlanDialog";
+import { CreatorModePaywall } from "@/components/CreatorModePaywall";
+import { UsageCounter } from "@/components/UsageCounter";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationBell } from "@/components/NotificationBell";
 import { Button } from "@/components/ui/button";
-import { LogIn, LogOut, Shield, Sparkles, Download, Crown } from "lucide-react";
+import { LogIn, LogOut, Shield, Download, Crown } from "lucide-react";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -65,6 +67,8 @@ const Index = () => {
   // Export state
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showProDialog, setShowProDialog] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallReason, setPaywallReason] = useState<"export" | "limit" | "premium-feature" | "hd-export">("limit");
 
   // Workspace meta
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
@@ -274,6 +278,21 @@ const Index = () => {
     }
   };
 
+  // Handle export button click - check limits first
+  const handleExportClick = async () => {
+    // Check if user can export (check generation limit)
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      // Guest - show signup prompt
+      setShowExportDialog(true);
+      return;
+    }
+
+    // Always allow export for now, but show paywall info after
+    setShowExportDialog(true);
+  };
+
   // Render user menu in navbar
   const renderUserMenu = () => (
     <div className="flex items-center gap-1 md:gap-2">
@@ -283,13 +302,26 @@ const Index = () => {
         </Button>
       )}
       
+      {/* Usage Counter - visible in create mode */}
+      {activeTab === "create" && !showHomepage && (
+        <div className="hidden md:block">
+          <UsageCounter 
+            type="generate" 
+            onUpgradeClick={() => {
+              setPaywallReason("limit");
+              setShowPaywall(true);
+            }}
+          />
+        </div>
+      )}
+      
       {/* Pro Button - visible on all screens */}
       <Button 
         variant="ghost" 
         size="icon" 
         onClick={() => setShowProDialog(true)} 
-        title="View Plans" 
-        className="h-9 w-9 text-amber-500 hover:text-amber-400"
+        title="Creator Mode" 
+        className="h-9 w-9 text-primary hover:text-primary/80"
       >
         <Crown className="h-4 w-4" />
       </Button>
@@ -367,7 +399,7 @@ const Index = () => {
         <WorkspaceTopBar
           projectName={currentTemplate?.name || "New Design"}
           saveStatus={saveStatus}
-          onExport={() => setShowExportDialog(true)}
+          onExport={handleExportClick}
           onUndo={() => undoRef.current?.()}
           onRedo={() => redoRef.current?.()}
           canUndo={canUndo}
@@ -404,10 +436,10 @@ const Index = () => {
   return (
     <>
       <SEO
-        title="EPIC - Design Generator | Create Professional Designs Instantly"
-        description="Create stunning logos, social media graphics, banners, and posters in seconds. No design skills needed."
-        keywords="design generator, logo maker, poster creator, social media graphics, AI design"
-        canonicalUrl="https://epic-ai-generator.lovable.app/"
+        title="EPIC — AI Design Generator | Create Professional Graphics Instantly"
+        description="Create stunning posters, logos, social media graphics, YouTube thumbnails, and more in seconds. No design skills needed. Free to use."
+        keywords="AI design generator, logo maker, poster creator, YouTube thumbnail maker, Instagram post creator, social media graphics, free design tool, no-prompt AI"
+        canonicalUrl="https://no-edit.lovable.app/"
         structuredData={homePageSchema}
       />
 
@@ -448,6 +480,12 @@ const Index = () => {
         />
 
         <ProPlanDialog open={showProDialog} onOpenChange={setShowProDialog} />
+        
+        <CreatorModePaywall 
+          open={showPaywall} 
+          onOpenChange={setShowPaywall}
+          triggerReason={paywallReason}
+        />
       </div>
     </>
   );

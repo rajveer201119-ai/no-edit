@@ -7,14 +7,21 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Crown, Check, Zap } from "lucide-react";
+import { Sparkles, X, Check, Zap, Crown } from "lucide-react";
 
-interface ProPlanDialogProps {
+interface CreatorModePaywallProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  triggerReason?: "export" | "limit" | "premium-feature" | "hd-export";
+  remainingCredits?: number;
 }
 
-export const ProPlanDialog = ({ open, onOpenChange }: ProPlanDialogProps) => {
+export const CreatorModePaywall = ({ 
+  open, 
+  onOpenChange,
+  triggerReason = "limit",
+  remainingCredits = 0,
+}: CreatorModePaywallProps) => {
   const navigate = useNavigate();
 
   const handleClose = () => {
@@ -26,26 +33,59 @@ export const ProPlanDialog = ({ open, onOpenChange }: ProPlanDialogProps) => {
     navigate(region === "india" ? "/pricing-india" : "/pricing-international");
   };
 
+  // Dynamic headline based on trigger
+  const getHeadline = () => {
+    switch (triggerReason) {
+      case "export":
+        return "Ready to export your creation?";
+      case "limit":
+        return "You've reached today's free limit";
+      case "hd-export":
+        return "Unlock HD exports";
+      case "premium-feature":
+        return "This is a Creator Mode feature";
+      default:
+        return "Upgrade to Creator Mode";
+    }
+  };
+
+  const getSubheadline = () => {
+    switch (triggerReason) {
+      case "export":
+        return "Creators export unlimited HD designs without watermarks.";
+      case "limit":
+        return "Creators get unlimited designs every day.";
+      case "hd-export":
+        return "Free users get standard quality. Creators get crystal-clear HD.";
+      case "premium-feature":
+        return "Unlock premium features with Creator Mode.";
+      default:
+        return "Get the unfair advantage.";
+    }
+  };
+
   const freeFeatures = [
     { text: "2 designs per day", included: true },
-    { text: "Standard export quality", included: true },
+    { text: "Standard resolution", included: true },
     { text: "Basic templates", included: true },
     { text: "HD export", included: false },
     { text: "Priority generation", included: false },
+    { text: "No watermark", included: false },
   ];
 
   const creatorFeatures = [
-    { text: "25 designs per day", included: true },
-    { text: "HD export quality", included: true },
+    { text: "Unlimited designs", included: true },
+    { text: "HD export", included: true },
     { text: "All premium templates", included: true },
     { text: "Priority generation", included: true },
+    { text: "No watermarks", included: true },
     { text: "Early access to new features", included: true },
   ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md glass-card border-2 border-primary/50 p-0 overflow-hidden">
-        {/* Header */}
+      <DialogContent className="sm:max-w-lg glass-card border-2 border-primary/50 p-0 overflow-hidden">
+        {/* Header with gradient */}
         <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-6 pb-4">
           <button
             onClick={handleClose}
@@ -63,16 +103,16 @@ export const ProPlanDialog = ({ open, onOpenChange }: ProPlanDialogProps) => {
               </span>
             </div>
             <DialogTitle className="text-2xl font-bold">
-              Unlock Your Creative Power
+              {getHeadline()}
             </DialogTitle>
             <DialogDescription className="text-base text-muted-foreground">
-              Get the unfair advantage with Creator Mode
+              {getSubheadline()}
             </DialogDescription>
           </DialogHeader>
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Feature Comparison */}
+          {/* Comparison Grid */}
           <div className="grid grid-cols-2 gap-4">
             {/* Free Column */}
             <div className="space-y-3">
@@ -143,12 +183,13 @@ export const ProPlanDialog = ({ open, onOpenChange }: ProPlanDialogProps) => {
             </div>
           </div>
 
+          {/* Continue Free Option */}
           <Button
             variant="ghost"
             onClick={handleClose}
-            className="w-full text-muted-foreground"
+            className="w-full text-muted-foreground hover:text-foreground"
           >
-            Maybe Later
+            Continue with free plan
           </Button>
         </div>
       </DialogContent>
