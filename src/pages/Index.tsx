@@ -31,6 +31,7 @@ import {
   LandingCredibility,
   Template,
   getRandomTemplate,
+ AIModeModal,
 } from "@/components/platform";
 
 import { useExportCanvas } from "@/components/platform/editor/useExportCanvas";
@@ -69,6 +70,7 @@ const Index = () => {
   const [showProDialog, setShowProDialog] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallReason, setPaywallReason] = useState<"export" | "limit" | "premium-feature" | "hd-export">("limit");
+   const [showAIModeModal, setShowAIModeModal] = useState(false);
 
   // Workspace meta
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
@@ -128,6 +130,21 @@ const Index = () => {
     setShowDesignTypeModal(true);
     setActiveTab("create");
   };
+ 
+   // Handle AI Mode button click
+   const handleAIModeClick = () => {
+     setShowAIModeModal(true);
+   };
+ 
+   // Handle AI Mode template generation
+   const handleAIModeGenerate = (template: Template) => {
+     setCurrentTemplate(template);
+     setActiveDesignCategory(template.category);
+     setCanvasWidth(template.canvasWidth);
+     setCanvasHeight(template.canvasHeight);
+     setActiveTab("create");
+     setShowHomepage(false);
+   };
 
   // Handle browsing inspiration
   const handleBrowseInspiration = () => {
@@ -272,11 +289,109 @@ const Index = () => {
         { format, quality: 0.95, scale: 2 },
         currentTemplate?.name || "design"
       );
+
+       // Save to history after successful export
+       saveToHistory(state, currentTemplate?.name);
     } catch (error) {
       console.error("Export error:", error);
       toast.error("Export failed. Please try again.");
     }
   };
+ 
+   // Save design to history
+   const saveToHistory = (state: CanvasState, name?: string) => {
+     const HISTORY_STORAGE_KEY = "epic_design_history";
+     const MAX_HISTORY_ITEMS = 20;
+ 
+     try {
+       const existing = localStorage.getItem(HISTORY_STORAGE_KEY);
+       const history = existing ? JSON.parse(existing) : [];
+ 
+       // Generate simple thumbnail
+       const thumbnail = generateThumbnail(state);
+       const now = new Date().toISOString();
+ 
+       const newItem = {
+         id: `design-${Date.now()}`,
+         name: name || `Design ${new Date().toLocaleDateString()}`,
+         thumbnail,
+         createdAt: now,
+         updatedAt: now,
+         canvasState: state,
+       };
+ 
+       const updated = [newItem, ...history].slice(0, MAX_HISTORY_ITEMS);
+       localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updated));
+     } catch (error) {
+       console.error("Failed to save to history:", error);
+     }
+   };
+ 
+   // Generate thumbnail from canvas state
+   const generateThumbnail = (state: CanvasState): string => {
+     try {
+       const canvas = document.createElement("canvas");
+       const scale = 100 / Math.max(state.width, state.height);
+       canvas.width = state.width * scale;
+       canvas.height = state.height * scale;
+       const ctx = canvas.getContext("2d");
+       
+       if (!ctx) return "";
+ 
+       // Fill background
+       ctx.fillStyle = "#f3f4f6";
+       ctx.fillRect(0, 0, canvas.width, canvas.height);
+ 
+       // Draw layers
+       const sortedLayers = [...state.layers].sort((a, b) => a.zIndex - b.zIndex);
+       
+       for (const layer of sortedLayers) {
+         if (!layer.visible) continue;
+ 
+         ctx.save();
+         ctx.globalAlpha = layer.opacity;
+ 
+         const x = layer.x * scale;
+         const y = layer.y * scale;
+         const w = layer.width * scale;
+         const h = layer.height * scale;
+ 
+         switch (layer.type) {
+           case "background": {
+             const bgLayer = layer as any;
+             ctx.fillStyle = bgLayer.backgroundColor || "#ffffff";
+             ctx.fillRect(x, y, w, h);
+             break;
+           }
+           case "shape": {
+             const shapeLayer = layer as any;
+             ctx.fillStyle = shapeLayer.fillColor;
+             if (shapeLayer.shapeType === "circle") {
+               ctx.beginPath();
+               ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+               ctx.fill();
+             } else {
+               ctx.fillRect(x, y, w, h);
+             }
+             break;
+           }
+           case "text": {
+             const textLayer = layer as any;
+             ctx.fillStyle = textLayer.color;
+             ctx.font = `${Math.max(8, textLayer.fontSize * scale)}px sans-serif`;
+             ctx.fillText(textLayer.content.slice(0, 20), x, y + h / 2);
+             break;
+           }
+         }
+ 
+         ctx.restore();
+       }
+ 
+       return canvas.toDataURL("image/png");
+     } catch {
+       return "";
+     }
+   };
 
   // Handle export button click - check limits first
   const handleExportClick = async () => {
@@ -365,6 +480,7 @@ const Index = () => {
           <NewHomepage
             onStartDesigning={handleStartDesigning}
             onBrowseInspiration={handleBrowseInspiration}
+             onAIModeClick={handleAIModeClick}
           />
           <LandingCredibility onStartDesigning={handleStartDesigning} />
         </>
@@ -486,6 +602,12 @@ const Index = () => {
           onOpenChange={setShowPaywall}
           triggerReason={paywallReason}
         />
+
+         <AIModeModal
+           open={showAIModeModal}
+           onOpenChange={setShowAIModeModal}
+           onGenerate={handleAIModeGenerate}
+         />
       </div>
     </>
   );

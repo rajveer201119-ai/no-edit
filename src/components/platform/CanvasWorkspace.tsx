@@ -34,6 +34,7 @@ import {
   UploadModal,
 } from "./editor";
 import { LucideIcon } from "lucide-react";
+ import { useDesignHistory } from "./editor/HistoryPanel";
 
 interface CanvasWorkspaceProps {
   template: Template | null;
@@ -98,9 +99,21 @@ export const CanvasWorkspace = ({
   // Export hook
   const { downloadExport } = useExportCanvas();
 
+   // History hook for auto-save
+   const { autoSaveFromProjectState } = useDesignHistory();
+
   // Notify parent of save status changes
   useEffect(() => {
     onSaveStatusChange?.(saveStatus);
+
+     // Auto-save to history when saved
+     if (saveStatus === "saved" && canvasState.layers.length > 1) {
+       // Debounce auto-save
+       const timeout = setTimeout(() => {
+         autoSaveFromProjectState();
+       }, 5000);
+       return () => clearTimeout(timeout);
+     }
   }, [saveStatus, onSaveStatusChange]);
 
   useEffect(() => {

@@ -33,6 +33,7 @@ import { CanvasState } from "./types";
 
 const HISTORY_STORAGE_KEY = "epic_design_history";
 const MAX_HISTORY_ITEMS = 20;
+ const AUTOSAVE_STORAGE_KEY = "epic_project_state";
 
 export interface HistoryItem {
   id: string;
@@ -393,5 +394,83 @@ export const useDesignHistory = () => {
     if (fn) fn();
   };
 
-  return { saveCurrentDesign };
+   // Auto-save from project state
+   const autoSaveFromProjectState = () => {
+     try {
+       const savedState = localStorage.getItem(AUTOSAVE_STORAGE_KEY);
+       if (!savedState) return;
+ 
+       const state = JSON.parse(savedState) as CanvasState;
+       if (!state.layers || state.layers.length === 0) return;
+ 
+       const existing = localStorage.getItem(HISTORY_STORAGE_KEY);
+       const history = existing ? JSON.parse(existing) : [];
+ 
+       // Generate thumbnail
+       const canvas = document.createElement("canvas");
+       const scale = 100 / Math.max(state.width, state.height);
+       canvas.width = state.width * scale;
+       canvas.height = state.height * scale;
+       const ctx = canvas.getContext("2d");
+       
+       if (!ctx) return;
+ 
+       ctx.fillStyle = "#f3f4f6";
+       ctx.fillRect(0, 0, canvas.width, canvas.height);
+ 
+       const sortedLayers = [...state.layers].sort((a, b) => a.zIndex - b.zIndex);
+       
+       for (const layer of sortedLayers) {
+         if (!layer.visible) continue;
+         ctx.save();
+         ctx.globalAlpha = layer.opacity;
+         const x = layer.x * scale;
+         const y = layer.y * scale;
+         const w = layer.width * scale;
+         const h = layer.height * scale;
+ 
+         switch (layer.type) {
+           case "background":
+             ctx.fillStyle = (layer as any).backgroundColor || "#ffffff";
+             ctx.fillRect(x, y, w, h);
+             break;
+           case "shape":
+             ctx.fillStyle = (layer as any).fillColor;
+             if ((layer as any).shapeType === "circle") {
+               ctx.beginPath();
+               ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+               ctx.fill();
+             } else {
+               ctx.fillRect(x, y, w, h);
+             }
+             break;
+           case "text":
+             ctx.fillStyle = (layer as any).color;
+             ctx.font = `${Math.max(8, (layer as any).fontSize * scale)}px sans-serif`;
+             ctx.fillText((layer as any).content?.slice(0, 20) || "", x, y + h / 2);
+             break;
+         }
+         ctx.restore();
+       }
+ 
+       const thumbnail = canvas.toDataURL("image/png");
+       const now = new Date().toISOString();
+ 
+       const newItem = {
+         id: `design-${Date.now()}`,
+         name: `Design ${new Date().toLocaleDateString()}`,
+         thumbnail,
+         createdAt: now,
+         updatedAt: now,
+         canvasState: state,
+       };
+ 
+       const updated = [newItem, ...history].slice(0, MAX_HISTORY_ITEMS);
+       localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updated));
+     } catch (e) {
+       console.error("Auto-save failed:", e);
+     }
+   };
+
+   return { saveCurrentDesign, autoSaveFromProjectState };
 };

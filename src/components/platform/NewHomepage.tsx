@@ -1,13 +1,16 @@
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { WebGLShader } from "@/components/ui/web-gl-shader";
 import epicLogo from "@/assets/epic-logo.png";
+ import { Zap } from "lucide-react";
+ import { Button } from "@/components/ui/button";
 
 interface NewHomepageProps {
   onStartDesigning: () => void;
   onBrowseInspiration: () => void;
+   onAIModeClick?: () => void;
 }
 
-export const NewHomepage = ({ onStartDesigning, onBrowseInspiration }: NewHomepageProps) => {
+ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeClick }: NewHomepageProps) => {
   return (
     <section
       className="relative mx-auto w-full pt-24 md:pt-40 px-6 text-center 
@@ -55,6 +58,19 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration }: NewHomepa
       
       {/* CTAs */}
       <div className="flex flex-col sm:flex-row items-center gap-4 relative z-20 animate-fade-in [animation-delay:400ms]">
+         {/* AI Mode Button */}
+         {onAIModeClick && (
+           <Button
+             onClick={onAIModeClick}
+             className="gap-2 bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 
+             text-white min-w-[200px] min-h-[48px] rounded-full text-base font-semibold shadow-lg 
+             hover:shadow-primary/25 transition-all duration-300 hover:scale-105 active:scale-95"
+           >
+             <Zap className="h-5 w-5" />
+             ⚡ AI Mode
+           </Button>
+         )}
+
         <LiquidButton 
           className="text-foreground border rounded-full min-w-[200px] min-h-[48px] cursor-pointer 
           hover:scale-105 active:scale-95 transition-transform duration-200" 

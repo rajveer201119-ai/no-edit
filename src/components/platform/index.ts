@@ -14,3 +14,4 @@ export { templates, getTemplatesByCategory, getRandomTemplate, searchTemplates, 
 // New platform features
 export { NichePresets, HomePresetButtons, presets, type NichePreset } from "./NichePresets";
 export { CommunityPromptCard, PromptStatusBadge, useCommunityPrompts, type CommunityPrompt, type PromptStatus } from "./CommunityPrompts";
+ export { AIModeModal } from "./AIModeModal";
