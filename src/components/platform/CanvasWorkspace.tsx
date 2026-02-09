@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { SmartResizePopover } from "./editor/SmartResizePopover";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -575,37 +576,42 @@ export const CanvasWorkspace = ({
       />
 
       {/* Zoom Controls & Quick Actions */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-border/30 bg-background/50 backdrop-blur-sm gap-2 flex-wrap">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-border/30 bg-background/80 backdrop-blur-sm gap-2 flex-wrap sticky top-0 z-20">
+        {/* Zoom Controls */}
+        <div className="flex items-center gap-1 bg-muted/40 rounded-lg px-1 py-0.5">
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7"
+            className="h-8 w-8 hover:bg-muted"
             onClick={() => setZoom((prev) => Math.max(prev - 10, 25))}
+            title="Zoom Out"
           >
-            <ZoomOut className="h-3.5 w-3.5" />
+            <ZoomOut className="h-4 w-4" />
           </Button>
-          <span className="text-xs font-medium w-10 text-center">{zoom}%</span>
+          <span className="text-xs font-semibold w-12 text-center tabular-nums select-none">{zoom}%</span>
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7"
+            className="h-8 w-8 hover:bg-muted"
             onClick={() => setZoom((prev) => Math.min(prev + 10, 200))}
+            title="Zoom In"
           >
-            <ZoomIn className="h-3.5 w-3.5" />
+            <ZoomIn className="h-4 w-4" />
           </Button>
+          <div className="w-px h-5 bg-border/40" />
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7"
+            className="h-8 w-8 hover:bg-muted"
             onClick={() => setZoom(100)}
+            title="Fit to Screen"
           >
-            <Maximize2 className="h-3.5 w-3.5" />
+            <Maximize2 className="h-4 w-4" />
           </Button>
         </div>
 
         {/* Quick Actions: Alignment, Palette, Auto-layout */}
-        <div className="hidden md:block">
+        <div className="hidden md:flex items-center gap-2">
           <QuickActions
             layers={canvasState.layers}
             selectedLayerIds={canvasState.selectedLayerIds}
@@ -614,13 +620,37 @@ export const CanvasWorkspace = ({
             onUpdateLayer={updateLayer}
             onSetBackground={setBackgroundColor}
           />
+
+          {/* Smart Resize */}
+          <SmartResizePopover
+            currentWidth={canvasState.width}
+            currentHeight={canvasState.height}
+            onResize={(w, h) => {
+              const scaleX = w / canvasState.width;
+              const scaleY = h / canvasState.height;
+              setCanvasState((prev) => ({
+                ...prev,
+                width: w,
+                height: h,
+                layers: prev.layers.map((layer) => ({
+                  ...layer,
+                  x: layer.x * scaleX,
+                  y: layer.y * scaleY,
+                  width: layer.width * scaleX,
+                  height: layer.height * scaleY,
+                  ...(layer.type === "text" ? { fontSize: Math.round((layer as any).fontSize * Math.min(scaleX, scaleY)) } : {}),
+                })),
+              }));
+              toast.success(`Resized to ${w}×${h}!`);
+            }}
+          />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
             variant={showLayerPanel ? "default" : "ghost"}
             size="sm"
-            className="gap-1.5 h-7 text-xs"
+            className="gap-1.5 h-8 text-xs"
             onClick={() => setShowLayerPanel(!showLayerPanel)}
           >
             <Layers className="h-3.5 w-3.5" />

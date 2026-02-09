@@ -54,6 +54,7 @@ export const CanvasRenderer = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState("");
+  const [snapGuides, setSnapGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     layerId: null,
@@ -135,6 +136,39 @@ export const CanvasRenderer = ({
     });
   };
 
+  // Calculate snap guides for a layer position
+  const calcSnapGuides = useCallback((layerId: string, lx: number, ly: number, lw: number, lh: number) => {
+    const SNAP_THRESHOLD = 5;
+    const guidesX: number[] = [];
+    const guidesY: number[] = [];
+
+    // Canvas center guides
+    const cx = width / 2;
+    const cy = height / 2;
+    const layerCX = lx + lw / 2;
+    const layerCY = ly + lh / 2;
+
+    if (Math.abs(layerCX - cx) < SNAP_THRESHOLD) guidesX.push(cx);
+    if (Math.abs(layerCY - cy) < SNAP_THRESHOLD) guidesY.push(cy);
+    if (Math.abs(lx) < SNAP_THRESHOLD) guidesX.push(0);
+    if (Math.abs(ly) < SNAP_THRESHOLD) guidesY.push(0);
+    if (Math.abs(lx + lw - width) < SNAP_THRESHOLD) guidesX.push(width);
+    if (Math.abs(ly + lh - height) < SNAP_THRESHOLD) guidesY.push(height);
+
+    // Other layers
+    layers.forEach((other) => {
+      if (other.id === layerId || other.type === "background" || !other.visible) return;
+      const otherCX = other.x + other.width / 2;
+      const otherCY = other.y + other.height / 2;
+      if (Math.abs(layerCX - otherCX) < SNAP_THRESHOLD) guidesX.push(otherCX);
+      if (Math.abs(layerCY - otherCY) < SNAP_THRESHOLD) guidesY.push(otherCY);
+      if (Math.abs(lx - other.x) < SNAP_THRESHOLD) guidesX.push(other.x);
+      if (Math.abs(lx + lw - (other.x + other.width)) < SNAP_THRESHOLD) guidesX.push(other.x + other.width);
+    });
+
+    return { x: guidesX, y: guidesY };
+  }, [width, height, layers]);
+
   // Handle mouse/touch move
   const handleMove = useCallback(
     (e: MouseEvent | TouchEvent) => {
@@ -144,10 +178,14 @@ export const CanvasRenderer = ({
         e.preventDefault();
         const deltaX = (pos.x - dragState.startX) / scale;
         const deltaY = (pos.y - dragState.startY) / scale;
-        onLayerUpdate(dragState.layerId, {
-          x: dragState.startLayerX + deltaX,
-          y: dragState.startLayerY + deltaY,
-        });
+        const newX = dragState.startLayerX + deltaX;
+        const newY = dragState.startLayerY + deltaY;
+        const layer = layers.find((l) => l.id === dragState.layerId);
+        if (layer) {
+          const guides = calcSnapGuides(layer.id, newX, newY, layer.width, layer.height);
+          setSnapGuides(guides);
+        }
+        onLayerUpdate(dragState.layerId, { x: newX, y: newY });
       }
 
       if (resizeState.isResizing && resizeState.layerId) {
@@ -160,7 +198,6 @@ export const CanvasRenderer = ({
         let newX = resizeState.startLayerX;
         let newY = resizeState.startLayerY;
 
-        // Handle different resize handles
         if (resizeState.handle.includes("e")) {
           newWidth = Math.max(20, resizeState.startWidth + deltaX);
         }
@@ -184,7 +221,7 @@ export const CanvasRenderer = ({
         });
       }
     },
-    [dragState, resizeState, scale, onLayerUpdate]
+    [dragState, resizeState, scale, onLayerUpdate, layers, calcSnapGuides]
   );
 
   // Handle mouse/touch up
@@ -194,6 +231,7 @@ export const CanvasRenderer = ({
     }
     setDragState((prev) => ({ ...prev, isDragging: false, layerId: null }));
     setResizeState((prev) => ({ ...prev, isResizing: false, layerId: null }));
+    setSnapGuides({ x: [], y: [] });
   }, [dragState.isDragging, resizeState.isResizing, onLayerCommit]);
 
   // Attach global listeners for drag/resize
@@ -625,6 +663,32 @@ export const CanvasRenderer = ({
 
       {/* Render all layers */}
       {sortedLayers.map(renderLayer)}
+
+      {/* Snap Guide Lines */}
+      {snapGuides.x.map((gx, i) => (
+        <div
+          key={`gx-${i}`}
+          className="absolute top-0 bottom-0 pointer-events-none z-[100]"
+          style={{
+            left: gx * scale,
+            width: 1,
+            background: "hsl(var(--primary))",
+            opacity: 0.7,
+          }}
+        />
+      ))}
+      {snapGuides.y.map((gy, i) => (
+        <div
+          key={`gy-${i}`}
+          className="absolute left-0 right-0 pointer-events-none z-[100]"
+          style={{
+            top: gy * scale,
+            height: 1,
+            background: "hsl(var(--primary))",
+            opacity: 0.7,
+          }}
+        />
+      ))}
     </div>
   );
 };
