@@ -32,6 +32,7 @@ import {
   CanvasRenderer,
   ElementsToolPanel,
   UploadModal,
+  QuickActions,
 } from "./editor";
 import { LucideIcon } from "lucide-react";
  import { useDesignHistory } from "./editor/HistoryPanel";
@@ -125,6 +126,19 @@ export const CanvasWorkspace = ({
   useEffect(() => {
     if (template) {
       setIsLoading(true);
+      
+      // If template has no elements, it's a "loaded design" - 
+      // useLayerManager will restore from localStorage
+      if (template.elements.length === 0) {
+        // Just update canvas dimensions, layers come from localStorage
+        setCanvasState((prev) => ({
+          ...prev,
+          width: template.canvasWidth,
+          height: template.canvasHeight,
+        }));
+        setTimeout(() => setIsLoading(false), 300);
+        return;
+      }
       
       const layers: Layer[] = template.elements.map((el, index) => {
         const baseProps = {
@@ -560,45 +574,56 @@ export const CanvasWorkspace = ({
         onImageUpload={handleImageUpload}
       />
 
-      {/* Zoom Controls */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-border/30 bg-background/50 backdrop-blur-sm">
+      {/* Zoom Controls & Quick Actions */}
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-border/30 bg-background/50 backdrop-blur-sm gap-2 flex-wrap">
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-7 w-7"
             onClick={() => setZoom((prev) => Math.max(prev - 10, 25))}
           >
-            <ZoomOut className="h-4 w-4" />
+            <ZoomOut className="h-3.5 w-3.5" />
           </Button>
-          <span className="text-sm font-medium w-14 text-center">{zoom}%</span>
+          <span className="text-xs font-medium w-10 text-center">{zoom}%</span>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-7 w-7"
             onClick={() => setZoom((prev) => Math.min(prev + 10, 200))}
           >
-            <ZoomIn className="h-4 w-4" />
+            <ZoomIn className="h-3.5 w-3.5" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-7 w-7"
             onClick={() => setZoom(100)}
           >
-            <Maximize2 className="h-4 w-4" />
+            <Maximize2 className="h-3.5 w-3.5" />
           </Button>
         </div>
 
+        {/* Quick Actions: Alignment, Palette, Auto-layout */}
+        <div className="hidden md:block">
+          <QuickActions
+            layers={canvasState.layers}
+            selectedLayerIds={canvasState.selectedLayerIds}
+            canvasWidth={canvasState.width}
+            canvasHeight={canvasState.height}
+            onUpdateLayer={updateLayer}
+            onSetBackground={setBackgroundColor}
+          />
+        </div>
+
         <div className="flex items-center gap-2">
-          {/* Layers toggle */}
           <Button
             variant={showLayerPanel ? "default" : "ghost"}
             size="sm"
-            className="gap-2 h-8"
+            className="gap-1.5 h-7 text-xs"
             onClick={() => setShowLayerPanel(!showLayerPanel)}
           >
-            <Layers className="h-4 w-4" />
+            <Layers className="h-3.5 w-3.5" />
             <span className="hidden md:inline">Layers</span>
           </Button>
         </div>

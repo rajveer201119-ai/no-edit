@@ -95,8 +95,8 @@ export const WorkspaceToolbar = ({
   // Desktop: Vertical fixed sidebar
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="fixed left-0 top-28 bottom-0 w-16 bg-background/90 backdrop-blur-xl border-r border-border/30 z-40">
-        <div className="flex flex-col items-center gap-2 p-3">
+      <div className="fixed left-0 top-28 bottom-0 w-16 bg-background/90 backdrop-blur-xl border-r border-border/30 z-40 overflow-y-auto scrollbar-thin scrollbar-thumb-border/50">
+        <div className="flex flex-col items-center gap-1.5 p-2">
           {tools.map((tool) => {
             const Icon = tool.icon;
             const isActive = activeTool === tool.id;
@@ -108,7 +108,7 @@ export const WorkspaceToolbar = ({
                     variant="ghost"
                     size="icon"
                     className={cn(
-                      "h-11 w-11 rounded-xl transition-all duration-200",
+                      "h-10 w-10 rounded-xl transition-all duration-200",
                       isActive
                         ? "bg-primary/20 text-primary ring-1 ring-primary/30"
                         : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
