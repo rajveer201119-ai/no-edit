@@ -519,7 +519,7 @@ const Index = () => {
 
     // Create workspace
     return (
-      <div className="min-h-screen pt-32 pb-20 md:pb-4">
+      <div className="min-h-screen pt-[10.5rem] pb-20 md:pb-4">
         {/* Workspace Top Bar */}
         <WorkspaceTopBar
           projectName={currentTemplate?.name || "New Design"}

@@ -13,6 +13,7 @@ export { ElementsToolPanel } from "./ElementsToolPanel";
 export { HistoryPanel, useDesignHistory, type HistoryItem } from "./HistoryPanel";
 export { UploadModal } from "./UploadModal";
 export { QuickActions } from "./QuickActions";
+export { SmartResizePopover } from "./SmartResizePopover";
 export { IconLayerRenderer, getIconComponent, isValidIconName } from "./IconRenderer";
 
 // New editor features
