@@ -66,7 +66,7 @@ export const WorkspaceTopBar = ({
     <TooltipProvider delayDuration={200}>
       <div className={cn(
         "fixed h-12 bg-background/90 backdrop-blur-xl border-b border-border/30 z-40",
-        isMobile ? "top-16 left-0 right-0" : "top-16 left-16 right-0"
+        isMobile ? "top-16 left-0 right-0" : "top-16 left-0 right-0"
       )}>
         <div className="h-full px-3 md:px-4 flex items-center justify-between gap-3">
           {/* Left: Project Info */}

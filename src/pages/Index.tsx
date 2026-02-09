@@ -37,6 +37,9 @@ import {
 import { useExportCanvas } from "@/components/platform/editor/useExportCanvas";
 import { Layer, CanvasState } from "@/components/platform/editor/types";
 
+// State to pass loaded canvas directly to workspace
+
+
 const Index = () => {
   const navigate = useNavigate();
   const { isInstallable, promptInstall } = useInstallPrompt();
@@ -71,6 +74,7 @@ const Index = () => {
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallReason, setPaywallReason] = useState<"export" | "limit" | "premium-feature" | "hd-export">("limit");
    const [showAIModeModal, setShowAIModeModal] = useState(false);
+   const [loadedCanvasState, setLoadedCanvasState] = useState<CanvasState | null>(null);
 
   // Workspace meta
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
@@ -196,14 +200,19 @@ const Index = () => {
 
   // Handle loading design from history
   const handleLoadDesign = (state: CanvasState) => {
-    setCanvasLayers(state.layers);
+    // Save the state to localStorage so useLayerManager picks it up
+    localStorage.setItem("epic_project_state", JSON.stringify(state));
+    
     setCanvasWidth(state.width);
     setCanvasHeight(state.height);
+    setLoadedCanvasState(state);
     setActiveTab("create");
     setShowHomepage(false);
-    // Create a blank template to trigger workspace rendering
+    
+    // Create a template that won't overwrite the loaded state
+    // We use a special id so CanvasWorkspace can detect it
     const blankTemplate: Template = {
-      id: "loaded-design",
+      id: `loaded-${Date.now()}`,
       name: "Loaded Design",
       category: "custom" as DesignCategory,
       thumbnailUrl: "",
@@ -510,7 +519,7 @@ const Index = () => {
 
     // Create workspace
     return (
-      <div className="min-h-screen pt-40 pb-20 md:pb-4">
+      <div className="min-h-screen pt-32 pb-20 md:pb-4">
         {/* Workspace Top Bar */}
         <WorkspaceTopBar
           projectName={currentTemplate?.name || "New Design"}
