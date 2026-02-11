@@ -24,3 +24,9 @@ export { ZeroEditMode, ZeroEditOutput } from "./ZeroEditMode";
 export { AIReasoningOverlay, AIReasoningToggle } from "./AIReasoningOverlay";
 export { RemixLineage, RemixBadge, useRemixHistory, type RemixNode } from "./RemixLineage";
 export { DesignMistakeDetector, detectMistakes, type DesignMistake } from "./DesignMistakeDetector";
+
+// Smart Automation Engine
+export { getContrastTextColor, getPerceivedBrightness, autoContrastLayers } from "./AutoContrastEngine";
+export { DesignWizard } from "./DesignWizard";
+export { ExportSizePack } from "./ExportSizePack";
+export { OnboardingGuide, OnboardingTrigger } from "./OnboardingGuide";

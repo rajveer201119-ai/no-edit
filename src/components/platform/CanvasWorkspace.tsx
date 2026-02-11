@@ -11,6 +11,8 @@ import {
   ZoomOut,
   Maximize2,
   Layers,
+  Package,
+  Wand2,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Template, TemplateElement } from "./templates";
@@ -22,6 +24,7 @@ import {
   ImageLayer,
   BackgroundLayer,
   IconLayer as IconLayerType,
+  CanvasState,
   useLayerManager,
   useExportCanvas,
   useKeyboardShortcuts,
@@ -34,9 +37,13 @@ import {
   ElementsToolPanel,
   UploadModal,
   QuickActions,
+  ExportSizePack,
+  OnboardingGuide,
+  OnboardingTrigger,
 } from "./editor";
+import { autoContrastLayers, getContrastTextColor } from "./editor/AutoContrastEngine";
 import { LucideIcon } from "lucide-react";
- import { useDesignHistory } from "./editor/HistoryPanel";
+import { useDesignHistory } from "./editor/HistoryPanel";
 
 interface CanvasWorkspaceProps {
   template: Template | null;
@@ -69,6 +76,8 @@ export const CanvasWorkspace = ({
   const [showToolPanel, setShowToolPanel] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showExportPack, setShowExportPack] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Layer manager hook
   const {
@@ -129,9 +138,27 @@ export const CanvasWorkspace = ({
       setIsLoading(true);
       
       // If template has no elements, it's a "loaded design" - 
-      // useLayerManager will restore from localStorage
+      // Force-load from localStorage directly
       if (template.elements.length === 0) {
-        // Just update canvas dimensions, layers come from localStorage
+        try {
+          const saved = localStorage.getItem("epic_project_state");
+          if (saved) {
+            const parsed = JSON.parse(saved) as CanvasState;
+            if (parsed.layers && parsed.layers.length > 0) {
+              setCanvasState({
+                ...parsed,
+                width: template.canvasWidth || parsed.width,
+                height: template.canvasHeight || parsed.height,
+                selectedLayerIds: [],
+                clipboard: [],
+              });
+              setTimeout(() => setIsLoading(false), 300);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to load design from history:", e);
+        }
         setCanvasState((prev) => ({
           ...prev,
           width: template.canvasWidth,
@@ -534,6 +561,14 @@ export const CanvasWorkspace = ({
             backgroundColor={backgroundColor}
             onColorChange={(color) => {
               setBackgroundColor(color);
+              // Auto-contrast: fix text visibility when bg changes
+              const updatedLayers = autoContrastLayers(canvasState.layers, color);
+              updatedLayers.forEach((layer: any, i: number) => {
+                const original = canvasState.layers[i] as any;
+                if (layer.type === "text" && layer.color !== original?.color) {
+                  updateLayer(layer.id, { color: layer.color });
+                }
+              });
               toast.success("Background updated!");
             }}
           />
@@ -574,6 +609,17 @@ export const CanvasWorkspace = ({
         onOpenChange={setShowUploadModal}
         onImageUpload={handleImageUpload}
       />
+
+      {/* Export Size Pack */}
+      <ExportSizePack
+        open={showExportPack}
+        onOpenChange={setShowExportPack}
+        canvasState={canvasState}
+        projectName={template?.name}
+      />
+
+      {/* Onboarding Guide */}
+      <OnboardingGuide />
 
       {/* Zoom Controls & Quick Actions */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-border/30 bg-background/80 backdrop-blur-sm gap-2 flex-wrap sticky top-0 z-20">
@@ -647,6 +693,17 @@ export const CanvasWorkspace = ({
         </div>
 
         <div className="flex items-center gap-1.5">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-1.5 h-8 text-xs"
+            onClick={() => setShowExportPack(true)}
+            title="Export Size Pack"
+          >
+            <Package className="h-3.5 w-3.5" />
+            <span className="hidden md:inline">Size Pack</span>
+          </Button>
+          <OnboardingTrigger onClick={() => setShowOnboarding(true)} />
           <Button
             variant={showLayerPanel ? "default" : "ghost"}
             size="sm"
