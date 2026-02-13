@@ -402,12 +402,15 @@ export const CanvasRenderer = ({
     switch (layer.type) {
       case "background": {
         const bgLayer = layer as any;
+        const isGradient = bgLayer.backgroundColor && bgLayer.backgroundColor.includes("gradient");
         return (
           <div
             key={layer.id}
             style={{
               ...baseStyle,
-              backgroundColor: bgLayer.backgroundColor,
+              ...(isGradient
+                ? { background: bgLayer.backgroundColor }
+                : { backgroundColor: bgLayer.backgroundColor }),
               backgroundImage: bgLayer.backgroundImage ? `url(${bgLayer.backgroundImage})` : undefined,
               backgroundSize: "cover",
               backgroundPosition: "center",

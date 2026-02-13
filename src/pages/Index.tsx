@@ -25,7 +25,6 @@ import {
   QuickStartStrip,
   CanvasWorkspace,
   LibraryTab,
-  InspireTab,
   NewHomepage,
   ExportDialog,
   LandingCredibility,
@@ -150,10 +149,10 @@ const Index = () => {
      setShowHomepage(false);
    };
 
-  // Handle browsing inspiration
+  // Handle browsing inspiration - now goes to library
   const handleBrowseInspiration = () => {
     setShowHomepage(false);
-    setActiveTab("inspire");
+    setActiveTab("library");
   };
 
   // Handle design type selection
@@ -222,42 +221,6 @@ const Index = () => {
     };
     setCurrentTemplate(blankTemplate);
     toast.success("Design loaded!");
-  };
-
-  // Handle remix from inspire
-  const handleRemix = (imageUrl: string, prompt: string) => {
-    setActiveTab("create");
-    setShowHomepage(false);
-    toast.info("Remix feature coming soon! For now, start fresh.");
-  };
-
-  // Handle start from inspire - opens image in workspace
-  const handleStartFrom = (imageUrl: string) => {
-    const blankTemplate: Template = {
-      id: "imported-design",
-      name: "Imported Design",
-      category: "custom" as DesignCategory,
-      thumbnailUrl: "",
-      canvasWidth: 800,
-      canvasHeight: 800,
-      elements: [
-        {
-          id: "bg",
-          type: "shape",
-          x: 0,
-          y: 0,
-          width: 800,
-          height: 800,
-          backgroundColor: "#1a1a2e",
-        },
-      ],
-    };
-    
-    setCurrentTemplate(blankTemplate);
-    setImportedImageUrl(imageUrl);
-    setActiveTab("create");
-    setShowHomepage(false);
-    toast.success("Image loaded in editor! Drag to position.");
   };
 
   // Handle tab change with proper routing
@@ -502,17 +465,6 @@ const Index = () => {
         <LibraryTab
           onUseTemplate={handleUseTemplate}
           onLoadDesign={handleLoadDesign}
-        />
-      );
-    }
-
-    // Inspire tab
-    if (activeTab === "inspire") {
-      return (
-        <InspireTab
-          onRemix={handleRemix}
-          onUseLayout={handleUseTemplate}
-          onStartFrom={handleStartFrom}
         />
       );
     }

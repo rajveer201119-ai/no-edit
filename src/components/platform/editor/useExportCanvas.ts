@@ -89,6 +89,61 @@ const iconSvgPaths: Record<string, string> = {
   Octagon: "M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86L7.86 2z",
 };
 
+// Parse CSS gradient string into canvas gradient
+function parseGradientToCanvas(
+  ctx: CanvasRenderingContext2D,
+  gradientStr: string,
+  x: number,
+  y: number,
+  w: number,
+  h: number
+): CanvasGradient | null {
+  try {
+    // Extract angle and color stops from linear-gradient
+    const match = gradientStr.match(/linear-gradient\(\s*(\d+)deg\s*,\s*(.+)\)/);
+    if (!match) {
+      // Try without angle (default 180deg)
+      const noAngle = gradientStr.match(/linear-gradient\(\s*(.+)\)/);
+      if (!noAngle) return null;
+      const stops = parseColorStops(noAngle[1]);
+      const grad = ctx.createLinearGradient(x, y, x, y + h);
+      stops.forEach(s => grad.addColorStop(s.offset, s.color));
+      return grad;
+    }
+    
+    const angle = parseInt(match[1]);
+    const stops = parseColorStops(match[2]);
+    
+    // Convert angle to gradient coordinates
+    const rad = (angle - 90) * Math.PI / 180;
+    const cx = x + w / 2;
+    const cy = y + h / 2;
+    const len = Math.max(w, h);
+    const grad = ctx.createLinearGradient(
+      cx - Math.cos(rad) * len / 2,
+      cy - Math.sin(rad) * len / 2,
+      cx + Math.cos(rad) * len / 2,
+      cy + Math.sin(rad) * len / 2
+    );
+    stops.forEach(s => grad.addColorStop(s.offset, s.color));
+    return grad;
+  } catch {
+    return null;
+  }
+}
+
+function parseColorStops(stopsStr: string): { offset: number; color: string }[] {
+  const parts = stopsStr.split(/,(?![^(]*\))/);
+  return parts.map((part, i) => {
+    const trimmed = part.trim();
+    const percentMatch = trimmed.match(/(.+?)\s+(\d+)%/);
+    if (percentMatch) {
+      return { color: percentMatch[1].trim(), offset: parseInt(percentMatch[2]) / 100 };
+    }
+    return { color: trimmed, offset: i / Math.max(parts.length - 1, 1) };
+  });
+}
+
 export function useExportCanvas() {
   const exportingRef = useRef(false);
 
@@ -114,13 +169,23 @@ export function useExportCanvas() {
     switch (layer.type) {
       case "background": {
         const bgLayer = layer as BackgroundLayer;
-        ctx.fillStyle = bgLayer.backgroundColor;
-        ctx.fillRect(
-          layer.x * scale,
-          layer.y * scale,
-          layer.width * scale,
-          layer.height * scale
-        );
+        const x = layer.x * scale;
+        const y = layer.y * scale;
+        const w = layer.width * scale;
+        const h = layer.height * scale;
+        
+        // Handle gradient backgrounds
+        if (bgLayer.backgroundColor && bgLayer.backgroundColor.includes("gradient")) {
+          const gradientFill = parseGradientToCanvas(ctx, bgLayer.backgroundColor, x, y, w, h);
+          if (gradientFill) {
+            ctx.fillStyle = gradientFill;
+          } else {
+            ctx.fillStyle = "#ffffff";
+          }
+        } else {
+          ctx.fillStyle = bgLayer.backgroundColor || "#ffffff";
+        }
+        ctx.fillRect(x, y, w, h);
         
         if (bgLayer.backgroundImage) {
           await new Promise<void>((resolve) => {

@@ -5,7 +5,7 @@ export { WorkspaceTopBar } from "./WorkspaceTopBar";
 export { QuickStartStrip } from "./QuickStartStrip";
 export { CanvasWorkspace } from "./CanvasWorkspace";
 export { LibraryTab } from "./LibraryTab";
-export { InspireTab } from "./InspireTab";
+// InspireTab removed
 export { NewHomepage } from "./NewHomepage";
 export { ExportDialog } from "./ExportDialog";
 export { LandingCredibility } from "./LandingCredibility";

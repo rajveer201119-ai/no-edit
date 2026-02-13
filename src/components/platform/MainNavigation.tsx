@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-export type MainTab = "home" | "create" | "library" | "inspire";
+export type MainTab = "home" | "create" | "library";
 
 interface MainNavigationProps {
   activeTab: MainTab;
@@ -29,7 +29,6 @@ export const MainNavigation = ({
     { id: "home" as const, label: "Home", icon: Home },
     { id: "create" as const, label: "Create", icon: Palette },
     { id: "library" as const, label: "Library", icon: Library },
-    { id: "inspire" as const, label: "Inspire", icon: Lightbulb },
   ];
 
   const handleTabChange = (tab: MainTab) => {
