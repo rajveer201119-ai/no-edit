@@ -264,20 +264,45 @@ const iconLibrary: IconItem[] = [
   { name: "Crosshair", icon: Crosshair, category: "special" },
 ];
 
-// Graphics/Decorations
+// Graphics/Decorations — expanded
 const graphicItems = [
   { id: "badge-circle", name: "Circle Badge", color: "#3b82f6" },
   { id: "badge-ribbon", name: "Ribbon", color: "#ef4444" },
+  { id: "badge-star", name: "Star Badge", color: "#f59e0b" },
+  { id: "badge-shield", name: "Shield Badge", color: "#0ea5e9" },
   { id: "banner-wave", name: "Wave Banner", color: "#10b981" },
+  { id: "banner-ribbon", name: "Ribbon Banner", color: "#ec4899" },
   { id: "divider-line", name: "Line Divider", color: "#6b7280" },
   { id: "divider-dots", name: "Dots Divider", color: "#6b7280" },
+  { id: "divider-zigzag", name: "Zigzag Divider", color: "#8b5cf6" },
   { id: "frame-simple", name: "Simple Frame", color: "#1f2937" },
   { id: "frame-rounded", name: "Rounded Frame", color: "#1f2937" },
+  { id: "frame-double", name: "Double Frame", color: "#d97706" },
+  { id: "frame-ornate", name: "Ornate Frame", color: "#7c3aed" },
   { id: "callout-arrow", name: "Arrow Callout", color: "#f59e0b" },
+  { id: "callout-speech", name: "Speech Bubble", color: "#06b6d4" },
   { id: "blob-1", name: "Blob Shape 1", color: "#8b5cf6" },
   { id: "blob-2", name: "Blob Shape 2", color: "#ec4899" },
+  { id: "blob-3", name: "Blob Shape 3", color: "#14b8a6" },
+  { id: "blob-4", name: "Blob Shape 4", color: "#f97316" },
   { id: "gradient-circle", name: "Gradient Circle", color: "#6366f1" },
-  { id: "gradient-rect", name: "Gradient Rectangle", color: "#14b8a6" },
+  { id: "gradient-rect", name: "Gradient Rect", color: "#14b8a6" },
+  { id: "gradient-blob", name: "Gradient Blob", color: "#a855f7" },
+  { id: "pattern-dots", name: "Dot Pattern", color: "#94a3b8" },
+  { id: "pattern-lines", name: "Line Pattern", color: "#475569" },
+  { id: "pattern-grid", name: "Grid Pattern", color: "#64748b" },
+  { id: "arrow-curved", name: "Curved Arrow", color: "#ef4444" },
+  { id: "arrow-double", name: "Double Arrow", color: "#3b82f6" },
+  { id: "wave-top", name: "Wave Top", color: "#22c55e" },
+  { id: "wave-bottom", name: "Wave Bottom", color: "#06b6d4" },
+  { id: "sticker-new", name: "NEW Sticker", color: "#dc2626" },
+  { id: "sticker-sale", name: "SALE Sticker", color: "#f59e0b" },
+  { id: "sticker-hot", name: "HOT Sticker", color: "#ef4444" },
+  { id: "sticker-free", name: "FREE Sticker", color: "#22c55e" },
+  { id: "ui-button", name: "Button", color: "#3b82f6" },
+  { id: "ui-card", name: "Card", color: "#e5e7eb" },
+  { id: "ui-input", name: "Input Field", color: "#f3f4f6" },
+  { id: "ui-avatar", name: "Avatar Circle", color: "#8b5cf6" },
 ];
 
 const categories = [
