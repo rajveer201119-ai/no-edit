@@ -30,3 +30,5 @@ export { getContrastTextColor, getPerceivedBrightness, autoContrastLayers } from
 export { DesignWizard } from "./DesignWizard";
 export { ExportSizePack } from "./ExportSizePack";
 export { OnboardingGuide, OnboardingTrigger } from "./OnboardingGuide";
+export { SketchToolPanel } from "./SketchTool";
+export { BlankCanvasModal } from "./BlankCanvasModal";

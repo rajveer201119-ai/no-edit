@@ -2,12 +2,13 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { FileText, Instagram, Youtube, Hexagon } from "lucide-react";
+import { FileText, Instagram, Youtube, Hexagon, PlusCircle } from "lucide-react";
 import type { DesignCategory } from "./DesignTypeModal";
 
 interface QuickStartStripProps {
   onSelect: (category: DesignCategory) => void;
   activeCategory?: DesignCategory;
+  onBlankCanvas?: () => void;
 }
 
 const quickCategories = [
@@ -17,7 +18,7 @@ const quickCategories = [
   { id: "logo" as const, label: "Logo", icon: Hexagon },
 ];
 
-export const QuickStartStrip = ({ onSelect, activeCategory }: QuickStartStripProps) => {
+export const QuickStartStrip = ({ onSelect, activeCategory, onBlankCanvas }: QuickStartStripProps) => {
   const isMobile = useIsMobile();
 
   return (
@@ -30,6 +31,16 @@ export const QuickStartStrip = ({ onSelect, activeCategory }: QuickStartStripPro
           <span className="text-xs text-muted-foreground whitespace-nowrap mr-1">
             Quick:
           </span>
+          {/* Blank Canvas Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onBlankCanvas}
+            className="gap-1.5 h-7 text-xs px-2.5 whitespace-nowrap border-dashed border-primary/40 text-primary hover:bg-primary/10"
+          >
+            <PlusCircle className="h-3 w-3" />
+            Blank Canvas
+          </Button>
           {quickCategories.map((cat) => {
             const Icon = cat.icon;
             const isActive = activeCategory === cat.id;
