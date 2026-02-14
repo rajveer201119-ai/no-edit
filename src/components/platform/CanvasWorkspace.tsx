@@ -40,6 +40,7 @@ import {
   ExportSizePack,
   OnboardingGuide,
   OnboardingTrigger,
+  SketchToolPanel,
 } from "./editor";
 import { autoContrastLayers, getContrastTextColor } from "./editor/AutoContrastEngine";
 import { LucideIcon } from "lucide-react";
@@ -495,7 +496,7 @@ export const CanvasWorkspace = ({
     }
     
     // Show tool panel for relevant tools
-    if (["text", "shapes", "crop", "background", "elements"].includes(activeTool)) {
+    if (["text", "shapes", "crop", "background", "elements", "sketch"].includes(activeTool)) {
       setShowToolPanel(true);
     } else {
       setShowToolPanel(false);
@@ -561,7 +562,6 @@ export const CanvasWorkspace = ({
             backgroundColor={backgroundColor}
             onColorChange={(color) => {
               setBackgroundColor(color);
-              // Auto-contrast: fix text visibility when bg changes
               const updatedLayers = autoContrastLayers(canvasState.layers, color);
               updatedLayers.forEach((layer: any, i: number) => {
                 const original = canvasState.layers[i] as any;
@@ -570,6 +570,35 @@ export const CanvasWorkspace = ({
                 }
               });
               toast.success("Background updated!");
+            }}
+          />
+        );
+      case "sketch":
+        return (
+          <SketchToolPanel
+            canvasWidth={canvasState.width}
+            canvasHeight={canvasState.height}
+            onAddSketchLayer={(dataUrl) => {
+              const newLayer: ImageLayer = {
+                id: `sketch-${Date.now()}`,
+                type: "image",
+                name: "Sketch",
+                x: 0,
+                y: 0,
+                width: canvasState.width,
+                height: canvasState.height,
+                rotation: 0,
+                opacity: 1,
+                locked: false,
+                visible: true,
+                zIndex: canvasState.layers.length,
+                src: dataUrl,
+                originalWidth: canvasState.width,
+                originalHeight: canvasState.height,
+              };
+              addLayer(newLayer);
+              selectLayer(newLayer.id);
+              toast.success("Sketch added as layer!");
             }}
           />
         );

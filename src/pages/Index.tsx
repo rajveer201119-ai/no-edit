@@ -35,6 +35,7 @@ import {
 
 import { useExportCanvas } from "@/components/platform/editor/useExportCanvas";
 import { Layer, CanvasState } from "@/components/platform/editor/types";
+import { BlankCanvasModal } from "@/components/platform/editor/BlankCanvasModal";
 
 // State to pass loaded canvas directly to workspace
 
@@ -74,6 +75,7 @@ const Index = () => {
   const [paywallReason, setPaywallReason] = useState<"export" | "limit" | "premium-feature" | "hd-export">("limit");
    const [showAIModeModal, setShowAIModeModal] = useState(false);
    const [loadedCanvasState, setLoadedCanvasState] = useState<CanvasState | null>(null);
+   const [showBlankCanvasModal, setShowBlankCanvasModal] = useState(false);
 
   // Workspace meta
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
@@ -493,6 +495,7 @@ const Index = () => {
         <QuickStartStrip
           onSelect={handleQuickCategoryChange}
           activeCategory={activeDesignCategory || undefined}
+          onBlankCanvas={() => setShowBlankCanvasModal(true)}
         />
 
         {/* Canvas Area */}
@@ -568,6 +571,38 @@ const Index = () => {
            open={showAIModeModal}
            onOpenChange={setShowAIModeModal}
            onGenerate={handleAIModeGenerate}
+         />
+
+         <BlankCanvasModal
+           open={showBlankCanvasModal}
+           onOpenChange={setShowBlankCanvasModal}
+           onSelectSize={(w, h, label) => {
+             const blankTemplate: Template = {
+               id: `blank-${Date.now()}`,
+               name: label,
+               category: "custom" as DesignCategory,
+               thumbnailUrl: "",
+               canvasWidth: w,
+               canvasHeight: h,
+               elements: [
+                 {
+                   id: "bg",
+                   type: "shape",
+                   x: 0,
+                   y: 0,
+                   width: w,
+                   height: h,
+                   backgroundColor: "#ffffff",
+                 },
+               ],
+             };
+             setCurrentTemplate(blankTemplate);
+             setCanvasWidth(w);
+             setCanvasHeight(h);
+             setActiveTab("create");
+             setShowHomepage(false);
+             toast.success(`Blank ${label} canvas ready!`);
+           }}
          />
       </div>
     </>

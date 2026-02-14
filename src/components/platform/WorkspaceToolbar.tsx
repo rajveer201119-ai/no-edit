@@ -14,6 +14,7 @@ import {
   PaintBucket,
   Layers,
   Wand2,
+  Pencil,
 } from "lucide-react";
 
 export type ToolType =
@@ -26,7 +27,8 @@ export type ToolType =
   | "elements"
   | "background"
   | "effects"
-  | "enhance";
+  | "enhance"
+  | "sketch";
 
 interface WorkspaceToolbarProps {
   activeTool: ToolType;
@@ -42,6 +44,7 @@ const tools = [
   { id: "crop" as const, label: "Crop", icon: Crop },
   { id: "shapes" as const, label: "Shapes", icon: Shapes },
   { id: "elements" as const, label: "Elements", icon: Layers },
+  { id: "sketch" as const, label: "Sketch", icon: Pencil },
   { id: "background" as const, label: "BG", icon: PaintBucket },
   { id: "effects" as const, label: "Effects", icon: Sparkles },
   { id: "enhance" as const, label: "AI", icon: Wand2 },
@@ -54,7 +57,6 @@ export const WorkspaceToolbar = ({
 }: WorkspaceToolbarProps) => {
   const isMobile = useIsMobile();
 
-  // Mobile: Horizontal scrollable strip at bottom
   if (isMobile) {
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border/30 safe-area-pb">
@@ -92,7 +94,6 @@ export const WorkspaceToolbar = ({
     );
   }
 
-  // Desktop: Vertical fixed sidebar
   return (
     <TooltipProvider delayDuration={200}>
       <div className="fixed left-0 top-28 bottom-0 w-16 bg-background/90 backdrop-blur-xl border-r border-border/30 z-40 overflow-y-auto scrollbar-thin scrollbar-thumb-border/50">
