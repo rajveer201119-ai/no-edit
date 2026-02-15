@@ -18,65 +18,38 @@ export const Footer = () => {
           <nav className="md:col-span-1" aria-label="Quick Links">
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
-              <li>
-                <Link 
-                  to="/" 
-                  className="text-sm text-gray-400 hover:text-primary transition-colors"
-                >
-                  Design Generator
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/pricing-india" 
-                  className="text-sm text-gray-400 hover:text-primary transition-colors"
-                >
-                  Pricing (India)
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/pricing-international" 
-                  className="text-sm text-gray-400 hover:text-primary transition-colors"
-                >
-                  Pricing (International)
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/terms" 
-                  className="text-sm text-gray-400 hover:text-primary transition-colors"
-                >
-                  Terms & Conditions
-                </Link>
-              </li>
+              <li><Link to="/" className="text-sm text-gray-400 hover:text-primary transition-colors">Design Generator</Link></li>
+              <li><Link to="/about" className="text-sm text-gray-400 hover:text-primary transition-colors">About EPIC</Link></li>
+              <li><Link to="/contact" className="text-sm text-gray-400 hover:text-primary transition-colors">Contact</Link></li>
+              <li><Link to="/pricing-india" className="text-sm text-gray-400 hover:text-primary transition-colors">Pricing (India)</Link></li>
+              <li><Link to="/pricing-international" className="text-sm text-gray-400 hover:text-primary transition-colors">Pricing (International)</Link></li>
             </ul>
           </nav>
 
-          {/* Design Types */}
-          <div className="md:col-span-1">
-            <h4 className="text-lg font-semibold mb-4">Design Types</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li>Logo Design</li>
-              <li>Social Media Graphics</li>
-              <li>Banners & Headers</li>
-              <li>Posters & Flyers</li>
-              <li>Business Cards</li>
-              <li>Presentation Slides</li>
+          {/* Design Tools */}
+          <nav className="md:col-span-1" aria-label="Design Tools">
+            <h4 className="text-lg font-semibold mb-4">Design Tools</h4>
+            <ul className="space-y-2">
+              <li><Link to="/tools/poster-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Poster Maker</Link></li>
+              <li><Link to="/tools/logo-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Logo Maker</Link></li>
+              <li><Link to="/tools/resume-builder" className="text-sm text-gray-400 hover:text-primary transition-colors">Resume Builder</Link></li>
+              <li><Link to="/tools/youtube-thumbnail-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Thumbnail Maker</Link></li>
+              <li><Link to="/tools/instagram-post-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Instagram Maker</Link></li>
+              <li><Link to="/tools/certificate-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Certificate Maker</Link></li>
             </ul>
-          </div>
+          </nav>
 
-          {/* Company Info */}
+          {/* Company */}
           <div className="md:col-span-1">
             <h4 className="text-lg font-semibold mb-4">Company</h4>
             <address className="not-italic text-sm text-gray-400 space-y-2">
-              <p>
-                <span className="font-semibold text-white">Founder:</span> RAJVEER RINKU
-              </p>
+              <p><span className="font-semibold text-white">Founder:</span> RAJVEER RINKU</p>
               <p>UNIT OF - NO BOX</p>
-              <p className="text-xs mt-4">
-                ALL RIGHTS RESERVED BY NO BOX © 2025
-              </p>
+              <div className="mt-3 space-y-1">
+                <Link to="/terms" className="block text-gray-400 hover:text-primary transition-colors">Terms & Conditions</Link>
+                <Link to="/privacy" className="block text-gray-400 hover:text-primary transition-colors">Privacy Policy</Link>
+              </div>
+              <p className="text-xs mt-4">ALL RIGHTS RESERVED BY NO BOX © 2025</p>
             </address>
           </div>
         </div>

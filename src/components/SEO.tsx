@@ -14,6 +14,8 @@ interface SEOProps {
 const defaultOgImage = "https://storage.googleapis.com/gpt-engineer-file-uploads/ywM0UvtJ3VdIZjuQEJN3LrvvOCt2/social-images/social-1769532119034-download (1).jpeg";
 const baseUrl = "https://no-edit.lovable.app";
 
+export { baseUrl };
+
 export const SEO = ({
   title = "EPIC — AI Design Generator | Create Professional Graphics Instantly",
   description = "Create stunning posters, logos, social media graphics, YouTube thumbnails, and more in seconds. No design skills needed. Free to use.",

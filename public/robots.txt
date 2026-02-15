@@ -1,5 +1,5 @@
-# EPIC AI Image Generator - Robots.txt
-# https://epic-ai-generator.lovable.app
+# EPIC Design Platform - Robots.txt
+# https://no-edit.lovable.app
 
 User-agent: Googlebot
 Allow: /
@@ -27,9 +27,9 @@ Allow: /
 User-agent: *
 Allow: /
 
-# Block authentication and admin pages
+# Block auth and admin
 Disallow: /auth
 Disallow: /admin
 
-# Sitemap location
-Sitemap: https://epic-ai-generator.lovable.app/sitemap.xml
+# Sitemap
+Sitemap: https://no-edit.lovable.app/sitemap.xml
