@@ -13,6 +13,10 @@ import Terms from "./pages/Terms";
 import PricingIndia from "./pages/PricingIndia";
 import PricingInternational from "./pages/PricingInternational";
 import Admin from "./pages/Admin";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
+import ToolLanding from "./pages/ToolLanding";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +33,10 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/tools/:tool" element={<ToolLanding />} />
               <Route path="/pricing-india" element={<PricingIndia />} />
               <Route path="/pricing-international" element={<PricingInternational />} />
               <Route path="/admin" element={<Admin />} />
