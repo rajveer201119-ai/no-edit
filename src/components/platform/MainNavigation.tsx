@@ -38,7 +38,7 @@ export const MainNavigation = ({
 
   // Desktop navigation
   const DesktopNav = () => (
-    <div className="hidden md:flex items-center gap-1 bg-muted/30 rounded-full p-1">
+    <div className="hidden md:flex items-center gap-1 bg-muted/20 backdrop-blur-lg rounded-full p-1 border border-border/10">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
@@ -146,7 +146,7 @@ export const MainNavigation = ({
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/30">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-2xl saturate-150 border-b border-border/20 shadow-[0_1px_3px_0_hsla(0,0%,0%,0.04)]">
       <div className="container mx-auto px-4">
         <div className="flex items-center h-16 gap-4">
           {/* Mobile Navigation (hamburger trigger) - LEFT */}

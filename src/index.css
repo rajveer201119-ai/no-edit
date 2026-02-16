@@ -218,8 +218,13 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
     min-height: 100vh;
     transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'kern' 1, 'liga' 1;
+    letter-spacing: -0.011em;
   }
   
   body:not(.dark) {
@@ -228,6 +233,12 @@ All colors MUST be HSL.
   
   .dark body {
     background: linear-gradient(135deg, hsl(240 10% 5%) 0%, hsl(240 10% 8%) 100%);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', system-ui, sans-serif;
+    letter-spacing: -0.025em;
+    font-weight: 600;
   }
 }
 
@@ -254,8 +265,46 @@ All colors MUST be HSL.
   
   .glass-card {
     background: hsl(var(--glass-bg));
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
     border: 1px solid hsl(var(--glass-border));
+    box-shadow: 
+      0 1px 3px 0 hsla(0 0% 0% / 0.04),
+      0 8px 24px -4px hsla(0 0% 0% / 0.08),
+      inset 0 1px 0 0 hsla(0 0% 100% / 0.06);
+  }
+
+  .liquid-glass {
+    background: hsla(0 0% 100% / 0.06);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid hsla(0 0% 100% / 0.12);
+    box-shadow:
+      0 0 0 0.5px hsla(0 0% 100% / 0.05),
+      0 1px 2px 0 hsla(0 0% 0% / 0.06),
+      0 8px 32px -4px hsla(0 0% 0% / 0.12),
+      inset 0 1px 0 0 hsla(0 0% 100% / 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .liquid-glass:hover {
+    background: hsla(0 0% 100% / 0.1);
+    border-color: hsla(0 0% 100% / 0.18);
+    box-shadow:
+      0 0 0 0.5px hsla(0 0% 100% / 0.08),
+      0 2px 4px 0 hsla(0 0% 0% / 0.08),
+      0 12px 40px -4px hsla(0 0% 0% / 0.16),
+      inset 0 1px 0 0 hsla(0 0% 100% / 0.12);
+  }
+
+  .dark .liquid-glass {
+    background: hsla(240 10% 10% / 0.4);
+    border-color: hsla(0 0% 100% / 0.08);
+  }
+
+  .dark .liquid-glass:hover {
+    background: hsla(240 10% 14% / 0.5);
+    border-color: hsla(0 0% 100% / 0.14);
   }
   
   .glow-purple {

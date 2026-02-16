@@ -124,7 +124,7 @@ export const UsageCounter = ({
             {usage.used}/{usage.limit}
           </span>
           <span className="text-xs text-muted-foreground">
-            {type === "edit" ? "edits" : "designs"} today
+            {type === "edit" ? "edits" : "exports"} today
           </span>
         </div>
       </div>
