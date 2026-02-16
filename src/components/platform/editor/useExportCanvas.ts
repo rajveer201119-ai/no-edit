@@ -320,7 +320,8 @@ export function useExportCanvas() {
       layers: Layer[],
       canvasWidth: number,
       canvasHeight: number,
-      options: ExportOptions
+      options: ExportOptions,
+      addWatermark: boolean = false
     ): Promise<Blob | null> => {
       if (exportingRef.current) {
         toast.error("Export already in progress");
@@ -349,6 +350,25 @@ export function useExportCanvas() {
 
         for (const layer of sortedLayers) {
           await renderLayerToCanvas(ctx, layer, scale);
+        }
+
+        // Add "Made with EPIC" watermark for free-tier users
+        if (addWatermark) {
+          const fontSize = Math.max(12, Math.round(canvas.width * 0.018));
+          ctx.save();
+          ctx.globalAlpha = 0.45;
+          ctx.font = `600 ${fontSize}px Inter, system-ui, sans-serif`;
+          ctx.fillStyle = "#ffffff";
+          ctx.strokeStyle = "rgba(0,0,0,0.5)";
+          ctx.lineWidth = 2;
+          ctx.textAlign = "right";
+          ctx.textBaseline = "bottom";
+          const text = "Made with EPIC • no-edit.lovable.app";
+          const xPos = canvas.width - fontSize * 0.8;
+          const yPos = canvas.height - fontSize * 0.6;
+          ctx.strokeText(text, xPos, yPos);
+          ctx.fillText(text, xPos, yPos);
+          ctx.restore();
         }
 
         const mimeType = options.format === "jpg" ? "image/jpeg" : "image/png";
@@ -380,11 +400,13 @@ export function useExportCanvas() {
       canvasWidth: number,
       canvasHeight: number,
       options: ExportOptions,
-      filename: string = "design"
+      filename: string = "design",
+      isPremium: boolean = false
     ) => {
       toast.info("Preparing your design...");
 
-      const blob = await exportCanvas(layers, canvasWidth, canvasHeight, options);
+      const addWatermark = !isPremium;
+      const blob = await exportCanvas(layers, canvasWidth, canvasHeight, options, addWatermark);
       if (!blob) return;
 
       const url = URL.createObjectURL(blob);

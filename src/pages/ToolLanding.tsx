@@ -353,8 +353,30 @@ const ToolLanding = () => {
           </div>
         </section>
 
-        {/* FAQ */}
+        {/* Related Tools */}
         <section className="py-16 px-6 bg-background">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-foreground">Explore More Tools</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {Object.values(toolPages)
+                .filter((t) => t.slug !== page.slug)
+                .slice(0, 6)
+                .map((t) => (
+                  <button
+                    key={t.slug}
+                    onClick={() => navigate(`/tools/${t.slug}`)}
+                    className="bg-card border border-border/50 rounded-xl p-4 text-left hover:border-primary/50 transition-colors"
+                  >
+                    <span className="font-medium text-sm text-foreground">{t.title}</span>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{t.subtitle}</p>
+                  </button>
+                ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="py-16 px-6 bg-muted/30">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-foreground">Frequently Asked Questions</h2>
             <div className="space-y-4">
