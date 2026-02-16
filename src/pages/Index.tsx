@@ -239,9 +239,8 @@ const Index = () => {
     }
   };
 
-  // Handle export using layer-based system
+  // Handle export using layer-based system — deducts 1 credit
   const handleExport = async (format: "png" | "jpg" | "pdf") => {
-    // Get canvas layers from localStorage (set by CanvasWorkspace)
     const savedState = localStorage.getItem("epic_project_state");
     if (!savedState) {
       toast.error("No design to export. Create something first!");
@@ -256,16 +255,48 @@ const Index = () => {
         return;
       }
 
+      // Check credit limit before exporting
+      const { data: { user } } = await supabase.auth.getUser();
+      let isPremium = false;
+
+      if (user) {
+        const { data: limitData, error: limitError } = await supabase.rpc("check_generation_limit", {
+          user_id_param: user.id,
+        });
+
+        if (limitError) {
+          console.error("Credit check failed:", limitError);
+        } else if (limitData && limitData.length > 0) {
+          const result = limitData[0];
+          isPremium = result.is_premium;
+
+          if (!result.can_generate) {
+            setPaywallReason("limit");
+            setShowPaywall(true);
+            toast.error("Daily export limit reached. Upgrade to Creator Mode for unlimited exports!");
+            return;
+          }
+        }
+      }
+
       await downloadExport(
         state.layers,
         state.width,
         state.height,
         { format, quality: 0.95, scale: 2 },
-        currentTemplate?.name || "design"
+        currentTemplate?.name || "design",
+        isPremium
       );
 
-       // Save to history after successful export
-       saveToHistory(state, currentTemplate?.name);
+      // Deduct 1 credit after successful export
+      if (user) {
+        await supabase.rpc("increment_generation_usage", {
+          user_id_param: user.id,
+        });
+      }
+
+      // Save to history after successful export
+      saveToHistory(state, currentTemplate?.name);
     } catch (error) {
       console.error("Export error:", error);
       toast.error("Export failed. Please try again.");

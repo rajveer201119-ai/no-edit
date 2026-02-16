@@ -65,7 +65,7 @@ export const WorkspaceTopBar = ({
   return (
     <TooltipProvider delayDuration={200}>
       <div className={cn(
-        "fixed h-12 bg-background/90 backdrop-blur-xl border-b border-border/30 z-40",
+        "fixed h-12 bg-background/60 backdrop-blur-2xl saturate-150 border-b border-border/20 z-40 shadow-[0_1px_3px_0_hsla(0,0%,0%,0.04)]",
         isMobile ? "top-16 left-0 right-0" : "top-16 left-0 right-0"
       )}>
         <div className="h-full px-3 md:px-4 flex items-center justify-between gap-3">
