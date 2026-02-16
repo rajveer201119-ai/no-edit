@@ -49,7 +49,7 @@ export const Footer = () => {
                 <Link to="/terms" className="block text-gray-400 hover:text-primary transition-colors">Terms & Conditions</Link>
                 <Link to="/privacy" className="block text-gray-400 hover:text-primary transition-colors">Privacy Policy</Link>
               </div>
-              <p className="text-xs mt-4">ALL RIGHTS RESERVED BY NO BOX © 2025</p>
+              <p className="text-xs mt-4">ALL RIGHTS RESERVED BY NO BOX © 2026</p>
             </address>
           </div>
         </div>
@@ -57,7 +57,7 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-400">
-            © 2025 EPIC Design Generator. All rights reserved.
+            © 2026 EPIC Design Generator. All rights reserved.
           </p>
           
           <nav className="flex gap-4" aria-label="Social Media Links">

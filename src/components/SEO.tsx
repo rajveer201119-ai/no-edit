@@ -164,7 +164,7 @@ export const pricingPageSchema = (currency: string, proPrice: number) => ({
       "price": proPrice.toString(),
       "priceCurrency": currency,
       "availability": "https://schema.org/InStock",
-      "priceValidUntil": "2025-12-31",
+      "priceValidUntil": "2026-12-31",
       "description": "Unlimited AI design generation with priority support"
     }
   ]
