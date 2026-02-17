@@ -1,9 +1,10 @@
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { WebGLShader } from "@/components/ui/web-gl-shader";
 import epicLogo from "@/assets/epic-logo.png";
-import { Zap, Layers, Download, Sparkles, Palette, Type, Image, Layout, Wand2, Users, Star, ArrowRight } from "lucide-react";
+import { Zap, Layers, Download, Sparkles, Palette, Type, Image, Layout, Wand2, Users, Star, ArrowRight, Globe, Network, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface NewHomepageProps {
   onStartDesigning: () => void;
@@ -32,17 +33,19 @@ const testimonials = [
 ];
 
 const showcaseCategories = [
-  { label: "Posters", color: "from-purple-500 to-pink-500" },
-  { label: "Certificates", color: "from-amber-500 to-orange-500" },
-  { label: "Social Media", color: "from-blue-500 to-cyan-500" },
-  { label: "Thumbnails", color: "from-red-500 to-rose-500" },
-  { label: "Business Cards", color: "from-emerald-500 to-teal-500" },
-  { label: "Presentations", color: "from-violet-500 to-purple-500" },
-  { label: "Resumes", color: "from-slate-500 to-zinc-500" },
-  { label: "Festival Designs", color: "from-yellow-500 to-amber-500" },
+  { label: "Posters", color: "from-purple-500 to-pink-500", emoji: "🎨" },
+  { label: "Certificates", color: "from-amber-500 to-orange-500", emoji: "📜" },
+  { label: "Social Media", color: "from-blue-500 to-cyan-500", emoji: "📱" },
+  { label: "Thumbnails", color: "from-red-500 to-rose-500", emoji: "▶️" },
+  { label: "Business Cards", color: "from-emerald-500 to-teal-500", emoji: "💼" },
+  { label: "Presentations", color: "from-violet-500 to-purple-500", emoji: "📊" },
+  { label: "Resumes", color: "from-slate-500 to-zinc-500", emoji: "📝" },
+  { label: "Festival Designs", color: "from-yellow-500 to-amber-500", emoji: "🎉" },
 ];
 
 export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeClick }: NewHomepageProps) => {
+  const navigate = useNavigate();
+
   return (
     <div className="w-full">
       {/* ===== HERO ===== */}
@@ -74,7 +77,61 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           </LiquidButton>
         </motion.div>
 
+        {/* Trust Badges */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-8 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-400 relative z-10">
+          <span className="flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5 text-green-400" /> Free Forever</span>
+          <span className="flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5 text-green-400" /> No Credit Card</span>
+          <span className="flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5 text-green-400" /> 200+ Templates</span>
+          <span className="flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5 text-green-400" /> AI Powered</span>
+        </motion.div>
+
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+      </section>
+
+      {/* ===== NEW: Navigation Maker Promo ===== */}
+      <section className="py-16 px-6 bg-background">
+        <div className="max-w-5xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp}
+            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/15 via-purple-500/10 to-pink-500/10 border border-primary/20 p-8 md:p-12">
+            <div className="absolute top-4 right-4 text-xs bg-primary/20 text-primary px-3 py-1 rounded-full font-semibold">NEW ✨</div>
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center">
+                    <Network className="h-6 w-6 text-primary" />
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">Website Navigation Maker</h2>
+                </div>
+                <p className="text-muted-foreground mb-6 max-w-lg">
+                  Drag-and-drop interface to plan your website structure. Add 50+ stock pages (Login, Dashboard, Cart, etc.), 
+                  connect them with navigation flows, and export your sitemap as PNG.
+                </p>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {["Drag & Drop", "50+ Pages", "Auto Arrows", "Export PNG", "Free"].map(tag => (
+                    <span key={tag} className="px-3 py-1 text-xs rounded-full bg-primary/10 text-primary border border-primary/20">{tag}</span>
+                  ))}
+                </div>
+                <Button onClick={() => navigate("/navigation-maker")} size="lg" className="gap-2 rounded-full bg-primary hover:bg-primary/90">
+                  <Globe className="h-5 w-5" /> Try Navigation Maker
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="w-full md:w-72 h-48 rounded-2xl bg-background/50 border border-border/30 flex items-center justify-center relative overflow-hidden">
+                {/* Mini preview illustration */}
+                <div className="relative w-full h-full p-4">
+                  <div className="absolute top-6 left-6 w-16 h-8 rounded-lg bg-primary/30 flex items-center justify-center text-[8px] text-primary font-medium">Home</div>
+                  <div className="absolute top-6 right-6 w-16 h-8 rounded-lg bg-purple-500/30 flex items-center justify-center text-[8px] text-purple-400 font-medium">Login</div>
+                  <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-16 h-8 rounded-lg bg-pink-500/30 flex items-center justify-center text-[8px] text-pink-400 font-medium">Dashboard</div>
+                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 280 180">
+                    <line x1="78" y1="34" x2="200" y2="34" stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0.5" />
+                    <line x1="60" y1="42" x2="140" y2="140" stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0.5" />
+                    <line x1="220" y1="42" x2="140" y2="140" stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0.5" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* ===== SHOWCASE CATEGORIES ===== */}
@@ -92,7 +149,8 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
                 onClick={onStartDesigning}
                 className="group cursor-pointer relative rounded-2xl overflow-hidden aspect-[4/3]">
                 <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-90 group-hover:opacity-100 transition-opacity`} />
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
+                  <span className="text-2xl">{cat.emoji}</span>
                   <span className="text-white font-bold text-lg md:text-xl drop-shadow-lg">{cat.label}</span>
                 </div>
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
@@ -114,7 +172,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {features.map((f, i) => (
               <motion.div key={f.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
-                className="bg-card border border-border/50 rounded-2xl p-6 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group">
+                className="bg-card/80 backdrop-blur-xl border border-border/30 rounded-2xl p-6 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <f.icon className="h-6 w-6 text-primary" />
                 </div>
@@ -135,7 +193,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
               <motion.div key={t.name} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
-                className="bg-card border border-border/50 rounded-2xl p-6">
+                className="bg-card/80 backdrop-blur-xl border border-border/30 rounded-2xl p-6">
                 <div className="flex gap-1 mb-3">
                   {Array.from({ length: t.rating }).map((_, j) => (
                     <Star key={j} className="h-4 w-4 fill-primary text-primary" />
@@ -161,9 +219,12 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp} className="text-muted-foreground mb-8">
             Join thousands of creators already using EPIC. Free to start.
           </motion.p>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2} variants={fadeUp}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2} variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button onClick={onStartDesigning} size="lg" className="gap-2 rounded-full text-base min-h-[48px] px-8 bg-primary hover:bg-primary/90">
               Start Designing Free <ArrowRight className="h-5 w-5" />
+            </Button>
+            <Button onClick={() => navigate("/navigation-maker")} variant="outline" size="lg" className="gap-2 rounded-full text-base min-h-[48px] px-8">
+              <Network className="h-5 w-5" /> Navigation Maker
             </Button>
           </motion.div>
         </div>
