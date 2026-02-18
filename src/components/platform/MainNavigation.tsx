@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Palette, Library, Lightbulb, Menu, Home, Sparkles, Shield, Crown } from "lucide-react";
+import { Palette, Library, Lightbulb, Menu, Home, Sparkles, Shield, Crown, Network } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -25,6 +26,7 @@ export const MainNavigation = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
 
+  const navigate = useNavigate();
   const tabs = [
     { id: "home" as const, label: "Home", icon: Home },
     { id: "create" as const, label: "Create", icon: Palette },
@@ -105,6 +107,23 @@ export const MainNavigation = ({
           
           {/* Divider */}
           <div className="h-px bg-border/50 my-2" />
+
+          {/* Navigation Maker - Mobile */}
+          <button
+            onClick={() => {
+              navigate("/navigation-maker");
+              setMobileMenuOpen(false);
+            }}
+            className={cn(
+              "flex items-center gap-3 px-4 py-4 rounded-xl transition-all duration-200",
+              "text-base font-medium min-h-[56px] w-full text-left",
+              "text-primary hover:bg-primary/10 border border-primary/20"
+            )}
+          >
+            <Network className="h-5 w-5 flex-shrink-0" />
+            <span>Navigation Maker</span>
+            <span className="ml-auto text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-semibold">NEW</span>
+          </button>
           
           {/* Pro Plan Button - Mobile */}
           <button
@@ -175,8 +194,17 @@ export const MainNavigation = ({
           {/* Spacer for mobile to balance the logo in center */}
           <div className="md:hidden w-10 shrink-0" />
 
-          {/* Empty space for user menu on desktop */}
-          <div className="hidden md:block w-[200px] shrink-0" />
+          {/* Navigation Maker CTA on desktop */}
+          <div className="hidden md:flex items-center gap-2 w-[200px] shrink-0 justify-end">
+            <button
+              onClick={() => navigate("/navigation-maker")}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-gradient-to-r from-primary/20 to-purple-500/20 border border-primary/30 text-primary hover:from-primary/30 hover:to-purple-500/30 transition-all duration-200 active:scale-95"
+            >
+              <Network className="h-3.5 w-3.5" />
+              Nav Maker
+              <span className="bg-primary/20 text-[9px] px-1.5 py-0.5 rounded-full">NEW</span>
+            </button>
+          </div>
         </div>
       </div>
     </nav>
