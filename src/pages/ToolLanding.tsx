@@ -236,8 +236,79 @@ const toolPages: Record<string, ToolPage> = {
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
   },
+  "invitation-maker": {
+    slug: "invitation-maker",
+    title: "Invitation Maker",
+    metaTitle: "Free Invitation Maker Online — Create Beautiful Invites | EPIC",
+    metaDescription: "Design stunning wedding, birthday, and event invitations online for free. Professional templates, easy editing, instant download. No design skills needed.",
+    h1: "Free Online Invitation Maker",
+    subtitle: "Create beautiful invitations for weddings, birthdays, baby showers, and any event — in minutes.",
+    keywords: "invitation maker, free invitation creator, wedding invitation design, birthday invite maker, event invitation template",
+    features: ["Wedding invitation templates", "Birthday party invites", "Baby shower designs", "RSVP card layouts", "Custom fonts & colors", "HD print-ready export"],
+    useCases: ["Weddings", "Birthday parties", "Baby showers", "Graduation ceremonies", "Corporate events", "Holiday gatherings"],
+    faqs: [
+      { question: "Can I make wedding invitations?", answer: "Yes! EPIC has elegant wedding invitation templates with customizable fonts, colors, and layouts." },
+      { question: "Are invitations printable?", answer: "Absolutely. Export as high-resolution PDF or PNG for professional print quality." },
+      { question: "Can I add RSVP details?", answer: "Yes. Customize text fields to include RSVP information, venue details, and more." },
+    ],
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "EPIC Invitation Maker",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+  },
+  "banner-maker": {
+    slug: "banner-maker",
+    title: "Banner Maker",
+    metaTitle: "Free Banner Maker Online — Create Web & Social Banners | EPIC",
+    metaDescription: "Design eye-catching banners for websites, social media, and ads. Professional templates, multiple sizes, instant download. Free to use.",
+    h1: "Free Online Banner Maker",
+    subtitle: "Create professional banners for websites, social media ads, and promotions with beautiful templates.",
+    keywords: "banner maker, free banner creator, web banner design, social media banner, ad banner maker, YouTube banner",
+    features: ["Web banner templates", "Social media ad sizes", "YouTube channel banners", "Animated-ready designs", "Brand kit support", "Multiple export formats"],
+    useCases: ["Website headers", "Facebook covers", "YouTube banners", "Google ads", "Email headers", "Event banners"],
+    faqs: [
+      { question: "What banner sizes are available?", answer: "EPIC supports all standard sizes: leaderboard (728x90), medium rectangle (300x250), YouTube banner (2560x1440), and custom sizes." },
+      { question: "Can I make YouTube channel art?", answer: "Yes! Use the 2560x1440 template optimized for YouTube channel banners." },
+    ],
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "EPIC Banner Maker",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+  },
+  "website-navigation-maker": {
+    slug: "website-navigation-maker",
+    title: "Website Navigation Maker",
+    metaTitle: "Free Website Navigation Maker — Plan Site Structure | EPIC",
+    metaDescription: "Drag-and-drop website navigation builder. Plan your site's page flow, create sitemaps, and download navigation maps. 50+ stock page templates included.",
+    h1: "Free Website Navigation Maker",
+    subtitle: "Plan your website structure with a visual drag-and-drop builder. Add pages, connect flows, and export your sitemap.",
+    keywords: "website navigation maker, sitemap builder, page flow designer, website structure planner, drag and drop navigation, site architecture tool",
+    features: ["Drag-and-drop interface", "50+ stock page templates", "Auto arrow connections", "PNG export", "Category-organized pages", "Visual sitemap builder"],
+    useCases: ["Website planning", "UX wireframing", "Client presentations", "Site architecture", "App flow design", "Startup MVPs"],
+    faqs: [
+      { question: "How does the navigation maker work?", answer: "Drag pages from the sidebar onto the canvas, connect them with arrows to show navigation flow, then export as PNG." },
+      { question: "Is it free?", answer: "Yes! The Website Navigation Maker is completely free with unlimited exports." },
+      { question: "Can I use it for mobile app flows?", answer: "Yes. The stock page templates include common mobile screens like onboarding, login, and settings." },
+    ],
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "EPIC Website Navigation Maker",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", ratingCount: "340" },
+    },
+  },
 };
-
 const ToolLanding = () => {
   const { tool } = useParams<{ tool: string }>();
   const navigate = useNavigate();
@@ -356,11 +427,11 @@ const ToolLanding = () => {
         {/* Related Tools */}
         <section className="py-16 px-6 bg-background">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-foreground">Explore More Tools</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 text-foreground">Explore More Tools</h2>
+            <p className="text-muted-foreground text-center mb-10">Discover all the free design tools EPIC has to offer.</p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {Object.values(toolPages)
                 .filter((t) => t.slug !== page.slug)
-                .slice(0, 6)
                 .map((t) => (
                   <button
                     key={t.slug}
@@ -372,6 +443,17 @@ const ToolLanding = () => {
                   </button>
                 ))}
             </div>
+
+            {/* Navigation Maker CTA */}
+            {page.slug !== "website-navigation-maker" && (
+              <div className="mt-8 p-6 rounded-2xl bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20 text-center">
+                <h3 className="text-lg font-bold text-foreground mb-2">🆕 Try Website Navigation Maker</h3>
+                <p className="text-sm text-muted-foreground mb-4">Plan your website structure visually with drag-and-drop. 50+ stock pages included.</p>
+                <Button onClick={() => navigate("/navigation-maker")} className="gap-2 rounded-full">
+                  Open Navigation Maker <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </section>
 

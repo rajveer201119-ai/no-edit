@@ -30,12 +30,16 @@ export const Footer = () => {
           <nav className="md:col-span-1" aria-label="Design Tools">
             <h4 className="text-lg font-semibold mb-4">Design Tools</h4>
             <ul className="space-y-2">
+              <li><Link to="/navigation-maker" className="text-sm text-amber-400 hover:text-primary transition-colors font-medium">🆕 Navigation Maker</Link></li>
               <li><Link to="/tools/poster-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Poster Maker</Link></li>
               <li><Link to="/tools/logo-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Logo Maker</Link></li>
               <li><Link to="/tools/resume-builder" className="text-sm text-gray-400 hover:text-primary transition-colors">Resume Builder</Link></li>
               <li><Link to="/tools/youtube-thumbnail-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Thumbnail Maker</Link></li>
               <li><Link to="/tools/instagram-post-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Instagram Maker</Link></li>
               <li><Link to="/tools/certificate-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Certificate Maker</Link></li>
+              <li><Link to="/tools/invitation-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Invitation Maker</Link></li>
+              <li><Link to="/tools/banner-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Banner Maker</Link></li>
+              <li><Link to="/tools/website-navigation-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Website Nav Builder</Link></li>
             </ul>
           </nav>
 
