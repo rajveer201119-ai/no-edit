@@ -39,6 +39,12 @@ export const Footer = () => {
               <li><Link to="/tools/certificate-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Certificate Maker</Link></li>
               <li><Link to="/tools/invitation-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Invitation Maker</Link></li>
               <li><Link to="/tools/banner-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Banner Maker</Link></li>
+              <li><Link to="/tools/meme-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Meme Maker</Link></li>
+              <li><Link to="/tools/infographic-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Infographic Maker</Link></li>
+              <li><Link to="/tools/menu-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Menu Maker</Link></li>
+              <li><Link to="/tools/brochure-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Brochure Maker</Link></li>
+              <li><Link to="/tools/album-cover-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Album Cover Maker</Link></li>
+              <li><Link to="/tools/ebook-cover-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">eBook Cover Maker</Link></li>
               <li><Link to="/tools/website-navigation-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Website Nav Builder</Link></li>
             </ul>
           </nav>
