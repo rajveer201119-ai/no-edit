@@ -5,7 +5,7 @@ export const Footer = () => {
   return (
     <footer className="relative z-10 bg-black text-white py-12 mt-16 border-t border-white/10">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-8">
           {/* Brand Section */}
           <div className="col-span-2 md:col-span-1">
             <h3 className="text-xl font-bold mb-4">EPIC Design</h3>
@@ -39,23 +39,39 @@ export const Footer = () => {
               <li><Link to="/tools/resume-builder" className="text-sm text-gray-400 hover:text-primary transition-colors">Resume Builder</Link></li>
               <li><Link to="/tools/youtube-thumbnail-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Thumbnail Maker</Link></li>
               <li><Link to="/tools/instagram-post-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Instagram Maker</Link></li>
+              <li><Link to="/tools/certificate-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Certificate Maker</Link></li>
+              <li><Link to="/tools/flyer-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Flyer Maker</Link></li>
+              <li><Link to="/tools/business-card-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Business Card Maker</Link></li>
+              <li><Link to="/tools/banner-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Banner Maker</Link></li>
+              <li><Link to="/tools/invitation-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Invitation Maker</Link></li>
               <li><Link to="/tools/meme-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Meme Maker</Link></li>
               <li><Link to="/tools/infographic-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Infographic Maker</Link></li>
-              <li><Link to="/tools/banner-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Banner Maker</Link></li>
+              <li><Link to="/tools/presentation-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Presentation Maker</Link></li>
+              <li><Link to="/tools/brochure-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Brochure Maker</Link></li>
+              <li><Link to="/tools/menu-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Menu Maker</Link></li>
+              <li><Link to="/tools/album-cover-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">Album Cover Maker</Link></li>
+              <li><Link to="/tools/ebook-cover-maker" className="text-sm text-gray-400 hover:text-primary transition-colors">eBook Cover Maker</Link></li>
             </ul>
           </nav>
 
-          {/* Blog */}
-          <nav aria-label="Blog">
-            <h4 className="text-lg font-semibold mb-4">Blog</h4>
+          {/* Alternatives */}
+          <nav aria-label="Alternatives">
+            <h4 className="text-lg font-semibold mb-4">Alternatives</h4>
+            <ul className="space-y-2">
+              <li><Link to="/alternatives/canva-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Canva Alternative</Link></li>
+              <li><Link to="/alternatives/figma-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Figma Alternative</Link></li>
+              <li><Link to="/alternatives/miro-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Miro Alternative</Link></li>
+              <li><Link to="/alternatives/lucidchart-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Lucidchart Alternative</Link></li>
+              <li><Link to="/alternatives/adobe-express-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Adobe Express Alt.</Link></li>
+            </ul>
+
+            <h4 className="text-lg font-semibold mb-3 mt-6">Blog</h4>
             <ul className="space-y-2">
               <li><Link to="/blog" className="text-sm text-gray-400 hover:text-primary transition-colors">All Articles</Link></li>
-              <li><Link to="/blog/what-is-website-user-flow" className="text-sm text-gray-400 hover:text-primary transition-colors">What Is User Flow?</Link></li>
-              <li><Link to="/blog/sitemap-vs-user-flow" className="text-sm text-gray-400 hover:text-primary transition-colors">Sitemap vs User Flow</Link></li>
-              <li><Link to="/blog/saas-onboarding-flow-design" className="text-sm text-gray-400 hover:text-primary transition-colors">SaaS Onboarding Flows</Link></li>
-              <li><Link to="/blog/website-architecture-guide" className="text-sm text-gray-400 hover:text-primary transition-colors">Website Architecture</Link></li>
-              <li><Link to="/blog/ux-navigation-best-practices" className="text-sm text-gray-400 hover:text-primary transition-colors">UX Navigation Tips</Link></li>
-              <li><Link to="/blog/tools-for-student-founders" className="text-sm text-gray-400 hover:text-primary transition-colors">Tools for Students</Link></li>
+              <li><Link to="/blog/category/ux-design" className="text-sm text-gray-400 hover:text-primary transition-colors">UX Design</Link></li>
+              <li><Link to="/blog/category/web-planning" className="text-sm text-gray-400 hover:text-primary transition-colors">Web Planning</Link></li>
+              <li><Link to="/blog/category/saas-design" className="text-sm text-gray-400 hover:text-primary transition-colors">SaaS Design</Link></li>
+              <li><Link to="/blog/category/design-tips" className="text-sm text-gray-400 hover:text-primary transition-colors">Design Tips</Link></li>
             </ul>
           </nav>
 

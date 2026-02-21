@@ -24,6 +24,8 @@ import PillarPage from "./pages/PillarPage";
 import Changelog from "./pages/Changelog";
 import Roadmap from "./pages/Roadmap";
 import Examples from "./pages/Examples";
+import AlternativePage from "./pages/AlternativePage";
+import BlogCategory from "./pages/BlogCategory";
 
 const queryClient = new QueryClient();
 
@@ -50,9 +52,11 @@ const App = () => (
               <Route path="/admin" element={<Admin />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/blog/category/:category" element={<BlogCategory />} />
               <Route path="/changelog" element={<Changelog />} />
               <Route path="/roadmap" element={<Roadmap />} />
               <Route path="/examples" element={<Examples />} />
+              <Route path="/alternatives/:slug" element={<AlternativePage />} />
               <Route path="/:slug" element={<PillarPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
