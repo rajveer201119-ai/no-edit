@@ -18,6 +18,12 @@ import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import ToolLanding from "./pages/ToolLanding";
 import NavigationMaker from "./pages/NavigationMaker";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import PillarPage from "./pages/PillarPage";
+import Changelog from "./pages/Changelog";
+import Roadmap from "./pages/Roadmap";
+import Examples from "./pages/Examples";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +48,12 @@ const App = () => (
               <Route path="/pricing-india" element={<PricingIndia />} />
               <Route path="/pricing-international" element={<PricingInternational />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/changelog" element={<Changelog />} />
+              <Route path="/roadmap" element={<Roadmap />} />
+              <Route path="/examples" element={<Examples />} />
+              <Route path="/:slug" element={<PillarPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
