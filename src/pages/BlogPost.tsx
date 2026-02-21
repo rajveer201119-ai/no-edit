@@ -6,9 +6,13 @@ import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown, ChevronUp, Calendar, Clock, Tag, Network } from "lucide-react";
 import { blogPosts } from "@/data/blogPosts";
 import { pillarPages } from "@/data/pillarPages";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { TableOfContents, slugify } from "@/components/TableOfContents";
+import { ReadingProgress } from "@/components/ReadingProgress";
 import { useState } from "react";
 
 const baseUrl = "https://no-edit.lovable.app";
+const epicLogoUrl = "https://storage.googleapis.com/gpt-engineer-file-uploads/kG5hIp7FM3biSpv5njI7csuUQ6O2/uploads/1759212272541-file_00000000100c61faa64c1df9bb0aebc8.png";
 
 const BlogPostPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -33,16 +37,19 @@ const BlogPostPage = () => {
     "@type": "Article",
     headline: post.h1,
     datePublished: post.publishDate,
-    dateModified: post.publishDate,
+    dateModified: post.lastModified || post.publishDate,
+    image: epicLogoUrl,
     author: { "@type": "Organization", name: "EPIC Design" },
-    publisher: { "@type": "Organization", name: "EPIC Design", logo: { "@type": "ImageObject", url: "https://storage.googleapis.com/gpt-engineer-file-uploads/kG5hIp7FM3biSpv5njI7csuUQ6O2/uploads/1759212272541-file_00000000100c61faa64c1df9bb0aebc8.png" } },
+    publisher: { "@type": "Organization", name: "EPIC Design", logo: { "@type": "ImageObject", url: epicLogoUrl } },
     mainEntityOfPage: { "@type": "WebPage", "@id": `${baseUrl}/blog/${post.slug}` },
   };
 
   const combinedSchema = [articleSchema, faqSchema(post.faqs)];
+  const headings = post.sections.map((s) => s.heading);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <ReadingProgress />
       <SEO
         title={post.metaTitle}
         description={post.metaDescription}
@@ -51,7 +58,6 @@ const BlogPostPage = () => {
         structuredData={combinedSchema}
       />
 
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/20">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="text-xl font-bold gradient-epic-text">EPIC</Link>
@@ -64,25 +70,30 @@ const BlogPostPage = () => {
         </div>
       </header>
 
-      {/* Article Header */}
-      <section className="py-16 md:py-20">
+      <Breadcrumbs items={[{ label: "Blog", href: "/blog" }, { label: post.h1 }]} />
+
+      <section className="py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-3xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="flex items-center gap-4 mb-6 text-sm text-muted-foreground">
+            <div className="flex items-center gap-4 mb-6 text-sm text-muted-foreground flex-wrap">
               <span className="flex items-center gap-1"><Tag className="h-4 w-4" /> {post.category}</span>
               <span className="flex items-center gap-1"><Calendar className="h-4 w-4" /> {post.publishDate}</span>
               <span className="flex items-center gap-1"><Clock className="h-4 w-4" /> {post.readTime}</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">{post.h1}</h1>
             <p className="text-lg text-muted-foreground">{post.metaDescription}</p>
+            {post.lastModified && (
+              <p className="text-xs text-muted-foreground mt-3">Last updated: {post.lastModified}</p>
+            )}
           </motion.div>
         </div>
       </section>
 
-      {/* Article Content */}
       <article className="container mx-auto px-4 max-w-3xl">
+        <TableOfContents headings={headings} />
+
         {post.sections.map((section, i) => (
-          <section key={i} className="mb-12">
+          <section key={i} id={slugify(section.heading)} className="mb-12 scroll-mt-20">
             <h2 className="text-xl md:text-2xl font-bold mb-4">{section.heading}</h2>
             {section.content.split("\n\n").map((para, j) => (
               <p key={j} className="text-muted-foreground leading-relaxed mb-4">{para}</p>
@@ -135,11 +146,7 @@ const BlogPostPage = () => {
               const r = blogPosts[rSlug];
               if (!r) return null;
               return (
-                <Link
-                  key={rSlug}
-                  to={`/blog/${rSlug}`}
-                  className="block p-4 rounded-xl border border-border hover:border-primary/40 hover:bg-primary/5 transition-all"
-                >
+                <Link key={rSlug} to={`/blog/${rSlug}`} className="block p-4 rounded-xl border border-border hover:border-primary/40 hover:bg-primary/5 transition-all">
                   <h3 className="font-semibold text-sm mb-1">{r.h1}</h3>
                   <p className="text-xs text-muted-foreground">{r.readTime} · {r.category}</p>
                 </Link>

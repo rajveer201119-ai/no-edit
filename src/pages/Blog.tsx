@@ -6,8 +6,17 @@ import { motion } from "framer-motion";
 import { Calendar, Clock, Tag, ArrowRight, Network } from "lucide-react";
 import { blogPosts } from "@/data/blogPosts";
 import { pillarPages } from "@/data/pillarPages";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 const baseUrl = "https://no-edit.lovable.app";
+
+const categories = [
+  { slug: "ux-design", label: "UX Design" },
+  { slug: "web-planning", label: "Web Planning" },
+  { slug: "saas-design", label: "SaaS Design" },
+  { slug: "design-tips", label: "Design Tips" },
+  { slug: "student-resources", label: "Student Resources" },
+];
 
 const Blog = () => {
   const navigate = useNavigate();
@@ -23,7 +32,6 @@ const Blog = () => {
         canonicalUrl={`${baseUrl}/blog`}
       />
 
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/20">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="text-xl font-bold gradient-epic-text">EPIC</Link>
@@ -35,8 +43,9 @@ const Blog = () => {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="py-16 md:py-20">
+      <Breadcrumbs items={[{ label: "Blog" }]} />
+
+      <section className="py-12 md:py-16">
         <div className="container mx-auto px-4 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">EPIC Design Blog</h1>
@@ -46,6 +55,19 @@ const Blog = () => {
       </section>
 
       <div className="container mx-auto px-4 max-w-6xl">
+        {/* Category Filter */}
+        <div className="flex flex-wrap gap-2 justify-center mb-10">
+          {categories.map((c) => (
+            <Link
+              key={c.slug}
+              to={`/blog/category/${c.slug}`}
+              className="px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+            >
+              {c.label}
+            </Link>
+          ))}
+        </div>
+
         {/* Pillar Pages Section */}
         <section className="mb-16">
           <h2 className="text-2xl font-bold mb-6">📚 In-Depth Guides</h2>
