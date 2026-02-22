@@ -15,11 +15,14 @@ import {
   Tv, Upload, Video, Wifi, Zap, BookOpen,
   Building, Briefcase, Clock, Coffee, Compass,
   Flag, Gift, Headphones, Megaphone, Music,
-  Newspaper, Rocket, Scale, Scissors, Send
+  Newspaper, Rocket, Scale, Scissors, Send,
+  FileJson, Crown
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import { CreatorModePaywall } from "@/components/CreatorModePaywall";
 
 // ====== STOCK PAGES ======
 const stockPages = [
@@ -136,7 +139,9 @@ const NavigationMaker = () => {
   const [draggingNode, setDraggingNode] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [connectionLabel, setConnectionLabel] = useState("");
+  const [showPaywall, setShowPaywall] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
+  const { isPro, canExportJSON } = useUserPlan();
 
   const categories = [...new Set(stockPages.map(p => p.category))];
   const filteredPages = stockPages.filter(p => 
@@ -144,13 +149,9 @@ const NavigationMaker = () => {
     p.category.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Add page to canvas
   const addPageToCanvas = (page: typeof stockPages[0]) => {
     const existing = nodes.find(n => n.pageId === page.id);
-    if (existing) {
-      toast.info(`${page.label} already on canvas`);
-      return;
-    }
+    if (existing) { toast.info(`${page.label} already on canvas`); return; }
     const newNode: CanvasNode = {
       id: `node-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       pageId: page.id,
@@ -163,14 +164,12 @@ const NavigationMaker = () => {
     toast.success(`Added ${page.label}`);
   };
 
-  // Remove node
   const removeNode = (nodeId: string) => {
     setNodes(prev => prev.filter(n => n.id !== nodeId));
     setConnections(prev => prev.filter(c => c.fromId !== nodeId && c.toId !== nodeId));
     if (selectedNode === nodeId) setSelectedNode(null);
   };
 
-  // Handle drag
   const handleMouseDown = (e: React.MouseEvent, nodeId: string) => {
     e.stopPropagation();
     const node = nodes.find(n => n.id === nodeId);
@@ -188,9 +187,7 @@ const NavigationMaker = () => {
     setNodes(prev => prev.map(n => n.id === draggingNode ? { ...n, x, y } : n));
   }, [draggingNode, dragOffset]);
 
-  const handleMouseUp = useCallback(() => {
-    setDraggingNode(null);
-  }, []);
+  const handleMouseUp = useCallback(() => { setDraggingNode(null); }, []);
 
   useEffect(() => {
     window.addEventListener("mousemove", handleMouseMove);
@@ -201,22 +198,14 @@ const NavigationMaker = () => {
     };
   }, [handleMouseMove, handleMouseUp]);
 
-  // Handle connection
   const handleNodeClick = (nodeId: string) => {
     if (connectingFrom) {
-      if (connectingFrom === nodeId) {
-        setConnectingFrom(null);
-        return;
-      }
+      if (connectingFrom === nodeId) { setConnectingFrom(null); return; }
       const exists = connections.find(c => 
         (c.fromId === connectingFrom && c.toId === nodeId) || 
         (c.fromId === nodeId && c.toId === connectingFrom)
       );
-      if (exists) {
-        toast.info("Connection already exists");
-        setConnectingFrom(null);
-        return;
-      }
+      if (exists) { toast.info("Connection already exists"); setConnectingFrom(null); return; }
       setConnections(prev => [...prev, {
         id: `conn-${Date.now()}`,
         fromId: connectingFrom,
@@ -231,12 +220,9 @@ const NavigationMaker = () => {
     }
   };
 
-  // Export as image
+  // Export as PNG
   const exportNavigation = async () => {
-    if (nodes.length === 0) {
-      toast.error("Add some pages first!");
-      return;
-    }
+    if (nodes.length === 0) { toast.error("Add some pages first!"); return; }
 
     const canvas = document.createElement("canvas");
     const padding = 60;
@@ -245,21 +231,16 @@ const NavigationMaker = () => {
     
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     nodes.forEach(n => {
-      minX = Math.min(minX, n.x);
-      minY = Math.min(minY, n.y);
-      maxX = Math.max(maxX, n.x + nodeW);
-      maxY = Math.max(maxY, n.y + nodeH);
+      minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
+      maxX = Math.max(maxX, n.x + nodeW); maxY = Math.max(maxY, n.y + nodeH);
     });
 
     canvas.width = (maxX - minX) + padding * 2;
     canvas.height = (maxY - minY) + padding * 2;
     const ctx = canvas.getContext("2d")!;
     
-    // Background
     ctx.fillStyle = "#0a0a0a";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Title
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 18px system-ui";
     ctx.fillText("Website Navigation — Made with EPIC", 20, 30);
@@ -267,54 +248,35 @@ const NavigationMaker = () => {
     const offsetX = padding - minX;
     const offsetY = padding - minY + 20;
 
-    // Draw connections
     ctx.strokeStyle = "#6366F1";
     ctx.lineWidth = 2;
     connections.forEach(conn => {
       const from = nodes.find(n => n.id === conn.fromId);
       const to = nodes.find(n => n.id === conn.toId);
       if (!from || !to) return;
-
       const fx = from.x + offsetX + nodeW / 2;
       const fy = from.y + offsetY + nodeH / 2;
       const tx = to.x + offsetX + nodeW / 2;
       const ty = to.y + offsetY + nodeH / 2;
-
-      ctx.beginPath();
-      ctx.moveTo(fx, fy);
-      ctx.lineTo(tx, ty);
-      ctx.stroke();
-
-      // Arrow
+      ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(tx, ty); ctx.stroke();
       const angle = Math.atan2(ty - fy, tx - fx);
       const arrowLen = 12;
-      ctx.beginPath();
-      ctx.moveTo(tx, ty);
+      ctx.beginPath(); ctx.moveTo(tx, ty);
       ctx.lineTo(tx - arrowLen * Math.cos(angle - 0.3), ty - arrowLen * Math.sin(angle - 0.3));
       ctx.moveTo(tx, ty);
       ctx.lineTo(tx - arrowLen * Math.cos(angle + 0.3), ty - arrowLen * Math.sin(angle + 0.3));
       ctx.stroke();
-
-      // Label
-      ctx.fillStyle = "#a5b4fc";
-      ctx.font = "11px system-ui";
+      ctx.fillStyle = "#a5b4fc"; ctx.font = "11px system-ui";
       ctx.fillText(conn.label, (fx + tx) / 2 - 20, (fy + ty) / 2 - 8);
     });
 
-    // Draw nodes
     nodes.forEach(node => {
       const nx = node.x + offsetX;
       const ny = node.y + offsetY;
-      
       ctx.fillStyle = node.color;
-      ctx.beginPath();
-      ctx.roundRect(nx, ny, nodeW, nodeH, 12);
-      ctx.fill();
-
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 14px system-ui";
-      ctx.textAlign = "center";
-      ctx.fillText(node.label, nx + nodeW / 2, ny + nodeH / 2 + 5);
+      ctx.beginPath(); ctx.roundRect(nx, ny, nodeW, nodeH, 12); ctx.fill();
+      ctx.fillStyle = "#ffffff"; ctx.font = "bold 14px system-ui";
+      ctx.textAlign = "center"; ctx.fillText(node.label, nx + nodeW / 2, ny + nodeH / 2 + 5);
       ctx.textAlign = "start";
     });
 
@@ -324,6 +286,67 @@ const NavigationMaker = () => {
     link.href = dataUrl;
     link.click();
     toast.success("Navigation map downloaded!");
+  };
+
+  // Export as JSON (Pro only)
+  const exportJSON = () => {
+    if (!canExportJSON) {
+      setShowPaywall(true);
+      return;
+    }
+    if (nodes.length === 0) { toast.error("Add some pages first!"); return; }
+
+    // Build structured nested JSON
+    const pageMap: Record<string, any> = {};
+    nodes.forEach(n => {
+      pageMap[n.id] = {
+        id: n.pageId,
+        label: n.label,
+        children: [] as any[],
+      };
+    });
+
+    // Add connections as children
+    connections.forEach(conn => {
+      const from = nodes.find(n => n.id === conn.fromId);
+      const to = nodes.find(n => n.id === conn.toId);
+      if (from && to && pageMap[from.id]) {
+        pageMap[from.id].children.push({
+          id: to.pageId,
+          label: to.label,
+          relationship: conn.label,
+        });
+      }
+    });
+
+    // Find root pages (pages with no incoming connections)
+    const hasIncoming = new Set(connections.map(c => c.toId));
+    const roots = nodes.filter(n => !hasIncoming.has(n.id));
+    
+    const sitemap = {
+      name: "Website Navigation",
+      generatedAt: new Date().toISOString(),
+      generatedBy: "EPIC Navigation Maker",
+      pages: (roots.length > 0 ? roots : nodes).map(n => pageMap[n.id]),
+      allConnections: connections.map(c => {
+        const from = nodes.find(n => n.id === c.fromId);
+        const to = nodes.find(n => n.id === c.toId);
+        return {
+          from: from?.pageId || c.fromId,
+          to: to?.pageId || c.toId,
+          label: c.label,
+        };
+      }),
+    };
+
+    const blob = new Blob([JSON.stringify(sitemap, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.download = "website-navigation.json";
+    link.href = url;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("JSON sitemap downloaded!");
   };
 
   return (
@@ -355,6 +378,11 @@ const NavigationMaker = () => {
               <Button size="sm" variant="ghost" onClick={() => setConnectingFrom(null)} className="h-7 text-xs">Cancel</Button>
             </div>
           )}
+          <Button variant="outline" size="sm" onClick={exportJSON} className="gap-1.5 h-8">
+            <FileJson className="h-3.5 w-3.5" /> 
+            Export JSON
+            {!canExportJSON && <Crown className="h-3 w-3 text-yellow-500" />}
+          </Button>
           <Button variant="outline" size="sm" onClick={exportNavigation} className="gap-1.5 h-8">
             <Download className="h-3.5 w-3.5" /> Export PNG
           </Button>
@@ -427,10 +455,8 @@ const NavigationMaker = () => {
                   const from = nodes.find(n => n.id === conn.fromId);
                   const to = nodes.find(n => n.id === conn.toId);
                   if (!from || !to) return null;
-                  const fx = from.x + 80;
-                  const fy = from.y + 28;
-                  const tx = to.x + 80;
-                  const ty = to.y + 28;
+                  const fx = from.x + 80; const fy = from.y + 28;
+                  const tx = to.x + 80; const ty = to.y + 28;
                   return (
                     <g key={conn.id}>
                       <line x1={fx} y1={fy} x2={tx} y2={ty} stroke="hsl(var(--primary))" strokeWidth={2} markerEnd="url(#arrowhead)" opacity={0.7} />
@@ -477,7 +503,6 @@ const NavigationMaker = () => {
                         <span className="text-xs font-medium text-foreground truncate">{node.label}</span>
                       </div>
 
-                      {/* Action buttons */}
                       <div className="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={e => { e.stopPropagation(); setConnectingFrom(node.id); }}
@@ -540,6 +565,13 @@ const NavigationMaker = () => {
           </div>
         </div>
       </div>
+
+      <CreatorModePaywall 
+        open={showPaywall} 
+        onOpenChange={setShowPaywall} 
+        triggerReason="json-export"
+        requiredPlan="pro"
+      />
     </>
   );
 };

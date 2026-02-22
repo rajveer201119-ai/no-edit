@@ -329,6 +329,7 @@ export type Database = {
           created_at: string
           id: string
           is_premium: boolean
+          plan_type: string
           premium_until: string | null
           updated_at: string
           user_id: string
@@ -338,6 +339,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_premium?: boolean
+          plan_type?: string
           premium_until?: string | null
           updated_at?: string
           user_id: string
@@ -347,6 +349,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_premium?: boolean
+          plan_type?: string
           premium_until?: string | null
           updated_at?: string
           user_id?: string
@@ -358,6 +361,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_set_plan: {
+        Args: {
+          new_plan_type: string
+          premium_until?: string
+          target_user: string
+        }
+        Returns: undefined
+      }
       admin_set_premium: {
         Args: {
           is_premium: boolean
@@ -394,6 +405,7 @@ export type Database = {
           remaining_prompts: number
         }[]
       }
+      get_user_plan: { Args: { user_id_param: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
