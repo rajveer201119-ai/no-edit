@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check, Crown, Zap, Shield, MessageCircle, User } from "lucide-react";
+import { Check, Crown, Zap, Shield, MessageCircle, User, X, Star } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -17,23 +17,28 @@ import { WebGLShader } from "@/components/ui/web-gl-shader";
 const PricingIndia = () => {
   const navigate = useNavigate();
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<"student" | "pro">("student");
 
-  const handleUpgradeClick = () => {
+  const handleUpgradeClick = (plan: "student" | "pro") => {
+    setSelectedPlan(plan);
     setShowPaymentDialog(true);
   };
 
   const handleWhatsAppClick = () => {
     const phoneNumber = "918638910252";
-    const message = encodeURIComponent("Hi, I want to upgrade to EPIC Creator Mode (India - ₹10/month). I have made the payment.");
+    const planLabel = selectedPlan === "pro" ? "Pro Lifetime (₹299)" : "Student Helper (₹10/month)";
+    const message = encodeURIComponent(`Hi, I want to upgrade to EPIC ${planLabel}. I have made the payment.`);
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
   };
+
+  const paymentAmount = selectedPlan === "pro" ? "₹299" : "₹10";
 
   return (
     <>
       <SEO 
-        title="Pricing India - EPIC Creator Mode | ₹10/month"
-        description="Get EPIC Creator Mode for just ₹10/month in India. Generate 25 designs per day with HD export. Free plan available with 2 designs daily."
-        keywords="AI design generator India, EPIC pricing India, cheap AI design, Creator Mode, pro plan India"
+        title="Pricing India - EPIC Plans | ₹10/month & ₹299 Lifetime"
+        description="EPIC pricing for India. Student Helper plan at ₹10/month or Pro Lifetime at ₹299 one-time. Free plan available."
+        keywords="AI design generator India, EPIC pricing India, cheap AI design, Student plan, Pro plan India"
         canonicalUrl="https://no-edit.lovable.app/pricing-india"
         ogType="product"
         structuredData={pricingPageSchema("INR", 10)}
@@ -54,99 +59,128 @@ const PricingIndia = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
               Choose Your Plan
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Pricing for India
-            </p>
+            <p className="text-muted-foreground text-lg">Pricing for India</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
             {/* Free Plan */}
             <Card className="p-8 border border-border/30 bg-background/10 backdrop-blur-2xl">
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-bold mb-2 text-foreground">Free Plan</h2>
                   <div className="text-4xl font-bold mb-4 text-foreground">₹0</div>
-                  <p className="text-muted-foreground">Perfect to get started</p>
+                  <p className="text-muted-foreground">Get started for free</p>
                 </div>
-
                 <ul className="space-y-3">
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="text-foreground">2 images per day</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="text-foreground">All AI styles available</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="text-foreground">Save to feed</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="text-foreground">Download images</span>
-                  </li>
+                  {[
+                    "2 designs per day",
+                    "Limited templates",
+                    "Standard export",
+                    "Watermark on exports",
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-primary mt-0.5" />
+                      <span className="text-foreground">{f}</span>
+                    </li>
+                  ))}
+                  {[
+                    "No JSON export",
+                    "No premium templates",
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <X className="h-5 w-5 text-muted-foreground/50 mt-0.5" />
+                      <span className="text-muted-foreground/50 line-through">{f}</span>
+                    </li>
+                  ))}
                 </ul>
-
-                <Button
-                  variant="outline"
-                  className="w-full border-border/50 bg-background/20 backdrop-blur-sm"
-                  onClick={() => navigate("/auth")}
-                >
+                <Button variant="outline" className="w-full" onClick={() => navigate("/auth")}>
                   Get Started
                 </Button>
               </div>
             </Card>
 
-            {/* Creator Mode */}
+            {/* Student Helper Plan */}
             <Card className="p-8 border-2 border-primary/50 bg-background/10 backdrop-blur-2xl relative overflow-hidden">
               <div className="absolute top-4 right-4">
                 <span className="gradient-epic px-3 py-1 rounded-full text-sm font-semibold text-primary-foreground flex items-center gap-1">
-                  <Crown className="h-3 w-3" />
+                  <Zap className="h-3 w-3" />
                   Popular
                 </span>
               </div>
-
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-bold mb-2 gradient-epic-text flex items-center gap-2">
-                    <Crown className="h-5 w-5" />
-                    Creator Mode
+                    <Zap className="h-5 w-5" />
+                    Student Helper
                   </h2>
                   <div className="text-4xl font-bold mb-1 text-foreground">₹10</div>
                   <p className="text-muted-foreground mb-2">per month</p>
                   <p className="text-sm text-primary font-medium">Less than ₹1/day!</p>
                 </div>
-
                 <ul className="space-y-3">
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="font-semibold text-foreground">25 designs per day</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="text-foreground">HD export quality</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="text-foreground">All premium templates</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="text-foreground">Priority generation</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-primary mt-0.5" aria-hidden="true" />
-                    <span className="text-foreground">Early access to features</span>
-                  </li>
+                  {[
+                    "10 designs per day",
+                    "No watermark",
+                    "Increased export limits",
+                    "Additional templates",
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-primary mt-0.5" />
+                      <span className="text-foreground font-medium">{f}</span>
+                    </li>
+                  ))}
+                  {[
+                    "No JSON export",
+                    "No premium nav templates",
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <X className="h-5 w-5 text-muted-foreground/50 mt-0.5" />
+                      <span className="text-muted-foreground/50 line-through">{f}</span>
+                    </li>
+                  ))}
                 </ul>
+                <Button className="w-full gradient-epic hover:opacity-90" onClick={() => handleUpgradeClick("student")}>
+                  <Zap className="mr-2 h-4 w-4" /> Get Student Plan
+                </Button>
+              </div>
+            </Card>
 
-                <Button
-                  className="w-full gradient-epic hover:opacity-90"
-                  onClick={handleUpgradeClick}
-                >
-                  <Zap className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Unlock Creator Mode
+            {/* Pro Lifetime Plan */}
+            <Card className="p-8 border-2 border-yellow-500/50 bg-background/10 backdrop-blur-2xl relative overflow-hidden">
+              <div className="absolute top-4 right-4">
+                <span className="bg-yellow-500 px-3 py-1 rounded-full text-sm font-semibold text-black flex items-center gap-1">
+                  <Crown className="h-3 w-3" />
+                  Best Value
+                </span>
+              </div>
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-2xl font-bold mb-2 text-yellow-500 flex items-center gap-2">
+                    <Crown className="h-5 w-5" />
+                    Pro Lifetime
+                  </h2>
+                  <div className="text-4xl font-bold mb-1 text-foreground">₹299</div>
+                  <p className="text-muted-foreground mb-2">one-time payment</p>
+                  <p className="text-sm text-yellow-500 font-medium">Pay once, use forever!</p>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Unlimited exports",
+                    "No watermark",
+                    "JSON sitemap export",
+                    "All premium templates",
+                    "All premium nav templates",
+                    "Future feature updates",
+                    "Pro badge in dashboard",
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-yellow-500 mt-0.5" />
+                      <span className="text-foreground font-medium">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold" onClick={() => handleUpgradeClick("pro")}>
+                  <Crown className="mr-2 h-4 w-4" /> Get Pro Lifetime
                 </Button>
               </div>
             </Card>
@@ -158,11 +192,9 @@ const PricingIndia = () => {
               <div className="text-center mb-6">
                 <h3 className="text-xl font-semibold text-foreground mb-3">How Payment Works</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  EPIC is in early access. To keep pricing at just ₹10, we use a simple manual process. 
-                  You pay via UPI, message the founder on WhatsApp, and your Pro access is activated personally — usually within hours.
+                  EPIC is in early access. You pay via UPI, message the founder on WhatsApp, and your access is activated personally — usually within hours.
                 </p>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="flex flex-col items-center text-center p-4 rounded-lg bg-background/20 border border-border/20">
                   <Shield className="h-6 w-6 text-primary mb-2" />
@@ -180,9 +212,8 @@ const PricingIndia = () => {
                   <span className="text-xs text-muted-foreground">Cancel anytime</span>
                 </div>
               </div>
-
               <p className="text-center text-xs text-muted-foreground">
-                If your Pro access is not activated within 24 hours, you will receive a full refund. No questions asked.
+                Full refund if not activated within 24 hours. No questions asked.
               </p>
             </Card>
           </div>
@@ -190,87 +221,58 @@ const PricingIndia = () => {
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
               Not from India?{" "}
-              <button
-                onClick={() => navigate("/pricing-international")}
-                className="text-primary underline hover:text-primary/80"
-              >
+              <button onClick={() => navigate("/pricing-international")} className="text-primary underline hover:text-primary/80">
                 View International Pricing
               </button>
             </p>
           </div>
         </div>
 
+        {/* Payment Dialog */}
         <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
           <DialogContent className="sm:max-w-md max-w-[95vw] border border-border/30 bg-background/90 backdrop-blur-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-xl sm:text-2xl gradient-epic-text flex items-center gap-2">
-                <Crown className="h-5 w-5" />
-                Unlock Creator Mode
+                {selectedPlan === "pro" ? <Crown className="h-5 w-5" /> : <Zap className="h-5 w-5" />}
+                {selectedPlan === "pro" ? "Unlock Pro Lifetime" : "Unlock Student Helper"}
               </DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground">
-                Two simple steps to activate your access
+                Two simple steps to activate
               </DialogDescription>
             </DialogHeader>
-
-            <div className="space-y-4 sm:space-y-5 py-4">
-              <div className="space-y-3 sm:space-y-4">
-                {/* Step 1 */}
-                <div className="p-4 border border-border/30 rounded-lg bg-background/20 backdrop-blur-sm">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm text-primary">
-                      1
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold mb-2 text-foreground">Pay ₹10 via UPI</h4>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Send ₹10 to this UPI number:
-                      </p>
-                      <div className="p-3 border border-border/30 rounded bg-background/30">
-                        <code className="text-primary font-mono text-lg">8638910252</code>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Step 2 */}
-                <div className="p-4 border border-border/30 rounded-lg bg-background/20 backdrop-blur-sm">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm text-primary">
-                      2
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold mb-2 text-foreground">Send Screenshot on WhatsApp</h4>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        The founder will personally activate your Pro access:
-                      </p>
-                      <Button
-                        onClick={handleWhatsAppClick}
-                        className="w-full gradient-epic hover:opacity-90"
-                      >
-                        <MessageCircle className="mr-2 h-4 w-4" />
-                        Message on WhatsApp
-                      </Button>
-                      <p className="text-xs text-muted-foreground mt-2 text-center">
-                        +91 8638910252
-                      </p>
+            <div className="space-y-4 py-4">
+              <div className="p-4 border border-border/30 rounded-lg bg-background/20">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm text-primary">1</div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold mb-2 text-foreground">Pay {paymentAmount} via UPI</h4>
+                    <p className="text-sm text-muted-foreground mb-3">Send {paymentAmount} to this UPI number:</p>
+                    <div className="p-3 border border-border/30 rounded bg-background/30">
+                      <code className="text-primary font-mono text-lg">8638910252</code>
                     </div>
                   </div>
                 </div>
               </div>
-
-              {/* Guarantee */}
+              <div className="p-4 border border-border/30 rounded-lg bg-background/20">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm text-primary">2</div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold mb-2 text-foreground">Send Screenshot on WhatsApp</h4>
+                    <p className="text-sm text-muted-foreground mb-3">The founder will personally activate your access:</p>
+                    <Button onClick={handleWhatsAppClick} className="w-full gradient-epic hover:opacity-90">
+                      <MessageCircle className="mr-2 h-4 w-4" /> Message on WhatsApp
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2 text-center">+91 8638910252</p>
+                  </div>
+                </div>
+              </div>
               <div className="p-3 border border-primary/30 rounded-lg bg-primary/5 text-center">
                 <p className="text-sm text-foreground">
                   <Shield className="inline h-4 w-4 mr-1 text-primary" />
-                  Full refund if Pro is not activated within 24 hours
+                  Full refund if not activated within 24 hours
                 </p>
               </div>
-
-              <Button
-                variant="outline"
-                onClick={() => setShowPaymentDialog(false)}
-                className="w-full border-border/50"
-              >
+              <Button variant="outline" onClick={() => setShowPaymentDialog(false)} className="w-full border-border/50">
                 Close
               </Button>
             </div>
