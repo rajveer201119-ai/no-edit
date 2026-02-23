@@ -72,6 +72,11 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           <Button onClick={onStartDesigning} variant="outline" size="lg" className="gap-2 min-w-[200px] min-h-[48px] rounded-lg border-white/20 text-white hover:bg-white/10 font-medium text-sm">
             Start Designing
           </Button>
+          {onAIModeClick && (
+            <Button onClick={onAIModeClick} variant="outline" size="lg" className="gap-2 min-w-[200px] min-h-[48px] rounded-lg border-purple-400/30 text-purple-300 hover:bg-purple-500/10 font-medium text-sm">
+              <Wand2 className="h-4 w-4" /> AI Design
+            </Button>
+          )}
         </motion.div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-8 flex flex-wrap items-center justify-center gap-4 text-xs text-neutral-500 relative z-10">
