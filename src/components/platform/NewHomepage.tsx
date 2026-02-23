@@ -1,7 +1,6 @@
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { WebGLShader } from "@/components/ui/web-gl-shader";
 import epicLogo from "@/assets/epic-logo.png";
-import { Zap, Layers, Download, Sparkles, Palette, Type, Image, Layout, Wand2, Users, Star, ArrowRight, Globe, Network, CheckCircle } from "lucide-react";
+import { Layers, Download, Type, Image, Layout, Wand2, Star, ArrowRight, Network, CheckCircle, FileJson, GitBranch, MousePointerClick, Grip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -13,8 +12,8 @@ interface NewHomepageProps {
 }
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5 } }),
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } }),
 };
 
 const features = [
@@ -33,14 +32,14 @@ const testimonials = [
 ];
 
 const showcaseCategories = [
-  { label: "Posters", color: "from-purple-500 to-pink-500", emoji: "🎨" },
-  { label: "Certificates", color: "from-amber-500 to-orange-500", emoji: "📜" },
-  { label: "Social Media", color: "from-blue-500 to-cyan-500", emoji: "📱" },
-  { label: "Thumbnails", color: "from-red-500 to-rose-500", emoji: "▶️" },
-  { label: "Business Cards", color: "from-emerald-500 to-teal-500", emoji: "💼" },
-  { label: "Presentations", color: "from-violet-500 to-purple-500", emoji: "📊" },
-  { label: "Resumes", color: "from-slate-500 to-zinc-500", emoji: "📝" },
-  { label: "Festival Designs", color: "from-yellow-500 to-amber-500", emoji: "🎉" },
+  { label: "Posters", emoji: "🎨" },
+  { label: "Certificates", emoji: "📜" },
+  { label: "Social Media", emoji: "📱" },
+  { label: "Thumbnails", emoji: "▶️" },
+  { label: "Business Cards", emoji: "💼" },
+  { label: "Presentations", emoji: "📊" },
+  { label: "Resumes", emoji: "📝" },
+  { label: "Festival Designs", emoji: "🎉" },
 ];
 
 export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeClick }: NewHomepageProps) => {
@@ -51,109 +50,157 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
       {/* ===== HERO ===== */}
       <section className="relative mx-auto w-full pt-24 md:pt-40 px-6 text-center min-h-[calc(100vh-64px)] overflow-hidden flex flex-col items-center justify-center">
         <div className="absolute inset-0 -z-20"><WebGLShader /></div>
-        <div className="absolute inset-0 -z-10 bg-black/20 backdrop-blur-sm" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white/[0.03] to-transparent" />
+        <div className="absolute inset-0 -z-10 bg-black/30 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white/[0.02] to-transparent" />
 
-        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5 }} className="flex justify-center mb-6 relative z-10">
-          <img src={epicLogo} alt="EPIC Design Generator" className="w-24 h-24 md:w-32 md:h-32 drop-shadow-2xl" width={128} height={128} loading="eager" />
+        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.4 }} className="flex justify-center mb-6 relative z-10">
+          <img src={epicLogo} alt="EPIC — Website Planning & Design Platform" className="w-20 h-20 md:w-28 md:h-28 drop-shadow-2xl" width={112} height={112} loading="eager" />
         </motion.div>
 
-        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-balance bg-gradient-to-br from-white from-30% to-white/60 bg-clip-text py-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tighter text-transparent relative z-10 max-w-3xl">
-          Design in seconds — with or without AI
+        <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5 }} className="text-balance bg-gradient-to-b from-white to-white/50 bg-clip-text py-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-[-0.04em] text-transparent relative z-10 max-w-3xl">
+          Plan, structure &amp; design — all in one place
         </motion.h1>
 
-        <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-4 mb-8 text-balance text-base md:text-lg tracking-tight text-gray-300 max-w-xl mx-auto relative z-10">
-          Create stunning posters, logos, and social graphics. 200+ templates. No design skills needed.
+        <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }} className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-neutral-400 max-w-lg mx-auto relative z-10 leading-relaxed">
+          Map your website structure in seconds. Create stunning visuals with 200+ templates. Export clean JSON or HD graphics.
         </motion.p>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="flex flex-col sm:flex-row items-center gap-4 relative z-20">
-          {onAIModeClick && (
-            <Button onClick={onAIModeClick} className="gap-2 bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 text-white min-w-[200px] min-h-[48px] rounded-full text-base font-semibold shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:scale-105 active:scale-95">
-              <Zap className="h-5 w-5" /> ⚡ AI Mode
-            </Button>
-          )}
-          <LiquidButton className="text-foreground border rounded-full min-w-[200px] min-h-[48px] cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200" size="xl" onClick={onStartDesigning}>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5 }} className="flex flex-col sm:flex-row items-center gap-3 relative z-20">
+          <Button onClick={() => navigate("/navigation-maker")} size="lg" className="gap-2 min-w-[220px] min-h-[48px] rounded-lg bg-white text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-sm">
+            <Network className="h-4 w-4" /> Plan Your Website
+          </Button>
+          <Button onClick={onStartDesigning} variant="outline" size="lg" className="gap-2 min-w-[200px] min-h-[48px] rounded-lg border-white/20 text-white hover:bg-white/10 font-medium text-sm">
             Start Designing
-          </LiquidButton>
+          </Button>
         </motion.div>
 
-        {/* Trust Badges */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-8 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-400 relative z-10">
-          <span className="flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5 text-green-400" /> Free Forever</span>
-          <span className="flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5 text-green-400" /> No Credit Card</span>
-          <span className="flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5 text-green-400" /> 200+ Templates</span>
-          <span className="flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5 text-green-400" /> AI Powered</span>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-8 flex flex-wrap items-center justify-center gap-4 text-xs text-neutral-500 relative z-10">
+          <span className="flex items-center gap-1"><CheckCircle className="h-3 w-3 text-neutral-400" /> Free Forever</span>
+          <span className="flex items-center gap-1"><CheckCircle className="h-3 w-3 text-neutral-400" /> No Credit Card</span>
+          <span className="flex items-center gap-1"><CheckCircle className="h-3 w-3 text-neutral-400" /> JSON + PNG Export</span>
         </motion.div>
 
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       </section>
 
-      {/* ===== NEW: Navigation Maker Promo ===== */}
-      <section className="py-16 px-6 bg-background">
-        <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp}
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/15 via-purple-500/10 to-pink-500/10 border border-primary/20 p-8 md:p-12">
-            <div className="absolute top-4 right-4 text-xs bg-primary/20 text-primary px-3 py-1 rounded-full font-semibold">NEW ✨</div>
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center">
-                    <Network className="h-6 w-6 text-primary" />
-                  </div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">Website Navigation Maker</h2>
-                </div>
-                <p className="text-muted-foreground mb-6 max-w-lg">
-                  Drag-and-drop interface to plan your website structure. Add 50+ stock pages (Login, Dashboard, Cart, etc.), 
-                  connect them with navigation flows, and export your sitemap as PNG.
-                </p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {["Drag & Drop", "50+ Pages", "Auto Arrows", "Export PNG", "Free"].map(tag => (
-                    <span key={tag} className="px-3 py-1 text-xs rounded-full bg-primary/10 text-primary border border-primary/20">{tag}</span>
-                  ))}
-                </div>
-                <Button onClick={() => navigate("/navigation-maker")} size="lg" className="gap-2 rounded-full bg-primary hover:bg-primary/90">
-                  <Globe className="h-5 w-5" /> Try Navigation Maker
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+      {/* ===== NAVIGATION MAKER — PRIMARY HERO FEATURE ===== */}
+      <section className="py-20 md:py-28 px-6 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-center mb-12">
+            <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-muted-foreground mb-3 px-3 py-1 rounded-full border border-border bg-muted">Primary Tool</span>
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-[-0.03em] mb-4">
+              Website Navigation Maker
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+              Plan your website structure in seconds. Export clean JSON. Plug into any no-code builder.
+            </p>
+          </motion.div>
+
+          {/* Feature Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+            {[
+              { icon: Grip, title: "Drag & Drop Canvas", desc: "Visually arrange pages with fluid drag-and-drop. 50+ pre-built page templates." },
+              { icon: GitBranch, title: "Smart Connections", desc: "Draw navigation flows between pages. Auto-layout with animated arrows." },
+              { icon: FileJson, title: "JSON + PNG Export", desc: "Export structured JSON sitemaps or high-res PNG maps. Builder-ready schemas." },
+            ].map((f, i) => (
+              <motion.div key={f.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i + 1} variants={fadeUp}
+                className="bg-card border border-border rounded-xl p-6 hover:border-foreground/20 transition-colors duration-300">
+                <f.icon className="h-5 w-5 text-foreground mb-4" strokeWidth={1.5} />
+                <h3 className="text-sm font-semibold text-foreground mb-1.5">{f.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Live Preview Mock */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2} variants={fadeUp}
+            className="relative rounded-xl border border-border bg-card overflow-hidden">
+            {/* Mock toolbar */}
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/30">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-neutral-300 dark:bg-neutral-600" />
+                <div className="w-3 h-3 rounded-full bg-neutral-300 dark:bg-neutral-600" />
+                <div className="w-3 h-3 rounded-full bg-neutral-300 dark:bg-neutral-600" />
               </div>
-              <div className="w-full md:w-72 h-48 rounded-2xl bg-background/50 border border-border/30 flex items-center justify-center relative overflow-hidden">
-                {/* Mini preview illustration */}
-                <div className="relative w-full h-full p-4">
-                  <div className="absolute top-6 left-6 w-16 h-8 rounded-lg bg-primary/30 flex items-center justify-center text-[8px] text-primary font-medium">Home</div>
-                  <div className="absolute top-6 right-6 w-16 h-8 rounded-lg bg-purple-500/30 flex items-center justify-center text-[8px] text-purple-400 font-medium">Login</div>
-                  <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-16 h-8 rounded-lg bg-pink-500/30 flex items-center justify-center text-[8px] text-pink-400 font-medium">Dashboard</div>
-                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 280 180">
-                    <line x1="78" y1="34" x2="200" y2="34" stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0.5" />
-                    <line x1="60" y1="42" x2="140" y2="140" stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0.5" />
-                    <line x1="220" y1="42" x2="140" y2="140" stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0.5" />
-                  </svg>
+              <div className="flex-1 mx-4 h-6 rounded-md bg-muted flex items-center px-3">
+                <span className="text-[10px] text-muted-foreground">epic.app/navigation-maker</span>
+              </div>
+              <div className="flex gap-1">
+                <div className="px-2 py-1 text-[9px] rounded border border-border text-muted-foreground">Export JSON</div>
+                <div className="px-2 py-1 text-[9px] rounded border border-border text-muted-foreground">Export PNG</div>
+              </div>
+            </div>
+            
+            {/* Mock canvas */}
+            <div className="flex">
+              {/* Sidebar */}
+              <div className="w-48 border-r border-border p-3 hidden md:block bg-muted/10">
+                <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Stock Pages</p>
+                {["Home", "Login", "Dashboard", "Products", "Blog", "Contact"].map(p => (
+                  <div key={p} className="flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-foreground/70 hover:bg-muted/50 cursor-default">
+                    <div className="w-3 h-3 rounded bg-foreground/10" />
+                    {p}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Canvas area */}
+              <div className="flex-1 h-64 md:h-80 relative bg-[radial-gradient(circle_at_1px_1px,hsl(var(--border)/0.3)_1px,transparent_0)] bg-[size:20px_20px]">
+                {/* Mock nodes */}
+                <div className="absolute top-8 left-[15%] w-28 h-10 rounded-lg bg-foreground text-primary-foreground flex items-center justify-center text-[11px] font-medium shadow-sm">Home</div>
+                <div className="absolute top-8 right-[15%] w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium">Login</div>
+                <div className="absolute top-[55%] left-[30%] w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium">Dashboard</div>
+                <div className="absolute top-[55%] right-[30%] w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium">Products</div>
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium">Blog</div>
+                
+                {/* Mock connections */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
+                  <line x1="22%" y1="18%" x2="78%" y2="18%" stroke="hsl(var(--foreground))" strokeWidth="1" opacity="0.15" />
+                  <line x1="22%" y1="22%" x2="36%" y2="55%" stroke="hsl(var(--foreground))" strokeWidth="1" opacity="0.15" />
+                  <line x1="78%" y1="22%" x2="64%" y2="55%" stroke="hsl(var(--foreground))" strokeWidth="1" opacity="0.15" />
+                  <line x1="36%" y1="62%" x2="50%" y2="82%" stroke="hsl(var(--foreground))" strokeWidth="1" opacity="0.15" />
+                </svg>
+
+                {/* JSON preview overlay */}
+                <div className="absolute bottom-3 right-3 w-40 rounded-lg bg-card/95 backdrop-blur border border-border p-2.5 text-[9px] font-mono text-muted-foreground leading-relaxed shadow-lg hidden md:block">
+                  <p className="text-foreground font-semibold mb-1 text-[10px]">sitemap.json</p>
+                  {`{`}<br/>
+                  &nbsp;&nbsp;{`"pages": [`}<br/>
+                  &nbsp;&nbsp;&nbsp;&nbsp;{`{ "id": "home" },`}<br/>
+                  &nbsp;&nbsp;&nbsp;&nbsp;{`{ "id": "login" },`}<br/>
+                  &nbsp;&nbsp;&nbsp;&nbsp;{`...`}<br/>
+                  &nbsp;&nbsp;{`]`}<br/>
+                  {`}`}
                 </div>
               </div>
             </div>
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={3} variants={fadeUp} className="text-center mt-10">
+            <Button onClick={() => navigate("/navigation-maker")} size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
+              <Network className="h-4 w-4" /> Open Navigation Maker <ArrowRight className="h-4 w-4" />
+            </Button>
           </motion.div>
         </div>
       </section>
 
       {/* ===== SHOWCASE CATEGORIES ===== */}
-      <section className="py-20 px-6 bg-background">
+      <section className="py-20 px-6 bg-muted/20">
         <div className="max-w-6xl mx-auto">
-          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-2xl md:text-4xl font-bold text-center mb-4 text-foreground">
+          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-2xl md:text-3xl font-semibold text-center mb-3 text-foreground tracking-tight">
             Create Anything You Imagine
           </motion.h2>
-          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp} className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
-            From social media posts to professional presentations — EPIC has you covered.
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp} className="text-muted-foreground text-center mb-12 max-w-lg mx-auto text-sm">
+            From social media posts to professional presentations.
           </motion.p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {showcaseCategories.map((cat, i) => (
               <motion.div key={cat.label} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
                 onClick={onStartDesigning}
-                className="group cursor-pointer relative rounded-2xl overflow-hidden aspect-[4/3]">
-                <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-90 group-hover:opacity-100 transition-opacity`} />
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                  <span className="text-2xl">{cat.emoji}</span>
-                  <span className="text-white font-bold text-lg md:text-xl drop-shadow-lg">{cat.label}</span>
-                </div>
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                className="group cursor-pointer rounded-xl border border-border bg-card p-6 text-center hover:border-foreground/20 hover:shadow-sm transition-all duration-300">
+                <span className="text-2xl mb-2 block">{cat.emoji}</span>
+                <span className="text-sm font-medium text-foreground">{cat.label}</span>
               </motion.div>
             ))}
           </div>
@@ -161,23 +208,21 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
       </section>
 
       {/* ===== FEATURES ===== */}
-      <section className="py-20 px-6 bg-muted/30">
+      <section className="py-20 px-6 bg-background">
         <div className="max-w-6xl mx-auto">
-          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-2xl md:text-4xl font-bold text-center mb-4 text-foreground">
+          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-2xl md:text-3xl font-semibold text-center mb-3 text-foreground tracking-tight">
             Everything You Need to Design
           </motion.h2>
-          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp} className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp} className="text-muted-foreground text-center mb-12 max-w-lg mx-auto text-sm">
             Powerful features that make EPIC the easiest design tool on the planet.
           </motion.p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {features.map((f, i) => (
               <motion.div key={f.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
-                className="bg-card/80 backdrop-blur-xl border border-border/30 rounded-2xl p-6 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <f.icon className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-lg font-bold text-foreground mb-2">{f.title}</h3>
-                <p className="text-sm text-muted-foreground">{f.desc}</p>
+                className="bg-card border border-border rounded-xl p-6 hover:border-foreground/20 transition-colors duration-300 group">
+                <f.icon className="h-5 w-5 text-foreground mb-4" strokeWidth={1.5} />
+                <h3 className="text-sm font-semibold text-foreground mb-1.5">{f.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -185,23 +230,23 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
       </section>
 
       {/* ===== TESTIMONIALS ===== */}
-      <section className="py-20 px-6 bg-background">
+      <section className="py-20 px-6 bg-muted/20">
         <div className="max-w-5xl mx-auto">
-          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-2xl md:text-4xl font-bold text-center mb-12 text-foreground">
+          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-2xl md:text-3xl font-semibold text-center mb-12 text-foreground tracking-tight">
             Loved by Creators
           </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {testimonials.map((t, i) => (
               <motion.div key={t.name} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
-                className="bg-card/80 backdrop-blur-xl border border-border/30 rounded-2xl p-6">
-                <div className="flex gap-1 mb-3">
+                className="bg-card border border-border rounded-xl p-6">
+                <div className="flex gap-0.5 mb-3">
                   {Array.from({ length: t.rating }).map((_, j) => (
-                    <Star key={j} className="h-4 w-4 fill-primary text-primary" />
+                    <Star key={j} className="h-3.5 w-3.5 fill-foreground text-foreground" />
                   ))}
                 </div>
-                <p className="text-sm text-foreground mb-4">"{t.text}"</p>
+                <p className="text-sm text-foreground mb-4 leading-relaxed">"{t.text}"</p>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                  <p className="text-sm font-medium text-foreground">{t.name}</p>
                   <p className="text-xs text-muted-foreground">{t.role}</p>
                 </div>
               </motion.div>
@@ -211,20 +256,20 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
       </section>
 
       {/* ===== CTA ===== */}
-      <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-3xl mx-auto text-center">
-          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-2xl md:text-4xl font-bold mb-4 text-foreground">
-            Ready to Create Something Amazing?
+      <section className="py-20 px-6 bg-background">
+        <div className="max-w-2xl mx-auto text-center">
+          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-2xl md:text-3xl font-semibold mb-3 text-foreground tracking-tight">
+            Ready to Plan Your Next Website?
           </motion.h2>
-          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp} className="text-muted-foreground mb-8">
-            Join thousands of creators already using EPIC. Free to start.
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp} className="text-muted-foreground mb-8 text-sm">
+            Join thousands of creators using EPIC. Free to start.
           </motion.p>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2} variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={onStartDesigning} size="lg" className="gap-2 rounded-full text-base min-h-[48px] px-8 bg-primary hover:bg-primary/90">
-              Start Designing Free <ArrowRight className="h-5 w-5" />
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2} variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button onClick={() => navigate("/navigation-maker")} size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
+              <Network className="h-4 w-4" /> Navigation Maker
             </Button>
-            <Button onClick={() => navigate("/navigation-maker")} variant="outline" size="lg" className="gap-2 rounded-full text-base min-h-[48px] px-8">
-              <Network className="h-5 w-5" /> Navigation Maker
+            <Button onClick={onStartDesigning} variant="outline" size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
+              Start Designing <ArrowRight className="h-4 w-4" />
             </Button>
           </motion.div>
         </div>

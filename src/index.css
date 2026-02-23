@@ -110,100 +110,95 @@ All colors MUST be HSL.
   }
 
   :root {
-    /* Light mode colors */
-    --background: 0 0% 100%;
-    --foreground: 240 10% 10%;
+    /* Light mode — Neutral Premium Palette */
+    --background: 0 0% 99%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 10%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 10%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 280 80% 50%;
+    --primary: 0 0% 12%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 340 75% 55%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 12%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 40%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 20 90% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 12%;
 
-    --destructive: 0 70% 50%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 280 80% 50%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+    --ring: 0 0% 12%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
     
-    /* Epic gradient colors */
-    --gradient-purple: 280 80% 50%;
-    --gradient-pink: 340 75% 55%;
-    --gradient-orange: 20 90% 55%;
-    --gradient-yellow: 45 100% 50%;
+    /* Neutral gradient tokens */
+    --gradient-start: 0 0% 12%;
+    --gradient-mid: 0 0% 25%;
+    --gradient-end: 0 0% 40%;
     
     /* Glass effect */
     --glass-bg: 0 0% 100% / 0.6;
-    --glass-border: 240 10% 10% / 0.1;
+    --glass-border: 0 0% 0% / 0.08;
     
-    /* Glow effects */
-    --glow-purple: 280 80% 50% / 0.3;
-    --glow-pink: 340 75% 55% / 0.3;
-    --glow-orange: 20 90% 55% / 0.3;
+    /* Subtle accent for highlights */
+    --highlight: 220 14% 96%;
 
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-foreground: 0 0% 25%;
+    --sidebar-primary: 0 0% 9%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 91%;
+    --sidebar-ring: 0 0% 12%;
   }
 
   .dark {
-    /* Dark mode colors */
-    --background: 240 10% 5%;
-    --foreground: 0 0% 98%;
+    /* Dark mode — Neutral Premium Palette */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
 
-    --card: 240 8% 8%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 96%;
 
-    --popover: 240 10% 6%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 96%;
 
-    --primary: 280 80% 60%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 96%;
+    --primary-foreground: 0 0% 6%;
 
-    --secondary: 340 80% 65%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 96%;
 
-    --muted: 240 5% 20%;
-    --muted-foreground: 240 5% 65%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 20 90% 60%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 14%;
+    --accent-foreground: 0 0% 96%;
 
-    --destructive: 0 70% 50%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 5% 15%;
-    --input: 240 5% 15%;
-    --ring: 280 80% 60%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 0 0% 96%;
     
     /* Glass effect for dark mode */
-    --glass-bg: 240 10% 10% / 0.4;
-    --glass-border: 0 0% 100% / 0.1;
+    --glass-bg: 0 0% 8% / 0.5;
+    --glass-border: 0 0% 100% / 0.08;
     
-    /* Glow effects for dark mode */
-    --glow-purple: 280 80% 60% / 0.5;
-    --glow-pink: 340 80% 65% / 0.5;
-    --glow-orange: 20 90% 60% / 0.5;
+    /* Subtle accent for highlights */
+    --highlight: 0 0% 12%;
   }
 }
 
@@ -228,11 +223,11 @@ All colors MUST be HSL.
   }
   
   body:not(.dark) {
-    background: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(240 10% 98%) 100%);
+    background: hsl(0 0% 99%);
   }
   
   .dark body {
-    background: linear-gradient(135deg, hsl(240 10% 5%) 0%, hsl(240 10% 8%) 100%);
+    background: hsl(0 0% 4%);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -245,18 +240,14 @@ All colors MUST be HSL.
 @layer utilities {
   .gradient-epic {
     background: linear-gradient(135deg, 
-      hsl(var(--gradient-purple)) 0%, 
-      hsl(var(--gradient-pink)) 33%, 
-      hsl(var(--gradient-orange)) 66%, 
-      hsl(var(--gradient-yellow)) 100%);
+      hsl(var(--foreground)) 0%, 
+      hsl(var(--muted-foreground)) 100%);
   }
   
   .gradient-epic-text {
     background: linear-gradient(135deg, 
-      hsl(var(--gradient-purple)) 0%, 
-      hsl(var(--gradient-pink)) 33%, 
-      hsl(var(--gradient-orange)) 66%, 
-      hsl(var(--gradient-yellow)) 100%);
+      hsl(var(--foreground)) 0%, 
+      hsl(var(--muted-foreground)) 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -307,19 +298,9 @@ All colors MUST be HSL.
     border-color: hsla(0 0% 100% / 0.14);
   }
   
-  .glow-purple {
-    box-shadow: 0 0 40px hsl(var(--glow-purple)),
-                0 0 80px hsl(var(--glow-purple));
-  }
-  
-  .glow-pink {
-    box-shadow: 0 0 40px hsl(var(--glow-pink)),
-                0 0 80px hsl(var(--glow-pink));
-  }
-  
-  .glow-orange {
-    box-shadow: 0 0 40px hsl(var(--glow-orange)),
-                0 0 80px hsl(var(--glow-orange));
+  .glow-subtle {
+    box-shadow: 0 0 40px hsla(0 0% 50% / 0.08),
+                0 0 80px hsla(0 0% 50% / 0.04);
   }
   
   .animate-gradient {
