@@ -110,48 +110,48 @@ All colors MUST be HSL.
   }
 
   :root {
-    /* Light mode — Neutral Premium Palette */
-    --background: 0 0% 99%;
-    --foreground: 0 0% 9%;
+    /* Light mode — Premium Palette with Color */
+    --background: 220 20% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 0 0% 12%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 12%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 12%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 91%;
-    --input: 0 0% 91%;
-    --ring: 0 0% 12%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
 
     --radius: 0.75rem;
     
-    /* Neutral gradient tokens */
-    --gradient-start: 0 0% 12%;
-    --gradient-mid: 0 0% 25%;
-    --gradient-end: 0 0% 40%;
+    /* Vibrant gradient tokens */
+    --gradient-start: 221 83% 53%;
+    --gradient-mid: 262 83% 58%;
+    --gradient-end: 330 81% 60%;
     
     /* Glass effect */
-    --glass-bg: 0 0% 100% / 0.6;
-    --glass-border: 0 0% 0% / 0.08;
+    --glass-bg: 220 20% 100% / 0.6;
+    --glass-border: 221 83% 53% / 0.1;
     
     /* Subtle accent for highlights */
-    --highlight: 220 14% 96%;
+    --highlight: 221 83% 97%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 0 0% 25%;
@@ -164,41 +164,41 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Dark mode — Neutral Premium Palette */
-    --background: 0 0% 4%;
-    --foreground: 0 0% 96%;
+    /* Dark mode — Premium Palette with Color */
+    --background: 222 47% 6%;
+    --foreground: 210 40% 96%;
 
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 96%;
+    --card: 222 47% 9%;
+    --card-foreground: 210 40% 96%;
 
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 96%;
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 96%;
 
-    --primary: 0 0% 96%;
-    --primary-foreground: 0 0% 6%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 96%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 96%;
 
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 55%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 55%;
 
-    --accent: 0 0% 14%;
-    --accent-foreground: 0 0% 96%;
+    --accent: 262 83% 65%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
-    --ring: 0 0% 96%;
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 217 91% 60%;
     
     /* Glass effect for dark mode */
-    --glass-bg: 0 0% 8% / 0.5;
-    --glass-border: 0 0% 100% / 0.08;
+    --glass-bg: 222 47% 10% / 0.5;
+    --glass-border: 217 91% 60% / 0.12;
     
     /* Subtle accent for highlights */
-    --highlight: 0 0% 12%;
+    --highlight: 217 33% 14%;
   }
 }
 
@@ -240,14 +240,16 @@ All colors MUST be HSL.
 @layer utilities {
   .gradient-epic {
     background: linear-gradient(135deg, 
-      hsl(var(--foreground)) 0%, 
-      hsl(var(--muted-foreground)) 100%);
+      hsl(var(--primary)) 0%, 
+      hsl(var(--accent)) 50%,
+      hsl(var(--gradient-end)) 100%);
   }
   
   .gradient-epic-text {
     background: linear-gradient(135deg, 
-      hsl(var(--foreground)) 0%, 
-      hsl(var(--muted-foreground)) 100%);
+      hsl(var(--primary)) 0%, 
+      hsl(var(--accent)) 50%,
+      hsl(var(--gradient-end)) 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
