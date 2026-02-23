@@ -436,14 +436,16 @@ const NavigationMaker = () => {
           }
           const newNodes: CanvasNode[] = [];
           const newConns: Connection[] = [];
-          const processPage = (page: any, depth: number, index: number) => {
+          let globalIndex = 0;
+          const processPage = (page: any, depth: number): string => {
             const nodeId = `node-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+            const currentIndex = globalIndex++;
             newNodes.push({
               id: nodeId,
-              pageId: page.id || page.label?.toLowerCase().replace(/\s+/g, "-") || `page-${index}`,
-              label: page.label || page.id || `Page ${index + 1}`,
-              x: 100 + depth * 220,
-              y: 80 + index * 80,
+              pageId: page.id || page.label?.toLowerCase().replace(/\s+/g, "-") || `page-${currentIndex}`,
+              label: page.label || page.id || `Page ${currentIndex + 1}`,
+              x: 100 + depth * 240,
+              y: 80 + currentIndex * 90,
               color: "hsl(var(--foreground))",
               pageType: page.pageType || "Content",
               slug: page.slug || "",
@@ -452,10 +454,10 @@ const NavigationMaker = () => {
               colorTag: page.colorTag || "none",
             });
             if (page.children && Array.isArray(page.children)) {
-              page.children.forEach((child: any, ci: number) => {
-                const childId = processPage(child, depth + 1, newNodes.length + ci);
+              page.children.forEach((child: any) => {
+                const childId = processPage(child, depth + 1);
                 newConns.push({
-                  id: `conn-${Date.now()}-${ci}`,
+                  id: `conn-${Date.now()}-${Math.random().toString(36).slice(2, 4)}`,
                   fromId: nodeId,
                   toId: childId,
                   label: child.relationship || "navigates to",
@@ -464,7 +466,7 @@ const NavigationMaker = () => {
             }
             return nodeId;
           };
-          data.pages.forEach((page: any, i: number) => processPage(page, 0, i));
+          data.pages.forEach((page: any) => processPage(page, 0));
           setNodes(newNodes);
           setConnections(newConns);
           pushHistory(newNodes, newConns);
