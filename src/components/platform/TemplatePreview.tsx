@@ -9,6 +9,51 @@ interface TemplatePreviewProps {
 }
 
 // Generate a visual preview of a template as a canvas-rendered image
+// Parse CSS gradient into canvas gradient
+const parseGradient = (ctx: CanvasRenderingContext2D, grad: string, x: number, y: number, w: number, h: number): CanvasGradient | null => {
+  try {
+    const radialMatch = grad.match(/radial-gradient\((.+)\)/);
+    if (radialMatch) {
+      const g = ctx.createRadialGradient(x + w / 2, y + h / 2, 0, x + w / 2, y + h / 2, Math.max(w, h) / 2);
+      const parts = radialMatch[1].split(/,(?![^(]*\))/);
+      parts.forEach((p, i) => {
+        const trimmed = p.trim();
+        const pm = trimmed.match(/(.+?)\s+(\d+)%/);
+        if (pm) g.addColorStop(parseInt(pm[2]) / 100, pm[1].trim());
+        else if (i > 0 || !trimmed.includes("circle")) g.addColorStop(i / Math.max(parts.length - 1, 1), trimmed);
+      });
+      return g;
+    }
+    const linearMatch = grad.match(/linear-gradient\(\s*(\d+)deg\s*,\s*(.+)\)/);
+    if (linearMatch) {
+      const angle = parseInt(linearMatch[1]);
+      const rad = (angle - 90) * Math.PI / 180;
+      const cx = x + w / 2, cy = y + h / 2, len = Math.max(w, h);
+      const g = ctx.createLinearGradient(cx - Math.cos(rad) * len / 2, cy - Math.sin(rad) * len / 2, cx + Math.cos(rad) * len / 2, cy + Math.sin(rad) * len / 2);
+      linearMatch[2].split(/,(?![^(]*\))/).forEach((p, i, arr) => {
+        const trimmed = p.trim();
+        const pm = trimmed.match(/(.+?)\s+(\d+)%/);
+        if (pm) g.addColorStop(parseInt(pm[2]) / 100, pm[1].trim());
+        else g.addColorStop(i / Math.max(arr.length - 1, 1), trimmed);
+      });
+      return g;
+    }
+    // No angle variant
+    const noAngle = grad.match(/linear-gradient\(\s*(.+)\)/);
+    if (noAngle) {
+      const g = ctx.createLinearGradient(x, y, x, y + h);
+      noAngle[1].split(/,(?![^(]*\))/).forEach((p, i, arr) => {
+        const trimmed = p.trim();
+        const pm = trimmed.match(/(.+?)\s+(\d+)%/);
+        if (pm) g.addColorStop(parseInt(pm[2]) / 100, pm[1].trim());
+        else g.addColorStop(i / Math.max(arr.length - 1, 1), trimmed);
+      });
+      return g;
+    }
+  } catch { /* fallback */ }
+  return null;
+};
+
 const generatePreview = (template: Template, scale: number): string => {
   const canvas = document.createElement("canvas");
   canvas.width = template.canvasWidth * scale;
@@ -17,7 +62,6 @@ const generatePreview = (template: Template, scale: number): string => {
 
   if (!ctx) return "";
 
-  // Render elements
   const sortedElements = [...template.elements];
 
   for (const el of sortedElements) {
@@ -28,9 +72,24 @@ const generatePreview = (template: Template, scale: number): string => {
     const w = el.width * scale;
     const h = el.height * scale;
 
-    if (el.type === "shape" && el.backgroundColor) {
-      ctx.fillStyle = el.backgroundColor;
-      
+    // Apply element opacity
+    if (el.opacity !== undefined && el.opacity !== 1) {
+      ctx.globalAlpha = el.opacity;
+    }
+
+    if (el.type === "shape") {
+      // Determine fill: gradient > backgroundColor
+      if (el.gradient) {
+        const grad = parseGradient(ctx, el.gradient, x, y, w, h);
+        if (grad) ctx.fillStyle = grad;
+        else ctx.fillStyle = el.backgroundColor || "#cccccc";
+      } else if (el.backgroundColor) {
+        ctx.fillStyle = el.backgroundColor;
+      } else {
+        ctx.fillStyle = "transparent";
+      }
+
+      // Draw shape with optional border radius
       if (el.borderRadius && el.borderRadius > 0) {
         const r = Math.min(el.borderRadius * scale, w / 2, h / 2);
         ctx.beginPath();
@@ -48,19 +107,33 @@ const generatePreview = (template: Template, scale: number): string => {
       } else {
         ctx.fillRect(x, y, w, h);
       }
+
+      // Stroke
+      if (el.strokeColor && el.strokeWidth) {
+        ctx.strokeStyle = el.strokeColor;
+        ctx.lineWidth = el.strokeWidth * scale;
+        if (el.borderRadius && el.borderRadius > 0) {
+          ctx.stroke(); // path already set
+        } else {
+          ctx.strokeRect(x, y, w, h);
+        }
+      }
     }
 
     if (el.type === "text" && el.content) {
       const fontSize = Math.max(8, (el.fontSize || 16) * scale);
-      ctx.font = `${el.fontWeight || "normal"} ${fontSize}px sans-serif`;
+      ctx.font = `${el.fontWeight || "normal"} ${fontSize}px ${el.fontFamily || "sans-serif"}`;
       ctx.fillStyle = el.color || "#000000";
       ctx.textBaseline = "top";
-      
-      // Handle multi-line text
+
+      const align = el.textAlign || "left";
+      ctx.textAlign = align;
+
       const lines = el.content.split("\n");
-      const lineHeight = fontSize * 1.2;
+      const lineHeight = fontSize * (el.lineHeight || 1.2);
       lines.forEach((line, i) => {
-        ctx.fillText(line, x, y + i * lineHeight);
+        const tx = align === "center" ? x + w / 2 : align === "right" ? x + w : x;
+        ctx.fillText(line, tx, y + i * lineHeight);
       });
     }
 
