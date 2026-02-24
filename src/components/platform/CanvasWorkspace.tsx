@@ -185,15 +185,17 @@ export const CanvasWorkspace = ({
         };
 
         if (el.type === "shape") {
+          const bgColor = el.gradient || el.backgroundColor || "#cccccc";
           return {
             ...baseProps,
             type: el.id === "bg" ? "background" : "shape",
             shapeType: "rectangle",
-            fillColor: el.backgroundColor || "#cccccc",
-            strokeColor: "transparent",
-            strokeWidth: 0,
+            fillColor: bgColor,
+            strokeColor: el.strokeColor || "transparent",
+            strokeWidth: el.strokeWidth || 0,
             borderRadius: el.borderRadius,
-            backgroundColor: el.backgroundColor,
+            backgroundColor: bgColor,
+            opacity: el.opacity ?? 1,
           } as ShapeLayer | BackgroundLayer;
         }
 
@@ -202,14 +204,15 @@ export const CanvasWorkspace = ({
             ...baseProps,
             type: "text",
             content: el.content || "",
-            fontFamily: "Inter, sans-serif",
+            fontFamily: el.fontFamily || "Inter, sans-serif",
             fontSize: el.fontSize || 16,
             fontWeight: el.fontWeight || "normal",
             fontStyle: "normal",
             color: el.color || "#000000",
-            textAlign: "left",
-            letterSpacing: 0,
-            lineHeight: 1.2,
+            textAlign: el.textAlign || "left",
+            letterSpacing: el.letterSpacing || 0,
+            lineHeight: el.lineHeight || 1.2,
+            opacity: el.opacity ?? 1,
           } as TextLayer;
         }
 
