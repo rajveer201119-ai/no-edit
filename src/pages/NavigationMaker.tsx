@@ -17,8 +17,7 @@ import {
   Flag, Gift, Headphones, Megaphone, Music,
   Newspaper, Rocket, Scale, Scissors, Send,
   FileJson, Crown, Undo2, Redo2, FileUp, Minimize2,
-  ChevronDown, Circle, X, MoreHorizontal, Type, Layout, Code, Paintbrush, 
-  MousePointer, Eye
+  ChevronDown, Circle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -109,31 +108,6 @@ const stockPages = [
 const pageTypes = ["Landing", "Blog", "Product", "Dashboard", "Auth", "Utility", "Content", "Marketing"] as const;
 type PageType = typeof pageTypes[number];
 
-// Section types that can be added to each page card (like in the reference image)
-const sectionPresets = [
-  { id: "header", label: "Header", icon: Layout, color: "#3b82f6" },
-  { id: "hero", label: "Hero", icon: Star, color: "#8b5cf6" },
-  { id: "cta", label: "CTA", icon: MousePointer, color: "#f59e0b" },
-  { id: "feature", label: "Feature", icon: Zap, color: "#22c55e" },
-  { id: "pricing", label: "Pricing", icon: CreditCard, color: "#ec4899" },
-  { id: "footer", label: "Footer", icon: Layout, color: "#6b7280" },
-  { id: "contact", label: "Contact", icon: Mail, color: "#14b8a6" },
-  { id: "testimonials", label: "Testimonials", icon: MessageSquare, color: "#f97316" },
-  { id: "our-mission", label: "Our Mission", icon: Target, color: "#8b5cf6" },
-  { id: "our-investors", label: "Our Investors", icon: Building, color: "#3b82f6" },
-  { id: "join-us", label: "Join Us", icon: User, color: "#22c55e" },
-  { id: "our-values", label: "Our Values", icon: Heart, color: "#ef4444" },
-  { id: "our-openings", label: "Our Openings", icon: Briefcase, color: "#f59e0b" },
-  { id: "join-the-journey", label: "Join the Journey", icon: Rocket, color: "#8b5cf6" },
-  { id: "why-choose-us", label: "Why Choose Us", icon: Star, color: "#f59e0b" },
-];
-
-interface PageSection {
-  id: string;
-  label: string;
-  color: string;
-}
-
 const colorTags = [
   { label: "None", value: "none", color: "hsl(var(--foreground))" },
   { label: "Blue", value: "blue", color: "#3b82f6" },
@@ -143,18 +117,6 @@ const colorTags = [
   { label: "Purple", value: "purple", color: "#a855f7" },
   { label: "Teal", value: "teal", color: "#14b8a6" },
 ];
-
-// Badge colors for page type
-const pageTypeBadgeColors: Record<string, { bg: string; text: string }> = {
-  Landing: { bg: "#dbeafe", text: "#1d4ed8" },
-  Blog: { bg: "#fce7f3", text: "#be185d" },
-  Product: { bg: "#d1fae5", text: "#065f46" },
-  Dashboard: { bg: "#ede9fe", text: "#5b21b6" },
-  Auth: { bg: "#fef3c7", text: "#92400e" },
-  Utility: { bg: "#e5e7eb", text: "#374151" },
-  Content: { bg: "#dbeafe", text: "#1d4ed8" },
-  Marketing: { bg: "#fce7f3", text: "#be185d" },
-};
 
 interface CanvasNode {
   id: string;
@@ -168,7 +130,6 @@ interface CanvasNode {
   description?: string;
   tags?: string[];
   colorTag?: string;
-  sections?: PageSection[];
 }
 
 interface Connection {
@@ -183,55 +144,6 @@ interface HistoryState {
   connections: Connection[];
 }
 
-// Default sections for different page types
-const getDefaultSections = (pageId: string): PageSection[] => {
-  const defaults: Record<string, PageSection[]> = {
-    home: [
-      { id: "header", label: "Header", color: "#3b82f6" },
-      { id: "hero", label: "Hero", color: "#8b5cf6" },
-      { id: "why-choose-us", label: "Why Choose Us", color: "#f59e0b" },
-      { id: "footer", label: "Footer", color: "#6b7280" },
-    ],
-    about: [
-      { id: "header", label: "Header", color: "#3b82f6" },
-      { id: "our-mission", label: "Our Mission", color: "#8b5cf6" },
-      { id: "our-investors", label: "Our Investors", color: "#3b82f6" },
-      { id: "footer", label: "Footer", color: "#6b7280" },
-      { id: "join-the-journey", label: "Join the Journey", color: "#8b5cf6" },
-    ],
-    products: [
-      { id: "header", label: "Header", color: "#3b82f6" },
-      { id: "cta", label: "CTA", color: "#f59e0b" },
-      { id: "feature", label: "Feature", color: "#22c55e" },
-      { id: "pricing", label: "Pricing", color: "#ec4899" },
-      { id: "footer", label: "Footer", color: "#6b7280" },
-    ],
-    contact: [
-      { id: "header", label: "Header", color: "#3b82f6" },
-      { id: "header-2", label: "Header", color: "#3b82f6" },
-      { id: "contact", label: "Contact", color: "#14b8a6" },
-      { id: "footer", label: "Footer", color: "#6b7280" },
-    ],
-    careers: [
-      { id: "header", label: "Header", color: "#3b82f6" },
-      { id: "our-values", label: "Our Values", color: "#ef4444" },
-      { id: "join-us", label: "Join Us", color: "#22c55e" },
-      { id: "our-openings", label: "Our Openings", color: "#f59e0b" },
-      { id: "footer", label: "Footer", color: "#6b7280" },
-    ],
-    features: [
-      { id: "header", label: "Header", color: "#3b82f6" },
-      { id: "feature", label: "Feature", color: "#22c55e" },
-      { id: "testimonials", label: "Testimonials", color: "#f97316" },
-      { id: "footer", label: "Footer", color: "#6b7280" },
-    ],
-  };
-  return defaults[pageId] || [
-    { id: "header", label: "Header", color: "#3b82f6" },
-    { id: "footer", label: "Footer", color: "#6b7280" },
-  ];
-};
-
 const NavigationMaker = () => {
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -245,7 +157,6 @@ const NavigationMaker = () => {
   const [connectionLabel, setConnectionLabel] = useState("");
   const [showPaywall, setShowPaywall] = useState(false);
   const [showMinimap, setShowMinimap] = useState(true);
-  const [addingSectionTo, setAddingSectionTo] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const { canExportJSON } = useUserPlan();
 
@@ -309,7 +220,6 @@ const NavigationMaker = () => {
       pageType: page.category === "Auth" ? "Auth" : page.category === "Dashboard" ? "Dashboard" : "Content",
       slug: `/${page.id}`,
       colorTag: "none",
-      sections: getDefaultSections(page.id),
     };
     const newNodes = [...nodes, newNode];
     setNodes(newNodes);
@@ -332,26 +242,6 @@ const NavigationMaker = () => {
     pushHistory(newNodes, connections);
   };
 
-  const addSectionToNode = (nodeId: string, section: typeof sectionPresets[0]) => {
-    const node = nodes.find(n => n.id === nodeId);
-    if (!node) return;
-    const newSection: PageSection = {
-      id: `${section.id}-${Date.now()}`,
-      label: section.label,
-      color: section.color,
-    };
-    const newSections = [...(node.sections || []), newSection];
-    updateNodeMeta(nodeId, { sections: newSections });
-    setAddingSectionTo(null);
-  };
-
-  const removeSectionFromNode = (nodeId: string, sectionId: string) => {
-    const node = nodes.find(n => n.id === nodeId);
-    if (!node) return;
-    const newSections = (node.sections || []).filter(s => s.id !== sectionId);
-    updateNodeMeta(nodeId, { sections: newSections });
-  };
-
   const handleMouseDown = (e: React.MouseEvent, nodeId: string) => {
     e.stopPropagation();
     const node = nodes.find(n => n.id === nodeId);
@@ -364,7 +254,7 @@ const NavigationMaker = () => {
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!draggingNode || !canvasRef.current) return;
     const rect = canvasRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(rect.width - 180, e.clientX - rect.left - dragOffset.x));
+    const x = Math.max(0, Math.min(rect.width - 160, e.clientX - rect.left - dragOffset.x));
     const y = Math.max(0, Math.min(rect.height - 60, e.clientY - rect.top - dragOffset.y));
     setNodes(prev => prev.map(n => n.id === draggingNode ? { ...n, x, y } : n));
   }, [draggingNode, dragOffset]);
@@ -394,7 +284,7 @@ const NavigationMaker = () => {
       );
       if (exists) { toast.info("Connection already exists"); setConnectingFrom(null); return; }
       const newConns = [...connections, {
-        id: `conn-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        id: `conn-${Date.now()}`,
         fromId: connectingFrom,
         toId: nodeId,
         label: connectionLabel || "navigates to",
@@ -413,122 +303,61 @@ const NavigationMaker = () => {
   const exportNavigation = async () => {
     if (nodes.length === 0) { toast.error("Add some pages first!"); return; }
     const canvas = document.createElement("canvas");
-    const padding = 80;
-    const nodeW = 180;
+    const padding = 60;
+    const nodeW = 160;
+    const nodeH = 56;
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     nodes.forEach(n => {
-      const nodeH = 60 + (n.sections?.length || 0) * 32;
       minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
       maxX = Math.max(maxX, n.x + nodeW); maxY = Math.max(maxY, n.y + nodeH);
     });
     canvas.width = (maxX - minX) + padding * 2;
     canvas.height = (maxY - minY) + padding * 2;
     const ctx = canvas.getContext("2d")!;
-    
-    // Light background
-    ctx.fillStyle = "#fafafa";
+    ctx.fillStyle = "#0a0a0a";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Dot grid
-    ctx.fillStyle = "#e5e7eb";
-    for (let x = 0; x < canvas.width; x += 20) {
-      for (let y = 0; y < canvas.height; y += 20) {
-        ctx.beginPath();
-        ctx.arc(x, y, 0.8, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    
-    // Title
-    ctx.fillStyle = "#374151";
-    ctx.font = "600 16px system-ui";
-    ctx.fillText("🏗 AI Product Sitemap", 24, 36);
-    ctx.fillStyle = "#9ca3af";
-    ctx.font = "12px system-ui";
-    ctx.fillText("Made with EPIC", 24, 54);
-
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 18px system-ui";
+    ctx.fillText("Website Navigation — Made with EPIC", 20, 30);
     const offsetX = padding - minX;
-    const offsetY = padding - minY + 30;
-
-    // Draw connections as curved lines
+    const offsetY = padding - minY + 20;
+    ctx.strokeStyle = "#555";
+    ctx.lineWidth = 1.5;
     connections.forEach(conn => {
       const from = nodes.find(n => n.id === conn.fromId);
       const to = nodes.find(n => n.id === conn.toId);
       if (!from || !to) return;
-      const fromH = 60 + (from.sections?.length || 0) * 32;
       const fx = from.x + offsetX + nodeW / 2;
-      const fy = from.y + offsetY + fromH;
+      const fy = from.y + offsetY + nodeH / 2;
       const tx = to.x + offsetX + nodeW / 2;
-      const ty = to.y + offsetY;
-      
-      ctx.strokeStyle = "#93c5fd";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(fx, fy);
-      const midY = (fy + ty) / 2;
-      ctx.bezierCurveTo(fx, midY, tx, midY, tx, ty);
+      const ty = to.y + offsetY + nodeH / 2;
+      ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(tx, ty); ctx.stroke();
+      const angle = Math.atan2(ty - fy, tx - fx);
+      const arrowLen = 12;
+      ctx.beginPath(); ctx.moveTo(tx, ty);
+      ctx.lineTo(tx - arrowLen * Math.cos(angle - 0.3), ty - arrowLen * Math.sin(angle - 0.3));
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(tx - arrowLen * Math.cos(angle + 0.3), ty - arrowLen * Math.sin(angle + 0.3));
       ctx.stroke();
-      
-      // Arrow dot at end
-      ctx.fillStyle = "#93c5fd";
-      ctx.beginPath();
-      ctx.arc(tx, ty, 4, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillStyle = "#888"; ctx.font = "11px system-ui";
+      ctx.fillText(conn.label, (fx + tx) / 2 - 20, (fy + ty) / 2 - 8);
     });
-
-    // Draw nodes as cards
     nodes.forEach(node => {
       const nx = node.x + offsetX;
       const ny = node.y + offsetY;
-      const sections = node.sections || [];
-      const nodeH = 60 + sections.length * 32;
-      
-      // Card shadow
-      ctx.fillStyle = "rgba(0,0,0,0.06)";
-      ctx.beginPath(); ctx.roundRect(nx + 2, ny + 2, nodeW, nodeH, 12); ctx.fill();
-      
-      // Card body
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath(); ctx.roundRect(nx, ny, nodeW, nodeH, 12); ctx.fill();
-      ctx.strokeStyle = "#e5e7eb";
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.roundRect(nx, ny, nodeW, nodeH, 12); ctx.stroke();
-      
-      // Title area
-      ctx.fillStyle = "#111827";
-      ctx.font = "600 13px system-ui";
-      ctx.textAlign = "left";
-      ctx.fillText(node.label, nx + 14, ny + 24);
-      
-      // Page type badge
+      const tagColor = colorTags.find(c => c.value === node.colorTag);
+      ctx.fillStyle = tagColor && tagColor.value !== "none" ? tagColor.color : "#1a1a1a";
+      ctx.beginPath(); ctx.roundRect(nx, ny, nodeW, nodeH, 8); ctx.fill();
+      ctx.strokeStyle = "#333"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(nx, ny, nodeW, nodeH, 8); ctx.stroke();
+      ctx.fillStyle = "#ffffff"; ctx.font = "bold 13px system-ui";
+      ctx.textAlign = "center"; ctx.fillText(node.label, nx + nodeW / 2, ny + nodeH / 2 + 1);
       if (node.pageType) {
-        const badgeColors = pageTypeBadgeColors[node.pageType] || { bg: "#e5e7eb", text: "#374151" };
-        const badgeText = node.pageType;
-        const badgeW = ctx.measureText(badgeText).width + 12;
-        ctx.fillStyle = badgeColors.bg;
-        ctx.beginPath(); ctx.roundRect(nx + 14, ny + 32, badgeW, 18, 4); ctx.fill();
-        ctx.fillStyle = badgeColors.text;
-        ctx.font = "500 9px system-ui";
-        ctx.fillText(badgeText, nx + 20, ny + 44);
+        ctx.fillStyle = "#888"; ctx.font = "9px system-ui";
+        ctx.fillText(node.pageType, nx + nodeW / 2, ny + nodeH / 2 + 14);
       }
-      
-      // Sections
-      sections.forEach((section, i) => {
-        const sy = ny + 58 + i * 32;
-        // Section dot
-        ctx.fillStyle = section.color;
-        ctx.beginPath();
-        ctx.arc(nx + 22, sy + 8, 4, 0, Math.PI * 2);
-        ctx.fill();
-        // Section label
-        ctx.fillStyle = "#374151";
-        ctx.font = "400 11px system-ui";
-        ctx.fillText(section.label, nx + 34, sy + 12);
-      });
-      
       ctx.textAlign = "start";
     });
-
     const dataUrl = canvas.toDataURL("image/png");
     const link = document.createElement("a"); link.download = "website-navigation.png"; link.href = dataUrl; link.click();
     toast.success("Navigation map downloaded!");
@@ -549,7 +378,6 @@ const NavigationMaker = () => {
         description: n.description || "",
         tags: n.tags || [],
         colorTag: n.colorTag || "none",
-        sections: (n.sections || []).map(s => ({ label: s.label, color: s.color })),
         children: [] as any[],
       };
     });
@@ -616,19 +444,14 @@ const NavigationMaker = () => {
               id: nodeId,
               pageId: page.id || page.label?.toLowerCase().replace(/\s+/g, "-") || `page-${currentIndex}`,
               label: page.label || page.id || `Page ${currentIndex + 1}`,
-              x: 100 + depth * 260,
-              y: 80 + currentIndex * 120,
+              x: 100 + depth * 240,
+              y: 80 + currentIndex * 90,
               color: "hsl(var(--foreground))",
               pageType: page.pageType || "Content",
               slug: page.slug || "",
               description: page.description || "",
               tags: page.tags || [],
               colorTag: page.colorTag || "none",
-              sections: page.sections?.map((s: any) => ({
-                id: `${s.label?.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
-                label: s.label || "Section",
-                color: s.color || "#3b82f6",
-              })) || getDefaultSections(page.id || ""),
             });
             if (page.children && Array.isArray(page.children)) {
               page.children.forEach((child: any) => {
@@ -661,22 +484,18 @@ const NavigationMaker = () => {
   const selectedNodeData = useMemo(() => nodes.find(n => n.id === selectedNode), [nodes, selectedNode]);
 
   // Minimap calculations
-  const minimapScale = 0.06;
+  const minimapScale = 0.08;
   const minimapNodes = useMemo(() => {
     if (nodes.length === 0) return [];
     return nodes.map(n => ({
       x: n.x * minimapScale,
       y: n.y * minimapScale,
-      w: 180 * minimapScale,
-      h: (60 + (n.sections?.length || 0) * 32) * minimapScale,
-      color: colorTags.find(c => c.value === n.colorTag)?.color || "#6366f1",
+      w: 160 * minimapScale,
+      h: 56 * minimapScale,
+      color: colorTags.find(c => c.value === n.colorTag)?.color || "hsl(var(--foreground))",
       isNone: !n.colorTag || n.colorTag === "none",
     }));
   }, [nodes]);
-
-  // Compute node heights for SVG connections
-  const getNodeHeight = (node: CanvasNode) => 60 + (node.sections?.length || 0) * 32;
-  const nodeW = 180;
 
   return (
     <>
@@ -687,79 +506,73 @@ const NavigationMaker = () => {
         canonicalUrl="https://no-edit.lovable.app/navigation-maker"
       />
 
-      <div className="min-h-screen bg-[#f8f9fb] dark:bg-background">
+      <div className="min-h-screen bg-background">
         {/* Top Bar */}
-        <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-white/90 dark:bg-card/90 backdrop-blur-xl border-b border-neutral-200 dark:border-border/40 flex items-center px-5 gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="h-9 w-9 rounded-lg">
+        <header className="fixed top-0 left-0 right-0 z-50 h-12 bg-background/80 backdrop-blur-xl border-b border-border/40 flex items-center px-4 gap-2">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="h-8 w-8">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-2">
-            <span className="text-sm">🏗</span>
-            <h1 className="text-sm font-semibold text-foreground">AI Product Sitemap</h1>
-          </div>
+          <h1 className="text-sm font-medium text-foreground">Navigation Maker</h1>
           
           <div className="flex-1" />
 
           {/* Undo/Redo */}
-          <div className="flex items-center gap-1 bg-neutral-100 dark:bg-muted/50 rounded-lg p-1">
-            <Button variant="ghost" size="icon" onClick={undo} disabled={historyIndex <= 0} className="h-7 w-7 rounded-md" title="Undo (⌘Z)">
-              <Undo2 className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={redo} disabled={historyIndex >= history.length - 1} className="h-7 w-7 rounded-md" title="Redo (⌘⇧Z)">
-              <Redo2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+          <Button variant="ghost" size="icon" onClick={undo} disabled={historyIndex <= 0} className="h-8 w-8" title="Undo (⌘Z)">
+            <Undo2 className="h-3.5 w-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={redo} disabled={historyIndex >= history.length - 1} className="h-8 w-8" title="Redo (⌘⇧Z)">
+            <Redo2 className="h-3.5 w-3.5" />
+          </Button>
+
+          <div className="w-px h-5 bg-border mx-1" />
 
           {connectingFrom && (
-            <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg">
+            <div className="flex items-center gap-2">
               <Input 
                 placeholder="Link label..." 
                 value={connectionLabel}
                 onChange={e => setConnectionLabel(e.target.value)}
-                className="w-28 h-7 text-xs border-blue-200 dark:border-blue-500/30"
+                className="w-28 h-7 text-xs"
               />
-              <span className="text-xs text-blue-600 dark:text-blue-400 animate-pulse whitespace-nowrap">Click target node...</span>
+              <span className="text-xs text-muted-foreground animate-pulse">Click target...</span>
               <Button size="sm" variant="ghost" onClick={() => setConnectingFrom(null)} className="h-7 text-xs">Cancel</Button>
             </div>
           )}
 
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={importJSON} className="gap-1.5 h-8 text-xs rounded-lg hover:bg-neutral-100 dark:hover:bg-muted/50">
-              <FileUp className="h-3.5 w-3.5" /> Import
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => exportJSON("generic")} className="gap-1.5 h-8 text-xs rounded-lg border-neutral-200 dark:border-border">
-              <FileJson className="h-3.5 w-3.5" /> JSON
-              {!canExportJSON && <Crown className="h-3 w-3 text-amber-500" />}
-            </Button>
-            <Button size="sm" onClick={exportNavigation} className="gap-1.5 h-8 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90">
-              <Download className="h-3.5 w-3.5" /> Export PNG
-            </Button>
-          </div>
+          <Button variant="ghost" size="sm" onClick={importJSON} className="gap-1.5 h-8 text-xs">
+            <FileUp className="h-3.5 w-3.5" /> Import
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => exportJSON("generic")} className="gap-1.5 h-8 text-xs">
+            <FileJson className="h-3.5 w-3.5" /> JSON
+            {!canExportJSON && <Crown className="h-3 w-3 text-muted-foreground" />}
+          </Button>
+          <Button variant="outline" size="sm" onClick={exportNavigation} className="gap-1.5 h-8 text-xs">
+            <Download className="h-3.5 w-3.5" /> PNG
+          </Button>
         </header>
 
-        <div className="flex pt-14 h-screen">
+        <div className="flex pt-12 h-screen">
           {/* Sidebar — Stock Pages */}
-          <aside className="w-60 border-r border-neutral-200 dark:border-border/40 bg-white dark:bg-card/50 flex flex-col shrink-0 hidden md:flex">
-            <div className="p-4 border-b border-neutral-100 dark:border-border/40">
-              <p className="text-xs font-semibold text-foreground mb-3">📦 Page Library</p>
+          <aside className="w-56 border-r border-border/40 bg-card/50 flex flex-col shrink-0 hidden md:flex">
+            <div className="p-3 border-b border-border/40">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
                 <Input 
                   placeholder="Search pages..." 
                   value={search} 
                   onChange={e => setSearch(e.target.value)}
-                  className="pl-8 h-8 text-xs rounded-lg bg-neutral-50 dark:bg-muted/30 border-neutral-200 dark:border-border/40"
+                  className="pl-8 h-7 text-xs"
                 />
               </div>
             </div>
             <ScrollArea className="flex-1">
-              <div className="p-3 space-y-4">
+              <div className="p-3 space-y-3">
                 {categories.map(cat => {
                   const pages = filteredPages.filter(p => p.category === cat);
                   if (pages.length === 0) return null;
                   return (
                     <div key={cat}>
-                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2 px-1">{cat}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">{cat}</p>
                       <div className="space-y-0.5">
                         {pages.map(page => {
                           const Icon = page.icon;
@@ -769,14 +582,14 @@ const NavigationMaker = () => {
                               key={page.id}
                               onClick={() => addPageToCanvas(page)}
                               className={cn(
-                                "flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg text-xs transition-all duration-150",
-                                "hover:bg-neutral-100 dark:hover:bg-muted active:scale-[0.97]",
-                                onCanvas ? "text-foreground bg-neutral-100 dark:bg-muted" : "text-muted-foreground"
+                                "flex items-center gap-2 w-full px-2 py-1.5 rounded-md text-xs transition-all duration-150",
+                                "hover:bg-muted active:scale-[0.97]",
+                                onCanvas ? "text-foreground bg-muted" : "text-muted-foreground"
                               )}
                             >
                               <Icon className="h-3.5 w-3.5 shrink-0" />
                               <span className="truncate">{page.label}</span>
-                              {onCanvas && <span className="ml-auto text-[9px] text-green-500 font-semibold">✓</span>}
+                              {onCanvas && <span className="ml-auto text-[9px] text-foreground">✓</span>}
                             </button>
                           );
                         })}
@@ -786,59 +599,46 @@ const NavigationMaker = () => {
                 })}
               </div>
             </ScrollArea>
-            <div className="p-3 border-t border-neutral-100 dark:border-border/40 text-center">
+            <div className="p-3 border-t border-border/40 text-center">
               <p className="text-[10px] text-muted-foreground">{nodes.length} on canvas · {stockPages.length} available</p>
             </div>
           </aside>
 
           {/* Canvas */}
-          <div className="flex-1 relative overflow-auto" style={{ background: "radial-gradient(circle, #e5e7eb 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
-            <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px]">
-              {/* SVG Connections — Curved Bezier lines */}
+          <div className="flex-1 relative overflow-auto bg-[radial-gradient(circle_at_1px_1px,hsl(var(--border)/0.2)_1px,transparent_0)] bg-[size:24px_24px]">
+            <div ref={canvasRef} className="relative w-full h-full min-w-[1200px] min-h-[800px]">
+              {/* SVG Connections */}
               <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0">
                 <defs>
-                  <linearGradient id="conn-gradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#93c5fd" />
-                    <stop offset="100%" stopColor="#c4b5fd" />
-                  </linearGradient>
+                  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="hsl(var(--muted-foreground))" />
+                  </marker>
                 </defs>
                 {connections.map(conn => {
                   const from = nodes.find(n => n.id === conn.fromId);
                   const to = nodes.find(n => n.id === conn.toId);
                   if (!from || !to) return null;
-                  const fromH = getNodeHeight(from);
-                  const fx = from.x + nodeW / 2;
-                  const fy = from.y + fromH;
-                  const tx = to.x + nodeW / 2;
-                  const ty = to.y;
-                  const midY = (fy + ty) / 2;
-                  
+                  const fx = from.x + 80; const fy = from.y + 28;
+                  const tx = to.x + 80; const ty = to.y + 28;
                   return (
                     <g key={conn.id}>
-                      <path
-                        d={`M ${fx} ${fy} C ${fx} ${midY}, ${tx} ${midY}, ${tx} ${ty}`}
-                        fill="none"
-                        stroke="url(#conn-gradient)"
-                        strokeWidth={2.5}
-                        strokeLinecap="round"
-                      />
-                      {/* Connection end dot */}
-                      <circle cx={tx} cy={ty} r={4} fill="#93c5fd" />
-                      <circle cx={fx} cy={fy} r={4} fill="#c4b5fd" />
+                      <line x1={fx} y1={fy} x2={tx} y2={ty} stroke="hsl(var(--border))" strokeWidth={1.5} markerEnd="url(#arrowhead)" />
+                      <text x={(fx + tx) / 2} y={(fy + ty) / 2 - 6} fill="hsl(var(--muted-foreground))" fontSize={10} textAnchor="middle" className="select-none">
+                        {conn.label}
+                      </text>
                     </g>
                   );
                 })}
               </svg>
 
-              {/* Nodes — Card style like reference image */}
+              {/* Nodes */}
               <AnimatePresence>
                 {nodes.map(node => {
                   const page = stockPages.find(p => p.id === node.pageId);
                   const Icon = page?.icon || FileText;
                   const isSelected = selectedNode === node.id;
                   const isConnecting = connectingFrom === node.id;
-                  const sections = node.sections || [];
-                  const badgeColor = pageTypeBadgeColors[node.pageType || "Content"] || { bg: "#e5e7eb", text: "#374151" };
+                  const tagColor = colorTags.find(c => c.value === node.colorTag);
 
                   return (
                     <motion.div
@@ -846,119 +646,48 @@ const NavigationMaker = () => {
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0.9, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className={cn("absolute select-none z-10 group", draggingNode === node.id && "z-30")}
-                      style={{ left: node.x, top: node.y, width: nodeW }}
+                      transition={{ duration: 0.15 }}
+                      className={cn("absolute w-40 select-none z-10 group", draggingNode === node.id && "z-30")}
+                      style={{ left: node.x, top: node.y }}
                     >
                       <div
                         onMouseDown={e => handleMouseDown(e, node.id)}
                         onClick={() => handleNodeClick(node.id)}
                         className={cn(
-                          "rounded-xl bg-white dark:bg-card cursor-grab active:cursor-grabbing transition-all duration-200",
-                          "shadow-[0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-none border",
-                          isSelected 
-                            ? "border-blue-400 dark:border-blue-500 ring-2 ring-blue-100 dark:ring-blue-500/20" 
-                            : "border-neutral-200 dark:border-border hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]",
-                          isConnecting && "border-purple-400 ring-2 ring-purple-100 dark:ring-purple-500/20"
+                          "rounded-lg p-3 flex items-center gap-2 cursor-grab active:cursor-grabbing transition-all duration-150",
+                          "bg-card border shadow-sm",
+                          isSelected ? "border-foreground ring-1 ring-foreground/20" : "border-border",
+                          isConnecting && "border-foreground ring-1 ring-foreground/20"
                         )}
+                        style={{
+                          borderLeftColor: tagColor && tagColor.value !== "none" ? tagColor.color : undefined,
+                          borderLeftWidth: tagColor && tagColor.value !== "none" ? 3 : undefined,
+                        }}
                       >
-                        {/* Card Header */}
-                        <div className="px-3.5 pt-3 pb-2">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-[13px] font-semibold text-foreground">{node.label}</span>
-                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button
-                                onClick={e => { e.stopPropagation(); setConnectingFrom(node.id); }}
-                                className="w-5 h-5 rounded-md bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:scale-110 transition-transform"
-                                title="Connect"
-                              >
-                                <Link2 className="h-2.5 w-2.5" />
-                              </button>
-                              <button
-                                onClick={e => { e.stopPropagation(); removeNode(node.id); }}
-                                className="w-5 h-5 rounded-md bg-red-100 dark:bg-red-500/20 text-red-500 flex items-center justify-center hover:scale-110 transition-transform"
-                                title="Remove"
-                              >
-                                <Trash2 className="h-2.5 w-2.5" />
-                              </button>
-                            </div>
-                          </div>
-                          
-                          {/* Type badges */}
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span
-                              className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-semibold"
-                              style={{ backgroundColor: badgeColor.bg, color: badgeColor.text }}
-                            >
-                              {node.pageType || "Content"}
-                            </span>
-                            {node.colorTag && node.colorTag !== "none" && (
-                              <span
-                                className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-semibold text-white"
-                                style={{ backgroundColor: colorTags.find(c => c.value === node.colorTag)?.color }}
-                              >
-                                {node.colorTag}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Divider */}
-                        {sections.length > 0 && <div className="mx-3 border-t border-neutral-100 dark:border-border/30" />}
-
-                        {/* Sections list */}
-                        {sections.length > 0 && (
-                          <div className="px-3 py-2 space-y-1">
-                            {sections.map(section => (
-                              <div key={section.id} className="flex items-center gap-2 group/section py-1">
-                                <div
-                                  className="w-2 h-2 rounded-full shrink-0"
-                                  style={{ backgroundColor: section.color }}
-                                />
-                                <span className="text-[11px] text-neutral-600 dark:text-muted-foreground flex-1">{section.label}</span>
-                                <button
-                                  onClick={e => { e.stopPropagation(); removeSectionFromNode(node.id, section.id); }}
-                                  className="opacity-0 group-hover/section:opacity-100 transition-opacity"
-                                >
-                                  <X className="h-2.5 w-2.5 text-neutral-400 hover:text-red-500" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Add section button */}
-                        <div className="px-3 pb-2.5">
-                          {addingSectionTo === node.id ? (
-                            <div className="mt-1 p-2 bg-neutral-50 dark:bg-muted/30 rounded-lg">
-                              <div className="grid grid-cols-2 gap-1 max-h-32 overflow-auto">
-                                {sectionPresets.map(preset => (
-                                  <button
-                                    key={preset.id}
-                                    onClick={e => { e.stopPropagation(); addSectionToNode(node.id, preset); }}
-                                    className="flex items-center gap-1.5 px-2 py-1 rounded text-[10px] text-neutral-600 dark:text-muted-foreground hover:bg-white dark:hover:bg-muted transition-colors text-left"
-                                  >
-                                    <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: preset.color }} />
-                                    {preset.label}
-                                  </button>
-                                ))}
-                              </div>
-                              <button
-                                onClick={e => { e.stopPropagation(); setAddingSectionTo(null); }}
-                                className="mt-1 text-[10px] text-muted-foreground hover:text-foreground w-full text-center"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={e => { e.stopPropagation(); setAddingSectionTo(node.id); }}
-                              className="flex items-center gap-1 text-[10px] text-neutral-400 dark:text-muted-foreground hover:text-foreground transition-colors opacity-0 group-hover:opacity-100"
-                            >
-                              <Plus className="h-3 w-3" /> Add section
-                            </button>
+                        <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        <div className="flex-1 min-w-0">
+                          <span className="text-xs font-medium text-foreground truncate block">{node.label}</span>
+                          {node.pageType && (
+                            <span className="text-[9px] text-muted-foreground">{node.pageType}</span>
                           )}
                         </div>
+                      </div>
+
+                      <div className="absolute -top-1.5 -right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                        <button
+                          onClick={e => { e.stopPropagation(); setConnectingFrom(node.id); }}
+                          className="w-5 h-5 rounded-full bg-foreground text-background flex items-center justify-center hover:scale-110 transition-transform"
+                          title="Connect"
+                        >
+                          <Link2 className="h-2.5 w-2.5" />
+                        </button>
+                        <button
+                          onClick={e => { e.stopPropagation(); removeNode(node.id); }}
+                          className="w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center hover:scale-110 transition-transform"
+                          title="Remove"
+                        >
+                          <Trash2 className="h-2.5 w-2.5" />
+                        </button>
                       </div>
                     </motion.div>
                   );
@@ -968,22 +697,15 @@ const NavigationMaker = () => {
               {/* Empty State */}
               {nodes.length === 0 && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center max-w-md bg-white dark:bg-card rounded-2xl p-10 shadow-sm border border-neutral-200 dark:border-border">
-                    <div className="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-muted/50 flex items-center justify-center mx-auto mb-5">
-                      <Globe className="h-8 w-8 text-neutral-400" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">Build Your Sitemap</h3>
-                    <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-                      Add pages from the library, drag to arrange, and connect them to build your website's navigation structure.
+                  <div className="text-center max-w-sm">
+                    <Globe className="h-12 w-12 mx-auto mb-4 text-muted-foreground/20" />
+                    <h3 className="text-base font-medium text-foreground mb-2">Build Your Website Navigation</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Click pages from the sidebar to add them. Drag to arrange, use the link icon to connect pages.
                     </p>
-                    <div className="flex gap-3 justify-center">
-                      <Button variant="outline" size="sm" onClick={importJSON} className="gap-1.5 rounded-lg">
-                        <FileUp className="h-3.5 w-3.5" /> Import JSON
-                      </Button>
-                      <Button size="sm" onClick={() => addPageToCanvas(stockPages[0])} className="gap-1.5 rounded-lg">
-                        <Plus className="h-3.5 w-3.5" /> Add Home Page
-                      </Button>
-                    </div>
+                    <Button variant="outline" size="sm" onClick={importJSON} className="gap-1.5">
+                      <FileUp className="h-3.5 w-3.5" /> Import Existing JSON
+                    </Button>
                   </div>
                 </div>
               )}
@@ -991,21 +713,21 @@ const NavigationMaker = () => {
 
             {/* Minimap */}
             {showMinimap && nodes.length > 0 && (
-              <div className="absolute bottom-4 left-4 w-44 h-28 bg-white/95 dark:bg-card/90 backdrop-blur border border-neutral-200 dark:border-border rounded-xl overflow-hidden z-20 shadow-sm">
-                <div className="absolute top-1.5 right-1.5 z-10">
-                  <button onClick={() => setShowMinimap(false)} className="text-neutral-400 hover:text-foreground">
+              <div className="absolute bottom-3 left-3 w-40 h-24 bg-card/90 backdrop-blur border border-border rounded-lg overflow-hidden z-20">
+                <div className="absolute top-1 right-1">
+                  <button onClick={() => setShowMinimap(false)} className="text-muted-foreground hover:text-foreground">
                     <Minimize2 className="h-3 w-3" />
                   </button>
                 </div>
-                <svg className="w-full h-full" viewBox={`0 0 ${1400 * minimapScale} ${900 * minimapScale}`}>
+                <svg className="w-full h-full" viewBox={`0 0 ${1200 * minimapScale} ${800 * minimapScale}`}>
                   {minimapNodes.map((n, i) => (
-                    <rect key={i} x={n.x} y={n.y} width={n.w} height={n.h} rx={2} fill={n.isNone ? "#6366f1" : n.color} opacity={0.5} />
+                    <rect key={i} x={n.x} y={n.y} width={n.w} height={n.h} rx={1} fill={n.isNone ? "hsl(var(--muted-foreground))" : n.color} opacity={0.6} />
                   ))}
                 </svg>
               </div>
             )}
             {!showMinimap && nodes.length > 0 && (
-              <button onClick={() => setShowMinimap(true)} className="absolute bottom-4 left-4 z-20 px-3 py-1.5 text-[10px] bg-white dark:bg-card border border-neutral-200 dark:border-border rounded-lg text-muted-foreground hover:text-foreground shadow-sm">
+              <button onClick={() => setShowMinimap(true)} className="absolute bottom-3 left-3 z-20 px-2 py-1 text-[10px] bg-card border border-border rounded-md text-muted-foreground hover:text-foreground">
                 Minimap
               </button>
             )}
@@ -1013,112 +735,81 @@ const NavigationMaker = () => {
 
           {/* Right Panel — Node Details */}
           {selectedNodeData && (
-            <aside className="w-72 border-l border-neutral-200 dark:border-border/40 bg-white dark:bg-card/50 flex flex-col shrink-0 hidden lg:flex">
-              <div className="p-5 border-b border-neutral-100 dark:border-border/40">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-semibold text-foreground">Page Details</p>
-                  <button onClick={() => setSelectedNode(null)} className="text-muted-foreground hover:text-foreground">
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-                <p className="text-[11px] text-muted-foreground mt-1">{selectedNodeData.label}</p>
+            <aside className="w-64 border-l border-border/40 bg-card/50 flex flex-col shrink-0 hidden lg:flex">
+              <div className="p-4 border-b border-border/40">
+                <p className="text-xs font-medium text-foreground mb-1">Page Details</p>
+                <p className="text-[10px] text-muted-foreground">{selectedNodeData.label}</p>
               </div>
-              <ScrollArea className="flex-1">
-                <div className="p-5 space-y-5">
-                  {/* Label */}
-                  <div>
-                    <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5">Label</label>
-                    <Input value={selectedNodeData.label} onChange={e => updateNodeMeta(selectedNodeData.id, { label: e.target.value })} className="h-9 text-xs rounded-lg" />
-                  </div>
+              <div className="p-4 space-y-4 flex-1 overflow-auto">
+                {/* Label */}
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Label</label>
+                  <Input value={selectedNodeData.label} onChange={e => updateNodeMeta(selectedNodeData.id, { label: e.target.value })} className="h-8 text-xs mt-1" />
+                </div>
 
-                  {/* Page Type */}
-                  <div>
-                    <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5">Page Type</label>
-                    <Select value={selectedNodeData.pageType || "Content"} onValueChange={(v) => updateNodeMeta(selectedNodeData.id, { pageType: v as PageType })}>
-                      <SelectTrigger className="h-9 text-xs rounded-lg"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {pageTypes.map(t => <SelectItem key={t} value={t} className="text-xs">{t}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                {/* Page Type */}
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Page Type</label>
+                  <Select value={selectedNodeData.pageType || "Content"} onValueChange={(v) => updateNodeMeta(selectedNodeData.id, { pageType: v as PageType })}>
+                    <SelectTrigger className="h-8 text-xs mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {pageTypes.map(t => <SelectItem key={t} value={t} className="text-xs">{t}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  {/* Slug */}
-                  <div>
-                    <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5">Slug</label>
-                    <Input value={selectedNodeData.slug || ""} onChange={e => updateNodeMeta(selectedNodeData.id, { slug: e.target.value })} className="h-9 text-xs rounded-lg font-mono" placeholder="/page-slug" />
-                  </div>
+                {/* Slug */}
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Slug</label>
+                  <Input value={selectedNodeData.slug || ""} onChange={e => updateNodeMeta(selectedNodeData.id, { slug: e.target.value })} className="h-8 text-xs mt-1 font-mono" placeholder="/page-slug" />
+                </div>
 
-                  {/* Description */}
-                  <div>
-                    <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5">Description</label>
-                    <textarea
-                      value={selectedNodeData.description || ""}
-                      onChange={e => updateNodeMeta(selectedNodeData.id, { description: e.target.value })}
-                      className="w-full h-20 px-3 py-2 text-xs bg-background border border-input rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring"
-                      placeholder="Brief page description..."
-                    />
-                  </div>
+                {/* Description */}
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Description</label>
+                  <textarea
+                    value={selectedNodeData.description || ""}
+                    onChange={e => updateNodeMeta(selectedNodeData.id, { description: e.target.value })}
+                    className="w-full h-16 mt-1 px-2 py-1.5 text-xs bg-background border border-input rounded-md resize-none focus:outline-none focus:ring-1 focus:ring-ring"
+                    placeholder="Brief page description..."
+                  />
+                </div>
 
-                  {/* Color Tag */}
-                  <div>
-                    <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-2">Color Tag</label>
-                    <div className="flex gap-2 flex-wrap">
-                      {colorTags.map(ct => (
-                        <button
-                          key={ct.value}
-                          onClick={() => updateNodeMeta(selectedNodeData.id, { colorTag: ct.value })}
-                          className={cn(
-                            "w-7 h-7 rounded-lg border-2 transition-all hover:scale-110",
-                            selectedNodeData.colorTag === ct.value ? "border-foreground scale-110 shadow-sm" : "border-transparent"
-                          )}
-                          style={{ backgroundColor: ct.value === "none" ? "hsl(var(--muted))" : ct.color }}
-                          title={ct.label}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Tags */}
-                  <div>
-                    <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5">Tags</label>
-                    <Input
-                      value={(selectedNodeData.tags || []).join(", ")}
-                      onChange={e => updateNodeMeta(selectedNodeData.id, { tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean) })}
-                      className="h-9 text-xs rounded-lg"
-                      placeholder="tag1, tag2, ..."
-                    />
-                  </div>
-
-                  {/* Sections */}
-                  <div>
-                    <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-2">Page Sections</label>
-                    <div className="space-y-1.5">
-                      {(selectedNodeData.sections || []).map(section => (
-                        <div key={section.id} className="flex items-center gap-2 px-2.5 py-1.5 bg-neutral-50 dark:bg-muted/30 rounded-lg">
-                          <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: section.color }} />
-                          <span className="text-xs text-foreground flex-1">{section.label}</span>
-                          <button onClick={() => removeSectionFromNode(selectedNodeData.id, section.id)}>
-                            <X className="h-3 w-3 text-neutral-400 hover:text-red-500" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setAddingSectionTo(selectedNodeData.id)}
-                      className="mt-2 h-7 text-[10px] gap-1 w-full justify-start"
-                    >
-                      <Plus className="h-3 w-3" /> Add Section
-                    </Button>
+                {/* Color Tag */}
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Color Tag</label>
+                  <div className="flex gap-1.5 mt-1.5 flex-wrap">
+                    {colorTags.map(ct => (
+                      <button
+                        key={ct.value}
+                        onClick={() => updateNodeMeta(selectedNodeData.id, { colorTag: ct.value })}
+                        className={cn(
+                          "w-6 h-6 rounded-full border-2 transition-transform hover:scale-110",
+                          selectedNodeData.colorTag === ct.value ? "border-foreground scale-110" : "border-transparent"
+                        )}
+                        style={{ backgroundColor: ct.value === "none" ? "hsl(var(--muted))" : ct.color }}
+                        title={ct.label}
+                      />
+                    ))}
                   </div>
                 </div>
-              </ScrollArea>
+
+                {/* Tags */}
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Tags</label>
+                  <Input
+                    value={(selectedNodeData.tags || []).join(", ")}
+                    onChange={e => updateNodeMeta(selectedNodeData.id, { tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean) })}
+                    className="h-8 text-xs mt-1"
+                    placeholder="tag1, tag2, ..."
+                  />
+                </div>
+              </div>
             </aside>
           )}
 
           {/* Mobile page list */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-card/90 backdrop-blur-xl border-t border-neutral-200 dark:border-border z-40">
+          <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-xl border-t border-border z-40">
             <ScrollArea className="h-48">
               <div className="p-3 grid grid-cols-3 gap-2">
                 {stockPages.slice(0, 30).map(page => {
@@ -1127,7 +818,7 @@ const NavigationMaker = () => {
                     <button
                       key={page.id}
                       onClick={() => addPageToCanvas(page)}
-                      className="flex flex-col items-center gap-1 p-2.5 rounded-xl text-[10px] bg-neutral-50 dark:bg-muted/30 hover:bg-neutral-100 dark:hover:bg-muted/60 active:scale-95 transition-all"
+                      className="flex flex-col items-center gap-1 p-2 rounded-lg text-[10px] bg-muted/30 hover:bg-muted/60 active:scale-95 transition-all"
                     >
                       <Icon className="h-4 w-4" />
                       <span className="truncate w-full text-center">{page.label}</span>
