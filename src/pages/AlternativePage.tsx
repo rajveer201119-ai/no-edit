@@ -50,7 +50,6 @@ const AlternativePage = () => {
         title={page.metaTitle}
         description={page.metaDescription}
         keywords={page.keywords}
-        canonicalUrl={`${baseUrl}/alternatives/${page.slug}`}
         structuredData={combinedSchema}
       />
 

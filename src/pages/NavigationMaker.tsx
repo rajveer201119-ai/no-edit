@@ -695,10 +695,9 @@ const NavigationMaker = () => {
   return (
     <>
       <SEO
-        title="Website Navigation Maker — Plan Your Site Structure | EPIC"
-        description="Drag-and-drop website navigation builder. Plan your site's page flow, create sitemaps, and download navigation maps. 50+ stock page templates."
+        title="Website Navigation Maker — Plan Site Structure | EPIC"
+        description="Drag-and-drop navigation builder. Plan page flow, create sitemaps, and export navigation maps. 50+ page templates."
         keywords="website navigation maker, sitemap builder, page flow designer, website structure planner, drag and drop navigation"
-        canonicalUrl="https://no-edit.lovable.app/navigation-maker"
       />
 
       <div className="min-h-screen bg-[#f8f9fb] dark:bg-background">

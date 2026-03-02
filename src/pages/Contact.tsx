@@ -20,10 +20,9 @@ const Contact = () => {
   return (
     <>
       <SEO
-        title="Contact Us — EPIC Design Platform"
-        description="Get in touch with the EPIC team. We're here to help with support, feedback, and partnership inquiries."
+        title="Contact Us — EPIC Design"
+        description="Get in touch with EPIC. We help with support, feedback, and partnership inquiries."
         keywords="contact EPIC, EPIC support, design tool help, EPIC feedback"
-        canonicalUrl={`${baseUrl}/contact`}
         structuredData={contactSchema}
       />
       <div className="min-h-screen bg-background">

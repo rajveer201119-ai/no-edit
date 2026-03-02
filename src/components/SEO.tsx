@@ -18,8 +18,8 @@ const baseUrl = "https://no-edit.lovable.app";
 export { baseUrl };
 
 export const SEO = ({
-  title = "EPIC — AI Design Generator | Create Professional Graphics Instantly",
-  description = "Create stunning posters, logos, social media graphics, YouTube thumbnails, and more in seconds. No design skills needed. Free to use.",
+  title = "EPIC — AI Design Generator | Free Graphics Tool",
+  description = "Create posters, logos, social media graphics, and thumbnails in seconds. No design skills needed. Free to use.",
   keywords = "AI design generator, logo maker, poster creator, YouTube thumbnail maker, Instagram post creator, social media graphics, free design tool, AI graphics, canva alternative",
   canonicalUrl,
   ogImage = defaultOgImage,

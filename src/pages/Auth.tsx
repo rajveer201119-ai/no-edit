@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { SEO } from "@/components/SEO";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -33,7 +34,7 @@ const Auth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Sign in or Sign up - EPIC";
+    // title managed by SEO component
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) navigate("/");
@@ -94,6 +95,8 @@ const Auth = () => {
   };
 
   return (
+    <>
+    <SEO title="Sign In — EPIC Design" description="Sign in or create a free EPIC account." noIndex />
     <main className="min-h-screen flex items-center justify-center px-4">
       <Card className="w-full max-w-md p-6 space-y-6">
         <header>
@@ -172,6 +175,7 @@ const Auth = () => {
         </form>
       </Card>
     </main>
+    </>
   );
 };
 
