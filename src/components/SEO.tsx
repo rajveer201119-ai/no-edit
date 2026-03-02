@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useLocation } from "react-router-dom";
 
 interface SEOProps {
   title?: string;
@@ -20,12 +21,14 @@ export const SEO = ({
   title = "EPIC — AI Design Generator | Create Professional Graphics Instantly",
   description = "Create stunning posters, logos, social media graphics, YouTube thumbnails, and more in seconds. No design skills needed. Free to use.",
   keywords = "AI design generator, logo maker, poster creator, YouTube thumbnail maker, Instagram post creator, social media graphics, free design tool, AI graphics, canva alternative",
-  canonicalUrl = baseUrl,
+  canonicalUrl,
   ogImage = defaultOgImage,
   ogType = "website",
   structuredData,
   noIndex = false,
 }: SEOProps) => {
+  const location = useLocation();
+  const resolvedCanonical = canonicalUrl || `${baseUrl}${location.pathname}`;
   const fullTitle = title.includes("EPIC") ? title : `${title} | EPIC Design`;
 
   return (
@@ -35,7 +38,7 @@ export const SEO = ({
       <meta name="title" content={fullTitle} />
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
-      <link rel="canonical" href={canonicalUrl} />
+      <link rel="canonical" href={resolvedCanonical} />
       
       {/* Mobile & PWA */}
       <meta name="theme-color" content="#8B5CF6" />
@@ -47,7 +50,7 @@ export const SEO = ({
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={ogType} />
-      <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:url" content={resolvedCanonical} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImage} />
@@ -56,7 +59,7 @@ export const SEO = ({
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content={canonicalUrl} />
+      <meta name="twitter:url" content={resolvedCanonical} />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
