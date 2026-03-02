@@ -26,10 +26,9 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SEO
-        title="EPIC Blog — Website Flow, UX Design & Design Tips"
-        description="Learn about website user flows, visual sitemaps, UX navigation, SaaS design, and graphic design. Actionable guides and tutorials from EPIC."
+        title="EPIC Blog — UX Design & Design Tips"
+        description="Learn about website user flows, visual sitemaps, UX navigation, and design. Actionable guides from EPIC."
         keywords="website flow blog, UX design blog, website planning guide, design tips, sitemap guide"
-        canonicalUrl={`${baseUrl}/blog`}
       />
 
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/20">

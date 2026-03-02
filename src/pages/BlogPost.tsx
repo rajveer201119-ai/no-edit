@@ -54,7 +54,6 @@ const BlogPostPage = () => {
         title={post.metaTitle}
         description={post.metaDescription}
         keywords={post.keywords}
-        canonicalUrl={`${baseUrl}/blog/${post.slug}`}
         structuredData={combinedSchema}
       />
 

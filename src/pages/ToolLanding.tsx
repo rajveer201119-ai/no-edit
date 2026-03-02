@@ -239,8 +239,8 @@ const toolPages: Record<string, ToolPage> = {
   "invitation-maker": {
     slug: "invitation-maker",
     title: "Invitation Maker",
-    metaTitle: "Free Invitation Maker Online — Create Beautiful Invites | EPIC",
-    metaDescription: "Design stunning wedding, birthday, and event invitations online for free. Professional templates, easy editing, instant download. No design skills needed.",
+    metaTitle: "Free Invitation Maker — Beautiful Invites | EPIC",
+    metaDescription: "Design wedding, birthday, and event invitations online for free. Professional templates, easy editing, instant download.",
     h1: "Free Online Invitation Maker",
     subtitle: "Create beautiful invitations for weddings, birthdays, baby showers, and any event — in minutes.",
     keywords: "invitation maker, free invitation creator, wedding invitation design, birthday invite maker, event invitation template",
@@ -263,8 +263,8 @@ const toolPages: Record<string, ToolPage> = {
   "banner-maker": {
     slug: "banner-maker",
     title: "Banner Maker",
-    metaTitle: "Free Banner Maker Online — Create Web & Social Banners | EPIC",
-    metaDescription: "Design eye-catching banners for websites, social media, and ads. Professional templates, multiple sizes, instant download. Free to use.",
+    metaTitle: "Free Banner Maker — Web & Social Banners | EPIC",
+    metaDescription: "Design banners for websites, social media, and ads. Professional templates, multiple sizes, instant download.",
     h1: "Free Online Banner Maker",
     subtitle: "Create professional banners for websites, social media ads, and promotions with beautiful templates.",
     keywords: "banner maker, free banner creator, web banner design, social media banner, ad banner maker, YouTube banner",
@@ -286,8 +286,8 @@ const toolPages: Record<string, ToolPage> = {
   "website-navigation-maker": {
     slug: "website-navigation-maker",
     title: "Website Navigation Maker",
-    metaTitle: "Free Website Navigation Maker — Plan Site Structure | EPIC",
-    metaDescription: "Drag-and-drop website navigation builder. Plan your site's page flow, create sitemaps, and download navigation maps. 50+ stock page templates included.",
+    metaTitle: "Free Website Navigation Maker — Plan Site | EPIC",
+    metaDescription: "Drag-and-drop website navigation builder. Plan page flow, create sitemaps, and export navigation maps. 50+ templates.",
     h1: "Free Website Navigation Maker",
     subtitle: "Plan your website structure with a visual drag-and-drop builder. Add pages, connect flows, and export your sitemap.",
     keywords: "website navigation maker, sitemap builder, page flow designer, website structure planner, drag and drop navigation, site architecture tool",

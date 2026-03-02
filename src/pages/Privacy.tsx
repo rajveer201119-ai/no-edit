@@ -12,10 +12,9 @@ const Privacy = () => {
   return (
     <>
       <SEO
-        title="Privacy Policy — EPIC Design Platform"
-        description="Read EPIC's privacy policy. Learn how we collect, use, and protect your data when you use our free design platform."
+        title="Privacy Policy — EPIC Design"
+        description="EPIC's privacy policy. How we collect, use, and protect your data on our free design platform."
         keywords="EPIC privacy policy, data protection, design tool privacy"
-        canonicalUrl={`${baseUrl}/privacy`}
       />
       <div className="min-h-screen bg-background">
         <header className="border-b border-border">

@@ -10,22 +10,21 @@ const Terms = () => {
   const termsSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Terms & Conditions - EPIC AI Image Generator",
-    "description": "Terms and conditions for using EPIC AI Image Generator. Learn about user accounts, content usage, intellectual property, and AI-generated content disclaimer.",
-    "url": "https://epic-ai-generator.lovable.app/terms",
+    "name": "Terms & Conditions — EPIC Design",
+    "description": "Terms and conditions for using EPIC Design platform.",
+    "url": "https://no-edit.lovable.app/terms",
     "publisher": {
       "@type": "Organization",
-      "name": "NO BOX"
+      "name": "EPIC Design"
     }
   };
 
   return (
     <>
       <SEO 
-        title="Terms & Conditions - EPIC AI Image Generator"
-        description="Read the terms and conditions for EPIC AI Image Generator. Learn about user accounts, content usage, intellectual property rights, and AI-generated content guidelines."
+        title="Terms & Conditions — EPIC Design"
+        description="Terms and conditions for EPIC Design. User accounts, content usage, intellectual property, and AI content guidelines."
         keywords="EPIC terms, AI image generator terms, terms of service, user agreement, content policy"
-        canonicalUrl="https://epic-ai-generator.lovable.app/terms"
         structuredData={termsSchema}
       />
       <div className="min-h-screen bg-background">

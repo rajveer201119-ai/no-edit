@@ -26,9 +26,8 @@ const About = () => {
     <>
       <SEO
         title="About EPIC — Free AI Design Platform"
-        description="Learn about EPIC, the free AI design platform built to democratize design. Create professional posters, logos, and graphics without any design experience."
+        description="Learn about EPIC, the free AI design platform. Create professional posters, logos, and graphics without design experience."
         keywords="about EPIC, EPIC design platform, free design tool, AI design generator"
-        canonicalUrl={`${baseUrl}/about`}
         structuredData={aboutSchema}
       />
       <div className="min-h-screen bg-background">

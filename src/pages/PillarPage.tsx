@@ -56,7 +56,6 @@ const PillarPage = () => {
         title={page.metaTitle}
         description={page.metaDescription}
         keywords={page.keywords}
-        canonicalUrl={`${baseUrl}/${page.slug}`}
         structuredData={combinedSchema}
       />
 
