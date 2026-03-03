@@ -36,6 +36,7 @@ import {
 import { useExportCanvas } from "@/components/platform/editor/useExportCanvas";
 import { Layer, CanvasState } from "@/components/platform/editor/types";
 import { BlankCanvasModal } from "@/components/platform/editor/BlankCanvasModal";
+import { OnboardingOverlay } from "@/components/OnboardingOverlay";
 
 // State to pass loaded canvas directly to workspace
 
@@ -635,6 +636,9 @@ const Index = () => {
              toast.success(`Blank ${label} canvas ready!`);
            }}
          />
+
+         {/* Onboarding for first-time visitors */}
+         {showHomepage && <OnboardingOverlay />}
       </div>
     </>
   );
