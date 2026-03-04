@@ -249,6 +249,7 @@ const NavigationMaker = () => {
   const [showMinimap, setShowMinimap] = useState(true);
   const [addingSectionTo, setAddingSectionTo] = useState<string | null>(null);
   const [isAuthed, setIsAuthed] = useState(false);
+  const [showUXScore, setShowUXScore] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const { canExportJSON } = useUserPlan();
 
