@@ -133,10 +133,12 @@ export const CanvasWorkspace = ({
     onCanRedo?.(canRedo);
   }, [canUndo, canRedo, onCanUndo, onCanRedo]);
 
-  // Convert template to layers on load
+  // Convert template to layers on load — clear localStorage to prevent stale state overriding template
   useEffect(() => {
     if (template) {
       setIsLoading(true);
+      // Clear saved state so it doesn't override the template being loaded
+      localStorage.removeItem("epic_project_state");
       
       // If template has no elements, it's a "loaded design" - 
       // Force-load from localStorage directly
