@@ -514,6 +514,62 @@ export const CanvasRenderer = ({
 
       case "shape": {
         const shapeLayer = layer as ShapeLayer;
+        const hasGradientFill = shapeLayer.fillColor && shapeLayer.fillColor.includes("gradient");
+        
+        // For shapes with CSS gradient fills, use div-based rendering since SVG fill can't handle CSS gradients
+        if (hasGradientFill && (shapeLayer.shapeType === "rectangle" || !shapeLayer.shapeType)) {
+          return (
+            <div
+              key={layer.id}
+              className={cn(
+                "cursor-move",
+                isSelected && "ring-2 ring-primary ring-offset-1"
+              )}
+              style={{
+                ...baseStyle,
+                background: shapeLayer.fillColor,
+                borderRadius: shapeLayer.borderRadius ? shapeLayer.borderRadius * scale : 0,
+                border: shapeLayer.strokeWidth > 0 ? `${shapeLayer.strokeWidth * scale}px solid ${shapeLayer.strokeColor}` : undefined,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onLayerSelect(layer.id);
+              }}
+              onMouseDown={(e) => handleDragStart(layer.id, e)}
+              onTouchStart={(e) => handleDragStart(layer.id, e)}
+            >
+              {isSelected && !layer.locked && renderResizeHandles(layer)}
+            </div>
+          );
+        }
+
+        // For shapes with CSS gradient fills and circle shape, use div with border-radius 50%
+        if (hasGradientFill && shapeLayer.shapeType === "circle") {
+          return (
+            <div
+              key={layer.id}
+              className={cn(
+                "cursor-move",
+                isSelected && "ring-2 ring-primary ring-offset-1"
+              )}
+              style={{
+                ...baseStyle,
+                background: shapeLayer.fillColor,
+                borderRadius: "50%",
+                border: shapeLayer.strokeWidth > 0 ? `${shapeLayer.strokeWidth * scale}px solid ${shapeLayer.strokeColor}` : undefined,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onLayerSelect(layer.id);
+              }}
+              onMouseDown={(e) => handleDragStart(layer.id, e)}
+              onTouchStart={(e) => handleDragStart(layer.id, e)}
+            >
+              {isSelected && !layer.locked && renderResizeHandles(layer)}
+            </div>
+          );
+        }
+
         return (
           <div
             key={layer.id}
