@@ -3,6 +3,7 @@ import epicLogo from "@/assets/epic-logo.png";
 import logoLovable from "@/assets/logo-lovable.png";
 import logoSupabase from "@/assets/logo-supabase.jpg";
 import logoGoogle from "@/assets/logo-google.png";
+import logoChatGPT from "@/assets/logo-chatgpt.png";
 import {
   Layers, Download, Type, Image, Layout, Wand2, Star, ArrowRight,
   Network, CheckCircle, FileJson, GitBranch, MousePointerClick, Grip,
@@ -28,9 +29,11 @@ const partnerLogos = [
   { src: logoLovable, alt: "Lovable", h: "h-7" },
   { src: logoSupabase, alt: "Supabase", h: "h-6" },
   { src: logoGoogle, alt: "Google", h: "h-7" },
+  { src: logoChatGPT, alt: "ChatGPT", h: "h-7" },
   { src: logoLovable, alt: "Lovable", h: "h-7" },
   { src: logoSupabase, alt: "Supabase", h: "h-6" },
   { src: logoGoogle, alt: "Google", h: "h-7" },
+  { src: logoChatGPT, alt: "ChatGPT", h: "h-7" },
 ];
 
 /* ── Testimonials ── */
@@ -121,6 +124,15 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           }} variant="outline" size="lg"
             className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
             <Play className="h-4 w-4" /> See Live Demo
+          </Button>
+        </motion.div>
+
+        {/* Start Designing CTA */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.5 }}
+          className="mt-3 relative z-20">
+          <Button onClick={onStartDesigning} variant="outline" size="lg"
+            className="gap-2 min-w-[200px] min-h-[48px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
+            <Layers className="h-4 w-4" /> Start Designing
           </Button>
         </motion.div>
 

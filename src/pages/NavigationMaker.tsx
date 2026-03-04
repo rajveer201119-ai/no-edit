@@ -19,12 +19,13 @@ import {
   Newspaper, Rocket, Scale, Scissors, Send,
   FileJson, Crown, Undo2, Redo2, FileUp, Minimize2,
   ChevronDown, Circle, X, MoreHorizontal, Type, Layout, Code, Paintbrush, 
-  MousePointer, Eye
+  MousePointer, Eye, TrendingUp
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { UXScorePanel } from "@/components/UXScorePanel";
 import { CreatorModePaywall } from "@/components/CreatorModePaywall";
 import {
   Select,
@@ -248,6 +249,7 @@ const NavigationMaker = () => {
   const [showMinimap, setShowMinimap] = useState(true);
   const [addingSectionTo, setAddingSectionTo] = useState<string | null>(null);
   const [isAuthed, setIsAuthed] = useState(false);
+  const [showUXScore, setShowUXScore] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const { canExportJSON } = useUserPlan();
 
@@ -737,6 +739,15 @@ const NavigationMaker = () => {
           )}
 
           <div className="flex items-center gap-2">
+            <Button
+              variant={showUXScore ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setShowUXScore(!showUXScore)}
+              className="gap-1.5 h-8 text-xs rounded-lg"
+              title="UX Score"
+            >
+              <TrendingUp className="h-3.5 w-3.5" /> UX Score
+            </Button>
             <Button variant="ghost" size="sm" onClick={importJSON} className="gap-1.5 h-8 text-xs rounded-lg hover:bg-neutral-100 dark:hover:bg-muted/50">
               <FileUp className="h-3.5 w-3.5" /> Import
             </Button>
@@ -807,6 +818,8 @@ const NavigationMaker = () => {
 
           {/* Canvas */}
           <div className="flex-1 relative overflow-auto" style={{ background: "radial-gradient(circle, #e5e7eb 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
+            {/* UX Score Panel */}
+            <UXScorePanel nodes={nodes} connections={connections} visible={showUXScore} onClose={() => setShowUXScore(false)} />
             <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px]">
               {/* SVG Connections — Curved Bezier lines */}
               <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0">
