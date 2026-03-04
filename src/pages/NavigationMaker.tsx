@@ -739,6 +739,15 @@ const NavigationMaker = () => {
           )}
 
           <div className="flex items-center gap-2">
+            <Button
+              variant={showUXScore ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setShowUXScore(!showUXScore)}
+              className="gap-1.5 h-8 text-xs rounded-lg"
+              title="UX Score"
+            >
+              <TrendingUp className="h-3.5 w-3.5" /> UX Score
+            </Button>
             <Button variant="ghost" size="sm" onClick={importJSON} className="gap-1.5 h-8 text-xs rounded-lg hover:bg-neutral-100 dark:hover:bg-muted/50">
               <FileUp className="h-3.5 w-3.5" /> Import
             </Button>
