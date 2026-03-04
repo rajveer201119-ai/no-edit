@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { UXScorePanel } from "@/components/UXScorePanel";
 import { CreatorModePaywall } from "@/components/CreatorModePaywall";
 import {
   Select,
