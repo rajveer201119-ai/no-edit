@@ -19,7 +19,7 @@ import {
   Newspaper, Rocket, Scale, Scissors, Send,
   FileJson, Crown, Undo2, Redo2, FileUp, Minimize2,
   ChevronDown, Circle, X, MoreHorizontal, Type, Layout, Code, Paintbrush, 
-  MousePointer, Eye
+  MousePointer, Eye, TrendingUp
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
