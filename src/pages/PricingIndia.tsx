@@ -31,6 +31,13 @@ const PricingIndia = () => {
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
   };
 
+  const handleEmailClick = () => {
+    const planLabel = selectedPlan === "pro" ? "Pro Lifetime (₹299)" : "Student Helper (₹10/month)";
+    const subject = encodeURIComponent(`EPIC ${planLabel} Upgrade Request`);
+    const body = encodeURIComponent(`Hi,\n\nI would like to upgrade to EPIC ${planLabel}.\n\nMy account email: [your EPIC account email]\n\nI have made the payment via UPI. Please activate my access.\n\nThank you!`);
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=rajveer201119@gmail.com&su=${subject}&body=${body}`, "_blank");
+  };
+
   const paymentAmount = selectedPlan === "pro" ? "₹299" : "₹10";
 
   return (
