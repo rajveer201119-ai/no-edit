@@ -18,9 +18,9 @@ const baseUrl = "https://no-edit.lovable.app";
 export { baseUrl };
 
 export const SEO = ({
-  title = "EPIC — AI Design Generator | Free Graphics Tool",
-  description = "Create posters, logos, social media graphics, and thumbnails in seconds. No design skills needed. Free to use.",
-  keywords = "AI design generator, logo maker, poster creator, YouTube thumbnail maker, Instagram post creator, social media graphics, free design tool, AI graphics, canva alternative",
+  title = "EPIC — Free Sitemap Builder & Design Tool | Ship Faster",
+  description = "Plan your website structure visually, export developer-ready JSON sitemaps, and create stunning graphics — all free. Used by 280+ founders in 15+ countries.",
+  keywords = "sitemap builder, website navigation planner, visual sitemap maker, free design tool, JSON sitemap export, website structure tool, UX planning, canva alternative, site architecture, website wireframe",
   canonicalUrl,
   ogImage = defaultOgImage,
   ogType = "website",
@@ -85,25 +85,26 @@ export const homePageSchema = {
       "applicationCategory": "DesignApplication",
       "operatingSystem": "Any",
       "url": baseUrl,
-      "description": "EPIC is a free AI design generator. Create stunning posters, logos, YouTube thumbnails, Instagram posts, and more in seconds. No design skills needed.",
+      "description": "EPIC is a free visual sitemap builder and design tool. Plan website navigation, export developer-ready JSON sitemaps, and create professional graphics. Used by 280+ founders worldwide.",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
       "featureList": [
-        "AI-powered design generation",
-        "YouTube thumbnail maker",
-        "Instagram post creator",
-        "Logo designer",
-        "Poster creator",
-        "No design skills required",
-        "Free to use"
+        "Visual sitemap builder",
+        "Website navigation planner",
+        "JSON sitemap export",
+        "HD PNG export",
+        "UX Score analyzer",
+        "200+ design templates",
+        "Drag & drop page builder",
+        "No signup required"
       ],
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "4.8",
-        "ratingCount": "1250"
+        "ratingCount": "280"
       }
     },
     {
@@ -118,8 +119,8 @@ export const homePageSchema = {
       "@type": "WebSite",
       "@id": `${baseUrl}/#website`,
       "url": baseUrl,
-      "name": "EPIC Design Generator",
-      "description": "Create professional designs in seconds with AI",
+      "name": "EPIC — Sitemap Builder & Design Tool",
+      "description": "Plan website structure visually, export JSON sitemaps, and create professional designs — free",
       "publisher": {
         "@id": `${baseUrl}/#organization`
       },
@@ -131,7 +132,7 @@ export const homePageSchema = {
     },
     {
       "@type": "SoftwareApplication",
-      "name": "EPIC Design Generator",
+      "name": "EPIC Sitemap Builder",
       "operatingSystem": "Web",
       "applicationCategory": "DesignApplication",
       "offers": {

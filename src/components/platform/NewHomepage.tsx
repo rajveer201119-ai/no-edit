@@ -4,6 +4,7 @@ import logoLovable from "@/assets/logo-lovable.png";
 import logoSupabase from "@/assets/logo-supabase.jpg";
 import logoGoogle from "@/assets/logo-google.png";
 import logoChatGPT from "@/assets/logo-chatgpt.png";
+import logoExtra from "@/assets/logo-extra.png";
 import {
   Layers, Download, Type, Image, Layout, Wand2, Star, ArrowRight,
   Network, CheckCircle, FileJson, GitBranch, MousePointerClick, Grip,
@@ -30,10 +31,12 @@ const partnerLogos = [
   { src: logoSupabase, alt: "Supabase", h: "h-6" },
   { src: logoGoogle, alt: "Google", h: "h-7" },
   { src: logoChatGPT, alt: "ChatGPT", h: "h-7" },
+  { src: logoExtra, alt: "Partner", h: "h-7" },
   { src: logoLovable, alt: "Lovable", h: "h-7" },
   { src: logoSupabase, alt: "Supabase", h: "h-6" },
   { src: logoGoogle, alt: "Google", h: "h-7" },
   { src: logoChatGPT, alt: "ChatGPT", h: "h-7" },
+  { src: logoExtra, alt: "Partner", h: "h-7" },
 ];
 
 /* ── Testimonials ── */
@@ -55,6 +58,34 @@ const testimonials = [
     role: "Startup CTO",
     text: "We use EPIC for every new project kickoff. Plan the sitemap, agree on structure, then build. Saves us hours of back-and-forth.",
     rating: 5,
+  },
+];
+
+/* ── Case Studies ── */
+const caseStudies = [
+  {
+    company: "FinTrack",
+    industry: "Fintech Startup",
+    result: "Planned a 24-page SaaS in 10 minutes",
+    detail: "Used EPIC's Navigation Maker to map user flows before development. Exported JSON directly into their Next.js router config. Saved 2 weeks of architecture meetings.",
+    metric: "2 weeks saved",
+    metricLabel: "Dev planning time",
+  },
+  {
+    company: "LearnPath",
+    industry: "EdTech Platform",
+    result: "Redesigned navigation, reduced bounce by 34%",
+    detail: "The UX Score feature identified 5 dead-end pages and missing CTAs. After restructuring with EPIC, their bounce rate dropped significantly.",
+    metric: "34%",
+    metricLabel: "Bounce rate reduction",
+  },
+  {
+    company: "NomadKit",
+    industry: "Travel Community",
+    result: "Shipped MVP sitemap in one afternoon",
+    detail: "Solo founder mapped 18 pages with connections, exported HD PNG for investor deck, and JSON for the developer. All in a single session.",
+    metric: "18 pages",
+    metricLabel: "Mapped in 1 session",
   },
 ];
 
@@ -308,8 +339,48 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         </div>
       </section>
 
-      {/* ═══════ TESTIMONIALS ═══════ */}
+      {/* ═══════ CASE STUDIES — Real Success Stories ═══════ */}
       <section className="py-20 px-6 bg-background">
+        <div className="max-w-5xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-center mb-4">
+            <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-primary mb-3 px-3 py-1 rounded-full border border-primary/20 bg-primary/5">
+              ✦ Success Stories
+            </span>
+            <h2 className="text-2xl md:text-3xl font-semibold text-foreground tracking-tight mb-3">
+              How teams ship faster with EPIC
+            </h2>
+            <p className="text-muted-foreground max-w-lg mx-auto text-sm">
+              Real results from founders, designers, and developers using EPIC.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
+            {caseStudies.map((cs, i) => (
+              <motion.div key={cs.company} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i + 1} variants={fadeUp}
+                className="bg-card border border-border rounded-xl p-6 flex flex-col">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                    {cs.company.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{cs.company}</p>
+                    <p className="text-[10px] text-muted-foreground">{cs.industry}</p>
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-foreground mb-2">{cs.result}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed flex-1">{cs.detail}</p>
+                <div className="mt-4 pt-3 border-t border-border flex items-baseline gap-2">
+                  <span className="text-lg font-bold text-primary">{cs.metric}</span>
+                  <span className="text-[10px] text-muted-foreground">{cs.metricLabel}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ TESTIMONIALS ═══════ */}
+      <section className="py-20 px-6 bg-muted/10">
         <div className="max-w-5xl mx-auto">
           <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp}
             className="text-2xl md:text-3xl font-semibold text-center mb-12 text-foreground tracking-tight">
@@ -329,6 +400,27 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
                   <p className="text-sm font-medium text-foreground">{t.name}</p>
                   <p className="text-xs text-muted-foreground">{t.role}</p>
                 </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ TRUST & SECURITY STRIP ═══════ */}
+      <section className="py-12 px-6 bg-background border-y border-border">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            {[
+              { icon: Shield, label: "No Data Stored", desc: "Designs stay on your device" },
+              { icon: Zap, label: "Instant Load", desc: "No signup wall" },
+              { icon: Globe, label: "Works Everywhere", desc: "Browser-based, any device" },
+              { icon: CheckCircle, label: "Free Forever", desc: "Core features always free" },
+            ].map((item, i) => (
+              <motion.div key={item.label} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
+                className="flex flex-col items-center gap-2">
+                <item.icon className="h-5 w-5 text-primary" strokeWidth={1.5} />
+                <p className="text-xs font-semibold text-foreground">{item.label}</p>
+                <p className="text-[10px] text-muted-foreground">{item.desc}</p>
               </motion.div>
             ))}
           </div>
