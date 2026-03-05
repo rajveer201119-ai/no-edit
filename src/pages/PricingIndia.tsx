@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check, Crown, Zap, Shield, MessageCircle, User, X, Star } from "lucide-react";
+import { Check, Crown, Zap, Shield, MessageCircle, User, X, Star, Mail } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +29,13 @@ const PricingIndia = () => {
     const planLabel = selectedPlan === "pro" ? "Pro Lifetime (₹299)" : "Student Helper (₹10/month)";
     const message = encodeURIComponent(`Hi, I want to upgrade to EPIC ${planLabel}. I have made the payment.`);
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
+  };
+
+  const handleEmailClick = () => {
+    const planLabel = selectedPlan === "pro" ? "Pro Lifetime (₹299)" : "Student Helper (₹10/month)";
+    const subject = encodeURIComponent(`EPIC ${planLabel} Upgrade Request`);
+    const body = encodeURIComponent(`Hi,\n\nI would like to upgrade to EPIC ${planLabel}.\n\nMy account email: [your EPIC account email]\n\nI have made the payment via UPI. Please activate my access.\n\nThank you!`);
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=rajveer201119@gmail.com&su=${subject}&body=${body}`, "_blank");
   };
 
   const paymentAmount = selectedPlan === "pro" ? "₹299" : "₹10";
@@ -257,11 +264,16 @@ const PricingIndia = () => {
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm text-primary">2</div>
                   <div className="flex-1">
-                    <h4 className="font-semibold mb-2 text-foreground">Send Screenshot on WhatsApp</h4>
-                    <p className="text-sm text-muted-foreground mb-3">The founder will personally activate your access:</p>
-                    <Button onClick={handleWhatsAppClick} className="w-full gradient-epic hover:opacity-90">
-                      <MessageCircle className="mr-2 h-4 w-4" /> Message on WhatsApp
-                    </Button>
+                    <h4 className="font-semibold mb-2 text-foreground">Send Screenshot & Confirm</h4>
+                    <p className="text-sm text-muted-foreground mb-3">Message the founder to activate your access:</p>
+                    <div className="flex gap-2">
+                      <Button onClick={handleWhatsAppClick} className="flex-1 gradient-epic hover:opacity-90">
+                        <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
+                      </Button>
+                      <Button onClick={handleEmailClick} variant="outline" className="flex-1 border-border/50">
+                        <Mail className="mr-2 h-4 w-4" /> Email
+                      </Button>
+                    </div>
                     <p className="text-xs text-muted-foreground mt-2 text-center">+91 8638910252</p>
                   </div>
                 </div>
