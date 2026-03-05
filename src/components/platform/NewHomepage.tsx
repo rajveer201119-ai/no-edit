@@ -3,6 +3,7 @@ import epicLogo from "@/assets/epic-logo.png";
 import logoLovable from "@/assets/logo-lovable.png";
 import logoSupabase from "@/assets/logo-supabase.jpg";
 import logoGoogle from "@/assets/logo-google.png";
+import logoChatGPT from "@/assets/logo-chatgpt.png";
 import logoExtra from "@/assets/logo-extra.png";
 import {
   Layers, Download, Type, Image, Layout, Wand2, Star, ArrowRight,
