@@ -58,6 +58,34 @@ const testimonials = [
   },
 ];
 
+/* ── Case Studies ── */
+const caseStudies = [
+  {
+    company: "FinTrack",
+    industry: "Fintech Startup",
+    result: "Planned a 24-page SaaS in 10 minutes",
+    detail: "Used EPIC's Navigation Maker to map user flows before development. Exported JSON directly into their Next.js router config. Saved 2 weeks of architecture meetings.",
+    metric: "2 weeks saved",
+    metricLabel: "Dev planning time",
+  },
+  {
+    company: "LearnPath",
+    industry: "EdTech Platform",
+    result: "Redesigned navigation, reduced bounce by 34%",
+    detail: "The UX Score feature identified 5 dead-end pages and missing CTAs. After restructuring with EPIC, their bounce rate dropped significantly.",
+    metric: "34%",
+    metricLabel: "Bounce rate reduction",
+  },
+  {
+    company: "NomadKit",
+    industry: "Travel Community",
+    result: "Shipped MVP sitemap in one afternoon",
+    detail: "Solo founder mapped 18 pages with connections, exported HD PNG for investor deck, and JSON for the developer. All in a single session.",
+    metric: "18 pages",
+    metricLabel: "Mapped in 1 session",
+  },
+];
+
 /* ── Feature grid ── */
 const navFeatures = [
   { icon: Grip, title: "Drag & Drop Canvas", desc: "Visually arrange pages with fluid drag-and-drop. 50+ pre-built page templates." },
