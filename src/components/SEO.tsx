@@ -18,9 +18,9 @@ const baseUrl = "https://no-edit.lovable.app";
 export { baseUrl };
 
 export const SEO = ({
-  title = "EPIC — AI Design Generator | Free Graphics Tool",
-  description = "Create posters, logos, social media graphics, and thumbnails in seconds. No design skills needed. Free to use.",
-  keywords = "AI design generator, logo maker, poster creator, YouTube thumbnail maker, Instagram post creator, social media graphics, free design tool, AI graphics, canva alternative",
+  title = "EPIC — Free Sitemap Builder & Design Tool | Ship Faster",
+  description = "Plan your website structure visually, export developer-ready JSON sitemaps, and create stunning graphics — all free. Used by 280+ founders in 15+ countries.",
+  keywords = "sitemap builder, website navigation planner, visual sitemap maker, free design tool, JSON sitemap export, website structure tool, UX planning, canva alternative, site architecture, website wireframe",
   canonicalUrl,
   ogImage = defaultOgImage,
   ogType = "website",
