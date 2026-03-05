@@ -31,10 +31,12 @@ const partnerLogos = [
   { src: logoSupabase, alt: "Supabase", h: "h-6" },
   { src: logoGoogle, alt: "Google", h: "h-7" },
   { src: logoChatGPT, alt: "ChatGPT", h: "h-7" },
+  { src: logoExtra, alt: "Partner", h: "h-7" },
   { src: logoLovable, alt: "Lovable", h: "h-7" },
   { src: logoSupabase, alt: "Supabase", h: "h-6" },
   { src: logoGoogle, alt: "Google", h: "h-7" },
   { src: logoChatGPT, alt: "ChatGPT", h: "h-7" },
+  { src: logoExtra, alt: "Partner", h: "h-7" },
 ];
 
 /* ── Testimonials ── */
