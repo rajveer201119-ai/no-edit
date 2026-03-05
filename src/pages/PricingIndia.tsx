@@ -264,11 +264,16 @@ const PricingIndia = () => {
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm text-primary">2</div>
                   <div className="flex-1">
-                    <h4 className="font-semibold mb-2 text-foreground">Send Screenshot on WhatsApp</h4>
-                    <p className="text-sm text-muted-foreground mb-3">The founder will personally activate your access:</p>
-                    <Button onClick={handleWhatsAppClick} className="w-full gradient-epic hover:opacity-90">
-                      <MessageCircle className="mr-2 h-4 w-4" /> Message on WhatsApp
-                    </Button>
+                    <h4 className="font-semibold mb-2 text-foreground">Send Screenshot & Confirm</h4>
+                    <p className="text-sm text-muted-foreground mb-3">Message the founder to activate your access:</p>
+                    <div className="flex gap-2">
+                      <Button onClick={handleWhatsAppClick} className="flex-1 gradient-epic hover:opacity-90">
+                        <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
+                      </Button>
+                      <Button onClick={handleEmailClick} variant="outline" className="flex-1 border-border/50">
+                        <Mail className="mr-2 h-4 w-4" /> Email
+                      </Button>
+                    </div>
                     <p className="text-xs text-muted-foreground mt-2 text-center">+91 8638910252</p>
                   </div>
                 </div>

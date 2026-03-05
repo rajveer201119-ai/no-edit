@@ -637,8 +637,7 @@ const Index = () => {
            }}
          />
 
-         {/* Onboarding for first-time visitors */}
-         {showHomepage && <OnboardingOverlay />}
+          {/* Onboarding overlay removed for cleaner funnel */}
       </div>
     </>
   );
