@@ -36,7 +36,7 @@ import {
 import { useExportCanvas } from "@/components/platform/editor/useExportCanvas";
 import { Layer, CanvasState } from "@/components/platform/editor/types";
 import { BlankCanvasModal } from "@/components/platform/editor/BlankCanvasModal";
-import { OnboardingOverlay } from "@/components/OnboardingOverlay";
+// OnboardingOverlay removed — cleaner funnel: signup → create → pay
 
 // State to pass loaded canvas directly to workspace
 

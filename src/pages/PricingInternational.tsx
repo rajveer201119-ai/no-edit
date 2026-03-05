@@ -25,11 +25,10 @@ const PricingInternational = () => {
   };
 
   const handleEmailClick = () => {
-    const email = "rajveer201119@gmail.com";
     const planLabel = selectedPlan === "pro" ? "Pro Lifetime ($5)" : "Student Helper ($1/month)";
     const subject = encodeURIComponent(`EPIC ${planLabel} Upgrade Request`);
-    const body = encodeURIComponent(`Hi,\n\nI would like to upgrade to EPIC ${planLabel}.\n\nPlease let me know the payment details.\n\nThank you!`);
-    window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
+    const body = encodeURIComponent(`Hi,\n\nI would like to upgrade to EPIC ${planLabel}.\n\nMy account email: [your EPIC account email]\n\nPlease share the payment details so I can complete the upgrade.\n\nThank you!`);
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=rajveer201119@gmail.com&su=${subject}&body=${body}`, "_blank");
   };
 
   return (

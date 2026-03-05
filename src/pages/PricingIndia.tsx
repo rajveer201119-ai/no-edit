@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check, Crown, Zap, Shield, MessageCircle, User, X, Star } from "lucide-react";
+import { Check, Crown, Zap, Shield, MessageCircle, User, X, Star, Mail } from "lucide-react";
 import {
   Dialog,
   DialogContent,
