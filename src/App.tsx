@@ -26,6 +26,9 @@ import Roadmap from "./pages/Roadmap";
 import Examples from "./pages/Examples";
 import AlternativePage from "./pages/AlternativePage";
 import BlogCategory from "./pages/BlogCategory";
+import WebsiteAnalyzer from "./pages/WebsiteAnalyzer";
+import PublicSitemap from "./pages/PublicSitemap";
+import SitemapLibrary from "./pages/SitemapLibrary";
 
 const queryClient = new QueryClient();
 
