@@ -20,11 +20,8 @@ const signInPasswordSchema = z.string()
   .min(1, "Password is required");
 
 const signUpPasswordSchema = z.string()
-  .min(8, "Password must be at least 8 characters")
-  .max(128, "Password too long")
-  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-  .regex(/[0-9]/, "Password must contain at least one number");
+  .min(6, "Password must be at least 6 characters")
+  .max(128, "Password too long");
 
 const Auth = () => {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
