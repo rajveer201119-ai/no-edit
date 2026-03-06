@@ -305,6 +305,63 @@ export type Database = {
         }
         Relationships: []
       }
+      published_sitemaps: {
+        Row: {
+          created_at: string
+          description: string | null
+          domain: string
+          id: string
+          is_seed: boolean
+          largest_cluster: string | null
+          largest_cluster_size: number | null
+          max_depth: number
+          orphan_pages: number | null
+          published_by: string | null
+          sitemap_data: Json
+          slug: string
+          title: string
+          top_level_sections: number
+          total_pages: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          domain: string
+          id?: string
+          is_seed?: boolean
+          largest_cluster?: string | null
+          largest_cluster_size?: number | null
+          max_depth?: number
+          orphan_pages?: number | null
+          published_by?: string | null
+          sitemap_data?: Json
+          slug: string
+          title: string
+          top_level_sections?: number
+          total_pages?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          domain?: string
+          id?: string
+          is_seed?: boolean
+          largest_cluster?: string | null
+          largest_cluster_size?: number | null
+          max_depth?: number
+          orphan_pages?: number | null
+          published_by?: string | null
+          sitemap_data?: Json
+          slug?: string
+          title?: string
+          top_level_sections?: number
+          total_pages?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
