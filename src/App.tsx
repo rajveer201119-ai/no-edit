@@ -60,6 +60,9 @@ const App = () => (
               <Route path="/roadmap" element={<Roadmap />} />
               <Route path="/examples" element={<Examples />} />
               <Route path="/alternatives/:slug" element={<AlternativePage />} />
+              <Route path="/analyzer" element={<WebsiteAnalyzer />} />
+              <Route path="/sitemaps" element={<SitemapLibrary />} />
+              <Route path="/sitemap/:slug" element={<PublicSitemap />} />
               <Route path="/:slug" element={<PillarPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
