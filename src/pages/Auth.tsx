@@ -136,6 +136,7 @@ const Auth = () => {
               required
               placeholder="••••••••"
               minLength={6}
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
