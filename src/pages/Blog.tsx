@@ -138,6 +138,7 @@ const Blog = () => {
         </section>
       </div>
 
+      <BackToTop />
       <Footer />
     </div>
   );

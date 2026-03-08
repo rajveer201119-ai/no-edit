@@ -169,6 +169,7 @@ const BlogPostPage = () => {
         </section>
       </article>
 
+      <BackToTop />
       <Footer />
     </div>
   );
