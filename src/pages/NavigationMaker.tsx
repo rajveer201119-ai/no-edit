@@ -1622,6 +1622,12 @@ const NavigationMaker = () => {
                       <SheetTitle className="text-sm font-semibold">{mobileEditNodeData.label}</SheetTitle>
                       <div className="flex gap-2">
                         <button
+                          onClick={() => { duplicateNode(mobileEditNodeData.id); setMobileNodeEditId(null); }}
+                          className="h-8 w-8 rounded-lg bg-neutral-100 dark:bg-muted/50 text-muted-foreground flex items-center justify-center"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </button>
+                        <button
                           onClick={() => { setConnectingFrom(mobileEditNodeData.id); setMobileNodeEditId(null); toast.info("Tap another node to connect"); }}
                           className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center"
                         >
