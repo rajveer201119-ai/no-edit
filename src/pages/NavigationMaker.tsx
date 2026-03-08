@@ -497,10 +497,10 @@ const NavigationMaker = () => {
     // Place unvisited nodes
     nodes.forEach(n => {
       if (!visited.has(n.id)) {
-        const level = (levelCounts.size || 0);
-        const idx = levelCounts.get(level) || 0;
-        levelCounts.set(level, idx + 1);
-        levels.set(n.id, { level, index: idx });
+        const level = Object.keys(levelCounts).length;
+        const idx = levelCounts[level] || 0;
+        levelCounts[level] = idx + 1;
+        levels[n.id] = { level, index: idx };
       }
     });
     
