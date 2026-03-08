@@ -20,7 +20,7 @@ import {
   Newspaper, Rocket, Scale, Scissors, Send,
   FileJson, Crown, Undo2, Redo2, FileUp, Minimize2,
   ChevronDown, Circle, X, MoreHorizontal, Type, Layout, Code, Paintbrush, 
-  MousePointer, Eye, TrendingUp, Share2, Save, FolderOpen
+  MousePointer, Eye, TrendingUp, Share2, Save, FolderOpen, Menu
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // ====== STOCK PAGES ======
 const stockPages = [
@@ -790,19 +797,19 @@ const NavigationMaker = () => {
 
       <div className="min-h-screen bg-[#f8f9fb] dark:bg-background">
         {/* Top Bar */}
-        <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-white/90 dark:bg-card/90 backdrop-blur-xl border-b border-neutral-200 dark:border-border/40 flex items-center px-5 gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="h-9 w-9 rounded-lg">
+        <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-white/90 dark:bg-card/90 backdrop-blur-xl border-b border-neutral-200 dark:border-border/40 flex items-center px-3 md:px-5 gap-2 md:gap-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="h-9 w-9 rounded-lg shrink-0">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <span className="text-sm">🏗</span>
-            <h1 className="text-sm font-semibold text-foreground truncate max-w-[180px]">{currentProjectName}</h1>
+            <h1 className="text-sm font-semibold text-foreground truncate max-w-[100px] md:max-w-[180px]">{currentProjectName}</h1>
           </div>
           
           <div className="flex-1" />
 
-          {/* Undo/Redo */}
-          <div className="flex items-center gap-1 bg-neutral-100 dark:bg-muted/50 rounded-lg p-1">
+          {/* Undo/Redo — always visible */}
+          <div className="flex items-center gap-1 bg-neutral-100 dark:bg-muted/50 rounded-lg p-1 shrink-0">
             <Button variant="ghost" size="icon" onClick={undo} disabled={historyIndex <= 0} className="h-7 w-7 rounded-md" title="Undo (⌘Z)">
               <Undo2 className="h-3.5 w-3.5" />
             </Button>
@@ -812,7 +819,7 @@ const NavigationMaker = () => {
           </div>
 
           {connectingFrom && (
-            <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg">
+            <div className="hidden md:flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg">
               <Input 
                 placeholder="Link label..." 
                 value={connectionLabel}
@@ -824,7 +831,8 @@ const NavigationMaker = () => {
             </div>
           )}
 
-          <div className="flex items-center gap-2">
+          {/* Desktop action buttons — hidden on mobile */}
+          <div className="hidden md:flex items-center gap-2">
             <Button
               variant={showUXScore ? "default" : "ghost"}
               size="sm"
@@ -874,6 +882,57 @@ const NavigationMaker = () => {
               <Download className="h-3.5 w-3.5" /> Export PNG
               {!isAuthed && <Lock className="h-3 w-3" />}
             </Button>
+          </div>
+
+          {/* Mobile action menu — visible only on mobile */}
+          <div className="flex md:hidden items-center gap-1 shrink-0">
+            <Button size="sm" onClick={exportNavigation} className="gap-1 h-8 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 px-2.5">
+              <Download className="h-3.5 w-3.5" /> PNG
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg">
+                  <Menu className="h-4.5 w-4.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => setShowUXScore(!showUXScore)}>
+                  <TrendingUp className="h-4 w-4 mr-2" /> UX Score
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={saveProject} disabled={savingProject}>
+                  <Save className="h-4 w-4 mr-2" /> {savingProject ? "Saving..." : currentProjectId ? "Save" : "Save As"}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/my-projects")}>
+                  <FolderOpen className="h-4 w-4 mr-2" /> Projects
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={importJSON}>
+                  <FileUp className="h-4 w-4 mr-2" /> Import JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => exportJSON("generic")}>
+                  <FileJson className="h-4 w-4 mr-2" /> Export JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={async () => {
+                  if (!isAuthed) { toast.error("Please sign in to share your sitemap"); navigate("/auth"); return; }
+                  if (nodes.length === 0) { toast.error("Add some pages first!"); return; }
+                  const shareId = Math.random().toString(36).slice(2, 9).toUpperCase();
+                  const { error } = await supabase.from("shared_sitemaps" as any).insert({
+                    id: shareId,
+                    title: "AI Product Sitemap",
+                    nodes: JSON.parse(JSON.stringify(nodes)),
+                    connections: JSON.parse(JSON.stringify(connections)),
+                    created_by: (await supabase.auth.getUser()).data.user?.id,
+                  } as any);
+                  if (error) { toast.error("Failed to share sitemap"); console.error(error); return; }
+                  const url = `${window.location.origin}/shared/${shareId}`;
+                  await navigator.clipboard.writeText(url);
+                  toast.success("Share link copied to clipboard!", { description: url });
+                }}>
+                  <Share2 className="h-4 w-4 mr-2" /> Share Link
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
