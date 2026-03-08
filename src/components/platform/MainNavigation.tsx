@@ -142,6 +142,20 @@ export const MainNavigation = ({
 
           <div className="hidden md:flex items-center gap-2 shrink-0">
             <button
+              onClick={() => navigate("/analyzer")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[0.625rem] text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors duration-200"
+            >
+              <Globe className="h-3.5 w-3.5" />
+              Analyzer
+            </button>
+            <button
+              onClick={() => navigate("/sitemaps")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[0.625rem] text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors duration-200"
+            >
+              <Library className="h-3.5 w-3.5" />
+              Sitemaps
+            </button>
+            <button
               onClick={() => navigate("/navigation-maker")}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-[0.625rem] text-xs font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 transition-colors duration-200"
             >
