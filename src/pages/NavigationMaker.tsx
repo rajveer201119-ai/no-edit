@@ -468,19 +468,19 @@ const NavigationMaker = () => {
   // ====== AUTO-LAYOUT (BFS tree) ======
   const autoLayout = useCallback(() => {
     if (nodes.length === 0) return;
-    const childrenMap = new Map<string, string[]>();
+    const childrenMap: Record<string, string[]> = {};
     const hasIncoming = new Set<string>();
     connections.forEach(c => {
       hasIncoming.add(c.toId);
-      if (!childrenMap.has(c.fromId)) childrenMap.set(c.fromId, []);
-      childrenMap.get(c.fromId)!.push(c.toId);
+      if (!childrenMap[c.fromId]) childrenMap[c.fromId] = [];
+      childrenMap[c.fromId].push(c.toId);
     });
     const roots = nodes.filter(n => !hasIncoming.has(n.id));
     if (roots.length === 0) roots.push(nodes[0]);
     
-    const levels = new Map<string, { level: number; index: number }>();
-    const levelCounts = new Map<number, number>();
-    const queue = roots.map((r, i) => ({ id: r.id, level: 0 }));
+    const levels: Record<string, { level: number; index: number }> = {};
+    const levelCounts: Record<number, number> = {};
+    const queue = roots.map((r) => ({ id: r.id, level: 0 }));
     const visited = new Set<string>();
     
     // BFS
@@ -488,10 +488,10 @@ const NavigationMaker = () => {
       const { id, level } = queue.shift()!;
       if (visited.has(id)) continue;
       visited.add(id);
-      const idx = levelCounts.get(level) || 0;
-      levelCounts.set(level, idx + 1);
-      levels.set(id, { level, index: idx });
-      const children = childrenMap.get(id) || [];
+      const idx = levelCounts[level] || 0;
+      levelCounts[level] = idx + 1;
+      levels[id] = { level, index: idx };
+      const children = childrenMap[id] || [];
       children.forEach(cid => { if (!visited.has(cid)) queue.push({ id: cid, level: level + 1 }); });
     }
     // Place unvisited nodes
