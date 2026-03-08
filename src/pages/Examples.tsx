@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Network, ArrowRight, Layout, ShoppingCart, BookOpen, Briefcase, GraduationCap, Smartphone } from "lucide-react";
 
@@ -34,6 +35,8 @@ const Examples = () => {
           </Button>
         </div>
       </header>
+
+      <Breadcrumbs items={[{ label: "Examples" }]} />
 
       <section className="py-16 md:py-20">
         <div className="container mx-auto px-4 max-w-5xl">

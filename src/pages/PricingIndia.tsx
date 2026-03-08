@@ -49,6 +49,11 @@ const PricingIndia = () => {
         canonicalUrl="https://no-edit.lovable.app/pricing-india"
         ogType="product"
         structuredData={pricingPageSchema("INR", 10)}
+        hreflang={[
+          { lang: "en-IN", href: "https://no-edit.lovable.app/pricing-india" },
+          { lang: "en", href: "https://no-edit.lovable.app/pricing-international" },
+          { lang: "x-default", href: "https://no-edit.lovable.app/pricing-international" },
+        ]}
       />
       <div className="min-h-screen bg-background relative">
         <WebGLShader />

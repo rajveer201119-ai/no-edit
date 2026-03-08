@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Network, CheckCircle2, Clock, CircleDot } from "lucide-react";
 
@@ -44,6 +45,8 @@ const Roadmap = () => {
           </Button>
         </div>
       </header>
+
+      <Breadcrumbs items={[{ label: "Roadmap" }]} />
 
       <section className="py-16 md:py-20">
         <div className="container mx-auto px-4 max-w-3xl">

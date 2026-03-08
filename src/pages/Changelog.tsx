@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Network, Sparkles, Zap, Palette, Layout, Image } from "lucide-react";
 
@@ -36,6 +37,8 @@ const Changelog = () => {
           </Button>
         </div>
       </header>
+
+      <Breadcrumbs items={[{ label: "Changelog" }]} />
 
       <section className="py-16 md:py-20">
         <div className="container mx-auto px-4 max-w-3xl">
