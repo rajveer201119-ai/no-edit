@@ -125,7 +125,11 @@ export const homePageSchema = {
       "name": "EPIC Design",
       "url": baseUrl,
       "logo": "https://storage.googleapis.com/gpt-engineer-file-uploads/kG5hIp7FM3biSpv5njI7csuUQ6O2/uploads/1759212272541-file_00000000100c61faa64c1df9bb0aebc8.png",
-      "sameAs": []
+      "sameAs": [
+        "https://x.com/epicdesigngen",
+        "https://instagram.com/epicdesigngen",
+        "https://linkedin.com/company/epicdesigngen"
+      ]
     },
     {
       "@type": "WebSite",

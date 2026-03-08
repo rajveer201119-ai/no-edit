@@ -110,10 +110,9 @@ export const Footer = () => {
           </p>
           
           <nav className="flex gap-4" aria-label="Social Media Links">
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" aria-label="Follow us on Twitter"><Twitter size={24} /></a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" aria-label="Follow us on Instagram"><Instagram size={24} /></a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" aria-label="Connect with us on LinkedIn"><Linkedin size={24} /></a>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" aria-label="Visit our GitHub"><Github size={24} /></a>
+            <a href="https://x.com/epicdesigngen" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" aria-label="Follow EPIC Design on X (Twitter)"><Twitter size={24} /></a>
+            <a href="https://instagram.com/epicdesigngen" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" aria-label="Follow EPIC Design on Instagram"><Instagram size={24} /></a>
+            <a href="https://linkedin.com/company/epicdesigngen" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" aria-label="Connect with EPIC Design on LinkedIn"><Linkedin size={24} /></a>
           </nav>
         </div>
       </div>

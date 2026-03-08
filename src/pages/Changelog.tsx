@@ -38,6 +38,8 @@ const Changelog = () => {
         </div>
       </header>
 
+      <Breadcrumbs items={[{ label: "Changelog" }]} />
+
       <section className="py-16 md:py-20">
         <div className="container mx-auto px-4 max-w-3xl">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Changelog</h1>
