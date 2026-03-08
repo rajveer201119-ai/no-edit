@@ -814,6 +814,7 @@ const NavigationMaker = () => {
         tags: n.tags || [],
         colorTag: n.colorTag || "none",
         sections: (n.sections || []).map(s => ({ label: s.label, color: s.color })),
+        notes: n.notes || "",
         children: [] as any[],
       };
     });
