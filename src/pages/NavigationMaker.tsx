@@ -636,7 +636,12 @@ const NavigationMaker = () => {
     };
   }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
 
-  const handleNodeClick = (nodeId: string) => {
+  const handleNodeClick = (nodeId: string, e?: React.MouseEvent) => {
+    // Multi-select with Shift+Click
+    if (e?.shiftKey) {
+      toggleMultiSelect(nodeId);
+      return;
+    }
     if (connectingFrom) {
       if (connectingFrom === nodeId) { setConnectingFrom(null); return; }
       const exists = connections.find(c => 
@@ -656,6 +661,7 @@ const NavigationMaker = () => {
       setConnectionLabel("");
       toast.success("Connected!");
     } else {
+      setSelectedNodes(new Set());
       // On desktop, toggle right panel; on mobile, open bottom sheet
       if (isMobileRef.current) {
         setMobileNodeEditId(nodeId);
