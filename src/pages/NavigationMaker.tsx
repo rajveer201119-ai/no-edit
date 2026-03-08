@@ -1272,6 +1272,31 @@ const NavigationMaker = () => {
                       {/* Connection end dot */}
                       <circle cx={tx} cy={ty} r={4} fill="#93c5fd" />
                       <circle cx={fx} cy={fy} r={4} fill="#c4b5fd" />
+                      {/* Connection label */}
+                      {conn.label && (
+                        <g>
+                          <rect
+                            x={(fx + tx) / 2 - conn.label.length * 3 - 6}
+                            y={(fy + ty) / 2 - 9}
+                            width={conn.label.length * 6 + 12}
+                            height={18}
+                            rx={9}
+                            fill="white"
+                            stroke="#e5e7eb"
+                            strokeWidth={1}
+                            opacity={0.95}
+                          />
+                          <text
+                            x={(fx + tx) / 2}
+                            y={(fy + ty) / 2 + 3}
+                            textAnchor="middle"
+                            className="text-[9px] fill-muted-foreground"
+                            style={{ fontSize: "9px", fill: "#6b7280" }}
+                          >
+                            {conn.label}
+                          </text>
+                        </g>
+                      )}
                     </g>
                   );
                 })}
