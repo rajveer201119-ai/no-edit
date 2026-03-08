@@ -389,7 +389,6 @@ export const blogPosts: Record<string, BlogPostData> = {
     ],
     relatedArticles: ["ux-navigation-best-practices", "what-is-website-user-flow", "website-architecture-guide"],
   },
-  },
   "how-to-create-a-website-sitemap": {
     slug: "how-to-create-a-website-sitemap",
     metaTitle: "How to Create a Website Sitemap — Easy Guide 2026",
