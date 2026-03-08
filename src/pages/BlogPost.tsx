@@ -34,16 +34,29 @@ const BlogPostPage = () => {
     );
   }
 
+  const defaultOgImage = "https://storage.googleapis.com/gpt-engineer-file-uploads/ywM0UvtJ3VdIZjuQEJN3LrvvOCt2/social-images/social-1769532119034-download (1).jpeg";
+
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.h1,
     datePublished: post.publishDate,
     dateModified: post.lastModified || post.publishDate,
-    image: epicLogoUrl,
-    author: { "@type": "Organization", name: "EPIC Design" },
-    publisher: { "@type": "Organization", name: "EPIC Design", logo: { "@type": "ImageObject", url: epicLogoUrl } },
+    image: [
+      defaultOgImage,
+      epicLogoUrl,
+    ],
+    author: { "@type": "Organization", name: "EPIC Design", url: baseUrl },
+    publisher: {
+      "@type": "Organization",
+      name: "EPIC Design",
+      logo: { "@type": "ImageObject", url: epicLogoUrl, width: 256, height: 256 },
+    },
     mainEntityOfPage: { "@type": "WebPage", "@id": `${baseUrl}/blog/${post.slug}` },
+    description: post.metaDescription,
+    keywords: post.keywords,
+    articleSection: post.category,
+    wordCount: post.sections.reduce((acc, s) => acc + s.content.split(/\s+/).length, 0),
   };
 
   const combinedSchema = [articleSchema, faqSchema(post.faqs)];
