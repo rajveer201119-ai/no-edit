@@ -267,6 +267,8 @@ const NavigationMaker = () => {
   const [savingProject, setSavingProject] = useState(false);
   const [mobileLibraryOpen, setMobileLibraryOpen] = useState(false);
   const [mobileNodeEditId, setMobileNodeEditId] = useState<string | null>(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
   const svgRef = useRef<SVGSVGElement>(null);
   const isMobileRef = useRef(false);
   
