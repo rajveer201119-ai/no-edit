@@ -237,6 +237,7 @@ const getDefaultSections = (pageId: string): PageSection[] => {
 
 const NavigationMaker = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const canvasRef = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
@@ -251,8 +252,11 @@ const NavigationMaker = () => {
   const [addingSectionTo, setAddingSectionTo] = useState<string | null>(null);
   const [isAuthed, setIsAuthed] = useState(false);
   const [showUXScore, setShowUXScore] = useState(false);
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+  const [currentProjectName, setCurrentProjectName] = useState("AI Product Sitemap");
+  const [savingProject, setSavingProject] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
-  const { canExportJSON } = useUserPlan();
+  const { canExportJSON, isPremium, userId } = useUserPlan();
 
   // Check auth state for download gating
   useEffect(() => {
