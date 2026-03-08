@@ -1,5 +1,4 @@
 import { WebGLShader } from "@/components/ui/web-gl-shader";
-import epicLogo from "@/assets/epic-logo.png";
 import { Button } from "@/components/ui/button";
 
 const badges = [
