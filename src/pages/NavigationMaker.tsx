@@ -268,6 +268,77 @@ const NavigationMaker = () => {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  // Load project from URL param
+  useEffect(() => {
+    const projectId = searchParams.get("project");
+    if (!projectId) return;
+    const loadProject = async () => {
+      const { data } = await supabase
+        .from("sitemap_projects" as any)
+        .select("*")
+        .eq("id", projectId)
+        .maybeSingle();
+      if (data) {
+        const d = data as any;
+        const loadedNodes = Array.isArray(d.nodes) ? d.nodes : [];
+        const loadedConns = Array.isArray(d.connections) ? d.connections : [];
+        setNodes(loadedNodes);
+        setConnections(loadedConns);
+        setCurrentProjectId(d.id);
+        setCurrentProjectName(d.name || "Untitled Project");
+        setHistory([{ nodes: loadedNodes, connections: loadedConns }]);
+        setHistoryIndex(0);
+        toast.success(`Loaded "${d.name}"`);
+      }
+    };
+    loadProject();
+  }, [searchParams]);
+
+  // Save project handler
+  const saveProject = async () => {
+    if (!isAuthed || !userId) { toast.error("Please sign in to save projects"); navigate("/auth"); return; }
+    if (nodes.length === 0) { toast.error("Add some pages first!"); return; }
+    setSavingProject(true);
+    try {
+      if (currentProjectId) {
+        // Update existing
+        const { error } = await supabase.from("sitemap_projects" as any).update({
+          nodes: JSON.parse(JSON.stringify(nodes)),
+          connections: JSON.parse(JSON.stringify(connections)),
+          name: currentProjectName,
+        } as any).eq("id", currentProjectId);
+        if (error) throw error;
+        toast.success("Project saved!");
+      } else {
+        // Check limit
+        const { count } = await supabase.from("sitemap_projects" as any).select("id", { count: "exact", head: true }).eq("user_id", userId);
+        const limit = isPremium ? 999 : 3;
+        if ((count || 0) >= limit) {
+          toast.error(isPremium ? "Project limit reached" : "Free plan: 3 projects max. Upgrade to Pro for unlimited.");
+          setSavingProject(false);
+          return;
+        }
+        const name = prompt("Project name:", currentProjectName) || currentProjectName;
+        const { data, error } = await supabase.from("sitemap_projects" as any).insert({
+          user_id: userId,
+          name,
+          nodes: JSON.parse(JSON.stringify(nodes)),
+          connections: JSON.parse(JSON.stringify(connections)),
+        } as any).select().single();
+        if (error) throw error;
+        const d = data as any;
+        setCurrentProjectId(d.id);
+        setCurrentProjectName(name);
+        toast.success(`Project "${name}" saved!`);
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to save project");
+    } finally {
+      setSavingProject(false);
+    }
+  };
+
   // Undo/Redo
   const [history, setHistory] = useState<HistoryState[]>([{ nodes: [], connections: [] }]);
   const [historyIndex, setHistoryIndex] = useState(0);
