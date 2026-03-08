@@ -18,6 +18,19 @@ const categories = [
   { slug: "student-resources", label: "Student Resources" },
 ];
 
+const blogSchema = {
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  name: "EPIC Blog — UX Design & Design Tips",
+  description: "Learn about website user flows, visual sitemaps, UX navigation, and design. Actionable guides from EPIC.",
+  url: `${baseUrl}/blog`,
+  publisher: {
+    "@type": "Organization",
+    name: "EPIC Design",
+    url: baseUrl,
+  },
+};
+
 const Blog = () => {
   const navigate = useNavigate();
   const posts = Object.values(blogPosts).sort((a, b) => b.publishDate.localeCompare(a.publishDate));
@@ -29,6 +42,7 @@ const Blog = () => {
         title="EPIC Blog — UX Design & Design Tips"
         description="Learn about website user flows, visual sitemaps, UX navigation, and design. Actionable guides from EPIC."
         keywords="website flow blog, UX design blog, website planning guide, design tips, sitemap guide"
+        structuredData={blogSchema}
       />
 
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/20">

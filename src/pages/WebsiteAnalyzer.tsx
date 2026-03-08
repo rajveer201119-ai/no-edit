@@ -260,6 +260,16 @@ const WebsiteAnalyzer = () => {
       <SEO
         title="Website Structure Analyzer — Free Sitemap Tool | EPIC"
         description="Analyze any website's architecture with real crawl data. Get a visual sitemap, structure report, and UX insights with EPIC's free analyzer tool."
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "EPIC Website Structure Analyzer",
+          applicationCategory: "DesignApplication",
+          operatingSystem: "Web",
+          description: "Analyze any website's architecture with real crawl data. Get a visual sitemap, structure report, and UX insights.",
+          url: "https://no-edit.lovable.app/analyzer",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        }}
       />
       <MainNavigation
         activeTab="home"

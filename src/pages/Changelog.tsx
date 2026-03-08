@@ -18,6 +18,15 @@ const changelog = [
   { date: "Sep 2025", version: "1.0", title: "EPIC Launch", description: "Initial launch with AI image generation, basic editing tools, and PWA support. Zero-edit design philosophy.", icon: Zap, tag: "Launch" },
 ];
 
+const changelogSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Changelog — EPIC Design Updates & New Features",
+  description: "See what's new in EPIC. Latest features, improvements, and updates to the AI design generator and website navigation maker.",
+  url: `${baseUrl}/changelog`,
+  publisher: { "@type": "Organization", name: "EPIC Design", url: baseUrl },
+};
+
 const Changelog = () => {
   const navigate = useNavigate();
 
@@ -27,6 +36,7 @@ const Changelog = () => {
         title="Changelog — EPIC Design Updates & New Features"
         description="See what's new in EPIC. Latest features, improvements, and updates to the AI design generator and website navigation maker."
         canonicalUrl={`${baseUrl}/changelog`}
+        structuredData={changelogSchema}
       />
 
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/20">
