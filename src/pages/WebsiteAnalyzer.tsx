@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { seedSitemaps, type SitemapNode } from "@/data/seedSitemaps";
 import { Footer } from "@/components/Footer";
+import { MainNavigation, type MainTab } from "@/components/platform/MainNavigation";
 
 interface AnalysisReport {
   domain: string;
