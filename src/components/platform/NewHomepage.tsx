@@ -540,6 +540,38 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         </div>
       </section>
 
+      {/* ═══════ TOOLS STRIP ═══════ */}
+      <section className="py-16 px-6 bg-muted/20 border-t border-border">
+        <div className="max-w-5xl mx-auto">
+          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp}
+            className="text-2xl md:text-3xl font-semibold text-center mb-3 text-foreground tracking-tight">
+            Explore Our Tools
+          </motion.h2>
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp}
+            className="text-muted-foreground text-center mb-10 max-w-lg mx-auto text-sm">
+            Everything you need to plan, analyze, and build better websites.
+          </motion.p>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              { title: "Website Analyzer", desc: "Enter any domain and get a full architecture report with visual sitemap.", icon: Globe, href: "/analyzer" },
+              { title: "Sitemap Library", desc: "Browse visual sitemaps of 30+ popular websites for inspiration.", icon: Layout, href: "/sitemaps" },
+              { title: "Navigation Maker", desc: "Build your website's navigation structure visually and export as JSON.", icon: Network, href: "/navigation-maker" },
+            ].map((tool, i) => (
+              <motion.div key={tool.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
+                onClick={() => navigate(tool.href)}
+                className="group cursor-pointer bg-card border border-border rounded-xl p-6 hover:border-primary/30 hover:shadow-md transition-all duration-300">
+                <tool.icon className="h-6 w-6 text-primary mb-3" strokeWidth={1.5} />
+                <h3 className="text-sm font-semibold text-foreground mb-1.5">{tool.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-3">{tool.desc}</p>
+                <span className="text-xs font-medium text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Try it free <ArrowRight className="h-3 w-3" />
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ═══════ FINAL CTA ═══════ */}
       <section className="py-20 px-6 bg-background">
         <div className="max-w-2xl mx-auto text-center">
@@ -556,8 +588,8 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
             <Button onClick={() => navigate("/navigation-maker")} size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
               <Network className="h-4 w-4" /> Create Your Sitemap
             </Button>
-            <Button onClick={onStartDesigning} variant="outline" size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
-              Start Designing <ArrowRight className="h-4 w-4" />
+            <Button onClick={() => navigate("/analyzer")} variant="outline" size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
+              <Globe className="h-4 w-4" /> Analyze a Website
             </Button>
           </motion.div>
         </div>

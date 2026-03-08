@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Palette, Library, Menu, Home, Shield, Crown, Network } from "lucide-react";
+import { Palette, Library, Menu, Home, Shield, Crown, Network, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -97,6 +97,22 @@ export const MainNavigation = ({
           <div className="h-px bg-border my-2" />
 
           <button
+            onClick={() => { navigate("/analyzer"); setMobileMenuOpen(false); }}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium w-full text-left text-foreground hover:bg-muted"
+          >
+            <Globe className="h-4 w-4 flex-shrink-0" />
+            <span>Website Analyzer</span>
+          </button>
+
+          <button
+            onClick={() => { navigate("/sitemaps"); setMobileMenuOpen(false); }}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium w-full text-left text-foreground hover:bg-muted"
+          >
+            <Library className="h-4 w-4 flex-shrink-0" />
+            <span>Sitemap Library</span>
+          </button>
+
+          <button
             onClick={() => { navigate("/navigation-maker"); setMobileMenuOpen(false); }}
             className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium w-full text-left text-foreground hover:bg-muted border border-border"
           >
@@ -141,6 +157,20 @@ export const MainNavigation = ({
           <div className="md:hidden w-10 shrink-0" />
 
           <div className="hidden md:flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => navigate("/analyzer")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[0.625rem] text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors duration-200"
+            >
+              <Globe className="h-3.5 w-3.5" />
+              Analyzer
+            </button>
+            <button
+              onClick={() => navigate("/sitemaps")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[0.625rem] text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors duration-200"
+            >
+              <Library className="h-3.5 w-3.5" />
+              Sitemaps
+            </button>
             <button
               onClick={() => navigate("/navigation-maker")}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-[0.625rem] text-xs font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 transition-colors duration-200"
