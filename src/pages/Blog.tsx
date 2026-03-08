@@ -36,7 +36,11 @@ const blogSchema = {
 
 const Blog = () => {
   const navigate = useNavigate();
-  const posts = Object.values(blogPosts).sort((a, b) => b.publishDate.localeCompare(a.publishDate));
+  const [search, setSearch] = useState("");
+  const allPosts = Object.values(blogPosts).sort((a, b) => b.publishDate.localeCompare(a.publishDate));
+  const posts = search.trim()
+    ? allPosts.filter(p => p.h1.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase()) || p.metaDescription.toLowerCase().includes(search.toLowerCase()))
+    : allPosts;
   const pillars = Object.values(pillarPages);
 
   return (
