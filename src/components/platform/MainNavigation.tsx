@@ -157,7 +157,7 @@ export const MainNavigation = ({
           <div className="md:hidden w-10 shrink-0" />
 
           {/* Right actions — pr-40 reserves space for the fixed user menu overlay */}
-          <div className="hidden md:flex items-center gap-1.5 shrink-0 pr-40">
+          <div className="hidden md:flex items-center gap-1.5 shrink-0 pr-48">
             <button
               onClick={() => navigate("/analyzer")}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[0.625rem] text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors duration-200"
