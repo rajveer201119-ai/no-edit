@@ -4,6 +4,8 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown, ChevronUp, Calendar, Clock, Tag, Network } from "lucide-react";
+import { SocialShare } from "@/components/SocialShare";
+import { BackToTop } from "@/components/BackToTop";
 import { blogPosts } from "@/data/blogPosts";
 import { pillarPages } from "@/data/pillarPages";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -84,6 +86,9 @@ const BlogPostPage = () => {
             {post.lastModified && (
               <p className="text-xs text-muted-foreground mt-3">Last updated: {post.lastModified}</p>
             )}
+            <div className="mt-4">
+              <SocialShare url={`${baseUrl}/blog/${post.slug}`} title={post.h1} />
+            </div>
           </motion.div>
         </div>
       </section>
@@ -164,6 +169,7 @@ const BlogPostPage = () => {
         </section>
       </article>
 
+      <BackToTop />
       <Footer />
     </div>
   );

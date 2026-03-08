@@ -142,6 +142,35 @@ const Auth = () => {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Please wait..." : mode === "signin" ? "Sign in" : "Create account"}
           </Button>
+          {mode === "signin" && (
+            <div className="text-center">
+              <button
+                type="button"
+                className="text-sm text-primary hover:underline"
+                onClick={async () => {
+                  const emailVal = emailSchema.safeParse(email);
+                  if (!emailVal.success) {
+                    toast.error("Enter your email address first");
+                    return;
+                  }
+                  setLoading(true);
+                  try {
+                    const { error } = await supabase.auth.resetPasswordForEmail(emailVal.data.toLowerCase(), {
+                      redirectTo: `${window.location.origin}/reset-password`,
+                    });
+                    if (error) throw error;
+                    toast.success("Check your email for a password reset link.");
+                  } catch (err: any) {
+                    toast.error(err?.message || "Failed to send reset email");
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+              >
+                Forgot your password?
+              </button>
+            </div>
+          )}
           <div className="text-center text-sm text-muted-foreground">
             {mode === "signin" ? (
               <>

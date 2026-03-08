@@ -3,7 +3,10 @@ import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Calendar, Clock, Tag, ArrowRight, Network } from "lucide-react";
+import { Calendar, Clock, Tag, ArrowRight, Network, Search } from "lucide-react";
+import { useState } from "react";
+import { BackToTop } from "@/components/BackToTop";
+import { Input } from "@/components/ui/input";
 import { blogPosts } from "@/data/blogPosts";
 import { pillarPages } from "@/data/pillarPages";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -33,7 +36,11 @@ const blogSchema = {
 
 const Blog = () => {
   const navigate = useNavigate();
-  const posts = Object.values(blogPosts).sort((a, b) => b.publishDate.localeCompare(a.publishDate));
+  const [search, setSearch] = useState("");
+  const allPosts = Object.values(blogPosts).sort((a, b) => b.publishDate.localeCompare(a.publishDate));
+  const posts = search.trim()
+    ? allPosts.filter(p => p.h1.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase()) || p.metaDescription.toLowerCase().includes(search.toLowerCase()))
+    : allPosts;
   const pillars = Object.values(pillarPages);
 
   return (
@@ -68,6 +75,12 @@ const Blog = () => {
       </section>
 
       <div className="container mx-auto px-4 max-w-6xl">
+        {/* Search */}
+        <div className="max-w-md mx-auto mb-8 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search articles..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+        </div>
+
         {/* Category Filter */}
         <div className="flex flex-wrap gap-2 justify-center mb-10">
           {categories.map((c) => (
@@ -125,6 +138,7 @@ const Blog = () => {
         </section>
       </div>
 
+      <BackToTop />
       <Footer />
     </div>
   );
