@@ -566,7 +566,7 @@ const Index = () => {
         />
 
         {/* User Menu */}
-        <div className="fixed top-0 right-2 md:right-4 h-16 flex items-center z-50">
+        <div className="fixed top-0 right-2 md:right-4 h-14 flex items-center z-50">
           {renderUserMenu()}
         </div>
 
