@@ -815,6 +815,7 @@ const NavigationMaker = () => {
 
   // Selected node details
   const selectedNodeData = useMemo(() => nodes.find(n => n.id === selectedNode), [nodes, selectedNode]);
+  const mobileEditNodeData = useMemo(() => nodes.find(n => n.id === mobileNodeEditId), [nodes, mobileNodeEditId]);
 
   // Minimap calculations
   const minimapScale = 0.06;
