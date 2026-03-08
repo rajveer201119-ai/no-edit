@@ -461,6 +461,9 @@ const NavigationMaker = () => {
     updateNodeMeta(nodeId, { sections: newSections });
   };
 
+  // Track if a touch was a drag or a tap
+  const touchDraggedRef = useRef(false);
+
   const handleMouseDown = (e: React.MouseEvent, nodeId: string) => {
     e.stopPropagation();
     const node = nodes.find(n => n.id === nodeId);
@@ -468,6 +471,17 @@ const NavigationMaker = () => {
     const rect = canvasRef.current.getBoundingClientRect();
     setDraggingNode(nodeId);
     setDragOffset({ x: e.clientX - rect.left - node.x, y: e.clientY - rect.top - node.y });
+  };
+
+  const handleTouchStart = (e: React.TouchEvent, nodeId: string) => {
+    e.stopPropagation();
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node || !canvasRef.current) return;
+    const touch = e.touches[0];
+    const rect = canvasRef.current.getBoundingClientRect();
+    setDraggingNode(nodeId);
+    setDragOffset({ x: touch.clientX - rect.left - node.x, y: touch.clientY - rect.top - node.y });
+    touchDraggedRef.current = false;
   };
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -478,6 +492,17 @@ const NavigationMaker = () => {
     setNodes(prev => prev.map(n => n.id === draggingNode ? { ...n, x, y } : n));
   }, [draggingNode, dragOffset]);
 
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (!draggingNode || !canvasRef.current) return;
+    e.preventDefault(); // Prevent scrolling while dragging
+    touchDraggedRef.current = true;
+    const touch = e.touches[0];
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(rect.width - 180, touch.clientX - rect.left - dragOffset.x));
+    const y = Math.max(0, Math.min(rect.height - 60, touch.clientY - rect.top - dragOffset.y));
+    setNodes(prev => prev.map(n => n.id === draggingNode ? { ...n, x, y } : n));
+  }, [draggingNode, dragOffset]);
+
   const handleMouseUp = useCallback(() => {
     if (draggingNode) {
       pushHistory(nodes, connections);
@@ -485,14 +510,29 @@ const NavigationMaker = () => {
     setDraggingNode(null);
   }, [draggingNode, nodes, connections, pushHistory]);
 
+  const handleTouchEnd = useCallback(() => {
+    if (draggingNode) {
+      pushHistory(nodes, connections);
+      // If it was a tap (not dragged), open mobile edit sheet
+      if (!touchDraggedRef.current && isMobileRef.current) {
+        setMobileNodeEditId(draggingNode);
+      }
+    }
+    setDraggingNode(null);
+  }, [draggingNode, nodes, connections, pushHistory]);
+
   useEffect(() => {
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd);
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [handleMouseMove, handleMouseUp]);
+  }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
 
   const handleNodeClick = (nodeId: string) => {
     if (connectingFrom) {
@@ -514,7 +554,12 @@ const NavigationMaker = () => {
       setConnectionLabel("");
       toast.success("Connected!");
     } else {
-      setSelectedNode(nodeId === selectedNode ? null : nodeId);
+      // On desktop, toggle right panel; on mobile, open bottom sheet
+      if (isMobileRef.current) {
+        setMobileNodeEditId(nodeId);
+      } else {
+        setSelectedNode(nodeId === selectedNode ? null : nodeId);
+      }
     }
   };
 
