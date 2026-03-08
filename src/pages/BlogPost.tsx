@@ -46,7 +46,7 @@ const BlogPostPage = () => {
       defaultOgImage,
       epicLogoUrl,
     ],
-    author: { "@type": "Organization", name: "EPIC Design", url: baseUrl },
+    author: { "@type": "Person", name: "EPIC Design Team", url: baseUrl + "/about" },
     publisher: {
       "@type": "Organization",
       name: "EPIC Design",

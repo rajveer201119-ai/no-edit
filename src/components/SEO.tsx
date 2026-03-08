@@ -129,7 +129,13 @@ export const homePageSchema = {
         "https://x.com/epicdesigngen",
         "https://instagram.com/epicdesigngen",
         "https://linkedin.com/company/epicdesigngen"
-      ]
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "url": `${baseUrl}/contact`,
+        "availableLanguage": "English"
+      }
     },
     {
       "@type": "WebSite",

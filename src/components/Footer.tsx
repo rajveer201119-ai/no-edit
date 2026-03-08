@@ -69,6 +69,9 @@ export const Footer = () => {
               <li><Link to="/alternatives/miro-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Miro Alternative</Link></li>
               <li><Link to="/alternatives/lucidchart-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Lucidchart Alternative</Link></li>
               <li><Link to="/alternatives/adobe-express-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Adobe Express Alt.</Link></li>
+              <li><Link to="/alternatives/visme-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Visme Alternative</Link></li>
+              <li><Link to="/alternatives/crello-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Crello Alternative</Link></li>
+              <li><Link to="/alternatives/piktochart-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Piktochart Alternative</Link></li>
             </ul>
 
             <h4 className="text-lg font-semibold mb-3 mt-6">Blog</h4>
