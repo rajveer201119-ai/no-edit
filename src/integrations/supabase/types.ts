@@ -392,6 +392,36 @@ export type Database = {
         }
         Relationships: []
       }
+      sitemap_projects: {
+        Row: {
+          connections: Json
+          created_at: string
+          id: string
+          name: string
+          nodes: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connections?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          nodes?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connections?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          nodes?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
