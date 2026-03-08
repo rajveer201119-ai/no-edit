@@ -1499,9 +1499,14 @@ const NavigationMaker = () => {
               <div className="p-5 border-b border-neutral-100 dark:border-border/40">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-semibold text-foreground">Page Details</p>
-                  <button onClick={() => setSelectedNode(null)} className="text-muted-foreground hover:text-foreground">
-                    <X className="h-3.5 w-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button onClick={() => duplicateNode(selectedNodeData.id)} className="text-muted-foreground hover:text-foreground" title="Duplicate">
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                    <button onClick={() => setSelectedNode(null)} className="text-muted-foreground hover:text-foreground">
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-1">{selectedNodeData.label}</p>
               </div>
