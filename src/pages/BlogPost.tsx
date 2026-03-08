@@ -155,20 +155,30 @@ const BlogPostPage = () => {
           </div>
         </section>
 
-        {/* Related Articles */}
+        {/* Related Articles — Category-based */}
         <section className="mb-12">
           <h2 className="text-xl font-bold mb-4">Related Articles</h2>
           <div className="grid gap-3">
-            {post.relatedArticles.map((rSlug) => {
-              const r = blogPosts[rSlug];
-              if (!r) return null;
-              return (
-                <Link key={rSlug} to={`/blog/${rSlug}`} className="block p-4 rounded-xl border border-border hover:border-primary/40 hover:bg-primary/5 transition-all">
-                  <h3 className="font-semibold text-sm mb-1">{r.h1}</h3>
-                  <p className="text-xs text-muted-foreground">{r.readTime} · {r.category}</p>
-                </Link>
-              );
-            })}
+            {(() => {
+              // Show articles from same category first, then from relatedArticles
+              const sameCategoryArticles = Object.entries(blogPosts)
+                .filter(([s, p]) => s !== slug && p.category === post.category)
+                .slice(0, 3);
+              const fallbackArticles = post.relatedArticles
+                .filter(rSlug => !sameCategoryArticles.some(([s]) => s === rSlug))
+                .map(rSlug => [rSlug, blogPosts[rSlug]] as const)
+                .filter(([, r]) => !!r);
+              const combined = [...sameCategoryArticles, ...fallbackArticles].slice(0, 4);
+              return combined.map(([rSlug, r]) => {
+                if (!r) return null;
+                return (
+                  <Link key={rSlug} to={`/blog/${rSlug}`} className="block p-4 rounded-xl border border-border hover:border-primary/40 hover:bg-primary/5 transition-all">
+                    <h3 className="font-semibold text-sm mb-1">{r.h1}</h3>
+                    <p className="text-xs text-muted-foreground">{r.readTime} · {r.category}</p>
+                  </Link>
+                );
+              });
+            })()}
           </div>
         </section>
 
