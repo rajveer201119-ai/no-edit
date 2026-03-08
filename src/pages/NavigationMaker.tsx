@@ -1541,6 +1541,19 @@ const NavigationMaker = () => {
                     />
                   </div>
 
+                  {/* Notes */}
+                  <div>
+                    <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5 flex items-center gap-1">
+                      <StickyNote className="h-3 w-3" /> Notes
+                    </label>
+                    <textarea
+                      value={selectedNodeData.notes || ""}
+                      onChange={e => updateNodeMeta(selectedNodeData.id, { notes: e.target.value })}
+                      className="w-full h-24 px-3 py-2 text-xs bg-background border border-input rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+                      placeholder="Dev notes, implementation details..."
+                    />
+                  </div>
+
                   {/* Color Tag */}
                   <div>
                     <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-2">Color Tag</label>
