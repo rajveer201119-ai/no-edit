@@ -264,7 +264,17 @@ const NavigationMaker = () => {
   const [currentProjectName, setCurrentProjectName] = useState("AI Product Sitemap");
   const [savingProject, setSavingProject] = useState(false);
   const [mobileLibraryOpen, setMobileLibraryOpen] = useState(false);
+  const [mobileNodeEditId, setMobileNodeEditId] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const isMobileRef = useRef(false);
+  
+  // Track if device is mobile for touch vs click differentiation
+  useEffect(() => {
+    const checkMobile = () => { isMobileRef.current = window.innerWidth < 768; };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
   const { canExportJSON, isPremium, userId } = useUserPlan();
 
   // Check auth state for download gating
