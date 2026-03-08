@@ -20,7 +20,8 @@ import {
   Newspaper, Rocket, Scale, Scissors, Send,
   FileJson, Crown, Undo2, Redo2, FileUp, Minimize2,
   ChevronDown, Circle, X, MoreHorizontal, Type, Layout, Code, Paintbrush, 
-  MousePointer, Eye, TrendingUp, Share2, Save, FolderOpen, Menu
+  MousePointer, Eye, TrendingUp, Share2, Save, FolderOpen, Menu,
+  Copy, ZoomIn, ZoomOut, LayoutTemplate, StickyNote
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -180,6 +181,7 @@ interface CanvasNode {
   tags?: string[];
   colorTag?: string;
   sections?: PageSection[];
+  notes?: string;
 }
 
 interface Connection {
@@ -265,6 +267,8 @@ const NavigationMaker = () => {
   const [savingProject, setSavingProject] = useState(false);
   const [mobileLibraryOpen, setMobileLibraryOpen] = useState(false);
   const [mobileNodeEditId, setMobileNodeEditId] = useState<string | null>(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
   const svgRef = useRef<SVGSVGElement>(null);
   const isMobileRef = useRef(false);
   
@@ -461,6 +465,104 @@ const NavigationMaker = () => {
     updateNodeMeta(nodeId, { sections: newSections });
   };
 
+  // ====== AUTO-LAYOUT (BFS tree) ======
+  const autoLayout = useCallback(() => {
+    if (nodes.length === 0) return;
+    const childrenMap: Record<string, string[]> = {};
+    const hasIncoming = new Set<string>();
+    connections.forEach(c => {
+      hasIncoming.add(c.toId);
+      if (!childrenMap[c.fromId]) childrenMap[c.fromId] = [];
+      childrenMap[c.fromId].push(c.toId);
+    });
+    const roots = nodes.filter(n => !hasIncoming.has(n.id));
+    if (roots.length === 0) roots.push(nodes[0]);
+    
+    const levels: Record<string, { level: number; index: number }> = {};
+    const levelCounts: Record<number, number> = {};
+    const queue = roots.map((r) => ({ id: r.id, level: 0 }));
+    const visited = new Set<string>();
+    
+    // BFS
+    while (queue.length > 0) {
+      const { id, level } = queue.shift()!;
+      if (visited.has(id)) continue;
+      visited.add(id);
+      const idx = levelCounts[level] || 0;
+      levelCounts[level] = idx + 1;
+      levels[id] = { level, index: idx };
+      const children = childrenMap[id] || [];
+      children.forEach(cid => { if (!visited.has(cid)) queue.push({ id: cid, level: level + 1 }); });
+    }
+    // Place unvisited nodes
+    nodes.forEach(n => {
+      if (!visited.has(n.id)) {
+        const level = Object.keys(levelCounts).length;
+        const idx = levelCounts[level] || 0;
+        levelCounts[level] = idx + 1;
+        levels[n.id] = { level, index: idx };
+      }
+    });
+    
+    const hGap = 240;
+    const vGap = 180;
+    const newNodes = nodes.map(n => {
+      const pos = levels[n.id];
+      if (!pos) return n;
+      const totalAtLevel = levelCounts[pos.level] || 1;
+      const startX = (totalAtLevel - 1) * hGap / -2 + 600;
+      return { ...n, x: startX + pos.index * hGap, y: 60 + pos.level * vGap };
+    });
+    setNodes(newNodes);
+    pushHistory(newNodes, connections);
+    toast.success("Auto-layout applied!");
+  }, [nodes, connections, pushHistory]);
+
+  // ====== DUPLICATE NODE ======
+  const duplicateNode = useCallback((nodeId: string) => {
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node) return;
+    const newNode: CanvasNode = {
+      ...node,
+      id: `node-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      x: node.x + 30,
+      y: node.y + 30,
+      label: `${node.label} (copy)`,
+      sections: node.sections?.map(s => ({ ...s, id: `${s.id}-${Date.now()}` })),
+    };
+    const newNodes = [...nodes, newNode];
+    setNodes(newNodes);
+    pushHistory(newNodes, connections);
+    toast.success(`Duplicated ${node.label}`);
+  }, [nodes, connections, pushHistory]);
+
+  // ====== MULTI-SELECT ======
+  const toggleMultiSelect = useCallback((nodeId: string) => {
+    setSelectedNodes(prev => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) next.delete(nodeId);
+      else next.add(nodeId);
+      return next;
+    });
+  }, []);
+
+  const deleteSelected = useCallback(() => {
+    if (selectedNodes.size === 0) return;
+    const newNodes = nodes.filter(n => !selectedNodes.has(n.id));
+    const newConns = connections.filter(c => !selectedNodes.has(c.fromId) && !selectedNodes.has(c.toId));
+    setNodes(newNodes);
+    setConnections(newConns);
+    pushHistory(newNodes, newConns);
+    setSelectedNodes(new Set());
+    if (selectedNode && selectedNodes.has(selectedNode)) setSelectedNode(null);
+    toast.success(`Deleted ${selectedNodes.size} nodes`);
+  }, [selectedNodes, nodes, connections, pushHistory, selectedNode]);
+
+  // ====== ZOOM ======
+  const zoomIn = useCallback(() => setZoomLevel(z => Math.min(2, z + 0.15)), []);
+  const zoomOut = useCallback(() => setZoomLevel(z => Math.max(0.3, z - 0.15)), []);
+  const zoomReset = useCallback(() => setZoomLevel(1), []);
+
   // Track if a touch was a drag or a tap
   const touchDraggedRef = useRef(false);
 
@@ -534,7 +636,12 @@ const NavigationMaker = () => {
     };
   }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
 
-  const handleNodeClick = (nodeId: string) => {
+  const handleNodeClick = (nodeId: string, e?: React.MouseEvent) => {
+    // Multi-select with Shift+Click
+    if (e?.shiftKey) {
+      toggleMultiSelect(nodeId);
+      return;
+    }
     if (connectingFrom) {
       if (connectingFrom === nodeId) { setConnectingFrom(null); return; }
       const exists = connections.find(c => 
@@ -554,6 +661,7 @@ const NavigationMaker = () => {
       setConnectionLabel("");
       toast.success("Connected!");
     } else {
+      setSelectedNodes(new Set());
       // On desktop, toggle right panel; on mobile, open bottom sheet
       if (isMobileRef.current) {
         setMobileNodeEditId(nodeId);
@@ -706,6 +814,7 @@ const NavigationMaker = () => {
         tags: n.tags || [],
         colorTag: n.colorTag || "none",
         sections: (n.sections || []).map(s => ({ label: s.label, color: s.color })),
+        notes: n.notes || "",
         children: [] as any[],
       };
     });
@@ -891,6 +1000,24 @@ const NavigationMaker = () => {
 
           {/* Desktop action buttons — hidden on mobile */}
           <div className="hidden md:flex items-center gap-2">
+            {/* Zoom controls */}
+            <div className="flex items-center gap-0.5 bg-neutral-100 dark:bg-muted/50 rounded-lg p-1">
+              <Button variant="ghost" size="icon" onClick={zoomOut} className="h-7 w-7 rounded-md" title="Zoom Out">
+                <ZoomOut className="h-3.5 w-3.5" />
+              </Button>
+              <button onClick={zoomReset} className="text-[10px] text-muted-foreground font-mono w-10 text-center hover:text-foreground">{Math.round(zoomLevel * 100)}%</button>
+              <Button variant="ghost" size="icon" onClick={zoomIn} className="h-7 w-7 rounded-md" title="Zoom In">
+                <ZoomIn className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+            <Button variant="ghost" size="sm" onClick={autoLayout} className="gap-1.5 h-8 text-xs rounded-lg" title="Auto Layout">
+              <LayoutTemplate className="h-3.5 w-3.5" /> Auto Layout
+            </Button>
+            {selectedNodes.size > 0 && (
+              <Button variant="destructive" size="sm" onClick={deleteSelected} className="gap-1.5 h-8 text-xs rounded-lg">
+                <Trash2 className="h-3.5 w-3.5" /> Delete {selectedNodes.size}
+              </Button>
+            )}
             <Button
               variant={showUXScore ? "default" : "ghost"}
               size="sm"
@@ -963,6 +1090,10 @@ const NavigationMaker = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/my-projects")}>
                   <FolderOpen className="h-4 w-4 mr-2" /> Projects
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={autoLayout}>
+                  <LayoutTemplate className="h-4 w-4 mr-2" /> Auto Layout
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={importJSON}>
@@ -1113,7 +1244,7 @@ const NavigationMaker = () => {
           <div className="flex-1 relative overflow-auto" style={{ background: "radial-gradient(circle, #e5e7eb 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
             {/* UX Score Panel */}
             <UXScorePanel nodes={nodes} connections={connections} visible={showUXScore} onClose={() => setShowUXScore(false)} />
-            <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px]">
+            <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px] origin-top-left transition-transform duration-150" style={{ transform: `scale(${zoomLevel})` }}>
               {/* SVG Connections — Curved Bezier lines */}
               <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0">
                 <defs>
@@ -1145,6 +1276,31 @@ const NavigationMaker = () => {
                       {/* Connection end dot */}
                       <circle cx={tx} cy={ty} r={4} fill="#93c5fd" />
                       <circle cx={fx} cy={fy} r={4} fill="#c4b5fd" />
+                      {/* Connection label */}
+                      {conn.label && (
+                        <g>
+                          <rect
+                            x={(fx + tx) / 2 - conn.label.length * 3 - 6}
+                            y={(fy + ty) / 2 - 9}
+                            width={conn.label.length * 6 + 12}
+                            height={18}
+                            rx={9}
+                            fill="white"
+                            stroke="#e5e7eb"
+                            strokeWidth={1}
+                            opacity={0.95}
+                          />
+                          <text
+                            x={(fx + tx) / 2}
+                            y={(fy + ty) / 2 + 3}
+                            textAnchor="middle"
+                            className="text-[9px] fill-muted-foreground"
+                            style={{ fontSize: "9px", fill: "#6b7280" }}
+                          >
+                            {conn.label}
+                          </text>
+                        </g>
+                      )}
                     </g>
                   );
                 })}
@@ -1156,6 +1312,7 @@ const NavigationMaker = () => {
                   const page = stockPages.find(p => p.id === node.pageId);
                   const Icon = page?.icon || FileText;
                   const isSelected = selectedNode === node.id;
+                  const isMultiSelected = selectedNodes.has(node.id);
                   const isConnecting = connectingFrom === node.id;
                   const sections = node.sections || [];
                   const badgeColor = pageTypeBadgeColors[node.pageType || "Content"] || { bg: "#e5e7eb", text: "#374151" };
@@ -1173,13 +1330,14 @@ const NavigationMaker = () => {
                       <div
                         onMouseDown={e => handleMouseDown(e, node.id)}
                         onTouchStart={e => handleTouchStart(e, node.id)}
-                        onClick={() => handleNodeClick(node.id)}
+                        onClick={(e) => handleNodeClick(node.id, e)}
                         className={cn(
                           "rounded-xl bg-white dark:bg-card cursor-grab active:cursor-grabbing transition-all duration-200",
                           "shadow-[0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-none border",
                           isSelected 
                             ? "border-blue-400 dark:border-blue-500 ring-2 ring-blue-100 dark:ring-blue-500/20" 
                             : "border-neutral-200 dark:border-border hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]",
+                          isMultiSelected && "border-amber-400 ring-2 ring-amber-100 dark:ring-amber-500/20",
                           isConnecting && "border-purple-400 ring-2 ring-purple-100 dark:ring-purple-500/20"
                         )}
                       >
@@ -1188,6 +1346,13 @@ const NavigationMaker = () => {
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[13px] font-semibold text-foreground">{node.label}</span>
                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={e => { e.stopPropagation(); duplicateNode(node.id); }}
+                                className="w-5 h-5 rounded-md bg-neutral-100 dark:bg-muted/50 text-muted-foreground flex items-center justify-center hover:scale-110 transition-transform"
+                                title="Duplicate"
+                              >
+                                <Copy className="h-2.5 w-2.5" />
+                              </button>
                               <button
                                 onClick={e => { e.stopPropagation(); setConnectingFrom(node.id); }}
                                 className="w-5 h-5 rounded-md bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:scale-110 transition-transform"
@@ -1338,9 +1503,14 @@ const NavigationMaker = () => {
               <div className="p-5 border-b border-neutral-100 dark:border-border/40">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-semibold text-foreground">Page Details</p>
-                  <button onClick={() => setSelectedNode(null)} className="text-muted-foreground hover:text-foreground">
-                    <X className="h-3.5 w-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button onClick={() => duplicateNode(selectedNodeData.id)} className="text-muted-foreground hover:text-foreground" title="Duplicate">
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                    <button onClick={() => setSelectedNode(null)} className="text-muted-foreground hover:text-foreground">
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-1">{selectedNodeData.label}</p>
               </div>
@@ -1377,6 +1547,19 @@ const NavigationMaker = () => {
                       onChange={e => updateNodeMeta(selectedNodeData.id, { description: e.target.value })}
                       className="w-full h-20 px-3 py-2 text-xs bg-background border border-input rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                       placeholder="Brief page description..."
+                    />
+                  </div>
+
+                  {/* Notes */}
+                  <div>
+                    <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5 flex items-center gap-1">
+                      <StickyNote className="h-3 w-3" /> Notes
+                    </label>
+                    <textarea
+                      value={selectedNodeData.notes || ""}
+                      onChange={e => updateNodeMeta(selectedNodeData.id, { notes: e.target.value })}
+                      className="w-full h-24 px-3 py-2 text-xs bg-background border border-input rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+                      placeholder="Dev notes, implementation details..."
                     />
                   </div>
 
@@ -1448,6 +1631,12 @@ const NavigationMaker = () => {
                       <SheetTitle className="text-sm font-semibold">{mobileEditNodeData.label}</SheetTitle>
                       <div className="flex gap-2">
                         <button
+                          onClick={() => { duplicateNode(mobileEditNodeData.id); setMobileNodeEditId(null); }}
+                          className="h-8 w-8 rounded-lg bg-neutral-100 dark:bg-muted/50 text-muted-foreground flex items-center justify-center"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </button>
+                        <button
                           onClick={() => { setConnectingFrom(mobileEditNodeData.id); setMobileNodeEditId(null); toast.info("Tap another node to connect"); }}
                           className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center"
                         >
@@ -1494,6 +1683,19 @@ const NavigationMaker = () => {
                         onChange={e => updateNodeMeta(mobileEditNodeData.id, { description: e.target.value })}
                         className="w-full h-20 px-3 py-2 text-sm bg-background border border-input rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                         placeholder="Brief page description..."
+                      />
+                    </div>
+
+                    {/* Notes */}
+                    <div>
+                      <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5 flex items-center gap-1">
+                        <StickyNote className="h-3 w-3" /> Notes
+                      </label>
+                      <textarea
+                        value={mobileEditNodeData.notes || ""}
+                        onChange={e => updateNodeMeta(mobileEditNodeData.id, { notes: e.target.value })}
+                        className="w-full h-24 px-3 py-2 text-sm bg-background border border-input rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+                        placeholder="Dev notes, implementation details..."
                       />
                     </div>
 

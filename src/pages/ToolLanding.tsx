@@ -565,24 +565,49 @@ const ToolLanding = () => {
           </div>
         </section>
 
-        {/* Related Tools */}
+        {/* Related Tools (Smart — 4 most relevant) */}
         <section className="py-16 px-6 bg-background">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 text-foreground">Explore More Tools</h2>
-            <p className="text-muted-foreground text-center mb-10">Discover all the free design tools EPIC has to offer.</p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {Object.values(toolPages)
-                .filter((t) => t.slug !== page.slug)
-                .map((t) => (
-                  <button
-                    key={t.slug}
-                    onClick={() => navigate(`/tools/${t.slug}`)}
-                    className="bg-card border border-border/50 rounded-xl p-4 text-left hover:border-primary/50 transition-colors"
-                  >
-                    <span className="font-medium text-sm text-foreground">{t.title}</span>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{t.subtitle}</p>
-                  </button>
-                ))}
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 text-foreground">Explore Related Tools</h2>
+            <p className="text-muted-foreground text-center mb-10">Other free design tools you might love.</p>
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+              {(() => {
+                const relatedMap: Record<string, string[]> = {
+                  "poster-maker": ["flyer-maker", "banner-maker", "invitation-maker", "certificate-maker"],
+                  "logo-maker": ["business-card-maker", "banner-maker", "brochure-maker", "youtube-thumbnail-maker"],
+                  "resume-builder": ["certificate-maker", "business-card-maker", "presentation-maker", "brochure-maker"],
+                  "youtube-thumbnail-maker": ["banner-maker", "instagram-post-maker", "meme-maker", "poster-maker"],
+                  "instagram-post-maker": ["youtube-thumbnail-maker", "banner-maker", "poster-maker", "meme-maker"],
+                  "certificate-maker": ["resume-builder", "invitation-maker", "presentation-maker", "poster-maker"],
+                  "flyer-maker": ["poster-maker", "brochure-maker", "banner-maker", "menu-maker"],
+                  "business-card-maker": ["logo-maker", "resume-builder", "brochure-maker", "certificate-maker"],
+                  "presentation-maker": ["infographic-maker", "poster-maker", "certificate-maker", "banner-maker"],
+                  "invitation-maker": ["certificate-maker", "poster-maker", "flyer-maker", "menu-maker"],
+                  "banner-maker": ["youtube-thumbnail-maker", "instagram-post-maker", "poster-maker", "flyer-maker"],
+                  "website-navigation-maker": ["infographic-maker", "presentation-maker", "brochure-maker", "poster-maker"],
+                  "meme-maker": ["instagram-post-maker", "youtube-thumbnail-maker", "poster-maker", "banner-maker"],
+                  "infographic-maker": ["presentation-maker", "poster-maker", "brochure-maker", "resume-builder"],
+                  "menu-maker": ["flyer-maker", "brochure-maker", "poster-maker", "invitation-maker"],
+                  "brochure-maker": ["flyer-maker", "business-card-maker", "poster-maker", "menu-maker"],
+                  "album-cover-maker": ["poster-maker", "instagram-post-maker", "youtube-thumbnail-maker", "banner-maker"],
+                  "ebook-cover-maker": ["poster-maker", "resume-builder", "presentation-maker", "brochure-maker"],
+                };
+                const related = relatedMap[page.slug] || Object.keys(toolPages).filter(s => s !== page.slug).slice(0, 4);
+                return related.map(slug => {
+                  const t = toolPages[slug];
+                  if (!t) return null;
+                  return (
+                    <button
+                      key={t.slug}
+                      onClick={() => navigate(`/tools/${t.slug}`)}
+                      className="bg-card border border-border/50 rounded-xl p-5 text-left hover:border-primary/50 transition-colors"
+                    >
+                      <span className="font-semibold text-sm text-foreground">{t.title}</span>
+                      <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">{t.subtitle}</p>
+                    </button>
+                  );
+                });
+              })()}
             </div>
 
             {/* Navigation Maker CTA */}
