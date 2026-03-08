@@ -362,6 +362,36 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_sitemaps: {
+        Row: {
+          connections: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          nodes: Json
+          title: string
+          view_count: number
+        }
+        Insert: {
+          connections?: Json
+          created_at?: string
+          created_by?: string | null
+          id: string
+          nodes?: Json
+          title?: string
+          view_count?: number
+        }
+        Update: {
+          connections?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nodes?: Json
+          title?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

@@ -19,7 +19,7 @@ import {
   Newspaper, Rocket, Scale, Scissors, Send,
   FileJson, Crown, Undo2, Redo2, FileUp, Minimize2,
   ChevronDown, Circle, X, MoreHorizontal, Type, Layout, Code, Paintbrush, 
-  MousePointer, Eye, TrendingUp
+  MousePointer, Eye, TrendingUp, Share2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -760,6 +760,29 @@ const NavigationMaker = () => {
             </Button>
             <Button variant="ghost" size="sm" onClick={importJSON} className="gap-1.5 h-8 text-xs rounded-lg hover:bg-neutral-100 dark:hover:bg-muted/50">
               <FileUp className="h-3.5 w-3.5" /> Import
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                if (!isAuthed) { toast.error("Please sign in to share your sitemap"); navigate("/auth"); return; }
+                if (nodes.length === 0) { toast.error("Add some pages first!"); return; }
+                const shareId = Math.random().toString(36).slice(2, 9).toUpperCase();
+                const { error } = await supabase.from("shared_sitemaps" as any).insert({
+                  id: shareId,
+                  title: "AI Product Sitemap",
+                  nodes: JSON.parse(JSON.stringify(nodes)),
+                  connections: JSON.parse(JSON.stringify(connections)),
+                  created_by: (await supabase.auth.getUser()).data.user?.id,
+                } as any);
+                if (error) { toast.error("Failed to share sitemap"); console.error(error); return; }
+                const url = `${window.location.origin}/shared/${shareId}`;
+                await navigator.clipboard.writeText(url);
+                toast.success("Share link copied to clipboard!", { description: url });
+              }}
+              className="gap-1.5 h-8 text-xs rounded-lg border-neutral-200 dark:border-border"
+            >
+              <Share2 className="h-3.5 w-3.5" /> Share
             </Button>
             <Button variant="outline" size="sm" onClick={() => exportJSON("generic")} className="gap-1.5 h-8 text-xs rounded-lg border-neutral-200 dark:border-border">
               <FileJson className="h-3.5 w-3.5" /> JSON
