@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.edit-image]
 verify_jwt = false
+
+[functions.firecrawl-map]
+verify_jwt = false

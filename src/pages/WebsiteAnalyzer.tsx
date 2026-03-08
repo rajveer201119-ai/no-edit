@@ -9,11 +9,12 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Globe, Search, Loader2, FileText, Layers, AlertTriangle,
-  BarChart3, Download, Share2, ArrowLeft, TreePine
+  BarChart3, Download, Share2, TreePine
 } from "lucide-react";
 import { seedSitemaps, type SitemapNode } from "@/data/seedSitemaps";
 import { Footer } from "@/components/Footer";
-import { MainNavigation, type MainTab } from "@/components/platform/MainNavigation";
+import { MainNavigation } from "@/components/platform/MainNavigation";
+import { firecrawlApi } from "@/lib/api/firecrawl";
 
 interface AnalysisReport {
   domain: string;
@@ -30,33 +31,84 @@ interface AnalysisReport {
 const countNodes = (nodes: SitemapNode[]): number => {
   let count = 0;
   for (const n of nodes) {
-    count++;
+    count += 1;
     if (n.children) count += countNodes(n.children);
   }
   return count;
 };
 
-const getMaxDepth = (nodes: SitemapNode[], d = 1): number => {
-  let max = d;
+// Get max depth
+const getMaxDepth = (nodes: SitemapNode[], depth = 1): number => {
+  let max = depth;
   for (const n of nodes) {
-    if (n.children && n.children.length > 0) {
-      max = Math.max(max, getMaxDepth(n.children, d + 1));
-    }
+    if (n.children) max = Math.max(max, getMaxDepth(n.children, depth + 1));
   }
   return max;
 };
 
+// Find largest cluster
 const findLargestCluster = (nodes: SitemapNode[]): { name: string; size: number } => {
-  let best = { name: "Root", size: 0 };
+  let largest = { name: "Root", size: 0 };
   for (const n of nodes) {
+    const size = n.children ? countNodes(n.children) : 0;
+    if (size > largest.size) largest = { name: n.name, size };
     if (n.children) {
-      const size = countNodes(n.children);
-      if (size > best.size) best = { name: n.name, size };
       const sub = findLargestCluster(n.children);
-      if (sub.size > best.size) best = sub;
+      if (sub.size > largest.size) largest = sub;
     }
   }
-  return best;
+  return largest;
+};
+
+/**
+ * Convert a flat list of URLs into a hierarchical tree structure.
+ */
+const urlsToTree = (urls: string[], domain: string): SitemapNode[] => {
+  const root: SitemapNode = { name: "Home", url: "/" };
+  const pathMap = new Map<string, SitemapNode>();
+  pathMap.set("/", root);
+
+  // Sort URLs so parents come before children
+  const paths = urls
+    .map(u => {
+      try {
+        const parsed = new URL(u.startsWith("http") ? u : `https://${u}`);
+        return parsed.pathname.replace(/\/$/, "") || "/";
+      } catch {
+        return null;
+      }
+    })
+    .filter((p): p is string => p !== null && p !== "")
+    .filter((v, i, a) => a.indexOf(v) === i) // dedupe
+    .sort();
+
+  for (const path of paths) {
+    if (path === "/") continue;
+
+    const segments = path.split("/").filter(Boolean);
+    let currentPath = "";
+    let parent = root;
+
+    for (let i = 0; i < segments.length; i++) {
+      currentPath += "/" + segments[i];
+      let node = pathMap.get(currentPath);
+
+      if (!node) {
+        const name = segments[i]
+          .replace(/[-_]/g, " ")
+          .replace(/\b\w/g, c => c.toUpperCase());
+        node = { name, url: currentPath };
+        pathMap.set(currentPath, node);
+
+        if (!parent.children) parent.children = [];
+        parent.children.push(node);
+      }
+
+      parent = node;
+    }
+  }
+
+  return [root];
 };
 
 const WebsiteAnalyzer = () => {
@@ -89,41 +141,84 @@ const WebsiteAnalyzer = () => {
         tree: seed.tree,
       });
       setLoading(false);
+      toast.success(`Analysis complete! Showing structure for ${domain}`);
       return;
     }
 
-    // Generate a simulated structure for unknown domains
-    setTimeout(() => {
-      const sections = ["Home", "About", "Products", "Blog", "Contact", "Pricing", "Support", "Careers"];
-      const tree: SitemapNode[] = [
-        {
-          name: "Home", url: "/", children: sections.slice(1, 5 + Math.floor(Math.random() * 3)).map(s => ({
-            name: s,
-            url: `/${s.toLowerCase()}`,
-            children: Math.random() > 0.5 ? [
-              { name: `${s} Overview`, url: `/${s.toLowerCase()}/overview` },
-              { name: `${s} Details`, url: `/${s.toLowerCase()}/details` },
-            ] : undefined,
-          })),
-        },
-      ];
-      const total = countNodes(tree);
-      const depth = getMaxDepth(tree);
-      const cluster = findLargestCluster(tree);
+    // Use Firecrawl Map API for real crawling
+    try {
+      const response = await firecrawlApi.map(domain, { limit: 200 });
 
-      setReport({
-        domain,
-        totalPages: total,
-        maxDepth: depth,
-        topLevelSections: tree[0].children?.length || 0,
-        largestCluster: cluster.name,
-        largestClusterSize: cluster.size,
-        orphanPages: Math.floor(Math.random() * 3),
-        tree,
-      });
-      setLoading(false);
-      toast.success("Analysis complete!");
-    }, 2000);
+      if (response.success && response.links && response.links.length > 0) {
+        const tree = urlsToTree(response.links, domain);
+        const total = countNodes(tree);
+        const depth = getMaxDepth(tree);
+        const cluster = findLargestCluster(tree);
+        const topLevel = tree[0]?.children?.length || 0;
+        
+        // Estimate orphan pages (pages at max depth with no children)
+        let orphans = 0;
+        const countOrphans = (nodes: SitemapNode[], d: number) => {
+          for (const n of nodes) {
+            if (!n.children && d > 2) orphans++;
+            if (n.children) countOrphans(n.children, d + 1);
+          }
+        };
+        countOrphans(tree, 1);
+
+        setReport({
+          domain,
+          totalPages: total,
+          maxDepth: depth,
+          topLevelSections: topLevel,
+          largestCluster: cluster.name,
+          largestClusterSize: cluster.size,
+          orphanPages: Math.min(orphans, 10),
+          tree,
+        });
+        toast.success(`Crawled ${response.links.length} URLs from ${domain}!`);
+      } else {
+        // Fallback: generate simulated structure
+        toast.info("Could not crawl this domain. Showing estimated structure.");
+        generateFallbackReport(domain);
+      }
+    } catch (error) {
+      console.error("Firecrawl error:", error);
+      toast.info("Crawler unavailable. Showing estimated structure.");
+      generateFallbackReport(domain);
+    }
+
+    setLoading(false);
+  };
+
+  const generateFallbackReport = (domain: string) => {
+    const sections = ["Home", "About", "Products", "Blog", "Contact", "Pricing", "Support", "Careers"];
+    const tree: SitemapNode[] = [
+      {
+        name: "Home", url: "/", children: sections.slice(1, 5 + Math.floor(Math.random() * 3)).map(s => ({
+          name: s,
+          url: `/${s.toLowerCase()}`,
+          children: Math.random() > 0.5 ? [
+            { name: `${s} Overview`, url: `/${s.toLowerCase()}/overview` },
+            { name: `${s} Details`, url: `/${s.toLowerCase()}/details` },
+          ] : undefined,
+        })),
+      },
+    ];
+    const total = countNodes(tree);
+    const depth = getMaxDepth(tree);
+    const cluster = findLargestCluster(tree);
+
+    setReport({
+      domain,
+      totalPages: total,
+      maxDepth: depth,
+      topLevelSections: tree[0].children?.length || 0,
+      largestCluster: cluster.name,
+      largestClusterSize: cluster.size,
+      orphanPages: Math.floor(Math.random() * 3),
+      tree,
+    });
   };
 
   const handlePublish = async () => {
@@ -163,8 +258,8 @@ const WebsiteAnalyzer = () => {
   return (
     <>
       <SEO
-        title="Website Structure Analyzer — EPIC"
-        description="Analyze any website's architecture. Get a visual sitemap, structure report, and UX insights with EPIC's free analyzer tool."
+        title="Website Structure Analyzer — Free Sitemap Tool | EPIC"
+        description="Analyze any website's architecture with real crawl data. Get a visual sitemap, structure report, and UX insights with EPIC's free analyzer tool."
       />
       <MainNavigation
         activeTab="home"
@@ -177,7 +272,7 @@ const WebsiteAnalyzer = () => {
         <header className="border-b border-border px-6 py-4 flex items-center gap-4">
           <div>
             <h1 className="text-xl font-bold">Website Structure Analyzer</h1>
-            <p className="text-sm text-muted-foreground">Analyze any website's architecture and generate visual sitemaps</p>
+            <p className="text-sm text-muted-foreground">Crawl any website and visualize its architecture with real data</p>
           </div>
         </header>
 
@@ -190,15 +285,18 @@ const WebsiteAnalyzer = () => {
                 <Input
                   value={url}
                   onChange={e => setUrl(e.target.value)}
-                  placeholder="Enter domain (e.g., notion.so)"
+                  placeholder="Enter domain (e.g., stripe.com)"
                   className="pl-10"
                 />
               </div>
               <Button type="submit" disabled={loading} className="gap-2">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                Analyze
+                {loading ? "Crawling…" : "Analyze"}
               </Button>
             </form>
+            <p className="text-xs text-muted-foreground mt-2">
+              Powered by Firecrawl — discovers real pages via live website crawling.
+            </p>
           </Card>
 
           {/* Report */}
