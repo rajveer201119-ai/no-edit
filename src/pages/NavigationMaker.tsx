@@ -1308,6 +1308,7 @@ const NavigationMaker = () => {
                   const page = stockPages.find(p => p.id === node.pageId);
                   const Icon = page?.icon || FileText;
                   const isSelected = selectedNode === node.id;
+                  const isMultiSelected = selectedNodes.has(node.id);
                   const isConnecting = connectingFrom === node.id;
                   const sections = node.sections || [];
                   const badgeColor = pageTypeBadgeColors[node.pageType || "Content"] || { bg: "#e5e7eb", text: "#374151" };
@@ -1325,13 +1326,14 @@ const NavigationMaker = () => {
                       <div
                         onMouseDown={e => handleMouseDown(e, node.id)}
                         onTouchStart={e => handleTouchStart(e, node.id)}
-                        onClick={() => handleNodeClick(node.id)}
+                        onClick={(e) => handleNodeClick(node.id, e)}
                         className={cn(
                           "rounded-xl bg-white dark:bg-card cursor-grab active:cursor-grabbing transition-all duration-200",
                           "shadow-[0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-none border",
                           isSelected 
                             ? "border-blue-400 dark:border-blue-500 ring-2 ring-blue-100 dark:ring-blue-500/20" 
                             : "border-neutral-200 dark:border-border hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]",
+                          isMultiSelected && "border-amber-400 ring-2 ring-amber-100 dark:ring-amber-500/20",
                           isConnecting && "border-purple-400 ring-2 ring-purple-100 dark:ring-purple-500/20"
                         )}
                       >
