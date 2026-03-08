@@ -68,6 +68,7 @@ const App = () => (
               <Route path="/analyzer" element={<WebsiteAnalyzer />} />
               <Route path="/sitemaps" element={<SitemapLibrary />} />
               <Route path="/sitemap/:slug" element={<PublicSitemap />} />
+              <Route path="/shared/:id" element={<SharedSitemap />} />
               <Route path="/:slug" element={<PillarPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
