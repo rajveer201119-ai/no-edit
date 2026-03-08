@@ -75,6 +75,12 @@ const Blog = () => {
       </section>
 
       <div className="container mx-auto px-4 max-w-6xl">
+        {/* Search */}
+        <div className="max-w-md mx-auto mb-8 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search articles..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+        </div>
+
         {/* Category Filter */}
         <div className="flex flex-wrap gap-2 justify-center mb-10">
           {categories.map((c) => (
