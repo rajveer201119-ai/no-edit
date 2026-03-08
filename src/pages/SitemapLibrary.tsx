@@ -11,6 +11,7 @@ import { Globe, Search, ArrowRight, FileText, Layers } from "lucide-react";
 import { MainNavigation, type MainTab } from "@/components/platform/MainNavigation";
 
 const SitemapLibrary = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [dbSitemaps, setDbSitemaps] = useState<any[]>([]);
 
