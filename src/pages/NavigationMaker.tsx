@@ -1000,6 +1000,24 @@ const NavigationMaker = () => {
 
           {/* Desktop action buttons — hidden on mobile */}
           <div className="hidden md:flex items-center gap-2">
+            {/* Zoom controls */}
+            <div className="flex items-center gap-0.5 bg-neutral-100 dark:bg-muted/50 rounded-lg p-1">
+              <Button variant="ghost" size="icon" onClick={zoomOut} className="h-7 w-7 rounded-md" title="Zoom Out">
+                <ZoomOut className="h-3.5 w-3.5" />
+              </Button>
+              <button onClick={zoomReset} className="text-[10px] text-muted-foreground font-mono w-10 text-center hover:text-foreground">{Math.round(zoomLevel * 100)}%</button>
+              <Button variant="ghost" size="icon" onClick={zoomIn} className="h-7 w-7 rounded-md" title="Zoom In">
+                <ZoomIn className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+            <Button variant="ghost" size="sm" onClick={autoLayout} className="gap-1.5 h-8 text-xs rounded-lg" title="Auto Layout">
+              <LayoutTemplate className="h-3.5 w-3.5" /> Auto Layout
+            </Button>
+            {selectedNodes.size > 0 && (
+              <Button variant="destructive" size="sm" onClick={deleteSelected} className="gap-1.5 h-8 text-xs rounded-lg">
+                <Trash2 className="h-3.5 w-3.5" /> Delete {selectedNodes.size}
+              </Button>
+            )}
             <Button
               variant={showUXScore ? "default" : "ghost"}
               size="sm"
