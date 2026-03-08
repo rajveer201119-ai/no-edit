@@ -1092,6 +1092,10 @@ const NavigationMaker = () => {
                   <FolderOpen className="h-4 w-4 mr-2" /> Projects
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={autoLayout}>
+                  <LayoutTemplate className="h-4 w-4 mr-2" /> Auto Layout
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={importJSON}>
                   <FileUp className="h-4 w-4 mr-2" /> Import JSON
                 </DropdownMenuItem>
