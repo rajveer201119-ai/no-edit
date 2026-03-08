@@ -32,6 +32,7 @@ import WebsiteAnalyzer from "./pages/WebsiteAnalyzer";
 import PublicSitemap from "./pages/PublicSitemap";
 import SitemapLibrary from "./pages/SitemapLibrary";
 import SharedSitemap from "./pages/SharedSitemap";
+import MyProjects from "./pages/MyProjects";
 
 const queryClient = new QueryClient();
 
