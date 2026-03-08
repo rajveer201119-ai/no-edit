@@ -507,9 +507,9 @@ const NavigationMaker = () => {
     const hGap = 240;
     const vGap = 180;
     const newNodes = nodes.map(n => {
-      const pos = levels.get(n.id);
+      const pos = levels[n.id];
       if (!pos) return n;
-      const totalAtLevel = levelCounts.get(pos.level) || 1;
+      const totalAtLevel = levelCounts[pos.level] || 1;
       const startX = (totalAtLevel - 1) * hGap / -2 + 600;
       return { ...n, x: startX + pos.index * hGap, y: 60 + pos.level * vGap };
     });
