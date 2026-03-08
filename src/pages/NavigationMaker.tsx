@@ -834,6 +834,12 @@ const NavigationMaker = () => {
             >
               <TrendingUp className="h-3.5 w-3.5" /> UX Score
             </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/my-projects")} className="gap-1.5 h-8 text-xs rounded-lg hover:bg-neutral-100 dark:hover:bg-muted/50">
+              <FolderOpen className="h-3.5 w-3.5" /> Projects
+            </Button>
+            <Button variant="ghost" size="sm" onClick={saveProject} disabled={savingProject} className="gap-1.5 h-8 text-xs rounded-lg hover:bg-neutral-100 dark:hover:bg-muted/50">
+              <Save className="h-3.5 w-3.5" /> {savingProject ? "Saving..." : currentProjectId ? "Save" : "Save As"}
+            </Button>
             <Button variant="ghost" size="sm" onClick={importJSON} className="gap-1.5 h-8 text-xs rounded-lg hover:bg-neutral-100 dark:hover:bg-muted/50">
               <FileUp className="h-3.5 w-3.5" /> Import
             </Button>
