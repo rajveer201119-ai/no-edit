@@ -16,6 +16,15 @@ const examples = [
   { title: "Mobile App Navigation Map", description: "Tab-based navigation with home feed, search/explore, create, notifications, and profile sections. Includes nested screens.", icon: Smartphone, category: "Mobile App", pages: 20 },
 ];
 
+const examplesSchema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Website Flow Examples — Navigation Diagrams & Templates",
+  description: "Browse real-world website flow examples for e-commerce, SaaS, blogs, portfolios, and more. Get inspired and create your own flow with EPIC.",
+  url: `${baseUrl}/examples`,
+  publisher: { "@type": "Organization", name: "EPIC Design", url: baseUrl },
+};
+
 const Examples = () => {
   const navigate = useNavigate();
 
@@ -25,6 +34,7 @@ const Examples = () => {
         title="Website Flow Examples — Navigation Diagrams & Templates"
         description="Browse real-world website flow examples for e-commerce, SaaS, blogs, portfolios, and more. Get inspired and create your own flow with EPIC."
         canonicalUrl={`${baseUrl}/examples`}
+        structuredData={examplesSchema}
       />
 
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/20">

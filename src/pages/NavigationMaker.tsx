@@ -700,6 +700,16 @@ const NavigationMaker = () => {
         title="Website Navigation Maker — Plan Site Structure | EPIC"
         description="Drag-and-drop navigation builder. Plan page flow, create sitemaps, and export navigation maps. 50+ page templates."
         keywords="website navigation maker, sitemap builder, page flow designer, website structure planner, drag and drop navigation"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "EPIC Website Navigation Maker",
+          applicationCategory: "DesignApplication",
+          operatingSystem: "Web",
+          description: "Drag-and-drop navigation builder. Plan page flow, create sitemaps, and export navigation maps. 50+ page templates.",
+          url: "https://no-edit.lovable.app/navigation-maker",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        }}
       />
 
       <div className="min-h-screen bg-[#f8f9fb] dark:bg-background">

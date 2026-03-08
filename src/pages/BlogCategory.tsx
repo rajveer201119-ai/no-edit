@@ -43,6 +43,15 @@ const BlogCategory = () => {
 
   const posts = Object.values(blogPosts).filter((p) => categoryMap[p.category] === category);
 
+  const categorySchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `${cat.title} Articles — EPIC Blog`,
+    description: cat.description,
+    url: `${baseUrl}/blog/category/${category}`,
+    isPartOf: { "@type": "Blog", name: "EPIC Blog", url: `${baseUrl}/blog` },
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SEO
@@ -50,6 +59,7 @@ const BlogCategory = () => {
         description={cat.description}
         keywords={cat.keywords}
         canonicalUrl={`${baseUrl}/blog/category/${category}`}
+        structuredData={categorySchema}
       />
 
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/20">

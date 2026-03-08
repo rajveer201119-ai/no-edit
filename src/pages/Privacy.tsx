@@ -6,6 +6,14 @@ import { ArrowLeft } from "lucide-react";
 
 const baseUrl = "https://no-edit.lovable.app";
 
+const privacySchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Privacy Policy — EPIC Design",
+  description: "EPIC's privacy policy. How we collect, use, and protect your data on our free design platform.",
+  url: `${baseUrl}/privacy`,
+};
+
 const Privacy = () => {
   const navigate = useNavigate();
 
@@ -15,6 +23,7 @@ const Privacy = () => {
         title="Privacy Policy — EPIC Design"
         description="EPIC's privacy policy. How we collect, use, and protect your data on our free design platform."
         keywords="EPIC privacy policy, data protection, design tool privacy"
+        structuredData={privacySchema}
       />
       <div className="min-h-screen bg-background">
         <header className="border-b border-border">

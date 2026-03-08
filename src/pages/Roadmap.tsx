@@ -26,6 +26,15 @@ const statusConfig = {
   planned: { icon: CircleDot, label: "Planned", color: "text-muted-foreground bg-muted/30" },
 };
 
+const roadmapSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Roadmap — EPIC Design Platform Future Plans",
+  description: "See what's coming next for EPIC. Our product roadmap includes collaborative flows, AI suggestions, Figma plugin, and more.",
+  url: `${baseUrl}/roadmap`,
+  publisher: { "@type": "Organization", name: "EPIC Design", url: baseUrl },
+};
+
 const Roadmap = () => {
   const navigate = useNavigate();
 
@@ -35,6 +44,7 @@ const Roadmap = () => {
         title="Roadmap — EPIC Design Platform Future Plans"
         description="See what's coming next for EPIC. Our product roadmap includes collaborative flows, AI suggestions, Figma plugin, and more."
         canonicalUrl={`${baseUrl}/roadmap`}
+        structuredData={roadmapSchema}
       />
 
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/20">
