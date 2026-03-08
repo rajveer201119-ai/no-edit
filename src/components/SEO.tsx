@@ -55,6 +55,11 @@ export const SEO = ({
       
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
+      {/* Hreflang Tags */}
+      {hreflang?.map((entry) => (
+        <link key={entry.lang} rel="alternate" hrefLang={entry.lang} href={entry.href} />
+      ))}
+
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={resolvedCanonical} />
