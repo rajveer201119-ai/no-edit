@@ -31,6 +31,7 @@ import BlogCategory from "./pages/BlogCategory";
 import WebsiteAnalyzer from "./pages/WebsiteAnalyzer";
 import PublicSitemap from "./pages/PublicSitemap";
 import SitemapLibrary from "./pages/SitemapLibrary";
+import SharedSitemap from "./pages/SharedSitemap";
 
 const queryClient = new QueryClient();
 
