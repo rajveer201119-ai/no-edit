@@ -86,6 +86,9 @@ const BlogPostPage = () => {
             {post.lastModified && (
               <p className="text-xs text-muted-foreground mt-3">Last updated: {post.lastModified}</p>
             )}
+            <div className="mt-4">
+              <SocialShare url={`${baseUrl}/blog/${post.slug}`} title={post.h1} />
+            </div>
           </motion.div>
         </div>
       </section>
