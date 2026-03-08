@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { SEO } from "@/components/SEO";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { seedSitemaps } from "@/data/seedSitemaps";
 import { supabase } from "@/integrations/supabase/client";
 import { Footer } from "@/components/Footer";
 import { Globe, Search, ArrowRight, FileText, Layers } from "lucide-react";
+import { MainNavigation, type MainTab } from "@/components/platform/MainNavigation";
 
 const SitemapLibrary = () => {
   const [search, setSearch] = useState("");
