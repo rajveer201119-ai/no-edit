@@ -465,6 +465,104 @@ const NavigationMaker = () => {
     updateNodeMeta(nodeId, { sections: newSections });
   };
 
+  // ====== AUTO-LAYOUT (BFS tree) ======
+  const autoLayout = useCallback(() => {
+    if (nodes.length === 0) return;
+    const childrenMap = new Map<string, string[]>();
+    const hasIncoming = new Set<string>();
+    connections.forEach(c => {
+      hasIncoming.add(c.toId);
+      if (!childrenMap.has(c.fromId)) childrenMap.set(c.fromId, []);
+      childrenMap.get(c.fromId)!.push(c.toId);
+    });
+    const roots = nodes.filter(n => !hasIncoming.has(n.id));
+    if (roots.length === 0) roots.push(nodes[0]);
+    
+    const levels = new Map<string, { level: number; index: number }>();
+    const levelCounts = new Map<number, number>();
+    const queue = roots.map((r, i) => ({ id: r.id, level: 0 }));
+    const visited = new Set<string>();
+    
+    // BFS
+    while (queue.length > 0) {
+      const { id, level } = queue.shift()!;
+      if (visited.has(id)) continue;
+      visited.add(id);
+      const idx = levelCounts.get(level) || 0;
+      levelCounts.set(level, idx + 1);
+      levels.set(id, { level, index: idx });
+      const children = childrenMap.get(id) || [];
+      children.forEach(cid => { if (!visited.has(cid)) queue.push({ id: cid, level: level + 1 }); });
+    }
+    // Place unvisited nodes
+    nodes.forEach(n => {
+      if (!visited.has(n.id)) {
+        const level = (levelCounts.size || 0);
+        const idx = levelCounts.get(level) || 0;
+        levelCounts.set(level, idx + 1);
+        levels.set(n.id, { level, index: idx });
+      }
+    });
+    
+    const hGap = 240;
+    const vGap = 180;
+    const newNodes = nodes.map(n => {
+      const pos = levels.get(n.id);
+      if (!pos) return n;
+      const totalAtLevel = levelCounts.get(pos.level) || 1;
+      const startX = (totalAtLevel - 1) * hGap / -2 + 600;
+      return { ...n, x: startX + pos.index * hGap, y: 60 + pos.level * vGap };
+    });
+    setNodes(newNodes);
+    pushHistory(newNodes, connections);
+    toast.success("Auto-layout applied!");
+  }, [nodes, connections, pushHistory]);
+
+  // ====== DUPLICATE NODE ======
+  const duplicateNode = useCallback((nodeId: string) => {
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node) return;
+    const newNode: CanvasNode = {
+      ...node,
+      id: `node-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      x: node.x + 30,
+      y: node.y + 30,
+      label: `${node.label} (copy)`,
+      sections: node.sections?.map(s => ({ ...s, id: `${s.id}-${Date.now()}` })),
+    };
+    const newNodes = [...nodes, newNode];
+    setNodes(newNodes);
+    pushHistory(newNodes, connections);
+    toast.success(`Duplicated ${node.label}`);
+  }, [nodes, connections, pushHistory]);
+
+  // ====== MULTI-SELECT ======
+  const toggleMultiSelect = useCallback((nodeId: string) => {
+    setSelectedNodes(prev => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) next.delete(nodeId);
+      else next.add(nodeId);
+      return next;
+    });
+  }, []);
+
+  const deleteSelected = useCallback(() => {
+    if (selectedNodes.size === 0) return;
+    const newNodes = nodes.filter(n => !selectedNodes.has(n.id));
+    const newConns = connections.filter(c => !selectedNodes.has(c.fromId) && !selectedNodes.has(c.toId));
+    setNodes(newNodes);
+    setConnections(newConns);
+    pushHistory(newNodes, newConns);
+    setSelectedNodes(new Set());
+    if (selectedNode && selectedNodes.has(selectedNode)) setSelectedNode(null);
+    toast.success(`Deleted ${selectedNodes.size} nodes`);
+  }, [selectedNodes, nodes, connections, pushHistory, selectedNode]);
+
+  // ====== ZOOM ======
+  const zoomIn = useCallback(() => setZoomLevel(z => Math.min(2, z + 0.15)), []);
+  const zoomOut = useCallback(() => setZoomLevel(z => Math.max(0.3, z - 0.15)), []);
+  const zoomReset = useCallback(() => setZoomLevel(1), []);
+
   // Track if a touch was a drag or a tap
   const touchDraggedRef = useRef(false);
 
