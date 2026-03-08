@@ -525,7 +525,6 @@ export const blogPosts: Record<string, BlogPostData> = {
     ],
     relatedArticles: ["best-free-design-tools-for-students-2026", "design-system-for-startups", "conversion-rate-optimization-ux"],
   },
-},
   "how-to-plan-a-restaurant-website": {
     slug: "how-to-plan-a-restaurant-website",
     metaTitle: "How to Plan a Restaurant Website — Full Guide 2026",

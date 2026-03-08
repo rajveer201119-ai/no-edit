@@ -178,7 +178,6 @@ export const alternativePages: Record<string, AlternativePageData> = {
     ],
     relatedAlternatives: ["canva-alternative", "figma-alternative", "lucidchart-alternative"],
   },
-},
   "visme-alternative": {
     slug: "visme-alternative",
     metaTitle: "Best Free Visme Alternative 2026 — EPIC Design",
