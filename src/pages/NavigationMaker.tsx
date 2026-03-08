@@ -180,6 +180,7 @@ interface CanvasNode {
   tags?: string[];
   colorTag?: string;
   sections?: PageSection[];
+  notes?: string;
 }
 
 interface Connection {
