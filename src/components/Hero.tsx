@@ -28,11 +28,11 @@ export const Hero = () => {
 
       <div className="flex justify-center mb-4 md:mb-5 relative z-10">
         <img 
-          src={epicLogo} 
-          alt="EPIC Design Generator" 
-          className="w-24 h-24 md:w-32 md:h-32 drop-shadow-2xl"
-          width={128}
-          height={128}
+          src="/epic-logo-256.png" 
+          alt="EPIC — Visual Sitemap & Design Platform" 
+          className="w-20 h-20 md:w-28 md:h-28 drop-shadow-2xl"
+          width={112}
+          height={112}
           loading="eager"
           // @ts-ignore
           fetchpriority="high"
