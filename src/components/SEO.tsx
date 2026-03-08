@@ -32,6 +32,7 @@ export const SEO = ({
   ogType = "website",
   structuredData,
   noIndex = false,
+  hreflang,
 }: SEOProps) => {
   const location = useLocation();
   const resolvedCanonical = canonicalUrl || `${baseUrl}${location.pathname}`;
