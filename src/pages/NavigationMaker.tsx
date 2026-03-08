@@ -796,7 +796,7 @@ const NavigationMaker = () => {
           </Button>
           <div className="flex items-center gap-2">
             <span className="text-sm">🏗</span>
-            <h1 className="text-sm font-semibold text-foreground">AI Product Sitemap</h1>
+            <h1 className="text-sm font-semibold text-foreground truncate max-w-[180px]">{currentProjectName}</h1>
           </div>
           
           <div className="flex-1" />
