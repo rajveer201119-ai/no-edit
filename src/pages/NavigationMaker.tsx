@@ -1171,6 +1171,7 @@ const NavigationMaker = () => {
                     >
                       <div
                         onMouseDown={e => handleMouseDown(e, node.id)}
+                        onTouchStart={e => handleTouchStart(e, node.id)}
                         onClick={() => handleNodeClick(node.id)}
                         className={cn(
                           "rounded-xl bg-white dark:bg-card cursor-grab active:cursor-grabbing transition-all duration-200",
