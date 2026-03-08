@@ -1,6 +1,11 @@
 import { Helmet } from "react-helmet-async";
 import { useLocation } from "react-router-dom";
 
+interface HreflangEntry {
+  lang: string;
+  href: string;
+}
+
 interface SEOProps {
   title?: string;
   description?: string;
@@ -10,6 +15,7 @@ interface SEOProps {
   ogType?: "website" | "article" | "product";
   structuredData?: object;
   noIndex?: boolean;
+  hreflang?: HreflangEntry[];
 }
 
 const defaultOgImage = "https://storage.googleapis.com/gpt-engineer-file-uploads/ywM0UvtJ3VdIZjuQEJN3LrvvOCt2/social-images/social-1769532119034-download (1).jpeg";
