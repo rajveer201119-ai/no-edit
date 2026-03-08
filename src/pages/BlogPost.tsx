@@ -4,6 +4,8 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown, ChevronUp, Calendar, Clock, Tag, Network } from "lucide-react";
+import { SocialShare } from "@/components/SocialShare";
+import { BackToTop } from "@/components/BackToTop";
 import { blogPosts } from "@/data/blogPosts";
 import { pillarPages } from "@/data/pillarPages";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
