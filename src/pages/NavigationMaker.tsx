@@ -1343,6 +1343,13 @@ const NavigationMaker = () => {
                             <span className="text-[13px] font-semibold text-foreground">{node.label}</span>
                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button
+                                onClick={e => { e.stopPropagation(); duplicateNode(node.id); }}
+                                className="w-5 h-5 rounded-md bg-neutral-100 dark:bg-muted/50 text-muted-foreground flex items-center justify-center hover:scale-110 transition-transform"
+                                title="Duplicate"
+                              >
+                                <Copy className="h-2.5 w-2.5" />
+                              </button>
+                              <button
                                 onClick={e => { e.stopPropagation(); setConnectingFrom(node.id); }}
                                 className="w-5 h-5 rounded-md bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:scale-110 transition-transform"
                                 title="Connect"
