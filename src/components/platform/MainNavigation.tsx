@@ -97,6 +97,22 @@ export const MainNavigation = ({
           <div className="h-px bg-border my-2" />
 
           <button
+            onClick={() => { navigate("/analyzer"); setMobileMenuOpen(false); }}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium w-full text-left text-foreground hover:bg-muted"
+          >
+            <Globe className="h-4 w-4 flex-shrink-0" />
+            <span>Website Analyzer</span>
+          </button>
+
+          <button
+            onClick={() => { navigate("/sitemaps"); setMobileMenuOpen(false); }}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium w-full text-left text-foreground hover:bg-muted"
+          >
+            <Library className="h-4 w-4 flex-shrink-0" />
+            <span>Sitemap Library</span>
+          </button>
+
+          <button
             onClick={() => { navigate("/navigation-maker"); setMobileMenuOpen(false); }}
             className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium w-full text-left text-foreground hover:bg-muted border border-border"
           >
