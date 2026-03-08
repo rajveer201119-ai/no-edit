@@ -1438,26 +1438,146 @@ const NavigationMaker = () => {
             </aside>
           )}
 
-          {/* Mobile page list */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-card/90 backdrop-blur-xl border-t border-neutral-200 dark:border-border z-40">
-            <ScrollArea className="h-48">
-              <div className="p-3 grid grid-cols-3 gap-2">
-                {stockPages.slice(0, 30).map(page => {
-                  const Icon = page.icon;
-                  return (
-                    <button
-                      key={page.id}
-                      onClick={() => addPageToCanvas(page)}
-                      className="flex flex-col items-center gap-1 p-2.5 rounded-xl text-[10px] bg-neutral-50 dark:bg-muted/30 hover:bg-neutral-100 dark:hover:bg-muted/60 active:scale-95 transition-all"
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span className="truncate w-full text-center">{page.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </ScrollArea>
-          </div>
+          {/* Mobile Node Editing Bottom Sheet */}
+          <Sheet open={!!mobileNodeEditId} onOpenChange={(open) => { if (!open) setMobileNodeEditId(null); }}>
+            <SheetContent side="bottom" className="md:hidden h-[75vh] rounded-t-2xl p-0">
+              {mobileEditNodeData && (
+                <>
+                  <SheetHeader className="p-4 pb-3 border-b border-border/40">
+                    <div className="flex items-center justify-between">
+                      <SheetTitle className="text-sm font-semibold">{mobileEditNodeData.label}</SheetTitle>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => { setConnectingFrom(mobileEditNodeData.id); setMobileNodeEditId(null); toast.info("Tap another node to connect"); }}
+                          className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center"
+                        >
+                          <Link2 className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => { removeNode(mobileEditNodeData.id); setMobileNodeEditId(null); }}
+                          className="h-8 w-8 rounded-lg bg-red-100 dark:bg-red-500/20 text-red-500 flex items-center justify-center"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </SheetHeader>
+                  <div className="overflow-y-auto overscroll-contain flex-1 p-4 space-y-5" style={{ maxHeight: "calc(75vh - 80px)" }}>
+                    {/* Label */}
+                    <div>
+                      <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5">Label</label>
+                      <Input value={mobileEditNodeData.label} onChange={e => updateNodeMeta(mobileEditNodeData.id, { label: e.target.value })} className="h-10 text-sm rounded-lg" />
+                    </div>
+
+                    {/* Page Type */}
+                    <div>
+                      <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5">Page Type</label>
+                      <Select value={mobileEditNodeData.pageType || "Content"} onValueChange={(v) => updateNodeMeta(mobileEditNodeData.id, { pageType: v as PageType })}>
+                        <SelectTrigger className="h-10 text-sm rounded-lg"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {pageTypes.map(t => <SelectItem key={t} value={t} className="text-sm">{t}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Slug */}
+                    <div>
+                      <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5">Slug</label>
+                      <Input value={mobileEditNodeData.slug || ""} onChange={e => updateNodeMeta(mobileEditNodeData.id, { slug: e.target.value })} className="h-10 text-sm rounded-lg font-mono" placeholder="/page-slug" />
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                      <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5">Description</label>
+                      <textarea
+                        value={mobileEditNodeData.description || ""}
+                        onChange={e => updateNodeMeta(mobileEditNodeData.id, { description: e.target.value })}
+                        className="w-full h-20 px-3 py-2 text-sm bg-background border border-input rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+                        placeholder="Brief page description..."
+                      />
+                    </div>
+
+                    {/* Color Tag */}
+                    <div>
+                      <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-2">Color Tag</label>
+                      <div className="flex gap-2.5 flex-wrap">
+                        {colorTags.map(ct => (
+                          <button
+                            key={ct.value}
+                            onClick={() => updateNodeMeta(mobileEditNodeData.id, { colorTag: ct.value })}
+                            className={cn(
+                              "w-9 h-9 rounded-lg border-2 transition-all",
+                              mobileEditNodeData.colorTag === ct.value ? "border-foreground scale-110 shadow-sm" : "border-transparent"
+                            )}
+                            style={{ backgroundColor: ct.value === "none" ? "hsl(var(--muted))" : ct.color }}
+                            title={ct.label}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Tags */}
+                    <div>
+                      <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-1.5">Tags</label>
+                      <Input
+                        value={(mobileEditNodeData.tags || []).join(", ")}
+                        onChange={e => updateNodeMeta(mobileEditNodeData.id, { tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean) })}
+                        className="h-10 text-sm rounded-lg"
+                        placeholder="tag1, tag2, ..."
+                      />
+                    </div>
+
+                    {/* Sections */}
+                    <div>
+                      <label className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mb-2">Page Sections</label>
+                      <div className="space-y-2">
+                        {(mobileEditNodeData.sections || []).map(section => (
+                          <div key={section.id} className="flex items-center gap-2.5 px-3 py-2.5 bg-muted/30 rounded-lg">
+                            <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: section.color }} />
+                            <span className="text-sm text-foreground flex-1">{section.label}</span>
+                            <button onClick={() => removeSectionFromNode(mobileEditNodeData.id, section.id)}>
+                              <X className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      {addingSectionTo === mobileEditNodeData.id ? (
+                        <div className="mt-3 p-3 bg-muted/30 rounded-lg">
+                          <div className="grid grid-cols-2 gap-1.5 max-h-40 overflow-auto">
+                            {sectionPresets.map(preset => (
+                              <button
+                                key={preset.id}
+                                onClick={() => addSectionToNode(mobileEditNodeData.id, preset)}
+                                className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs text-muted-foreground hover:bg-background transition-colors text-left"
+                              >
+                                <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: preset.color }} />
+                                {preset.label}
+                              </button>
+                            ))}
+                          </div>
+                          <button
+                            onClick={() => setAddingSectionTo(null)}
+                            className="mt-2 text-xs text-muted-foreground hover:text-foreground w-full text-center"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setAddingSectionTo(mobileEditNodeData.id)}
+                          className="mt-2 h-9 text-xs gap-1 w-full justify-start"
+                        >
+                          <Plus className="h-3.5 w-3.5" /> Add Section
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
 
