@@ -262,6 +262,7 @@ const NavigationMaker = () => {
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [currentProjectName, setCurrentProjectName] = useState("AI Product Sitemap");
   const [savingProject, setSavingProject] = useState(false);
+  const [mobileLibraryOpen, setMobileLibraryOpen] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const { canExportJSON, isPremium, userId } = useUserPlan();
 
