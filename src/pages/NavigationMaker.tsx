@@ -992,6 +992,67 @@ const NavigationMaker = () => {
             </div>
           </aside>
 
+          {/* Mobile Page Library — Bottom Sheet */}
+          <Sheet open={mobileLibraryOpen} onOpenChange={setMobileLibraryOpen}>
+            <SheetContent side="bottom" className="md:hidden h-[70vh] rounded-t-2xl p-0">
+              <SheetHeader className="p-4 pb-2 border-b border-border/40">
+                <SheetTitle className="text-sm font-semibold">📦 Page Library</SheetTitle>
+                <div className="relative mt-2">
+                  <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search pages..." 
+                    value={search} 
+                    onChange={e => setSearch(e.target.value)}
+                    className="pl-8 h-8 text-xs rounded-lg bg-muted/30 border-border/40"
+                  />
+                </div>
+              </SheetHeader>
+              <div className="overflow-y-auto overscroll-contain flex-1 p-3 space-y-4" style={{ maxHeight: "calc(70vh - 100px)" }}>
+                {categories.map(cat => {
+                  const pages = filteredPages.filter(p => p.category === cat);
+                  if (pages.length === 0) return null;
+                  return (
+                    <div key={cat}>
+                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2 px-1">{cat}</p>
+                      <div className="space-y-0.5">
+                        {pages.map(page => {
+                          const Icon = page.icon;
+                          const onCanvas = nodes.some(n => n.pageId === page.id);
+                          return (
+                            <button
+                              key={page.id}
+                              onClick={() => { addPageToCanvas(page); setMobileLibraryOpen(false); }}
+                              className={cn(
+                                "flex items-center gap-2.5 w-full px-2.5 py-2.5 rounded-lg text-xs transition-all duration-150",
+                                "hover:bg-muted active:scale-[0.97]",
+                                onCanvas ? "text-foreground bg-muted" : "text-muted-foreground"
+                              )}
+                            >
+                              <Icon className="h-4 w-4 shrink-0" />
+                              <span className="truncate">{page.label}</span>
+                              {onCanvas && <span className="ml-auto text-[9px] text-green-500 font-semibold">✓</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="p-3 border-t border-border/40 text-center">
+                <p className="text-[10px] text-muted-foreground">{nodes.length} on canvas · {stockPages.length} available</p>
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          {/* Mobile FAB — Add Page */}
+          <button
+            onClick={() => setMobileLibraryOpen(true)}
+            className="md:hidden fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-foreground text-background shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <Plus className="h-6 w-6" />
+          </button>
+
           {/* Canvas */}
           <div className="flex-1 relative overflow-auto" style={{ background: "radial-gradient(circle, #e5e7eb 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
             {/* UX Score Panel */}
