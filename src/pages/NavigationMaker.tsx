@@ -1240,7 +1240,7 @@ const NavigationMaker = () => {
           <div className="flex-1 relative overflow-auto" style={{ background: "radial-gradient(circle, #e5e7eb 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
             {/* UX Score Panel */}
             <UXScorePanel nodes={nodes} connections={connections} visible={showUXScore} onClose={() => setShowUXScore(false)} />
-            <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px]">
+            <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px] origin-top-left transition-transform duration-150" style={{ transform: `scale(${zoomLevel})` }}>
               {/* SVG Connections — Curved Bezier lines */}
               <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0">
                 <defs>
