@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,7 @@ import {
   Newspaper, Rocket, Scale, Scissors, Send,
   FileJson, Crown, Undo2, Redo2, FileUp, Minimize2,
   ChevronDown, Circle, X, MoreHorizontal, Type, Layout, Code, Paintbrush, 
-  MousePointer, Eye, TrendingUp, Share2
+  MousePointer, Eye, TrendingUp, Share2, Save, FolderOpen
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -236,6 +237,7 @@ const getDefaultSections = (pageId: string): PageSection[] => {
 
 const NavigationMaker = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const canvasRef = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
@@ -250,8 +252,11 @@ const NavigationMaker = () => {
   const [addingSectionTo, setAddingSectionTo] = useState<string | null>(null);
   const [isAuthed, setIsAuthed] = useState(false);
   const [showUXScore, setShowUXScore] = useState(false);
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+  const [currentProjectName, setCurrentProjectName] = useState("AI Product Sitemap");
+  const [savingProject, setSavingProject] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
-  const { canExportJSON } = useUserPlan();
+  const { canExportJSON, isPremium, userId } = useUserPlan();
 
   // Check auth state for download gating
   useEffect(() => {
@@ -263,6 +268,77 @@ const NavigationMaker = () => {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  // Load project from URL param
+  useEffect(() => {
+    const projectId = searchParams.get("project");
+    if (!projectId) return;
+    const loadProject = async () => {
+      const { data } = await supabase
+        .from("sitemap_projects" as any)
+        .select("*")
+        .eq("id", projectId)
+        .maybeSingle();
+      if (data) {
+        const d = data as any;
+        const loadedNodes = Array.isArray(d.nodes) ? d.nodes : [];
+        const loadedConns = Array.isArray(d.connections) ? d.connections : [];
+        setNodes(loadedNodes);
+        setConnections(loadedConns);
+        setCurrentProjectId(d.id);
+        setCurrentProjectName(d.name || "Untitled Project");
+        setHistory([{ nodes: loadedNodes, connections: loadedConns }]);
+        setHistoryIndex(0);
+        toast.success(`Loaded "${d.name}"`);
+      }
+    };
+    loadProject();
+  }, [searchParams]);
+
+  // Save project handler
+  const saveProject = async () => {
+    if (!isAuthed || !userId) { toast.error("Please sign in to save projects"); navigate("/auth"); return; }
+    if (nodes.length === 0) { toast.error("Add some pages first!"); return; }
+    setSavingProject(true);
+    try {
+      if (currentProjectId) {
+        // Update existing
+        const { error } = await supabase.from("sitemap_projects" as any).update({
+          nodes: JSON.parse(JSON.stringify(nodes)),
+          connections: JSON.parse(JSON.stringify(connections)),
+          name: currentProjectName,
+        } as any).eq("id", currentProjectId);
+        if (error) throw error;
+        toast.success("Project saved!");
+      } else {
+        // Check limit
+        const { count } = await supabase.from("sitemap_projects" as any).select("id", { count: "exact", head: true }).eq("user_id", userId);
+        const limit = isPremium ? 999 : 3;
+        if ((count || 0) >= limit) {
+          toast.error(isPremium ? "Project limit reached" : "Free plan: 3 projects max. Upgrade to Pro for unlimited.");
+          setSavingProject(false);
+          return;
+        }
+        const name = prompt("Project name:", currentProjectName) || currentProjectName;
+        const { data, error } = await supabase.from("sitemap_projects" as any).insert({
+          user_id: userId,
+          name,
+          nodes: JSON.parse(JSON.stringify(nodes)),
+          connections: JSON.parse(JSON.stringify(connections)),
+        } as any).select().single();
+        if (error) throw error;
+        const d = data as any;
+        setCurrentProjectId(d.id);
+        setCurrentProjectName(name);
+        toast.success(`Project "${name}" saved!`);
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to save project");
+    } finally {
+      setSavingProject(false);
+    }
+  };
+
   // Undo/Redo
   const [history, setHistory] = useState<HistoryState[]>([{ nodes: [], connections: [] }]);
   const [historyIndex, setHistoryIndex] = useState(0);
@@ -720,7 +796,7 @@ const NavigationMaker = () => {
           </Button>
           <div className="flex items-center gap-2">
             <span className="text-sm">🏗</span>
-            <h1 className="text-sm font-semibold text-foreground">AI Product Sitemap</h1>
+            <h1 className="text-sm font-semibold text-foreground truncate max-w-[180px]">{currentProjectName}</h1>
           </div>
           
           <div className="flex-1" />
@@ -757,6 +833,12 @@ const NavigationMaker = () => {
               title="UX Score"
             >
               <TrendingUp className="h-3.5 w-3.5" /> UX Score
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/my-projects")} className="gap-1.5 h-8 text-xs rounded-lg hover:bg-neutral-100 dark:hover:bg-muted/50">
+              <FolderOpen className="h-3.5 w-3.5" /> Projects
+            </Button>
+            <Button variant="ghost" size="sm" onClick={saveProject} disabled={savingProject} className="gap-1.5 h-8 text-xs rounded-lg hover:bg-neutral-100 dark:hover:bg-muted/50">
+              <Save className="h-3.5 w-3.5" /> {savingProject ? "Saving..." : currentProjectId ? "Save" : "Save As"}
             </Button>
             <Button variant="ghost" size="sm" onClick={importJSON} className="gap-1.5 h-8 text-xs rounded-lg hover:bg-neutral-100 dark:hover:bg-muted/50">
               <FileUp className="h-3.5 w-3.5" /> Import

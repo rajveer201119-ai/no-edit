@@ -32,6 +32,7 @@ import WebsiteAnalyzer from "./pages/WebsiteAnalyzer";
 import PublicSitemap from "./pages/PublicSitemap";
 import SitemapLibrary from "./pages/SitemapLibrary";
 import SharedSitemap from "./pages/SharedSitemap";
+import MyProjects from "./pages/MyProjects";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/tools/:tool" element={<ToolLanding />} />
               <Route path="/navigation-maker" element={<NavigationMaker />} />
+              <Route path="/my-projects" element={<MyProjects />} />
               <Route path="/pricing-india" element={<PricingIndia />} />
               <Route path="/pricing-international" element={<PricingInternational />} />
               <Route path="/admin" element={<Admin />} />
