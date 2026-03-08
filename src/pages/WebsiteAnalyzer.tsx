@@ -166,12 +166,15 @@ const WebsiteAnalyzer = () => {
         title="Website Structure Analyzer — EPIC"
         description="Analyze any website's architecture. Get a visual sitemap, structure report, and UX insights with EPIC's free analyzer tool."
       />
-      <main className="min-h-screen bg-background">
+      <MainNavigation
+        activeTab="home"
+        onTabChange={(tab) => {
+          if (tab === "home") navigate("/");
+        }}
+      />
+      <main className="min-h-screen bg-background pt-14">
         {/* Header */}
         <header className="border-b border-border px-6 py-4 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
           <div>
             <h1 className="text-xl font-bold">Website Structure Analyzer</h1>
             <p className="text-sm text-muted-foreground">Analyze any website's architecture and generate visual sitemaps</p>

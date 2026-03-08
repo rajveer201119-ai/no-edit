@@ -54,7 +54,13 @@ const SitemapLibrary = () => {
         title="Website Structure Library — Visual Sitemaps | EPIC"
         description="Browse visual sitemaps of popular websites and explore their architecture. Discover how top sites structure their content."
       />
-      <main className="min-h-screen bg-background">
+      <MainNavigation
+        activeTab="home"
+        onTabChange={(tab) => {
+          if (tab === "home") navigate("/");
+        }}
+      />
+      <main className="min-h-screen bg-background pt-14">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <header className="text-center mb-10">
             <h1 className="text-4xl font-bold mb-3">Website Structure Library</h1>
