@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { SEO, faqSchema } from "@/components/SEO";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -490,16 +491,20 @@ const ToolLanding = () => {
 
       <div className="min-h-screen bg-background">
         {/* Nav */}
-        <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50" aria-label="Breadcrumb">
+        <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="container mx-auto px-4 py-3 flex items-center gap-3">
             <button onClick={() => navigate("/")} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <img src={epicLogo} alt="EPIC" className="w-8 h-8" width={32} height={32} />
               <span className="font-bold text-foreground">EPIC</span>
             </button>
-            <span className="text-muted-foreground">/</span>
-            <span className="text-sm text-muted-foreground">{page.title}</span>
           </div>
         </nav>
+        
+        {/* Breadcrumbs with Schema */}
+        <Breadcrumbs items={[
+          { label: "Tools", href: "/" },
+          { label: page.title }
+        ]} />
 
         {/* Hero */}
         <header className="py-20 md:py-28 px-6 text-center bg-gradient-to-b from-primary/5 to-background">

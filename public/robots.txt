@@ -4,6 +4,8 @@
 User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /auth
+Disallow: /my-projects
 
 # Sitemaps
 Sitemap: https://no-edit.lovable.app/sitemap.xml
