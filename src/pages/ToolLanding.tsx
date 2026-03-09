@@ -494,7 +494,7 @@ const ToolLanding = () => {
         <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="container mx-auto px-4 py-3 flex items-center gap-3">
             <button onClick={() => navigate("/")} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <img src={epicLogo} alt="EPIC" className="w-8 h-8" width={32} height={32} />
+              <img src={epicLogo} alt="EPIC" className="w-8 h-8" width={32} height={32} loading="lazy" decoding="async" />
               <span className="font-bold text-foreground">EPIC</span>
             </button>
           </div>

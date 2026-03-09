@@ -124,7 +124,7 @@ const BlogCategory = () => {
       </div>
 
       <Footer />
-    </div>
+    </main>
   );
 };
 

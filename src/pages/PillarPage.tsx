@@ -174,7 +174,7 @@ const PillarPage = () => {
       </article>
 
       <Footer />
-    </div>
+    </main>
   );
 };
 

@@ -132,16 +132,9 @@ const PublicSitemap = () => {
         }}
       />
       
-      <main className="min-h-screen bg-background pt-14">
+      <main id="main-content" className="min-h-screen bg-background pt-14">
+        <Breadcrumbs items={[{ label: "Sitemap Library", href: "/sitemaps" }, { label: `${data.domain} Sitemap` }]} />
         <div className="max-w-5xl mx-auto px-6 py-12 space-y-10">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
-            <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
-            <span>/</span>
-            <Link to="/sitemaps" className="hover:text-foreground transition-colors">Sitemap Library</Link>
-            <span>/</span>
-            <span className="text-foreground">{data.domain}</span>
-          </nav>
 
           {/* Header */}
           <header>

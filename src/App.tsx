@@ -7,34 +7,43 @@ import { ThemeProvider } from "next-themes";
 import { HelmetProvider } from "react-helmet-async";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import React, { Suspense } from "react";
 import Index from "./pages/Index";
-import ResetPassword from "./pages/ResetPassword";
-import NotFound from "./pages/NotFound";
-import Auth from "./pages/Auth";
-import Terms from "./pages/Terms";
-import PricingIndia from "./pages/PricingIndia";
-import PricingInternational from "./pages/PricingInternational";
-import Admin from "./pages/Admin";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Privacy from "./pages/Privacy";
-import ToolLanding from "./pages/ToolLanding";
-import NavigationMaker from "./pages/NavigationMaker";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
-import PillarPage from "./pages/PillarPage";
-import Changelog from "./pages/Changelog";
-import Roadmap from "./pages/Roadmap";
-import Examples from "./pages/Examples";
-import AlternativePage from "./pages/AlternativePage";
-import BlogCategory from "./pages/BlogCategory";
-import WebsiteAnalyzer from "./pages/WebsiteAnalyzer";
-import PublicSitemap from "./pages/PublicSitemap";
-import SitemapLibrary from "./pages/SitemapLibrary";
-import SharedSitemap from "./pages/SharedSitemap";
-import MyProjects from "./pages/MyProjects";
+
+// Lazy-loaded pages for code splitting
+const ResetPassword = React.lazy(() => import("./pages/ResetPassword"));
+const NotFound = React.lazy(() => import("./pages/NotFound"));
+const Auth = React.lazy(() => import("./pages/Auth"));
+const Terms = React.lazy(() => import("./pages/Terms"));
+const PricingIndia = React.lazy(() => import("./pages/PricingIndia"));
+const PricingInternational = React.lazy(() => import("./pages/PricingInternational"));
+const Admin = React.lazy(() => import("./pages/Admin"));
+const About = React.lazy(() => import("./pages/About"));
+const Contact = React.lazy(() => import("./pages/Contact"));
+const Privacy = React.lazy(() => import("./pages/Privacy"));
+const ToolLanding = React.lazy(() => import("./pages/ToolLanding"));
+const NavigationMaker = React.lazy(() => import("./pages/NavigationMaker"));
+const Blog = React.lazy(() => import("./pages/Blog"));
+const BlogPost = React.lazy(() => import("./pages/BlogPost"));
+const PillarPage = React.lazy(() => import("./pages/PillarPage"));
+const Changelog = React.lazy(() => import("./pages/Changelog"));
+const Roadmap = React.lazy(() => import("./pages/Roadmap"));
+const Examples = React.lazy(() => import("./pages/Examples"));
+const AlternativePage = React.lazy(() => import("./pages/AlternativePage"));
+const BlogCategory = React.lazy(() => import("./pages/BlogCategory"));
+const WebsiteAnalyzer = React.lazy(() => import("./pages/WebsiteAnalyzer"));
+const PublicSitemap = React.lazy(() => import("./pages/PublicSitemap"));
+const SitemapLibrary = React.lazy(() => import("./pages/SitemapLibrary"));
+const SharedSitemap = React.lazy(() => import("./pages/SharedSitemap"));
+const MyProjects = React.lazy(() => import("./pages/MyProjects"));
 
 const queryClient = new QueryClient();
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+  </div>
+);
 
 const App = () => (
   <HelmetProvider>
@@ -44,8 +53,12 @@ const App = () => (
           <Toaster />
           <Sonner />
           <InstallPrompt />
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:text-sm focus:font-medium">
+            Skip to main content
+          </a>
           <ErrorBoundary>
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -75,6 +88,7 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
           </BrowserRouter>
           </ErrorBoundary>
         </TooltipProvider>

@@ -154,7 +154,7 @@ const AlternativePage = () => {
       </article>
 
       <Footer />
-    </div>
+    </main>
   );
 };
 

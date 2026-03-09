@@ -194,7 +194,7 @@ const BlogPostPage = () => {
 
       <BackToTop />
       <Footer />
-    </div>
+    </main>
   );
 };
 
