@@ -51,25 +51,25 @@
 
   <!-- Pricing Pages (0.7) with hreflang -->
   <url>
-    <loc>https://no-edit.lovable.app/pricing-india</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.7</priority>
+    <loc>https://no-edit.lovable.app/pricing-india</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en-IN" href="https://no-edit.lovable.app/pricing-india"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://no-edit.lovable.app/pricing-international"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://no-edit.lovable.app/pricing-international"/>
   </url>
   <url>
-    <loc>https://no-edit.lovable.app/pricing-international</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.7</priority>
+    <loc>https://no-edit.lovable.app/pricing-international</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en-IN" href="https://no-edit.lovable.app/pricing-india"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://no-edit.lovable.app/pricing-international"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://no-edit.lovable.app/pricing-international"/>
   </url>
 
   <!-- Blog (0.7) -->
-  <url><loc>https://no-edit.lovable.app/blog</loc><lastmod>2026-03-08</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://no-edit.lovable.app/blog/category/ux-design</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/blog/category/web-planning</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/blog/category/saas-design</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/blog/category/design-tips</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/blog/category/student-resources</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/blog</loc><lastmod>2026-03-09</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://no-edit.lovable.app/blog/category/ux-design</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/blog/category/web-planning</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/blog/category/saas-design</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/blog/category/design-tips</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/blog/category/student-resources</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
 
   <!-- Blog Articles (0.6) -->
   <url><loc>https://no-edit.lovable.app/blog/what-is-website-user-flow</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
