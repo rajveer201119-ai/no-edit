@@ -93,7 +93,7 @@ const Auth = () => {
 
   return (
     <>
-    <SEO title="Sign In — EPIC Design" description="Sign in or create a free EPIC account." noIndex />
+    <SEO title="Sign In — EPIC Design" description="Sign in or create a free EPIC account." noIndex={true} />
     <main className="min-h-screen flex items-center justify-center px-4">
       <Card className="w-full max-w-md p-6 space-y-6">
         <header>

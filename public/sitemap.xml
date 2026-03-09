@@ -104,48 +104,45 @@
   <url><loc>https://no-edit.lovable.app/blog/website-footer-design-best-practices</loc><lastmod>2026-03-07</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
 
   <!-- Public Sitemap Pages (0.6) -->
-  <url><loc>https://no-edit.lovable.app/sitemap/notion-so</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/figma-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/stripe-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/vercel-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/airbnb-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/shopify-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/github-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/linear-app</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/supabase-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/tailwindcss-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/nextjs-org</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/slack-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/spotify-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/dropbox-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/atlassian-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/hubspot-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/twitch-tv</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/canva-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/wordpress-org</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/intercom-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/webflow-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/airtable-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/calendly-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/loom-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/producthunt-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/dribbble-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/medium-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/hashnode-dev</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/zapier-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemap/mailchimp-com</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/notion-so</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/figma-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/stripe-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/vercel-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/airbnb-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/shopify-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/github-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/linear-app</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/supabase-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/tailwindcss-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/nextjs-org</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/slack-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/spotify-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/dropbox-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/atlassian-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/hubspot-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/twitch-tv</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/canva-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/wordpress-org</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/intercom-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/webflow-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/airtable-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/calendly-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/loom-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/producthunt-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/dribbble-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/medium-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/hashnode-dev</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/zapier-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemap/mailchimp-com</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
 
   <!-- Authority Pages (0.5) -->
-  <url><loc>https://no-edit.lovable.app/changelog</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://no-edit.lovable.app/roadmap</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://no-edit.lovable.app/examples</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://no-edit.lovable.app/changelog</loc><lastmod>2026-03-09</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://no-edit.lovable.app/roadmap</loc><lastmod>2026-03-09</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://no-edit.lovable.app/examples</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>
 
   <!-- Static Pages (0.5) -->
-  <url><loc>https://no-edit.lovable.app/about</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://no-edit.lovable.app/contact</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://no-edit.lovable.app/privacy</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
-  <url><loc>https://no-edit.lovable.app/terms</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
-
-  <!-- Auth (0.4) -->
-  <url><loc>https://no-edit.lovable.app/auth</loc><lastmod>2026-03-08</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://no-edit.lovable.app/about</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://no-edit.lovable.app/contact</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://no-edit.lovable.app/privacy</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://no-edit.lovable.app/terms</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
 </urlset>
