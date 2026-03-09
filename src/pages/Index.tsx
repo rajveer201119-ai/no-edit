@@ -555,7 +555,7 @@ const Index = () => {
         structuredData={homePageSchema}
       />
 
-      <div className="min-h-screen bg-background">
+      <div id="main-content" className="min-h-screen bg-background" role="main">
         {/* Main Navigation */}
         <MainNavigation
           activeTab={activeTab}

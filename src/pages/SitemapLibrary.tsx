@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Footer } from "@/components/Footer";
 import { Globe, Search, ArrowRight, FileText, Layers } from "lucide-react";
 import { MainNavigation } from "@/components/platform/MainNavigation";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 const SitemapLibrary = () => {
   const navigate = useNavigate();
@@ -86,14 +87,9 @@ const SitemapLibrary = () => {
           if (tab === "home") navigate("/");
         }}
       />
-      <main className="min-h-screen bg-background pt-14">
+      <main id="main-content" className="min-h-screen bg-background pt-14">
+        <Breadcrumbs items={[{ label: "Sitemap Library" }]} />
         <div className="max-w-6xl mx-auto px-6 py-12">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8" aria-label="Breadcrumb">
-            <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
-            <span>/</span>
-            <span className="text-foreground">Sitemap Library</span>
-          </nav>
 
           <header className="text-center mb-10">
             <h1 className="text-4xl font-bold mb-3">Website Structure Library</h1>
