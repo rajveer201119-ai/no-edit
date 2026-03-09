@@ -53,7 +53,7 @@ const BlogCategory = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <main id="main-content" className="min-h-screen bg-background text-foreground">
       <SEO
         title={`${cat.title} Articles — EPIC Blog`}
         description={cat.description}
