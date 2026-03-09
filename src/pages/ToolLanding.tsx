@@ -656,7 +656,7 @@ const ToolLanding = () => {
         </section>
 
         <Footer />
-      </div>
+      </main>
     </>
   );
 };
