@@ -10,6 +10,7 @@ import { seedSitemaps } from "@/data/seedSitemaps";
 import { Footer } from "@/components/Footer";
 import { MainNavigation } from "@/components/platform/MainNavigation";
 import { FileText, Layers, BarChart3, AlertTriangle, TreePine, ArrowRight } from "lucide-react";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 const PublicSitemap = () => {
   const { slug } = useParams<{ slug: string }>();
