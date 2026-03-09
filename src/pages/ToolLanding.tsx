@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { SEO, faqSchema } from "@/components/SEO";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
