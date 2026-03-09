@@ -2,12 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <!-- Homepage -->
-  <url><loc>https://no-edit.lovable.app/</loc><lastmod>2026-03-08</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://no-edit.lovable.app/</loc><lastmod>2026-03-09</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
 
   <!-- Sitemap Builder / Core Tools (0.9) -->
-  <url><loc>https://no-edit.lovable.app/navigation-maker</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://no-edit.lovable.app/analyzer</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://no-edit.lovable.app/sitemaps</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://no-edit.lovable.app/navigation-maker</loc><lastmod>2026-03-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://no-edit.lovable.app/analyzer</loc><lastmod>2026-03-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://no-edit.lovable.app/sitemaps</loc><lastmod>2026-03-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
 
   <!-- Templates / Tool Landing Pages (0.8) -->
   <url><loc>https://no-edit.lovable.app/tools/poster-maker</loc><lastmod>2026-03-08</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
