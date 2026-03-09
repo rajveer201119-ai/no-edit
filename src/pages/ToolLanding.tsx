@@ -489,7 +489,7 @@ const ToolLanding = () => {
         }}
       />
 
-      <div className="min-h-screen bg-background">
+      <main id="main-content" className="min-h-screen bg-background">
         {/* Nav */}
         <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="container mx-auto px-4 py-3 flex items-center gap-3">
