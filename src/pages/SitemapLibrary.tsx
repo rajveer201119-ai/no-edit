@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Footer } from "@/components/Footer";
 import { Globe, Search, ArrowRight, FileText, Layers } from "lucide-react";
 import { MainNavigation } from "@/components/platform/MainNavigation";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 const SitemapLibrary = () => {
   const navigate = useNavigate();
