@@ -1,4 +1,4 @@
-import { Github, Linkedin, Twitter, Instagram } from "lucide-react";
+import { Github, Linkedin, Twitter, Instagram, Sparkles, Zap, Map } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -12,6 +12,10 @@ export const Footer = () => {
             <p className="text-sm text-gray-400 mb-4">
               Design generator for non-designers. Create professional logos, social media graphics, banners, and more with AI. No design skills needed.
             </p>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <span className="inline-flex items-center gap-1 text-xs bg-primary/20 text-primary px-2 py-1 rounded-full"><Sparkles className="h-3 w-3" /> AI-Powered</span>
+              <span className="inline-flex items-center gap-1 text-xs bg-amber-500/20 text-amber-400 px-2 py-1 rounded-full"><Zap className="h-3 w-3" /> Free</span>
+            </div>
           </div>
 
           {/* Guides (Pillar Pages) */}
@@ -54,12 +58,24 @@ export const Footer = () => {
             </ul>
           </nav>
 
-          {/* Website Tools & Alternatives */}
+          {/* Website Tools, Sitemap & Alternatives */}
           <nav aria-label="Website Tools & Alternatives">
-            <h4 className="text-lg font-semibold mb-4">Website Tools</h4>
+            <h4 className="text-lg font-semibold mb-4">Website & Sitemap</h4>
             <ul className="space-y-2 mb-4">
               <li><Link to="/analyzer" className="text-sm text-amber-400 hover:text-primary transition-colors font-medium">🔍 Website Analyzer</Link></li>
               <li><Link to="/sitemaps" className="text-sm text-amber-400 hover:text-primary transition-colors font-medium">🗺️ Sitemap Library</Link></li>
+              <li><Link to="/navigation-maker" className="text-sm text-amber-400 hover:text-primary transition-colors font-medium">🧩 Sitemap Editor</Link></li>
+              <li><Link to="/my-projects" className="text-sm text-gray-400 hover:text-primary transition-colors">My Projects</Link></li>
+            </ul>
+
+            <h4 className="text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Editor Features</h4>
+            <ul className="space-y-1 mb-4 text-xs text-gray-500">
+              <li>✦ Auto-Layout & Smart Arrange</li>
+              <li>✦ Zoom & Pan Controls</li>
+              <li>✦ Multi-Select & Bulk Actions</li>
+              <li>✦ Page Notes & Annotations</li>
+              <li>✦ Connection Labels on Canvas</li>
+              <li>✦ Duplicate Nodes</li>
             </ul>
 
             <h4 className="text-lg font-semibold mb-4">Alternatives</h4>
@@ -73,14 +89,24 @@ export const Footer = () => {
               <li><Link to="/alternatives/crello-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Crello Alternative</Link></li>
               <li><Link to="/alternatives/piktochart-alternative" className="text-sm text-gray-400 hover:text-primary transition-colors">Piktochart Alternative</Link></li>
             </ul>
+          </nav>
 
-            <h4 className="text-lg font-semibold mb-3 mt-6">Blog</h4>
+          {/* Blog & Resources */}
+          <nav aria-label="Blog & Resources">
+            <h4 className="text-lg font-semibold mb-4">Blog & Learn</h4>
             <ul className="space-y-2">
               <li><Link to="/blog" className="text-sm text-gray-400 hover:text-primary transition-colors">All Articles</Link></li>
               <li><Link to="/blog/category/ux-design" className="text-sm text-gray-400 hover:text-primary transition-colors">UX Design</Link></li>
               <li><Link to="/blog/category/web-planning" className="text-sm text-gray-400 hover:text-primary transition-colors">Web Planning</Link></li>
               <li><Link to="/blog/category/saas-design" className="text-sm text-gray-400 hover:text-primary transition-colors">SaaS Design</Link></li>
               <li><Link to="/blog/category/design-tips" className="text-sm text-gray-400 hover:text-primary transition-colors">Design Tips</Link></li>
+            </ul>
+
+            <h4 className="text-lg font-semibold mb-4 mt-6">Resources</h4>
+            <ul className="space-y-2">
+              <li><Link to="/changelog" className="text-sm text-gray-400 hover:text-primary transition-colors">Changelog</Link></li>
+              <li><Link to="/roadmap" className="text-sm text-gray-400 hover:text-primary transition-colors">Roadmap</Link></li>
+              <li><Link to="/examples" className="text-sm text-gray-400 hover:text-primary transition-colors">Examples</Link></li>
             </ul>
           </nav>
 
@@ -93,9 +119,6 @@ export const Footer = () => {
               <ul className="mt-3 space-y-1">
                 <li><Link to="/about" className="block text-gray-400 hover:text-primary transition-colors">About</Link></li>
                 <li><Link to="/contact" className="block text-gray-400 hover:text-primary transition-colors">Contact</Link></li>
-                <li><Link to="/changelog" className="block text-gray-400 hover:text-primary transition-colors">Changelog</Link></li>
-                <li><Link to="/roadmap" className="block text-gray-400 hover:text-primary transition-colors">Roadmap</Link></li>
-                <li><Link to="/examples" className="block text-gray-400 hover:text-primary transition-colors">Examples</Link></li>
                 <li><Link to="/pricing-india" className="block text-gray-400 hover:text-primary transition-colors">Pricing (India)</Link></li>
                 <li><Link to="/pricing-international" className="block text-gray-400 hover:text-primary transition-colors">Pricing (Intl)</Link></li>
                 <li><Link to="/terms" className="block text-gray-400 hover:text-primary transition-colors">Terms</Link></li>
@@ -111,6 +134,16 @@ export const Footer = () => {
           <p className="text-xs text-gray-400">
             © 2026 EPIC Design Generator. All rights reserved.
           </p>
+
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            <Link to="/navigation-maker" className="flex items-center gap-1 hover:text-primary transition-colors">
+              <Map className="h-3.5 w-3.5" /> Sitemap Editor
+            </Link>
+            <span>·</span>
+            <Link to="/analyzer" className="hover:text-primary transition-colors">Analyzer</Link>
+            <span>·</span>
+            <Link to="/sitemaps" className="hover:text-primary transition-colors">Library</Link>
+          </div>
           
           <nav className="flex gap-4" aria-label="Social Media Links">
             <a href="https://x.com/epicdesigngen" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" aria-label="Follow EPIC Design on X (Twitter)"><Twitter size={24} /></a>
