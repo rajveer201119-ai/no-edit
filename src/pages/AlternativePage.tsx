@@ -44,7 +44,7 @@ const AlternativePage = () => {
   const headings = page.sections.map((s) => s.heading);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <main id="main-content" className="min-h-screen bg-background text-foreground">
       <ReadingProgress />
       <SEO
         title={page.metaTitle}
