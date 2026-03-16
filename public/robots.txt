@@ -1,11 +1,6 @@
 # EPIC Design Platform - Robots.txt
 # https://no-edit.lovable.app
-
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /auth
-Disallow: /my-projects
 
-# Sitemaps
 Sitemap: https://no-edit.lovable.app/sitemap.xml
