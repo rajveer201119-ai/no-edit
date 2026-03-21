@@ -26,29 +26,29 @@ const PricingIndia = () => {
 
   const handleWhatsAppClick = () => {
     const phoneNumber = "918638910252";
-    const planLabel = selectedPlan === "pro" ? "Pro Lifetime (rs.999)" : "Student Helper (rs.299/month)";
+    const planLabel = selectedPlan === "pro" ? "Pro Lifetime (₹299)" : "Student Helper (₹10/month)";
     const message = encodeURIComponent(`Hi, I want to upgrade to EPIC ${planLabel}. I have made the payment.`);
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
   };
 
   const handleEmailClick = () => {
-    const planLabel = selectedPlan === "pro" ? "Pro Lifetime (rs.999)" : "Student Helper (rs.299/month)";
+    const planLabel = selectedPlan === "pro" ? "Pro Lifetime (₹299)" : "Student Helper (₹10/month)";
     const subject = encodeURIComponent(`EPIC ${planLabel} Upgrade Request`);
     const body = encodeURIComponent(`Hi,\n\nI would like to upgrade to EPIC ${planLabel}.\n\nMy account email: [your EPIC account email]\n\nI have made the payment via UPI. Please activate my access.\n\nThank you!`);
     window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=rajveer201119@gmail.com&su=${subject}&body=${body}`, "_blank");
   };
 
-  const paymentAmount = selectedPlan === "pro" ? "rs.999" : "rs.299";
+  const paymentAmount = selectedPlan === "pro" ? "₹299" : "₹10";
 
   return (
     <>
       <SEO 
-        title="Pricing India - EPIC Plans | rs.299/month & rs.999 Lifetime"
-        description="EPIC pricing for India. Student Helper plan at rs.299/month or Pro Lifetime at rs.999 one-time. Free plan available."
+        title="Pricing India - EPIC Plans | ₹10/month & ₹299 Lifetime"
+        description="EPIC pricing for India. Student Helper plan at ₹10/month or Pro Lifetime at ₹299 one-time. Free plan available."
         keywords="AI design generator India, EPIC pricing India, cheap AI design, Student plan, Pro plan India"
         canonicalUrl="https://no-edit.lovable.app/pricing-india"
         ogType="product"
-        structuredData={pricingPageSchema("INR", 299)}
+        structuredData={pricingPageSchema("INR", 10)}
         hreflang={[
           { lang: "en-IN", href: "https://no-edit.lovable.app/pricing-india" },
           { lang: "en", href: "https://no-edit.lovable.app/pricing-international" },
@@ -80,7 +80,7 @@ const PricingIndia = () => {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-bold mb-2 text-foreground">Free Plan</h2>
-                  <div className="text-4xl font-bold mb-4 text-foreground">rs.0</div>
+                  <div className="text-4xl font-bold mb-4 text-foreground">₹0</div>
                   <p className="text-muted-foreground">Get started for free</p>
                 </div>
                 <ul className="space-y-3">
@@ -125,9 +125,9 @@ const PricingIndia = () => {
                     <Zap className="h-5 w-5" />
                     Student Helper
                   </h2>
-                  <div className="text-4xl font-bold mb-1 text-foreground">rs.299</div>
+                  <div className="text-4xl font-bold mb-1 text-foreground">₹10</div>
                   <p className="text-muted-foreground mb-2">per month</p>
-                  <p className="text-sm text-primary font-medium">Less than rs.1/day!</p>
+                  <p className="text-sm text-primary font-medium">Less than ₹1/day!</p>
                 </div>
                 <ul className="space-y-3">
                   {[
@@ -171,7 +171,7 @@ const PricingIndia = () => {
                     <Crown className="h-5 w-5" />
                     Pro Lifetime
                   </h2>
-                  <div className="text-4xl font-bold mb-1 text-foreground">rs.999</div>
+                  <div className="text-4xl font-bold mb-1 text-foreground">₹299</div>
                   <p className="text-muted-foreground mb-2">one-time payment</p>
                   <p className="text-sm text-yellow-500 font-medium">Pay once, use forever!</p>
                 </div>

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -8,7 +7,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Crown } from "lucide-react";
+import { X, Crown, Check, Zap } from "lucide-react";
 
 interface ProPlanDialogProps {
   open: boolean;
@@ -17,12 +16,11 @@ interface ProPlanDialogProps {
 
 export const ProPlanDialog = ({ open, onOpenChange }: ProPlanDialogProps) => {
   const navigate = useNavigate();
-  const [isIndia, setIsIndia] = useState(true);
   const handleClose = () => onOpenChange(false);
 
-  const handleViewPricing = () => {
+  const handleViewPricing = (region: "india" | "international") => {
     onOpenChange(false);
-    navigate(isIndia ? "/pricing-india" : "/pricing-international");
+    navigate(region === "india" ? "/pricing-india" : "/pricing-international");
   };
 
   return (
@@ -45,53 +43,39 @@ export const ProPlanDialog = ({ open, onOpenChange }: ProPlanDialogProps) => {
         </div>
 
         <div className="p-6 space-y-6">
-          <div className="flex justify-center bg-muted p-1 rounded-md">
-            <Button onClick={() => setIsIndia(true)} variant={isIndia ? "secondary" : "ghost"} className="flex-1 text-sm">🇮🇳 India</Button>
-            <Button onClick={() => setIsIndia(false)} variant={!isIndia ? "secondary" : "ghost"} className="flex-1 text-sm">🌍 International</Button>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="space-y-1 p-3 rounded-lg border border-border/30">
+              <div className="text-xs font-semibold text-muted-foreground">Free</div>
+              <div className="font-bold">₹0</div>
+              <div className="text-[10px] text-muted-foreground">2/day</div>
+            </div>
+            <div className="space-y-1 p-3 rounded-lg border-2 border-primary">
+              <div className="text-xs font-semibold text-primary">Student</div>
+              <div className="font-bold">₹10/mo</div>
+              <div className="text-[10px] text-muted-foreground">10/day</div>
+            </div>
+            <div className="space-y-1 p-3 rounded-lg border-2 border-yellow-500">
+              <div className="text-xs font-semibold text-yellow-500">Pro</div>
+              <div className="font-bold">₹299</div>
+              <div className="text-[10px] text-muted-foreground">Unlimited</div>
+            </div>
           </div>
 
-          {isIndia ? (
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="space-y-1 p-3 rounded-lg border border-border/30">
-                <div className="text-xs font-semibold text-muted-foreground">Free</div>
-                <div className="font-bold">₹0</div>
-                <div className="text-[10px] text-muted-foreground">2/day</div>
-              </div>
-              <div className="space-y-1 p-3 rounded-lg border-2 border-primary">
-                <div className="text-xs font-semibold text-primary">Student</div>
-                <div className="font-bold">₹299/mo</div>
-                <div className="text-[10px] text-muted-foreground">10/day</div>
-              </div>
-              <div className="space-y-1 p-3 rounded-lg border-2 border-yellow-500">
-                <div className="text-xs font-semibold text-yellow-500">Pro</div>
-                <div className="font-bold">₹999</div>
-                <div className="text-[10px] text-muted-foreground">Unlimited</div>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="space-y-1 p-3 rounded-lg border border-border/30">
-                <div className="text-xs font-semibold text-muted-foreground">Free</div>
-                <div className="font-bold">$0</div>
-                <div className="text-[10px] text-muted-foreground">2/day</div>
-              </div>
-              <div className="space-y-1 p-3 rounded-lg border-2 border-primary">
-                <div className="text-xs font-semibold text-primary">Student</div>
-                <div className="font-bold">$15/mo</div>
-                <div className="text-[10px] text-muted-foreground">10/day</div>
-              </div>
-              <div className="space-y-1 p-3 rounded-lg border-2 border-yellow-500">
-                <div className="text-xs font-semibold text-yellow-500">Pro</div>
-                <div className="font-bold">$79</div>
-                <div className="text-[10px] text-muted-foreground">Unlimited</div>
-              </div>
-            </div>
-          )}
-
           <div className="space-y-3 pt-2">
-            <Button onClick={handleViewPricing} className="w-full gradient-epic hover:opacity-90 h-auto py-3 font-semibold">
-              View Full Pricing Details
-            </Button>
+            <div className="grid grid-cols-2 gap-3">
+              <Button onClick={() => handleViewPricing("india")} className="gradient-epic hover:opacity-90 h-auto py-3">
+                <div className="text-center">
+                  <span className="text-lg">🇮🇳</span>
+                  <div className="font-semibold">India</div>
+                </div>
+              </Button>
+              <Button onClick={() => handleViewPricing("international")} className="gradient-epic hover:opacity-90 h-auto py-3">
+                <div className="text-center">
+                  <span className="text-lg">🌍</span>
+                  <div className="font-semibold">International</div>
+                </div>
+              </Button>
+            </div>
           </div>
 
           <Button variant="ghost" onClick={handleClose} className="w-full text-muted-foreground">

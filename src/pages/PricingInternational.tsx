@@ -25,7 +25,7 @@ const PricingInternational = () => {
   };
 
   const handleEmailClick = () => {
-    const planLabel = selectedPlan === "pro" ? "Pro Lifetime ($79)" : "Student Helper ($15/month)";
+    const planLabel = selectedPlan === "pro" ? "Pro Lifetime ($5)" : "Student Helper ($1/month)";
     const subject = encodeURIComponent(`EPIC ${planLabel} Upgrade Request`);
     const body = encodeURIComponent(`Hi,\n\nI would like to upgrade to EPIC ${planLabel}.\n\nMy account email: [your EPIC account email]\n\nPlease share the payment details so I can complete the upgrade.\n\nThank you!`);
     window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=rajveer201119@gmail.com&su=${subject}&body=${body}`, "_blank");
@@ -34,12 +34,12 @@ const PricingInternational = () => {
   return (
     <>
       <SEO 
-        title="Pricing - EPIC Plans | $15/month & $79 Lifetime"
-        description="EPIC pricing. Student Helper plan at $15/month or Pro Lifetime at $79 one-time. Free plan available."
+        title="Pricing - EPIC Plans | $1/month & $5 Lifetime"
+        description="EPIC pricing. Student Helper plan at $1/month or Pro Lifetime at $5 one-time. Free plan available."
         keywords="AI design generator pricing, EPIC pricing, cheap AI design, Student plan, Pro plan"
         canonicalUrl="https://no-edit.lovable.app/pricing-international"
         ogType="product"
-        structuredData={pricingPageSchema("USD", 15)}
+        structuredData={pricingPageSchema("USD", 1)}
         hreflang={[
           { lang: "en-IN", href: "https://no-edit.lovable.app/pricing-india" },
           { lang: "en", href: "https://no-edit.lovable.app/pricing-international" },
@@ -98,9 +98,9 @@ const PricingInternational = () => {
                   <h2 className="text-2xl font-bold mb-2 gradient-epic-text flex items-center gap-2">
                     <Zap className="h-5 w-5" /> Student Helper
                   </h2>
-                  <div className="text-4xl font-bold mb-1 text-foreground">$15</div>
+                  <div className="text-4xl font-bold mb-1 text-foreground">$1</div>
                   <p className="text-muted-foreground mb-2">per month</p>
-                  <p className="text-sm text-primary font-medium">Less than $0.5/day!</p>
+                  <p className="text-sm text-primary font-medium">Less than $0.04/day!</p>
                 </div>
                 <ul className="space-y-3">
                   {["10 designs per day", "No watermark", "Increased export limits", "Additional templates"].map((f, i) => (
@@ -134,7 +134,7 @@ const PricingInternational = () => {
                   <h2 className="text-2xl font-bold mb-2 text-yellow-500 flex items-center gap-2">
                     <Crown className="h-5 w-5" /> Pro Lifetime
                   </h2>
-                  <div className="text-4xl font-bold mb-1 text-foreground">$79</div>
+                  <div className="text-4xl font-bold mb-1 text-foreground">$5</div>
                   <p className="text-muted-foreground mb-2">one-time payment</p>
                   <p className="text-sm text-yellow-500 font-medium">Pay once, use forever!</p>
                 </div>
