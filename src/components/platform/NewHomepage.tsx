@@ -577,19 +577,19 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         <div className="max-w-2xl mx-auto text-center">
           <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp}
             className="text-2xl md:text-3xl font-semibold mb-3 text-foreground tracking-tight">
-            Ready to plan your next website?
+            Create Your Website Structure Now
           </motion.h2>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp}
             className="text-muted-foreground mb-8 text-sm">
-            Join hundreds of founders using EPIC. Free to start, no signup required.
+            Join hundreds of founders and designers using EPIC to plan better websites.
           </motion.p>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2} variants={fadeUp}
             className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button onClick={() => navigate("/navigation-maker")} size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
-              <Network className="h-4 w-4" /> Create Your Sitemap
+              <Network className="h-4 w-4" /> Start Building Your Sitemap
             </Button>
-            <Button onClick={() => navigate("/analyzer")} variant="outline" size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
-              <Globe className="h-4 w-4" /> Analyze a Website
+            <Button onClick={() => navigate("/pricing-india")} variant="outline" size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
+              <Crown className="h-4 w-4" /> View Pro Plans
             </Button>
           </motion.div>
         </div>
