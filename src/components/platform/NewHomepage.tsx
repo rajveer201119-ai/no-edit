@@ -133,21 +133,21 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         {/* Headline — outcome-focused */}
         <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5 }}
           className="text-balance bg-gradient-to-b from-white to-white/60 bg-clip-text py-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-[-0.04em] text-transparent relative z-10 max-w-3xl">
-          Ship your website faster with a clear structure
+          Build Visual Sitemaps &amp; Plan Your UX Flow
         </motion.h1>
 
-        {/* Subheadline — outcome, not feature */}
+        {/* Subheadline — SEO + outcome */}
         <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}
           className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-white/60 max-w-lg mx-auto relative z-10 leading-relaxed">
-          Plan your website's navigation visually. Export clean JSON for developers or HD images for stakeholders — in under 2 minutes.
+          The fastest visual sitemap builder for designers, developers, and founders. Create website architecture, export JSON or HD images — in under 2 minutes.
         </motion.p>
 
         {/* Dual CTA */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5 }}
           className="flex flex-col sm:flex-row items-center gap-3 relative z-20">
           <Button onClick={() => navigate("/navigation-maker")} size="lg"
-            className="gap-2 min-w-[240px] min-h-[52px] rounded-[0.625rem] bg-white text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-lg shadow-white/10">
-            <Network className="h-4 w-4" /> Create Your Sitemap — Free
+            className="gap-2 min-w-[260px] min-h-[52px] rounded-[0.625rem] bg-white text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-lg shadow-white/10">
+            <Network className="h-4 w-4" /> Start Building Your Sitemap
           </Button>
           <Button onClick={() => {
             const demo = document.getElementById("live-demo");
@@ -158,22 +158,22 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           </Button>
         </motion.div>
 
-        {/* Start Designing CTA */}
+        {/* Secondary CTA */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.5 }}
           className="mt-3 relative z-20">
           <Button onClick={onStartDesigning} variant="outline" size="lg"
             className="gap-2 min-w-[200px] min-h-[48px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
-            <Layers className="h-4 w-4" /> Start Designing
+            <Layers className="h-4 w-4" /> Plan Your UX Flow Visually
           </Button>
         </motion.div>
 
         {/* Micro-trust indicators */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
           className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-white/40 relative z-10">
-          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> Free forever</span>
+          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> Free to start</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> No credit card</span>
-          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> No signup required</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> JSON + PNG export</span>
+          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> 33+ website templates</span>
         </motion.div>
 
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
