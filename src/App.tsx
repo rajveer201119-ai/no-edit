@@ -69,11 +69,11 @@ const App = () => (
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/tools/:tool" element={<ToolLanding />} />
-              <Route path="/navigation-maker" element={<NavigationMaker />} />
-              <Route path="/my-projects" element={<MyProjects />} />
+              <Route path="/navigation-maker" element={<RequireAuth><NavigationMaker /></RequireAuth>} />
+              <Route path="/my-projects" element={<RequireAuth><MyProjects /></RequireAuth>} />
               <Route path="/pricing-india" element={<PricingIndia />} />
               <Route path="/pricing-international" element={<PricingInternational />} />
-              <Route path="/admin" element={<Admin />} />
+              <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/blog/category/:category" element={<BlogCategory />} />
