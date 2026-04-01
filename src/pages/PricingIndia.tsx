@@ -2,53 +2,49 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check, Crown, Zap, Shield, MessageCircle, User, X, Star, Mail } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Check, Crown, Shield, X, Lock, Zap } from "lucide-react";
 import { SEO, pricingPageSchema } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
 import { WebGLShader } from "@/components/ui/web-gl-shader";
+import { toast } from "sonner";
+import { z } from "zod";
+
+const emailSchema = z.string().trim().min(1, "Email is required").email("Enter a valid email");
 
 const PricingIndia = () => {
   const navigate = useNavigate();
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<"student" | "pro">("student");
+  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "lifetime">("lifetime");
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
 
-  const handleUpgradeClick = (plan: "student" | "pro") => {
-    setSelectedPlan(plan);
-    setShowPaymentDialog(true);
+  const amount = selectedPlan === "monthly" ? 299 : 1500;
+
+  const handleUPIPay = () => {
+    const result = emailSchema.safeParse(email);
+    if (!result.success) {
+      setEmailError(result.error.errors[0].message);
+      return;
+    }
+    setEmailError("");
+
+    const upiId = "8638910252@upi";
+    const txnNote = encodeURIComponent("EPIC Pro Upgrade");
+    const upiUrl = `upi://pay?pa=${upiId}&pn=EPIC%20Pro&am=${amount}&cu=INR&tn=${txnNote}`;
+    window.location.href = upiUrl;
+    toast.info("Opening your UPI app. Complete the payment to activate Pro.", { duration: 6000 });
   };
-
-  const handleWhatsAppClick = () => {
-    const phoneNumber = "918638910252";
-    const planLabel = selectedPlan === "pro" ? "Pro Lifetime (₹299)" : "Student Helper (₹10/month)";
-    const message = encodeURIComponent(`Hi, I want to upgrade to EPIC ${planLabel}. I have made the payment.`);
-    window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
-  };
-
-  const handleEmailClick = () => {
-    const planLabel = selectedPlan === "pro" ? "Pro Lifetime (₹299)" : "Student Helper (₹10/month)";
-    const subject = encodeURIComponent(`EPIC ${planLabel} Upgrade Request`);
-    const body = encodeURIComponent(`Hi,\n\nI would like to upgrade to EPIC ${planLabel}.\n\nMy account email: [your EPIC account email]\n\nI have made the payment via UPI. Please activate my access.\n\nThank you!`);
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=rajveer201119@gmail.com&su=${subject}&body=${body}`, "_blank");
-  };
-
-  const paymentAmount = selectedPlan === "pro" ? "₹299" : "₹10";
 
   return (
     <>
-      <SEO 
-        title="Pricing India - EPIC Plans | ₹10/month & ₹299 Lifetime"
-        description="EPIC pricing for India. Student Helper plan at ₹10/month or Pro Lifetime at ₹299 one-time. Free plan available."
-        keywords="AI design generator India, EPIC pricing India, cheap AI design, Student plan, Pro plan India"
+      <SEO
+        title="EPIC Pro Pricing — ₹299/mo or ₹1500 Lifetime | Visual Sitemap Builder"
+        description="Upgrade to EPIC Pro for unlimited visual sitemaps, PDF/PNG export, UX testing, website analyzer, and more. ₹299/month or ₹1500 lifetime."
+        keywords="EPIC pricing, visual sitemap builder pricing, UX tool pricing, sitemap generator pro"
         canonicalUrl="https://no-edit.lovable.app/pricing-india"
         ogType="product"
-        structuredData={pricingPageSchema("INR", 10)}
+        structuredData={pricingPageSchema("INR", 299)}
         hreflang={[
           { lang: "en-IN", href: "https://no-edit.lovable.app/pricing-india" },
           { lang: "en", href: "https://no-edit.lovable.app/pricing-international" },
@@ -57,7 +53,7 @@ const PricingIndia = () => {
       />
       <div className="min-h-screen bg-background relative">
         <WebGLShader />
-        
+
         <div className="relative z-10 container mx-auto px-4 py-12">
           <Button
             variant="outline"
@@ -69,12 +65,14 @@ const PricingIndia = () => {
 
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Choose Your Plan
+              EPIC Pro
             </h1>
-            <p className="text-muted-foreground text-lg">Pricing for India</p>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+              Unlock the full power of EPIC — Visual Sitemap Builder
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
             {/* Free Plan */}
             <Card className="p-8 border border-border/30 bg-background/10 backdrop-blur-2xl">
               <div className="space-y-6">
@@ -85,10 +83,9 @@ const PricingIndia = () => {
                 </div>
                 <ul className="space-y-3">
                   {[
-                    "2 designs per day",
-                    "Limited templates",
-                    "Standard export",
-                    "Watermark on exports",
+                    "1 visual sitemap project",
+                    "First 10 pages per sitemap",
+                    "JSON Export",
                   ].map((f, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <Check className="h-5 w-5 text-primary mt-0.5" />
@@ -96,94 +93,82 @@ const PricingIndia = () => {
                     </li>
                   ))}
                   {[
-                    "No JSON export",
-                    "No premium templates",
+                    "PDF Export",
+                    "PNG Export",
+                    "UX Tester",
+                    "Analyze Features",
+                    "Website Structure Library",
                   ].map((f, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <X className="h-5 w-5 text-muted-foreground/50 mt-0.5" />
-                      <span className="text-muted-foreground/50 line-through">{f}</span>
+                      <Lock className="h-5 w-5 text-muted-foreground/50 mt-0.5" />
+                      <span className="text-muted-foreground/50">{f}</span>
                     </li>
                   ))}
                 </ul>
                 <Button variant="outline" className="w-full" onClick={() => navigate("/auth")}>
-                  Get Started
+                  Get Started Free
                 </Button>
               </div>
             </Card>
 
-            {/* Student Helper Plan */}
-            <Card className="p-8 border-2 border-primary/50 bg-background/10 backdrop-blur-2xl relative overflow-hidden">
-              <div className="absolute top-4 right-4">
-                <span className="gradient-epic px-3 py-1 rounded-full text-sm font-semibold text-primary-foreground flex items-center gap-1">
-                  <Zap className="h-3 w-3" />
-                  Popular
-                </span>
-              </div>
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-2xl font-bold mb-2 gradient-epic-text flex items-center gap-2">
-                    <Zap className="h-5 w-5" />
-                    Student Helper
-                  </h2>
-                  <div className="text-4xl font-bold mb-1 text-foreground">₹10</div>
-                  <p className="text-muted-foreground mb-2">per month</p>
-                  <p className="text-sm text-primary font-medium">Less than ₹1/day!</p>
-                </div>
-                <ul className="space-y-3">
-                  {[
-                    "10 designs per day",
-                    "No watermark",
-                    "Increased export limits",
-                    "Additional templates",
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <Check className="h-5 w-5 text-primary mt-0.5" />
-                      <span className="text-foreground font-medium">{f}</span>
-                    </li>
-                  ))}
-                  {[
-                    "No JSON export",
-                    "No premium nav templates",
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <X className="h-5 w-5 text-muted-foreground/50 mt-0.5" />
-                      <span className="text-muted-foreground/50 line-through">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button className="w-full gradient-epic hover:opacity-90" onClick={() => handleUpgradeClick("student")}>
-                  <Zap className="mr-2 h-4 w-4" /> Get Student Plan
-                </Button>
-              </div>
-            </Card>
-
-            {/* Pro Lifetime Plan */}
+            {/* Pro Plan with UPI */}
             <Card className="p-8 border-2 border-yellow-500/50 bg-background/10 backdrop-blur-2xl relative overflow-hidden">
               <div className="absolute top-4 right-4">
                 <span className="bg-yellow-500 px-3 py-1 rounded-full text-sm font-semibold text-black flex items-center gap-1">
                   <Crown className="h-3 w-3" />
-                  Best Value
+                  Pro
                 </span>
               </div>
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-bold mb-2 text-yellow-500 flex items-center gap-2">
                     <Crown className="h-5 w-5" />
-                    Pro Lifetime
+                    EPIC Pro
                   </h2>
-                  <div className="text-4xl font-bold mb-1 text-foreground">₹299</div>
-                  <p className="text-muted-foreground mb-2">one-time payment</p>
-                  <p className="text-sm text-yellow-500 font-medium">Pay once, use forever!</p>
+
+                  {/* Plan toggle */}
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    <button
+                      onClick={() => setSelectedPlan("monthly")}
+                      className={`p-3 rounded-lg border-2 text-left transition-all ${
+                        selectedPlan === "monthly"
+                          ? "border-yellow-500 bg-yellow-500/5"
+                          : "border-border/30 hover:border-yellow-500/30"
+                      }`}
+                    >
+                      <div className="text-xs font-semibold text-muted-foreground uppercase">Monthly</div>
+                      <div className="text-xl font-bold text-foreground">₹299</div>
+                      <div className="text-[10px] text-muted-foreground">per month</div>
+                    </button>
+                    <button
+                      onClick={() => setSelectedPlan("lifetime")}
+                      className={`p-3 rounded-lg border-2 text-left transition-all relative ${
+                        selectedPlan === "lifetime"
+                          ? "border-yellow-500 bg-yellow-500/5"
+                          : "border-border/30 hover:border-yellow-500/30"
+                      }`}
+                    >
+                      <span className="absolute -top-2 right-2 text-[9px] font-bold bg-yellow-500 text-black px-1.5 py-0.5 rounded-full">
+                        SAVE 58%
+                      </span>
+                      <div className="text-xs font-semibold text-muted-foreground uppercase">Lifetime</div>
+                      <div className="text-xl font-bold text-foreground">₹1,500</div>
+                      <div className="text-[10px] text-muted-foreground">one-time</div>
+                    </button>
+                  </div>
                 </div>
+
                 <ul className="space-y-3">
                   {[
-                    "Unlimited exports",
-                    "No watermark",
-                    "JSON sitemap export",
-                    "All premium templates",
-                    "All premium nav templates",
-                    "Future feature updates",
-                    "Pro badge in dashboard",
+                    "Unlimited visual sitemaps",
+                    "Unlimited sitemap pages",
+                    "PDF & PNG Export",
+                    "JSON Export",
+                    "UX Tester",
+                    "Analyze Features",
+                    "Website Structure Library",
+                    "All advanced features",
+                    "Future updates included",
                   ].map((f, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <Check className="h-5 w-5 text-yellow-500 mt-0.5" />
@@ -191,9 +176,39 @@ const PricingIndia = () => {
                     </li>
                   ))}
                 </ul>
-                <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold" onClick={() => handleUpgradeClick("pro")}>
-                  <Crown className="mr-2 h-4 w-4" /> Get Pro Lifetime
-                </Button>
+
+                {/* Email + UPI Pay */}
+                <div className="space-y-3 pt-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="pricing-email" className="text-sm font-medium text-foreground">
+                      Email Address <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="pricing-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (emailError) setEmailError("");
+                      }}
+                      className={emailError ? "border-destructive" : ""}
+                    />
+                    {emailError && (
+                      <p className="text-xs text-destructive">{emailError}</p>
+                    )}
+                  </div>
+                  <Button
+                    onClick={handleUPIPay}
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold h-12 text-base"
+                  >
+                    <Zap className="mr-2 h-4 w-4" />
+                    Pay with UPI — {selectedPlan === "monthly" ? "₹299" : "₹1,500"}
+                  </Button>
+                  <p className="text-center text-[11px] text-muted-foreground">
+                    Opens Google Pay, PhonePe, Paytm, BHIM, or any UPI app
+                  </p>
+                </div>
               </div>
             </Card>
           </div>
@@ -201,32 +216,23 @@ const PricingIndia = () => {
           {/* Trust Section */}
           <div className="max-w-2xl mx-auto mb-16">
             <Card className="p-6 md:p-8 border border-border/30 bg-background/10 backdrop-blur-2xl">
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-semibold text-foreground mb-3">How Payment Works</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  EPIC is in early access. You pay via UPI, message the founder on WhatsApp, and your access is activated personally — usually within hours.
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="flex flex-col items-center text-center p-4 rounded-lg bg-background/20 border border-border/20">
                   <Shield className="h-6 w-6 text-primary mb-2" />
-                  <span className="text-sm text-foreground font-medium">Refund Guaranteed</span>
-                  <span className="text-xs text-muted-foreground">If not activated</span>
+                  <span className="text-sm text-foreground font-medium">Secure UPI Payment</span>
+                  <span className="text-xs text-muted-foreground">Direct bank transfer</span>
                 </div>
                 <div className="flex flex-col items-center text-center p-4 rounded-lg bg-background/20 border border-border/20">
-                  <User className="h-6 w-6 text-primary mb-2" />
-                  <span className="text-sm text-foreground font-medium">Founder Activates</span>
-                  <span className="text-xs text-muted-foreground">Personal service</span>
+                  <Lock className="h-6 w-6 text-primary mb-2" />
+                  <span className="text-sm text-foreground font-medium">Instant Activation</span>
+                  <span className="text-xs text-muted-foreground">Access within hours</span>
                 </div>
                 <div className="flex flex-col items-center text-center p-4 rounded-lg bg-background/20 border border-border/20">
-                  <MessageCircle className="h-6 w-6 text-primary mb-2" />
-                  <span className="text-sm text-foreground font-medium">No Auto-Renewals</span>
-                  <span className="text-xs text-muted-foreground">Cancel anytime</span>
+                  <Crown className="h-6 w-6 text-yellow-500 mb-2" />
+                  <span className="text-sm text-foreground font-medium">Full Refund</span>
+                  <span className="text-xs text-muted-foreground">If not activated in 24h</span>
                 </div>
               </div>
-              <p className="text-center text-xs text-muted-foreground">
-                Full refund if not activated within 24 hours. No questions asked.
-              </p>
             </Card>
           </div>
 
@@ -239,62 +245,6 @@ const PricingIndia = () => {
             </p>
           </div>
         </div>
-
-        {/* Payment Dialog */}
-        <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-          <DialogContent className="sm:max-w-md max-w-[95vw] border border-border/30 bg-background/90 backdrop-blur-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-xl sm:text-2xl gradient-epic-text flex items-center gap-2">
-                {selectedPlan === "pro" ? <Crown className="h-5 w-5" /> : <Zap className="h-5 w-5" />}
-                {selectedPlan === "pro" ? "Unlock Pro Lifetime" : "Unlock Student Helper"}
-              </DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground">
-                Two simple steps to activate
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="p-4 border border-border/30 rounded-lg bg-background/20">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm text-primary">1</div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold mb-2 text-foreground">Pay {paymentAmount} via UPI</h4>
-                    <p className="text-sm text-muted-foreground mb-3">Send {paymentAmount} to this UPI number:</p>
-                    <div className="p-3 border border-border/30 rounded bg-background/30">
-                      <code className="text-primary font-mono text-lg">8638910252</code>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 border border-border/30 rounded-lg bg-background/20">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-sm text-primary">2</div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold mb-2 text-foreground">Send Screenshot & Confirm</h4>
-                    <p className="text-sm text-muted-foreground mb-3">Message the founder to activate your access:</p>
-                    <div className="flex gap-2">
-                      <Button onClick={handleWhatsAppClick} className="flex-1 gradient-epic hover:opacity-90">
-                        <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
-                      </Button>
-                      <Button onClick={handleEmailClick} variant="outline" className="flex-1 border-border/50">
-                        <Mail className="mr-2 h-4 w-4" /> Email
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2 text-center">+91 8638910252</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-3 border border-primary/30 rounded-lg bg-primary/5 text-center">
-                <p className="text-sm text-foreground">
-                  <Shield className="inline h-4 w-4 mr-1 text-primary" />
-                  Full refund if not activated within 24 hours
-                </p>
-              </div>
-              <Button variant="outline" onClick={() => setShowPaymentDialog(false)} className="w-full border-border/50">
-                Close
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
 
         <Footer />
       </div>

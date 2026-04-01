@@ -7,115 +7,100 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Check, Zap, Crown } from "lucide-react";
+import { X, Crown, Lock, Zap } from "lucide-react";
 
 interface CreatorModePaywallProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  triggerReason?: "export" | "limit" | "premium-feature" | "hd-export" | "json-export";
-  remainingCredits?: number;
-  requiredPlan?: "student" | "pro";
+  triggerReason?: "export" | "limit" | "premium-feature" | "hd-export" | "json-export" | "pdf-export" | "png-export" | "ux-tester" | "analyzer" | "library";
+  featureName?: string;
 }
 
-export const CreatorModePaywall = ({ 
-  open, 
+export const CreatorModePaywall = ({
+  open,
   onOpenChange,
   triggerReason = "limit",
-  remainingCredits = 0,
-  requiredPlan = "student",
+  featureName,
 }: CreatorModePaywallProps) => {
   const navigate = useNavigate();
 
   const handleClose = () => onOpenChange(false);
 
-  const handleViewPricing = (region: "india" | "international") => {
+  const handleUpgrade = () => {
     onOpenChange(false);
-    navigate(region === "india" ? "/pricing-india" : "/pricing-international");
+    navigate("/pricing-india");
   };
 
   const getHeadline = () => {
+    if (featureName) return `${featureName} is a Pro feature`;
     switch (triggerReason) {
+      case "pdf-export": return "PDF Export is a Pro feature";
+      case "png-export": return "PNG Export is a Pro feature";
+      case "ux-tester": return "UX Tester is a Pro feature";
+      case "analyzer": return "Website Analyzer is a Pro feature";
+      case "library": return "Structure Library is a Pro feature";
       case "json-export": return "JSON Export is a Pro feature";
       case "export": return "Ready to export your creation?";
-      case "limit": return "You've reached today's free limit";
+      case "limit": return "You've reached the free plan limit";
       case "hd-export": return "Unlock HD exports";
-      case "premium-feature": return "This is a premium feature";
-      default: return "Upgrade your plan";
+      case "premium-feature": return "This is a Pro feature";
+      default: return "Upgrade to EPIC Pro";
     }
   };
-
-  const getSubheadline = () => {
-    switch (triggerReason) {
-      case "json-export": return "Upgrade to Pro Lifetime to export structured JSON sitemaps.";
-      case "export": return "Paid users export unlimited HD designs without watermarks.";
-      case "limit": return "Upgrade for more daily designs.";
-      case "hd-export": return "Free users get standard quality. Paid users get HD.";
-      case "premium-feature": return "Unlock premium features with an upgrade.";
-      default: return "Get the unfair advantage.";
-    }
-  };
-
-  const isProRequired = requiredPlan === "pro" || triggerReason === "json-export";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg glass-card border-2 border-primary/50 p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-lg border-2 border-primary/50 p-0 overflow-hidden">
         <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-6 pb-4">
-          <button onClick={handleClose} className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100">
+          <button onClick={handleClose} className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100">
             <X className="h-4 w-4" /><span className="sr-only">Close</span>
           </button>
           <DialogHeader className="space-y-3">
             <div className="flex items-center gap-2">
-              {isProRequired ? <Crown className="h-6 w-6 text-yellow-500" /> : <Zap className="h-6 w-6 text-primary" />}
+              <Crown className="h-6 w-6 text-yellow-500" />
               <span className="text-xs font-medium text-primary uppercase tracking-wider">
-                {isProRequired ? "Pro Feature" : "Upgrade Required"}
+                Pro Feature
               </span>
             </div>
             <DialogTitle className="text-2xl font-bold">{getHeadline()}</DialogTitle>
-            <DialogDescription className="text-base text-muted-foreground">{getSubheadline()}</DialogDescription>
+            <DialogDescription className="text-base text-muted-foreground">
+              Upgrade to EPIC Pro to unlock this feature and more.
+            </DialogDescription>
           </DialogHeader>
         </div>
 
-        <div className="p-6 space-y-6">
-          {/* Quick comparison */}
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="space-y-2 p-3 rounded-lg border border-border/30">
-              <div className="text-xs font-semibold text-muted-foreground uppercase">Free</div>
-              <div className="text-lg font-bold">₹0</div>
-              <div className="text-xs text-muted-foreground">2/day, watermark</div>
+        <div className="p-6 space-y-5">
+          {/* What you get */}
+          <div className="space-y-2">
+            {[
+              "Unlimited visual sitemaps",
+              "Unlimited pages per sitemap",
+              "PDF & PNG Export",
+              "UX Tester & Analyzer",
+              "Website Structure Library",
+            ].map((f) => (
+              <div key={f} className="flex items-center gap-2 text-sm text-foreground">
+                <Zap className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                {f}
+              </div>
+            ))}
+          </div>
+
+          {/* Pricing summary */}
+          <div className="grid grid-cols-2 gap-3 text-center">
+            <div className="p-3 rounded-lg border border-border/30">
+              <div className="text-lg font-bold text-foreground">₹299</div>
+              <div className="text-xs text-muted-foreground">per month</div>
             </div>
-            <div className={`space-y-2 p-3 rounded-lg border-2 ${!isProRequired ? 'border-primary' : 'border-border/30'}`}>
-              <div className="text-xs font-semibold text-primary uppercase">Student</div>
-              <div className="text-lg font-bold">₹10</div>
-              <div className="text-xs text-muted-foreground">10/day, no watermark</div>
-            </div>
-            <div className={`space-y-2 p-3 rounded-lg border-2 ${isProRequired ? 'border-yellow-500' : 'border-border/30'}`}>
-              <div className="text-xs font-semibold text-yellow-500 uppercase">Pro</div>
-              <div className="text-lg font-bold">₹299</div>
-              <div className="text-xs text-muted-foreground">Unlimited, JSON</div>
+            <div className="p-3 rounded-lg border-2 border-yellow-500">
+              <div className="text-lg font-bold text-foreground">₹1,500</div>
+              <div className="text-xs text-muted-foreground">lifetime</div>
             </div>
           </div>
 
-          {/* Pricing CTAs */}
-          <div className="space-y-3 pt-2">
-            <p className="text-center text-sm text-muted-foreground">Choose your region:</p>
-            <div className="grid grid-cols-2 gap-3">
-              <Button onClick={() => handleViewPricing("india")} className="gradient-epic hover:opacity-90 h-auto py-3">
-                <div className="text-center">
-                  <span className="text-lg">🇮🇳</span>
-                  <div className="font-semibold">India</div>
-                  <div className="text-xs opacity-80">₹10/mo or ₹299</div>
-                </div>
-              </Button>
-              <Button onClick={() => handleViewPricing("international")} className="gradient-epic hover:opacity-90 h-auto py-3">
-                <div className="text-center">
-                  <span className="text-lg">🌍</span>
-                  <div className="font-semibold">International</div>
-                  <div className="text-xs opacity-80">$1/mo or $5</div>
-                </div>
-              </Button>
-            </div>
-          </div>
+          <Button onClick={handleUpgrade} className="w-full h-12 text-base font-semibold">
+            <Crown className="mr-2 h-4 w-4" /> Upgrade to Pro
+          </Button>
 
           <Button variant="ghost" onClick={handleClose} className="w-full text-muted-foreground hover:text-foreground">
             Continue with free plan

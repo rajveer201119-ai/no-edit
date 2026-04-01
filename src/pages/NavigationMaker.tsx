@@ -1787,7 +1787,6 @@ const NavigationMaker = () => {
         open={showPaywall} 
         onOpenChange={setShowPaywall} 
         triggerReason="json-export"
-        requiredPlan="pro"
       />
     </>
   );

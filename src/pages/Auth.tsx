@@ -31,14 +31,22 @@ const Auth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // title managed by SEO component
+    const redirectTo = () => {
+      const saved = sessionStorage.getItem("epic_redirect_after_login");
+      if (saved) {
+        sessionStorage.removeItem("epic_redirect_after_login");
+        navigate(saved, { replace: true });
+      } else {
+        navigate("/");
+      }
+    };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) navigate("/");
+      if (session) redirectTo();
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) navigate("/");
+      if (session) redirectTo();
     });
 
     return () => subscription.unsubscribe();
@@ -100,7 +108,7 @@ const Auth = () => {
           <h1 className="text-2xl font-bold">
             {mode === "signin" ? "Sign in" : "Create your account"}
           </h1>
-          <p className="text-sm text-muted-foreground">Access the EPIC AI image generator.</p>
+          <p className="text-sm text-muted-foreground">Access EPIC — Visual Sitemap Builder & Design Platform.</p>
         </header>
 
         <nav className="grid grid-cols-2 gap-2" aria-label="Auth mode">

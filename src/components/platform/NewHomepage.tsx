@@ -133,21 +133,21 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         {/* Headline — outcome-focused */}
         <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5 }}
           className="text-balance bg-gradient-to-b from-white to-white/60 bg-clip-text py-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-[-0.04em] text-transparent relative z-10 max-w-3xl">
-          Ship your website faster with a clear structure
+          Build Visual Sitemaps &amp; Plan Your UX Flow
         </motion.h1>
 
-        {/* Subheadline — outcome, not feature */}
+        {/* Subheadline — SEO + outcome */}
         <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}
           className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-white/60 max-w-lg mx-auto relative z-10 leading-relaxed">
-          Plan your website's navigation visually. Export clean JSON for developers or HD images for stakeholders — in under 2 minutes.
+          The fastest visual sitemap builder for designers, developers, and founders. Create website architecture, export JSON or HD images — in under 2 minutes.
         </motion.p>
 
         {/* Dual CTA */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5 }}
           className="flex flex-col sm:flex-row items-center gap-3 relative z-20">
           <Button onClick={() => navigate("/navigation-maker")} size="lg"
-            className="gap-2 min-w-[240px] min-h-[52px] rounded-[0.625rem] bg-white text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-lg shadow-white/10">
-            <Network className="h-4 w-4" /> Create Your Sitemap — Free
+            className="gap-2 min-w-[260px] min-h-[52px] rounded-[0.625rem] bg-white text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-lg shadow-white/10">
+            <Network className="h-4 w-4" /> Start Building Your Sitemap
           </Button>
           <Button onClick={() => {
             const demo = document.getElementById("live-demo");
@@ -158,22 +158,22 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           </Button>
         </motion.div>
 
-        {/* Start Designing CTA */}
+        {/* Secondary CTA */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.5 }}
           className="mt-3 relative z-20">
           <Button onClick={onStartDesigning} variant="outline" size="lg"
             className="gap-2 min-w-[200px] min-h-[48px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
-            <Layers className="h-4 w-4" /> Start Designing
+            <Layers className="h-4 w-4" /> Plan Your UX Flow Visually
           </Button>
         </motion.div>
 
         {/* Micro-trust indicators */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
           className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-white/40 relative z-10">
-          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> Free forever</span>
+          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> Free to start</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> No credit card</span>
-          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> No signup required</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> JSON + PNG export</span>
+          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> 33+ website templates</span>
         </motion.div>
 
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
@@ -495,14 +495,14 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
               <p className="text-muted-foreground text-xs mb-6">Perfect for getting started</p>
               <div className="text-3xl font-semibold text-foreground mb-6">₹0 <span className="text-sm font-normal text-muted-foreground">forever</span></div>
               <ul className="space-y-3 mb-8">
-                {["Visual sitemap builder", "Basic PNG export", "50+ templates", "Watermarked exports", "3 exports per day"].map(f => (
+                {["1 visual sitemap project", "First 10 pages per sitemap", "JSON Export", "Basic templates"].map(f => (
                   <li key={f} className="flex items-start gap-2 text-sm text-foreground">
                     <CheckCircle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" /> {f}
                   </li>
                 ))}
               </ul>
               <Button onClick={() => navigate("/navigation-maker")} variant="outline" className="w-full rounded-lg">
-                Start Free
+                Try EPIC Free
               </Button>
             </motion.div>
 
@@ -516,23 +516,23 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
                 <Crown className="h-4 w-4 text-primary" /> Pro
               </h3>
               <p className="text-muted-foreground text-xs mb-6">For professionals who ship</p>
-              <div className="text-3xl font-semibold text-foreground mb-6">₹299 <span className="text-sm font-normal text-muted-foreground">lifetime</span></div>
+              <div className="text-3xl font-semibold text-foreground mb-1">₹299 <span className="text-sm font-normal text-muted-foreground">/month</span></div>
+              <p className="text-xs text-muted-foreground mb-6">or ₹1,500 lifetime</p>
               <ul className="space-y-3 mb-8">
                 {[
-                  "Unlimited exports",
-                  "No watermarks",
-                  "High-res PNG & PDF",
-                  "JSON sitemap export",
-                  "Shareable public links",
-                  "All premium templates",
-                  "Priority processing",
+                  "Unlimited visual sitemaps",
+                  "Unlimited pages per sitemap",
+                  "PDF & PNG Export",
+                  "UX Tester & Analyzer",
+                  "Website Structure Library",
+                  "All advanced features",
                 ].map(f => (
                   <li key={f} className="flex items-start gap-2 text-sm text-foreground">
                     <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" /> {f}
                   </li>
                 ))}
               </ul>
-              <Button onClick={() => navigate("/auth")} className="w-full rounded-lg">
+              <Button onClick={() => navigate("/pricing-india")} className="w-full rounded-lg">
                 Upgrade to Pro
               </Button>
             </motion.div>
@@ -577,19 +577,19 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         <div className="max-w-2xl mx-auto text-center">
           <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp}
             className="text-2xl md:text-3xl font-semibold mb-3 text-foreground tracking-tight">
-            Ready to plan your next website?
+            Create Your Website Structure Now
           </motion.h2>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp}
             className="text-muted-foreground mb-8 text-sm">
-            Join hundreds of founders using EPIC. Free to start, no signup required.
+            Join hundreds of founders and designers using EPIC to plan better websites.
           </motion.p>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2} variants={fadeUp}
             className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button onClick={() => navigate("/navigation-maker")} size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
-              <Network className="h-4 w-4" /> Create Your Sitemap
+              <Network className="h-4 w-4" /> Start Building Your Sitemap
             </Button>
-            <Button onClick={() => navigate("/analyzer")} variant="outline" size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
-              <Globe className="h-4 w-4" /> Analyze a Website
+            <Button onClick={() => navigate("/pricing-india")} variant="outline" size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
+              <Crown className="h-4 w-4" /> View Pro Plans
             </Button>
           </motion.div>
         </div>

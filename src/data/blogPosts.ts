@@ -795,6 +795,553 @@ export const blogPosts: Record<string, BlogPostData> = {
     ],
     relatedArticles: ["website-architecture-guide", "ux-navigation-best-practices", "website-redesign-checklist-2026"]
   },
+  "how-to-plan-website-architecture": {
+    slug: "how-to-plan-website-architecture",
+    metaTitle: "How to Plan Website Architecture — Step-by-Step Guide",
+    metaDescription: "Learn how to plan website architecture that improves SEO, user experience, and scalability. Complete guide with examples and tools.",
+    keywords: "website architecture, plan website structure, site architecture, information architecture, website planning",
+    h1: "How to Plan Website Architecture: Step-by-Step Guide",
+    publishDate: "2026-03-10",
+    readTime: "9 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker", "website-flow-generator"],
+    sections: [
+      { heading: "What Is Website Architecture?", content: "Website architecture is the structural design of your website — how pages are organized, grouped, and connected. Think of it as the blueprint for your digital property. Good architecture makes content findable for users and crawlable for search engines.\n\nArchitecture covers three dimensions: hierarchy (parent-child page relationships), navigation (how users move between sections), and URL structure (how pages are addressed). All three must work together.\n\nPoor architecture leads to orphan pages that search engines can't find, confusing navigation that frustrates users, and duplicate content that dilutes SEO signals. EPIC's visual sitemap builder helps you design architecture that avoids these pitfalls." },
+      { heading: "Start With Content Inventory", content: "Before designing architecture, list every piece of content your site needs. This includes landing pages, product pages, blog posts, legal pages, support articles, and utility pages like login and signup.\n\nGroup related content into categories. For a SaaS site: Product (features, pricing, integrations), Resources (blog, docs, guides), Company (about, careers, press), Support (help center, contact, status page).\n\nPrioritize by business value and search volume. Your most important commercial pages should be closest to the homepage — ideally one click away." },
+      { heading: "Design the Hierarchy", content: "Website hierarchy follows a tree structure: homepage at the top, main sections below, and sub-pages nested underneath. The golden rule: no page should be more than 3 clicks from the homepage.\n\nFlat hierarchies (few levels, many top-level pages) are better for SEO because link equity flows more directly. Deep hierarchies (many nested levels) create pages that are far from the homepage and receive less internal link juice.\n\nUse EPIC to visually map your hierarchy. Drag pages onto the canvas, connect them with parent-child relationships, and see your entire structure at a glance. Export the result as JSON for your development team." },
+      { heading: "URL Structure Best Practices", content: "URLs should mirror your hierarchy: domain.com/category/subcategory/page. This creates logical, predictable URLs that both users and search engines understand.\n\nKeep URLs short and descriptive. Use hyphens between words. Avoid parameters, session IDs, and unnecessary depth. A clean URL like /blog/website-architecture-guide is far better than /blog/2026/03/10/post-id-12345.\n\nImplement canonical tags to prevent duplicate content. Use 301 redirects for moved pages. Create an XML sitemap that includes all important URLs with correct priority values." },
+      { heading: "Internal Linking Strategy", content: "Internal links are how search engines discover pages and how link equity flows through your site. Every page should link to related pages, and important pages should receive links from many other pages.\n\nCreate hub pages (pillar content) that link to clusters of related pages. This topical clustering signals to search engines that your site is an authority on specific subjects.\n\nLink from navigation, body content, sidebars, and footers. Contextual links (within body content) carry the most SEO weight. Use descriptive anchor text that includes relevant keywords." },
+      { heading: "Tools for Website Architecture Planning", content: "EPIC's navigation maker is purpose-built for architecture planning. It offers 50+ page templates, drag-and-drop connections, and instant JSON export. Map your entire site structure visually, then export for your development team.\n\nComplement EPIC with analytics data. Google Analytics shows which pages users visit most, which paths they take, and where they drop off. Use this data to optimize your architecture around real user behavior.\n\nRegularly audit your architecture as your site grows. New content should fit logically into existing categories. If you find yourself creating catch-all sections, it's time to restructure." }
+    ],
+    faqs: [
+      { question: "How many levels should a website hierarchy have?", answer: "3 levels maximum for most sites. Homepage → Section → Page. Deeper hierarchies reduce crawl efficiency and user findability." },
+      { question: "What is flat vs deep website architecture?", answer: "Flat architecture has few levels with many pages at each level. Deep architecture has many nested levels. Flat is generally better for SEO and usability." },
+      { question: "How does architecture affect SEO?", answer: "Architecture determines how link equity flows, how easily pages are crawled, and how content relationships are understood. Good architecture improves rankings for all pages." }
+    ],
+    relatedArticles: ["sitemap-vs-user-flow", "website-architecture-guide", "ux-navigation-best-practices"]
+  },
+  "ux-design-process-explained": {
+    slug: "ux-design-process-explained",
+    metaTitle: "UX Design Process Explained — A Complete Guide for 2026",
+    metaDescription: "Understand the UX design process from research to testing. Learn each phase, key deliverables, and tools used by professional UX designers.",
+    keywords: "UX design process, UX workflow, user experience design, UX methodology, design thinking, UX research",
+    h1: "UX Design Process Explained: From Research to Launch",
+    publishDate: "2026-03-11",
+    readTime: "10 min read",
+    category: "UX Design",
+    pillarLinks: ["user-flow-diagram-tool", "website-flow-generator"],
+    sections: [
+      { heading: "The Five Phases of UX Design", content: "The UX design process follows five core phases: Research, Define, Ideate, Design, and Test. Each phase builds on the previous one, creating a structured path from problem identification to validated solution.\n\nResearch: Understand your users, their goals, pain points, and context. Methods include user interviews, surveys, analytics review, and competitive analysis.\n\nDefine: Synthesize research findings into actionable insights. Create user personas, journey maps, and problem statements that guide design decisions.\n\nIdeate: Generate solution concepts through brainstorming, sketching, and collaborative workshops. Explore multiple approaches before committing to one.\n\nDesign: Create wireframes, prototypes, and visual designs. Start low-fidelity (paper sketches, wireframes) and increase fidelity as concepts are validated.\n\nTest: Validate designs with real users through usability testing, A/B testing, and analytics. Iterate based on findings." },
+      { heading: "User Research Methods", content: "Effective UX starts with understanding users. User interviews are the richest source of qualitative data — sit with 5-8 users and ask about their goals, frustrations, and current workflows.\n\nSurveys reach larger audiences but provide shallower data. Use them to validate patterns found in interviews, not to discover new insights.\n\nAnalytics reveal what users actually do (vs what they say they do). Track page views, click paths, bounce rates, and conversion funnels.\n\nCompetitive analysis shows what's already working in your space. Study 3-5 competitors to understand user expectations and identify differentiation opportunities." },
+      { heading: "Creating User Personas and Journey Maps", content: "User personas are fictional characters representing your key user segments. Each persona has a name, background, goals, and pain points. They keep the team focused on real user needs rather than internal assumptions.\n\nJourney maps visualize the end-to-end experience across all touchpoints. They show what users do, think, and feel at each stage. Map both the current state (with pain points) and the ideal future state.\n\nUse EPIC to create visual journey maps. Each stage becomes a page template connected with user flow arrows, showing the path from awareness to conversion." },
+      { heading: "Wireframing and Prototyping", content: "Wireframes are low-fidelity layouts showing page structure without visual design. They focus on content hierarchy, layout, and functionality. Create wireframes for every key page before investing in visual design.\n\nPrototypes add interactivity to wireframes. Clickable prototypes let users experience the flow before any code is written. They're invaluable for usability testing and stakeholder buy-in.\n\nStart with paper sketches for rapid exploration. Move to digital wireframes in EPIC or Figma. Create interactive prototypes for testing. Each step increases investment, so validate early and often." },
+      { heading: "Usability Testing", content: "Usability testing puts real users in front of your design and observes how they interact. It reveals issues that no amount of internal review can catch.\n\nModerated testing: A researcher guides users through tasks while observing and asking questions. Best for complex products and early-stage designs.\n\nUnmoderated testing: Users complete tasks independently while their screen is recorded. Best for scaling tests across many users with established designs.\n\nTest early and often. Testing a paper prototype catches structural issues before they're expensive to fix. Testing a final design validates polish and edge cases." },
+      { heading: "UX Deliverables and Handoff", content: "Key UX deliverables include: user personas, journey maps, sitemaps, wireframes, user flows, interaction specifications, and design systems.\n\nFor developer handoff, provide annotated designs with spacing, typography, and interaction details. Export sitemaps and user flows from EPIC as JSON for direct integration into project documentation.\n\nMaintain a design system that ensures consistency across all pages and components. Document patterns, interactions, and edge cases so developers can implement accurately." }
+    ],
+    faqs: [
+      { question: "How long does the UX design process take?", answer: "A typical UX design cycle takes 4-12 weeks depending on project complexity. Simple features may need 1-2 weeks. Complex products require months." },
+      { question: "What tools do UX designers use?", answer: "Research: UserTesting, Hotjar. Design: Figma, EPIC. Prototyping: Figma, InVision. Testing: Maze, Lookback. Planning: EPIC, Miro." },
+      { question: "Do I need formal UX training?", answer: "Not necessarily. Many successful UX designers are self-taught. Focus on learning research methods, design principles, and user testing. Practice with real projects." }
+    ],
+    relatedArticles: ["what-is-website-user-flow", "wireflow-examples", "website-architecture-guide"]
+  },
+  "wireframing-guide-for-beginners": {
+    slug: "wireframing-guide-for-beginners",
+    metaTitle: "Wireframing Guide for Beginners — How to Create Wireframes",
+    metaDescription: "Learn wireframing from scratch. This beginner's guide covers wireframe types, tools, best practices, and how to create effective wireframes for web projects.",
+    keywords: "wireframing guide, how to wireframe, wireframe tutorial, wireframing for beginners, wireframe tools, wireframe examples",
+    h1: "Wireframing Guide for Beginners: Everything You Need to Know",
+    publishDate: "2026-03-12",
+    readTime: "8 min read",
+    category: "UX Design",
+    pillarLinks: ["visual-sitemap-maker", "user-flow-diagram-tool"],
+    sections: [
+      { heading: "What Is a Wireframe?", content: "A wireframe is a simplified visual representation of a web page's layout. It shows the structure and arrangement of elements — headers, navigation, content areas, buttons, and forms — without visual design details like colors, images, or typography.\n\nThink of wireframes as architectural blueprints for web pages. Just as builders need blueprints before construction, designers need wireframes before visual design.\n\nWireframes serve three purposes: they help designers plan layouts efficiently, they give stakeholders something concrete to review, and they provide developers with structural requirements before design is finalized." },
+      { heading: "Types of Wireframes", content: "Low-fidelity wireframes are the simplest. They use basic shapes (rectangles, lines, placeholder text) to represent layout elements. Drawn on paper or whiteboards, they're perfect for brainstorming and early exploration.\n\nMid-fidelity wireframes add more detail: actual headings, button labels, form fields, and content hierarchy. Created digitally in tools like EPIC or Figma, they're used for team reviews and stakeholder presentations.\n\nHigh-fidelity wireframes closely resemble the final design, with real content, accurate proportions, and detailed interactions. They bridge the gap between wireframe and mockup." },
+      { heading: "How to Create Your First Wireframe", content: "Step 1: Define the page purpose. What is this page supposed to achieve? A homepage converts visitors into users. A product page informs and persuades. A checkout page collects payment.\n\nStep 2: List all content elements. What needs to appear on this page? Navigation, hero section, feature descriptions, testimonials, pricing, CTAs, footer.\n\nStep 3: Prioritize by importance. The most important elements go at the top (above the fold). Supporting content follows. Less critical elements go lower or in secondary positions.\n\nStep 4: Sketch the layout. Use rectangles for content blocks, lines for text, and buttons for CTAs. Focus on spatial relationships and hierarchy, not aesthetics.\n\nStep 5: Add annotations. Label each element and note its purpose and behavior (e.g., 'Click to open pricing modal')." },
+      { heading: "Wireframing Best Practices", content: "Keep it simple. The value of wireframes is speed and clarity. Adding too much detail defeats the purpose — that's what mockups are for.\n\nDesign for content, not decoration. Place real or realistic content to ensure your layout works with actual text lengths and image proportions.\n\nConsider mobile first. Design the mobile wireframe before desktop. This forces you to prioritize content and ensures a solid foundation that scales up.\n\nInclude all states. Don't just wireframe the happy path. Show empty states, error states, loading states, and edge cases.\n\nUse consistent patterns. Standardize element sizes, spacing, and alignment across all wireframes in a project. This creates a coherent experience." },
+      { heading: "Best Wireframing Tools", content: "EPIC is ideal for wireframing website structures. Its drag-and-drop canvas with 50+ page templates lets you quickly lay out entire website architectures. Export as PNG for presentations or JSON for developers.\n\nFigma is the industry standard for detailed wireframing and design. Its component system and collaboration features make it powerful for team projects.\n\nPaper and pen remain the fastest wireframing tool for brainstorming. Use them for rapid exploration before committing to digital wireframes.\n\nChoose the tool that matches your phase: paper for brainstorming, EPIC for site structure, Figma for detailed page layouts." }
+    ],
+    faqs: [
+      { question: "How long should wireframing take?", answer: "A simple page wireframe takes 15-30 minutes. A full website wireframe set (10-20 pages) takes 2-4 hours. Don't over-invest — wireframes are meant to be quick explorations." },
+      { question: "Should wireframes include real content?", answer: "Ideally, yes. Real content reveals layout issues that lorem ipsum hides: long headings, variable paragraph lengths, and empty state scenarios." },
+      { question: "What's the difference between wireframe and mockup?", answer: "Wireframes show structure and layout without visual design. Mockups add colors, typography, images, and branding. Wireframes come first, mockups second." }
+    ],
+    relatedArticles: ["wireflow-examples", "ux-design-process-explained", "what-is-website-user-flow"]
+  },
+  "website-navigation-design-patterns": {
+    slug: "website-navigation-design-patterns",
+    metaTitle: "Website Navigation Design Patterns — 12 Proven Patterns",
+    metaDescription: "Discover 12 proven website navigation design patterns. Learn when to use each pattern and how they impact UX, engagement, and conversion rates.",
+    keywords: "website navigation patterns, navigation design, web navigation, UX navigation, menu design patterns, hamburger menu",
+    h1: "12 Website Navigation Design Patterns That Actually Work",
+    publishDate: "2026-03-13",
+    readTime: "11 min read",
+    category: "UX Design",
+    pillarLinks: ["website-flow-generator", "visual-sitemap-maker"],
+    sections: [
+      { heading: "Why Navigation Design Matters", content: "Navigation is how users move through your website. Get it wrong, and users can't find content — leading to high bounce rates, poor engagement, and lost conversions. Get it right, and users flow naturally toward their goals.\n\nResearch shows that 94% of users cite easy navigation as the most important website feature. Navigation problems are the #1 reason users abandon websites. Your navigation design literally determines whether your site succeeds or fails.\n\nGood navigation is invisible — users don't think about it, they just use it. Bad navigation is painfully obvious, creating confusion and frustration at every click." },
+      { heading: "Top Navigation Bar", content: "The most common pattern: horizontal links at the top of every page. Works best for sites with 5-8 main sections. Users expect it and know how to use it immediately.\n\nBest for: Corporate sites, SaaS products, portfolios. Limitations: Breaks down with too many items. Consider dropdown menus for sub-navigation.\n\nDesign tips: Keep labels short (1-2 words). Highlight the active page. Include a logo that links to home. Place the primary CTA (Sign Up, Contact) on the right end." },
+      { heading: "Hamburger Menu", content: "Three horizontal lines that expand into a full menu. Saves space on mobile and creates a clean visual appearance. However, it hides navigation behind an extra click.\n\nBest for: Mobile-first designs, content-heavy sites, apps with many sections. Not ideal for: Sites where discovery is key — hidden navigation means lower engagement with secondary pages.\n\nDesign tips: Add a label ('Menu') next to the icon. Use smooth animation for open/close. Consider a full-screen overlay for complex menus." },
+      { heading: "Mega Menu", content: "Dropdown panels showing multiple columns of links, often with images and descriptions. Used by large sites with deep content hierarchies.\n\nBest for: E-commerce (product categories), enterprise sites, media/news. Not ideal for: Simple sites with few pages — it creates unnecessary complexity.\n\nDesign tips: Group links logically. Use headings for each column. Include visual elements (icons, images) to aid scanning. Ensure the mega menu is accessible via keyboard." },
+      { heading: "Sidebar Navigation", content: "Vertical navigation along the left side of the page. Common in dashboards, documentation, and admin interfaces. Allows for many items and nested hierarchies.\n\nBest for: Web applications, documentation, admin panels. Not ideal for: Marketing websites, mobile experiences.\n\nDesign tips: Use collapsible sections for nested items. Highlight the active page clearly. Allow the sidebar to be minimized on desktop for more content space." },
+      { heading: "Breadcrumb Navigation", content: "Shows the user's location in the site hierarchy: Home > Category > Sub-category > Page. Helps users understand where they are and navigate upward.\n\nBest for: E-commerce, hierarchical content sites, documentation. Essential for: Any site with more than 2 levels of hierarchy.\n\nDesign tips: Use chevrons (>) or slashes (/) as separators. Make each level clickable except the current page. Place breadcrumbs below the main navigation." },
+      { heading: "Choosing the Right Pattern", content: "Consider your site's complexity: simple sites (under 10 pages) need only a top bar. Medium sites (10-50 pages) benefit from top bar with dropdowns. Complex sites (50+ pages) need mega menus or sidebars.\n\nConsider your audience: tech-savvy users handle hamburger menus well. General audiences need visible, labeled navigation. Mobile users need touch-friendly, thumb-reachable navigation.\n\nUse EPIC's navigation maker to plan your navigation structure visually. Map all pages and sections, then determine which navigation pattern best fits your hierarchy. Export the result to share with your design team." }
+    ],
+    faqs: [
+      { question: "Is the hamburger menu bad for UX?", answer: "Not inherently. It's great for mobile and secondary navigation. But for primary desktop navigation, visible links outperform hidden menus in engagement metrics." },
+      { question: "How many items should main navigation have?", answer: "5-7 items is the sweet spot. Research shows users can process 7±2 items easily. More than 9 items causes cognitive overload." },
+      { question: "Should navigation be sticky?", answer: "Yes for most sites. Sticky navigation keeps the menu accessible as users scroll, reducing the effort to navigate. It's especially valuable on long pages." }
+    ],
+    relatedArticles: ["ux-navigation-best-practices", "website-architecture-guide", "website-footer-design-best-practices"]
+  },
+  "website-redesign-planning-guide": {
+    slug: "website-redesign-planning-guide",
+    metaTitle: "Website Redesign Planning Guide — How to Plan a Redesign",
+    metaDescription: "Plan a successful website redesign with this complete guide. Covers auditing, goal setting, sitemap planning, content strategy, and launch preparation.",
+    keywords: "website redesign, redesign planning, website overhaul, site redesign guide, web redesign strategy",
+    h1: "How to Plan a Website Redesign: The Complete Guide",
+    publishDate: "2026-03-14",
+    readTime: "10 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker", "website-flow-generator"],
+    sections: [
+      { heading: "When to Redesign Your Website", content: "Not every website needs a redesign — many need optimization. True redesigns are warranted when your site's core architecture is fundamentally broken, your brand has changed significantly, or your technology stack is outdated.\n\nSigns you need a redesign: bounce rates above 70%, conversion rates declining despite traffic growth, mobile experience is unacceptable, site speed is consistently poor, or your competitors' sites are significantly better.\n\nSigns you need optimization, not redesign: specific pages underperform, navigation could be clearer, visual design feels dated but structure is sound. Optimization is faster, cheaper, and less risky." },
+      { heading: "Audit Your Current Site", content: "Before redesigning, understand what you have. Content audit: list every page, its purpose, traffic, and conversion data. Identify top-performing content to preserve and underperforming content to improve or remove.\n\nSEO audit: document all ranking keywords, backlinks, and indexed pages. A redesign can destroy SEO rankings if pages are removed or URLs change without proper redirects.\n\nUser feedback: survey current users about pain points. Check support tickets for recurring complaints. Analyze heatmaps and session recordings to see how users actually use your site.\n\nUse EPIC's website analyzer to crawl your current site and generate a visual architecture report. This gives you a clear picture of your existing structure to plan improvements." },
+      { heading: "Define Redesign Goals", content: "Every redesign should have measurable goals. 'Make the website look better' is not a goal. 'Increase demo requests by 30% within 3 months' is.\n\nCommon redesign goals: improve conversion rate, reduce bounce rate, increase page speed, improve mobile experience, support new product lines, refresh brand identity.\n\nPrioritize goals. A redesign can't optimize for everything simultaneously. Choose 2-3 primary goals and design decisions should serve those goals." },
+      { heading: "Plan the New Architecture", content: "Use EPIC to plan your new sitemap. Start with the content inventory from your audit, then restructure based on user needs and business goals.\n\nSimplify wherever possible. Most redesigns should result in fewer pages, not more. Combine redundant content, remove outdated pages, and create clear pathways to key conversion points.\n\nMap user flows for your top 3-5 conversion paths. Ensure the new architecture supports these flows with minimal friction." },
+      { heading: "Manage the Transition", content: "Create a comprehensive redirect map: every old URL must 301 redirect to its new equivalent. Missing redirects destroy SEO rankings and create broken links.\n\nLaunch in phases if possible. Start with the most critical sections, validate performance, then migrate remaining sections. This reduces risk and allows course correction.\n\nMonitor closely post-launch. Track key metrics daily for the first 2 weeks. SEO rankings may fluctuate temporarily — this is normal. But significant drops require immediate investigation." }
+    ],
+    faqs: [
+      { question: "How long does a website redesign take?", answer: "Small sites (under 20 pages): 4-8 weeks. Medium sites (20-100 pages): 8-16 weeks. Large sites (100+ pages): 3-6 months. Add time for content creation and SEO migration." },
+      { question: "Will a redesign hurt my SEO?", answer: "It can if not handled carefully. Preserve URLs where possible, implement 301 redirects for changed URLs, and maintain all existing content. Monitor rankings closely post-launch." },
+      { question: "Should I redesign incrementally or all at once?", answer: "Incremental is safer. Redesign section by section, validate performance, then continue. Full redesigns are higher risk but create a more cohesive result." }
+    ],
+    relatedArticles: ["website-architecture-guide", "how-to-plan-website-architecture", "website-redesign-checklist-2026"]
+  },
+  "information-architecture-fundamentals": {
+    slug: "information-architecture-fundamentals",
+    metaTitle: "Information Architecture Fundamentals — A Designer's Guide",
+    metaDescription: "Master information architecture fundamentals. Learn how to organize, label, and structure digital content for better usability and findability.",
+    keywords: "information architecture, IA design, content organization, taxonomy, labeling systems, IA fundamentals",
+    h1: "Information Architecture Fundamentals for Designers",
+    publishDate: "2026-03-15",
+    readTime: "9 min read",
+    category: "UX Design",
+    pillarLinks: ["visual-sitemap-maker", "user-flow-diagram-tool"],
+    sections: [
+      { heading: "What Is Information Architecture?", content: "Information architecture (IA) is the practice of organizing and structuring content so users can find what they need. It's the invisible framework behind every well-designed website, app, and digital product.\n\nIA encompasses four systems: organization (how content is grouped), labeling (how content is named), navigation (how users move through content), and search (how users find specific content).\n\nGood IA is invisible — users accomplish tasks without thinking about structure. Bad IA is painfully obvious — users get lost, confused, and frustrated." },
+      { heading: "Organization Schemes", content: "Content can be organized in several ways. Alphabetical: useful for glossaries, directories, and indexes. Not great for exploratory browsing.\n\nChronological: used for blogs, news, and event listings. Users expect newest content first.\n\nTopical: groups content by subject matter. The most common scheme for websites. EPIC is organized topically: tools, blog, pricing, about.\n\nTask-based: organizes content by what users want to do. 'Create a sitemap,' 'Analyze a website,' 'Export as PNG.' Highly effective for product interfaces.\n\nAudience-based: different sections for different user types. 'For Designers,' 'For Developers,' 'For Founders.' Works when audiences have distinctly different needs." },
+      { heading: "Labeling Systems", content: "Labels are the words you use to describe content and navigation items. They must be clear, concise, and consistent.\n\nUse language your users use, not internal jargon. If your users say 'pricing,' don't label it 'plans and packages.' If they say 'help,' don't call it 'knowledge base.'\n\nKeep labels short: 1-3 words for navigation items. 'About Us' beats 'Learn More About Our Company.' 'Blog' beats 'Insights and Thought Leadership.'\n\nBe consistent. If you call it 'Products' in the main nav, don't call it 'Solutions' in the footer. Inconsistent labeling confuses users." },
+      { heading: "Card Sorting for IA", content: "Card sorting is the go-to method for validating information architecture. Write each piece of content on a card (physical or digital), then have users organize them into groups and label the groups.\n\nOpen card sorting: users create their own categories and labels. Use this when starting from scratch to understand users' mental models.\n\nClosed card sorting: users sort cards into pre-defined categories. Use this to validate a proposed IA structure.\n\nTree testing validates the final IA. Users are given tasks ('Find the pricing page') and navigate a text-only version of your hierarchy. This reveals whether users can find content using your proposed structure." },
+      { heading: "IA Tools and Deliverables", content: "Site maps are the primary IA deliverable. They show the complete content hierarchy — every page and its relationship to other pages. Create them in EPIC's visual sitemap builder for a clear, shareable diagram.\n\nContent models define the types of content your site contains (articles, products, pages) and their attributes (title, description, image, category). They ensure consistency across all content.\n\nTaxonomies define your classification systems — categories, tags, and content types. A well-designed taxonomy makes content findable and creates clear navigation paths." }
+    ],
+    faqs: [
+      { question: "What's the difference between IA and UX?", answer: "IA is a subset of UX. IA focuses specifically on content organization and structure. UX encompasses the entire user experience including visual design, interaction design, and usability." },
+      { question: "How do I know if my IA is good?", answer: "Test it. If users can complete common tasks (find pricing, access help, navigate to a product) without confusion, your IA works. Use tree testing and analytics to validate." },
+      { question: "Should IA come before or after design?", answer: "Before. IA defines the structural foundation that design builds upon. Designing without IA is like decorating a building without architectural plans." }
+    ],
+    relatedArticles: ["how-to-plan-website-architecture", "ux-design-process-explained", "website-architecture-guide"]
+  },
+  "user-flow-diagram-best-practices": {
+    slug: "user-flow-diagram-best-practices",
+    metaTitle: "User Flow Diagram Best Practices — Create Better Flows",
+    metaDescription: "Create effective user flow diagrams with these best practices. Learn symbols, techniques, and tools for designing clear, actionable user flows.",
+    keywords: "user flow diagram, user flow best practices, flow diagram design, UX flow, user journey diagram",
+    h1: "User Flow Diagram Best Practices for 2026",
+    publishDate: "2026-03-16",
+    readTime: "7 min read",
+    category: "UX Design",
+    pillarLinks: ["user-flow-diagram-tool", "website-flow-generator"],
+    sections: [
+      { heading: "Standard Symbols and Notation", content: "User flow diagrams use standardized symbols for consistency and clarity. Rectangles represent screens or pages. Diamonds represent decision points where users choose between options. Arrows show the direction of flow.\n\nRounded rectangles represent start and end points. Parallelograms represent input/output operations (forms, data display). Circles indicate connectors that link parts of complex flows.\n\nConsistency is key. Use the same shapes throughout your project. Document your notation in a legend so team members can read your flows accurately." },
+      { heading: "Keep Flows Focused", content: "Each flow diagram should map one specific user goal. 'Sign up for an account' is one flow. 'Browse and purchase a product' is another. Don't combine multiple goals into a single diagram.\n\nFocused flows are easier to read, review, and optimize. A flow with 50+ screens becomes unwieldy. If your flow is growing too large, break it into connected sub-flows.\n\nStart with the most common user tasks first. Map the happy path (everything goes right), then add error paths and alternative routes." },
+      { heading: "Include Decision Points and Branches", content: "Real user journeys aren't linear. Users make choices, encounter errors, and change their minds. Your flows should reflect this reality.\n\nDecision points show where users choose between options: 'Sign up with email or Google?' 'Continue shopping or checkout?' Each choice branches the flow.\n\nError states show what happens when things go wrong: invalid form input, payment failure, session timeout. Design recovery paths for each error.\n\nAlternative paths show different routes to the same goal. Some users browse categories, others use search. Both should reach the product page." },
+      { heading: "Creating Flows in EPIC", content: "EPIC's navigation maker is built for creating user flows. Drag page templates onto the canvas, draw connections between them, and annotate with decision points and notes.\n\nUse color coding: green for start points, red for error states, blue for decision points, gray for optional steps. This makes flows scannable at a glance.\n\nExport as PNG for documentation and presentations. Export as JSON for integration with development tools and project management systems." }
+    ],
+    faqs: [
+      { question: "How detailed should a user flow be?", answer: "Include every screen and decision point, but not every micro-interaction. If a user would notice the transition (page change, modal, redirect), include it. If not, skip it." },
+      { question: "Should user flows include mobile and desktop?", answer: "Create separate flows if the mobile and desktop journeys differ significantly. If they follow the same steps, one flow with device annotations suffices." },
+      { question: "How often should flows be updated?", answer: "Update flows whenever the user journey changes — new features, redesigned pages, or changed business logic. Outdated flows cause more confusion than no flows." }
+    ],
+    relatedArticles: ["what-is-website-user-flow", "wireflow-examples", "ux-design-process-explained"]
+  },
+  "web-design-color-theory": {
+    slug: "web-design-color-theory",
+    metaTitle: "Web Design Color Theory — A Practical Guide for Designers",
+    metaDescription: "Learn color theory for web design. Understand color psychology, harmonies, contrast ratios, and how to create effective color palettes for websites.",
+    keywords: "color theory web design, web color palette, color psychology, color harmonies, web design colors, accessibility colors",
+    h1: "Color Theory for Web Design: A Practical Guide",
+    publishDate: "2026-03-17",
+    readTime: "8 min read",
+    category: "UI Design",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "Color Psychology in Web Design", content: "Colors evoke emotions and influence behavior. Blue conveys trust and professionalism — used by banks, tech companies, and healthcare providers. Red creates urgency and excitement — used for sales, CTAs, and food brands.\n\nGreen signals growth, nature, and safety. Purple suggests luxury and creativity. Orange implies energy and friendliness. Black communicates sophistication and power.\n\nYour color choices should align with your brand personality. A children's education site uses bright, playful colors. A law firm uses muted, professional tones. Mismatched colors create cognitive dissonance." },
+      { heading: "Building a Color Palette", content: "Start with one primary color that represents your brand. This will be your most prominent color — used for CTAs, headers, and key UI elements.\n\nAdd 1-2 secondary colors for supporting elements. Choose colors that complement your primary — use color wheel harmonies (complementary, analogous, triadic) as starting points.\n\nDefine neutral colors for text, backgrounds, and borders. Every palette needs blacks, grays, and whites. Most of your site will use neutrals; primary and secondary colors are accents.\n\nInclude semantic colors: green for success, red for errors, yellow for warnings, blue for information. These should be distinct from your brand colors to avoid confusion." },
+      { heading: "Color Contrast and Accessibility", content: "WCAG requires a minimum contrast ratio of 4.5:1 for normal text and 3:1 for large text. This ensures text is readable for users with visual impairments.\n\nDon't rely on color alone to convey information. Color-blind users can't distinguish red from green. Use icons, patterns, or text labels alongside color coding.\n\nTest your palette with accessibility tools. Chrome DevTools has a built-in contrast checker. WebAIM's contrast checker validates specific color combinations.\n\nConsider dark mode. Every color in your palette needs a dark mode equivalent. EPIC's auto-contrast engine automatically adjusts text colors for readability against any background." },
+      { heading: "60-30-10 Rule", content: "The classic interior design rule applies perfectly to web design. Use your dominant color for 60% of the interface (backgrounds, large areas). Use your secondary color for 30% (cards, sections, navigation). Use your accent color for 10% (CTAs, highlights, links).\n\nThis creates visual hierarchy without overwhelming users. The 10% accent draws attention precisely because it's scarce. Overusing your accent color dilutes its impact.\n\nExample: white backgrounds (60%), light gray sections (30%), blue CTA buttons (10%). Simple, balanced, effective." }
+    ],
+    faqs: [
+      { question: "How many colors should a website use?", answer: "3-5 colors plus neutrals. One primary, one secondary, one accent, and 3-4 neutral shades. More than 5 brand colors creates visual chaos." },
+      { question: "What's the best CTA button color?", answer: "The color that contrasts most with its surroundings. Orange on blue, white on dark — the specific color matters less than the contrast. Test with your audience." },
+      { question: "Should I use dark mode?", answer: "Yes, if your audience expects it. Dark mode reduces eye strain in low light and saves battery on OLED screens. It's becoming a standard expectation." }
+    ],
+    relatedArticles: ["ux-design-process-explained", "wireframing-guide-for-beginners", "responsive-design-guide"]
+  },
+  "responsive-design-guide": {
+    slug: "responsive-design-guide",
+    metaTitle: "Responsive Web Design Guide — Build for Every Screen",
+    metaDescription: "Complete guide to responsive web design. Learn breakpoints, fluid layouts, responsive images, and mobile-first design strategies.",
+    keywords: "responsive design, responsive web design, mobile-first design, CSS breakpoints, responsive layout, fluid design",
+    h1: "Responsive Web Design: The Complete Guide for 2026",
+    publishDate: "2026-03-18",
+    readTime: "9 min read",
+    category: "Web Development",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "Why Responsive Design Is Non-Negotiable", content: "Over 60% of web traffic comes from mobile devices. Google uses mobile-first indexing, meaning your mobile experience directly affects search rankings. A non-responsive site is essentially invisible to the majority of users and search engines.\n\nResponsive design means your website adapts to any screen size — phones, tablets, laptops, desktops, and everything in between. One codebase, every device.\n\nThe alternative — separate mobile and desktop sites — is outdated and problematic. It doubles maintenance, creates content inconsistencies, and confuses search engines with duplicate content." },
+      { heading: "Mobile-First Design Approach", content: "Start designing for the smallest screen, then scale up. Mobile-first forces you to prioritize content because space is limited. Everything that makes the mobile design is essential; everything else is enhancement.\n\nMobile-first CSS starts with base styles for mobile, then uses min-width media queries to add complexity for larger screens. This is more efficient than desktop-first because mobile users don't download unused desktop styles.\n\nPlan your responsive layout in EPIC. Create a sitemap showing which content appears at each breakpoint and how navigation changes from hamburger menu to full top bar." },
+      { heading: "Breakpoints and Fluid Layouts", content: "Common breakpoints: 320px (small phones), 375px (iPhone), 768px (tablets), 1024px (small laptops), 1280px (desktops), 1920px (large screens).\n\nDon't design for specific devices — design for content. Set breakpoints where your content breaks, not where popular devices happen to be. If text becomes too wide at 900px, add a breakpoint there.\n\nUse fluid units (%, vw, em, rem) instead of fixed pixels. Fluid layouts adapt smoothly between breakpoints rather than jumping between fixed layouts." },
+      { heading: "Responsive Images and Media", content: "Images are often the largest assets on a page. Serve appropriate sizes for each device using srcset and sizes attributes. A 2000px hero image on a 375px phone wastes bandwidth.\n\nUse modern formats: WebP is 25-30% smaller than JPEG with equivalent quality. AVIF is even smaller. Use picture element for format fallbacks.\n\nLazy load off-screen images. Only load images as users scroll to them. This dramatically improves initial page load, especially on mobile with limited bandwidth." },
+      { heading: "Testing Responsive Designs", content: "Test on real devices, not just browser DevTools. Emulators don't capture touch interactions, screen glare, fat-finger mistakes, and actual performance.\n\nTest key user flows at each breakpoint: Can users navigate? Can they read content? Can they complete forms? Can they reach CTAs without excessive scrolling?\n\nPerformance matters more on mobile. Test load times on throttled connections (3G, slow 4G). A site that loads in 1 second on desktop may take 8 seconds on mobile." }
+    ],
+    faqs: [
+      { question: "What is mobile-first design?", answer: "Designing for mobile screens first, then enhancing for larger screens. It forces content prioritization and results in faster, more focused websites." },
+      { question: "How many breakpoints should I use?", answer: "3-5 breakpoints cover most needs: mobile (375px), tablet (768px), desktop (1024px), and optionally small desktop (1280px) and large desktop (1920px)." },
+      { question: "Is responsive design the same as adaptive design?", answer: "No. Responsive design uses fluid layouts that continuously adapt. Adaptive design uses fixed layouts that snap to specific screen sizes. Responsive is more flexible and generally preferred." }
+    ],
+    relatedArticles: ["web-design-color-theory", "ux-design-process-explained", "website-navigation-design-patterns"]
+  },
+  "seo-friendly-website-structure": {
+    slug: "seo-friendly-website-structure",
+    metaTitle: "SEO-Friendly Website Structure — How to Build for Rankings",
+    metaDescription: "Build a website structure that ranks. Learn URL hierarchy, internal linking, site architecture, and technical SEO fundamentals for better search visibility.",
+    keywords: "SEO website structure, SEO friendly site, site architecture SEO, URL structure SEO, internal linking SEO",
+    h1: "How to Build an SEO-Friendly Website Structure",
+    publishDate: "2026-03-19",
+    readTime: "10 min read",
+    category: "SEO",
+    pillarLinks: ["visual-sitemap-maker", "website-flow-generator"],
+    sections: [
+      { heading: "Why Structure Matters for SEO", content: "Search engines crawl your site by following links from page to page. Your site structure determines which pages get crawled, how often, and how much authority each page receives.\n\nA well-structured site ensures every important page is discoverable, receives internal link equity, and is grouped with related content. This helps search engines understand your content and rank it appropriately.\n\nPoor structure creates orphan pages (no internal links pointing to them), crawl traps (infinite URL patterns), and diluted authority (link equity spread too thin). These issues directly hurt rankings." },
+      { heading: "Flat Hierarchy for SEO", content: "Keep your site hierarchy flat — ideally no page is more than 3 clicks from the homepage. Flat hierarchies ensure crawl bots can reach every page efficiently and that link equity flows from the homepage to all pages.\n\nStructure: Homepage → Category Pages → Individual Pages. Avoid unnecessary intermediate levels. If users need to click through 5 pages to reach content, search engines will undervalue that content.\n\nUse EPIC to visualize your hierarchy. Map every page and count the clicks from the homepage. If any page requires more than 3 clicks, restructure to bring it closer." },
+      { heading: "URL Structure for SEO", content: "Clean, descriptive URLs perform better in search. Use: domain.com/category/page-name. Avoid: domain.com/p?id=12345&cat=7.\n\nInclude target keywords in URLs. /blog/visual-sitemap-builder-guide tells search engines exactly what the page is about. Keep URLs under 60 characters when possible.\n\nUse hyphens between words (not underscores). Lowercase only. No special characters. Consistent patterns across the entire site." },
+      { heading: "Internal Linking Architecture", content: "Internal links are your most powerful SEO tool. They distribute authority, help crawl discovery, and provide contextual relevance signals.\n\nPillar-cluster model: Create comprehensive pillar pages on broad topics, then create cluster pages on specific subtopics that link back to the pillar. This creates topical authority.\n\nContextual links (within body content) carry more weight than navigation links. Link from relevant content to related pages using descriptive anchor text.\n\nEvery page should have at least 3-5 internal links pointing to it. Use EPIC's sitemap builder to identify orphan pages that lack internal links." },
+      { heading: "Technical SEO Checklist", content: "XML sitemap: Include all important pages with accurate lastmod dates and priority values. Submit to Google Search Console.\n\nRobots.txt: Allow crawling of all important pages. Block only admin, staging, and utility pages.\n\nCanonical tags: Every page should have a self-referencing canonical. This prevents duplicate content issues.\n\nPage speed: Fast sites rank better. Optimize images, minify code, and use CDN. Core Web Vitals are ranking factors.\n\nMobile-friendliness: Google uses mobile-first indexing. Your mobile experience determines rankings, not desktop.\n\nStructured data: Add JSON-LD schema markup for rich results. Organization, BreadcrumbList, Article, FAQ, and HowTo schemas help search engines understand your content." }
+    ],
+    faqs: [
+      { question: "How does website structure affect SEO?", answer: "Structure determines crawlability, internal link equity distribution, and topical relevance signals. Good structure helps every page rank better." },
+      { question: "What is an SEO-friendly URL?", answer: "Short, descriptive, keyword-rich, lowercase, hyphen-separated. Example: /blog/seo-friendly-website-structure is ideal." },
+      { question: "How many internal links should a page have?", answer: "Every page should link to 3-10 relevant internal pages. Important pages should receive links from many other pages. There's no strict maximum, but keep links relevant." }
+    ],
+    relatedArticles: ["how-to-plan-website-architecture", "website-architecture-guide", "website-footer-design-best-practices"]
+  },
+  "product-design-workflow": {
+    slug: "product-design-workflow",
+    metaTitle: "Product Design Workflow — From Idea to Launch",
+    metaDescription: "Learn the complete product design workflow used by top teams. Covers discovery, design, prototyping, testing, and handoff best practices.",
+    keywords: "product design workflow, design process, product development, design sprint, product design steps",
+    h1: "Product Design Workflow: From Idea to Launch",
+    publishDate: "2026-03-20",
+    readTime: "9 min read",
+    category: "Product Design",
+    pillarLinks: ["user-flow-diagram-tool", "visual-sitemap-maker"],
+    sections: [
+      { heading: "Discovery Phase", content: "Every product starts with understanding the problem. Discovery involves stakeholder interviews (what does the business need?), user research (what do users need?), and market analysis (what already exists?).\n\nKey deliverables: problem statement, user personas, competitive landscape, success metrics. Don't skip this phase — building the wrong product perfectly is worse than building the right product imperfectly.\n\nUse EPIC to map the product's information architecture during discovery. Visual sitemaps help stakeholders see the scope of the product and make informed decisions about what to build first." },
+      { heading: "Design Phase", content: "Design moves from rough to refined. Start with site maps and user flows (in EPIC), then wireframes, then visual designs, then interactive prototypes.\n\nEach step increases fidelity and investment. Validate at each stage before moving to the next. It's cheap to change a sitemap, expensive to change a coded interface.\n\nDesign systems ensure consistency. Define colors, typography, spacing, and component patterns early. Reference these throughout the design phase." },
+      { heading: "Prototyping and Testing", content: "Prototypes make designs interactive. Low-fidelity prototypes (clickable wireframes) test structure and flow. High-fidelity prototypes (pixel-perfect mockups with interactions) test visual design and micro-interactions.\n\nUsability testing validates assumptions. Watch 5-8 users attempt key tasks. Note where they struggle, hesitate, or fail. These observations drive design improvements.\n\nIterate quickly. Each round of testing should lead to design changes, which are tested again. 2-3 rounds of testing usually identifies and resolves major usability issues." },
+      { heading: "Developer Handoff", content: "Good handoff reduces back-and-forth and ensures accurate implementation. Provide: annotated designs with spacing and sizing, interaction specifications (hover states, transitions, error states), and exported assets.\n\nExport sitemaps from EPIC as JSON for direct integration into development documentation. This gives developers a clear map of pages and navigation to implement.\n\nMaintain a living design system. Developers should reference the design system for component specifications rather than measuring pixels in static mockups." },
+      { heading: "Launch and Iterate", content: "Launch is the beginning, not the end. Monitor analytics closely: are users completing key flows? Where do they drop off? What features are used vs ignored?\n\nPlan post-launch iterations based on real usage data. Features that seemed important in design may be rarely used. Unexpected user behaviors may reveal new opportunities.\n\nContinuous improvement beats big redesigns. Small, data-driven changes accumulate into significant improvements over time." }
+    ],
+    faqs: [
+      { question: "How long should the design phase take?", answer: "2-6 weeks for most features. Complex products may need 2-3 months. Time should scale with risk and complexity — high-stakes features deserve more design investment." },
+      { question: "Should designers code?", answer: "Understanding code is valuable but not required. Designers who understand technical constraints make more buildable designs. But design and engineering are separate skills." },
+      { question: "What's the most important design deliverable?", answer: "The user flow. It defines the core experience — how users accomplish their goals. Everything else (wireframes, visual design) serves the flow." }
+    ],
+    relatedArticles: ["ux-design-process-explained", "wireframing-guide-for-beginners", "how-to-plan-website-architecture"]
+  },
+  "landing-page-ux-optimization": {
+    slug: "landing-page-ux-optimization",
+    metaTitle: "Landing Page UX Optimization — Increase Conversions",
+    metaDescription: "Optimize your landing page UX to increase conversions. Learn layout, copy, CTAs, trust signals, and performance techniques that drive results.",
+    keywords: "landing page UX, landing page optimization, conversion rate optimization, CRO, landing page design, UX conversion",
+    h1: "Landing Page UX Optimization: Techniques That Convert",
+    publishDate: "2026-03-21",
+    readTime: "8 min read",
+    category: "UX Design",
+    pillarLinks: ["website-flow-generator", "visual-sitemap-maker"],
+    sections: [
+      { heading: "Above-the-Fold Essentials", content: "Users form opinions about your page in 50 milliseconds. The above-the-fold area must immediately communicate: what this is, who it's for, and what to do next.\n\nEssential elements: clear headline (what you offer), subheadline (why it matters), primary CTA (what to do next), and a relevant visual (what it looks like). Everything else comes below.\n\nRemove anything that doesn't serve these four goals. Navigation, social proof, and feature details can wait — they belong below the fold where interested users will scroll to find them." },
+      { heading: "CTA Design and Placement", content: "Your CTA is the single most important element on the page. It should be visually dominant, clearly labeled, and positioned prominently.\n\nUse action-oriented text: 'Start Building Your Sitemap' outperforms 'Get Started.' Specific verbs that describe the outcome outperform generic actions.\n\nRepeat the CTA multiple times: above the fold, after feature sections, and at the bottom. Users decide at different points — give them conversion opportunities throughout.\n\nContrast is key. The CTA button must be the most visually prominent element. Use your accent color and make it large enough to be unmissable." },
+      { heading: "Social Proof and Trust", content: "Social proof reduces purchase anxiety. Include testimonials with real names and roles, client logos, usage statistics ('Join 500+ teams'), and ratings/reviews.\n\nPlace social proof after the hero but before detailed features. Users who aren't immediately convinced need reassurance before investing time in learning more.\n\nSpecific numbers outperform vague claims. '34% bounce rate reduction' beats 'Improved UX.' 'Used by teams in 15 countries' beats 'Global reach.'" },
+      { heading: "Page Speed and Performance", content: "Every second of load time reduces conversions by ~7%. A 5-second load time means you've lost ~35% of potential conversions before the page even appears.\n\nOptimize images: compress, use WebP format, and lazy load below-the-fold images. Minimize JavaScript — especially render-blocking scripts. Use CDN for static assets.\n\nCore Web Vitals matter for both SEO and UX: LCP (largest contentful paint) under 2.5s, FID (first input delay) under 100ms, CLS (cumulative layout shift) under 0.1." },
+      { heading: "Mobile Landing Page UX", content: "Mobile landing pages need larger touch targets (44px minimum), simplified layouts, and faster load times. Mobile users are often on slower connections and smaller screens.\n\nStack content vertically. Multi-column layouts don't work on mobile. Prioritize content for the vertical scroll: headline, CTA, social proof, features, second CTA.\n\nMake phone numbers tappable (tel: links). Make forms minimal — every additional field reduces mobile conversions. Consider sticky CTA bars that remain visible during scrolling." }
+    ],
+    faqs: [
+      { question: "How long should a landing page be?", answer: "Long enough to address all objections, short enough to maintain attention. For complex products, long pages with multiple CTA points outperform short pages." },
+      { question: "Should landing pages have navigation?", answer: "Minimal navigation. Remove the main site nav to keep users focused on the conversion goal. Include only the logo (linking home) and essential links." },
+      { question: "How do I know if my landing page is working?", answer: "Track conversion rate, bounce rate, scroll depth, and time on page. A/B test headlines, CTAs, and layouts to continuously improve." }
+    ],
+    relatedArticles: ["ux-navigation-best-practices", "web-design-color-theory", "website-redesign-planning-guide"]
+  },
+  "design-system-guide": {
+    slug: "design-system-guide",
+    metaTitle: "Design System Guide — Build Consistent Digital Products",
+    metaDescription: "Learn how to create and maintain a design system. Covers tokens, components, documentation, and governance for consistent digital products.",
+    keywords: "design system, design tokens, component library, UI kit, design system guide, design consistency",
+    h1: "Design System Guide: Build Consistent Digital Products",
+    publishDate: "2026-03-22",
+    readTime: "10 min read",
+    category: "UI Design",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "What Is a Design System?", content: "A design system is a collection of reusable components, design tokens, guidelines, and documentation that ensures consistency across all digital products. It's the single source of truth for how your product looks, feels, and behaves.\n\nDesign systems include: design tokens (colors, spacing, typography), components (buttons, inputs, cards), patterns (forms, navigation, tables), and guidelines (voice, accessibility, responsiveness).\n\nThe goal is efficiency and consistency. Instead of designing every button from scratch, designers use the button component from the system. Instead of arguing about shades of blue, teams reference the defined color palette." },
+      { heading: "Design Tokens", content: "Design tokens are the atomic values of your design system: colors, spacing scales, typography scales, border radii, shadows, and animations.\n\nDefine tokens as variables (CSS custom properties or JSON) so they can be updated globally. Changing --primary changes every primary-colored element across the entire product.\n\nUse semantic naming: --color-primary instead of --blue-500. Semantic names allow you to change the actual color without updating every reference. Your primary color might be blue today and green tomorrow — semantic tokens make the switch painless." },
+      { heading: "Component Library", content: "Components are reusable UI building blocks: buttons, inputs, cards, modals, navigation elements. Each component has defined variants (primary, secondary, destructive), sizes (small, medium, large), and states (default, hover, active, disabled).\n\nDocument every component with: usage guidelines (when to use it), props/variants (how to customize it), accessibility requirements (ARIA attributes, keyboard interactions), and examples.\n\nKeep components composable. Small, focused components that combine into larger patterns are more flexible than large, complex components that try to handle every case." },
+      { heading: "Maintaining a Design System", content: "A design system is never 'done.' It evolves with your product. Assign a dedicated team or rotation to maintain the system. Without ownership, systems decay.\n\nVersion your system. When components change, document what changed and why. Breaking changes need migration guides.\n\nMeasure adoption. Track what percentage of the product uses system components vs custom implementations. Low adoption means the system isn't meeting team needs." }
+    ],
+    faqs: [
+      { question: "When should I create a design system?", answer: "When you have 2+ products or 3+ designers. Below that, the overhead isn't justified. Start small: define colors, typography, and 5-10 core components." },
+      { question: "What tools are used for design systems?", answer: "Design: Figma (components + documentation). Code: Storybook (component development), Chromatic (visual testing). Tokens: Style Dictionary, Tailwind CSS." },
+      { question: "How long does it take to build a design system?", answer: "A basic system (tokens + 10-15 components): 2-4 weeks. A comprehensive system: 2-3 months. Maintaining and evolving it is ongoing." }
+    ],
+    relatedArticles: ["web-design-color-theory", "ux-design-process-explained", "wireframing-guide-for-beginners"]
+  },
+  "website-speed-optimization-guide": {
+    slug: "website-speed-optimization-guide",
+    metaTitle: "Website Speed Optimization — Make Your Site Load Faster",
+    metaDescription: "Speed up your website with this optimization guide. Learn image optimization, code splitting, caching, CDN, and Core Web Vitals improvements.",
+    keywords: "website speed optimization, page speed, Core Web Vitals, web performance, fast loading website, site speed",
+    h1: "Website Speed Optimization: The Complete Guide",
+    publishDate: "2026-03-23",
+    readTime: "9 min read",
+    category: "Web Development",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "Why Speed Matters", content: "Page speed directly impacts conversions, SEO rankings, and user satisfaction. A 1-second delay reduces conversions by 7%. Google uses Core Web Vitals as ranking factors. Users expect pages to load in under 3 seconds.\n\nMobile performance is especially critical. Mobile users are often on slower connections and less powerful devices. A site that loads in 2 seconds on desktop may take 8 seconds on mobile.\n\nSpeed is a competitive advantage. If your competitor's site loads in 5 seconds and yours loads in 2, you capture impatient users they lose." },
+      { heading: "Image Optimization", content: "Images typically account for 50-80% of page weight. Optimize every image: compress without visible quality loss, serve modern formats (WebP, AVIF), and use responsive images (srcset) to serve appropriate sizes.\n\nLazy load images below the fold. Only load images as users scroll to them. This can reduce initial page weight by 40-60%.\n\nUse CSS for decorative elements instead of images. Gradients, shadows, and simple shapes rendered in CSS are infinitely lighter than image files." },
+      { heading: "Code Optimization", content: "Minify CSS, JavaScript, and HTML. Remove whitespace, comments, and unused code. This can reduce file sizes by 20-40%.\n\nCode splitting loads only the JavaScript needed for the current page. Users visiting your homepage don't need to download code for your admin dashboard. EPIC uses React.lazy() and Suspense for route-level code splitting.\n\nRemove unused CSS. Tools like PurgeCSS analyze your HTML and remove CSS rules that aren't used, dramatically reducing stylesheet size." },
+      { heading: "Caching and CDN", content: "Browser caching tells browsers to store files locally so returning users don't re-download them. Set cache headers for static assets (images, CSS, JS) with long expiry times.\n\nCDNs serve files from servers closest to the user. A user in India gets files from an Indian server, not a US server. This can reduce latency by 200-500ms.\n\nService workers enable offline functionality and instant load for returning users. They cache critical resources on the user's device for near-zero latency repeat visits." },
+      { heading: "Core Web Vitals", content: "LCP (Largest Contentful Paint): measures when the main content loads. Target: under 2.5 seconds. Optimize by preloading critical resources and reducing server response time.\n\nFID (First Input Delay): measures interactivity. Target: under 100ms. Optimize by reducing JavaScript execution time and breaking up long tasks.\n\nCLS (Cumulative Layout Shift): measures visual stability. Target: under 0.1. Prevent by defining image dimensions, using CSS containment, and avoiding dynamically injected content above existing content." }
+    ],
+    faqs: [
+      { question: "How fast should a website load?", answer: "Under 3 seconds on mobile, under 2 seconds on desktop. Top-performing sites load in under 1.5 seconds. Google considers anything over 4 seconds slow." },
+      { question: "Does page speed affect SEO?", answer: "Yes. Core Web Vitals are ranking factors. Fast sites rank higher and get crawled more frequently. Speed also reduces bounce rate, which indirectly helps SEO." },
+      { question: "What's the biggest speed improvement I can make?", answer: "Image optimization. Compressing images, using WebP format, and lazy loading below-the-fold images typically reduces page weight by 40-60%." }
+    ],
+    relatedArticles: ["responsive-design-guide", "seo-friendly-website-structure", "landing-page-ux-optimization"]
+  },
+  "conversion-rate-optimization-basics": {
+    slug: "conversion-rate-optimization-basics",
+    metaTitle: "Conversion Rate Optimization Basics — Increase Your Website CRO",
+    metaDescription: "Learn the basics of conversion rate optimization. Understand CRO methodology, A/B testing, funnel analysis, and quick wins for higher conversions.",
+    keywords: "conversion rate optimization, CRO basics, A/B testing, website conversion, funnel optimization, CRO strategy",
+    h1: "Conversion Rate Optimization: The Essential Guide",
+    publishDate: "2026-03-24",
+    readTime: "8 min read",
+    category: "UX Design",
+    pillarLinks: ["website-flow-generator", "user-flow-diagram-tool"],
+    sections: [
+      { heading: "What Is CRO?", content: "Conversion rate optimization (CRO) is the systematic process of increasing the percentage of website visitors who take desired actions — signing up, purchasing, requesting a demo, or any other goal.\n\nCRO is about making the most of existing traffic. Instead of spending more on ads to get more visitors, CRO helps you convert more of the visitors you already have. Doubling your conversion rate is equivalent to doubling your traffic — without spending more.\n\nThe methodology: measure current performance, identify problems, hypothesize solutions, test changes, implement winners. Repeat continuously." },
+      { heading: "Understanding Your Funnel", content: "Every conversion has a funnel — the sequence of steps from first visit to completed action. Map your funnel and measure drop-off at each step.\n\nUse EPIC to visualize your conversion funnel as a user flow. Map each step, identify decision points, and note where users exit. This visual representation makes problems obvious.\n\nCommon funnel stages: Landing → Interest (scroll/click) → Consideration (features/pricing) → Intent (signup/cart) → Conversion (payment/activation). Each transition loses some users. Your job is to minimize the loss." },
+      { heading: "Quick CRO Wins", content: "Improve your headline. Your headline is the first thing users read. Test different value propositions, specific numbers, and emotional appeals. A better headline can lift conversions 20-30%.\n\nSimplify your CTA. Use clear, action-oriented text. 'Start Building Your Sitemap' outperforms 'Submit.' Make the button visually prominent and repeat it multiple times on the page.\n\nReduce form fields. Every additional field reduces completion rates by ~10%. Ask for only what's essential for the initial conversion. Collect additional information after the user is engaged.\n\nAdd social proof. Testimonials, client logos, and usage statistics reduce anxiety and increase trust. Place them near decision points." },
+      { heading: "A/B Testing", content: "A/B testing compares two versions of a page to determine which performs better. Test one variable at a time: headline, CTA color, image, layout, or copy.\n\nRequired sample size depends on your traffic and the size of the improvement you're looking for. Generally, you need 100-500 conversions per variation for statistically significant results.\n\nTest high-impact elements first: headlines, CTAs, pricing display, and hero sections. These typically have the largest impact on conversion rates." }
+    ],
+    faqs: [
+      { question: "What's a good conversion rate?", answer: "Industry average is 2-5%. Top performers achieve 10-15%. But 'good' depends on your industry, traffic source, and conversion goal. Focus on improving your own rate." },
+      { question: "How long should I run an A/B test?", answer: "Until you reach statistical significance — typically 2-4 weeks. Don't stop tests early based on initial results; early data is often misleading." },
+      { question: "What should I test first?", answer: "Start with your highest-traffic, lowest-converting page. Test the headline and CTA first — these typically have the biggest impact." }
+    ],
+    relatedArticles: ["landing-page-ux-optimization", "what-is-website-user-flow", "ux-navigation-best-practices"]
+  },
+  "accessibility-in-web-design": {
+    slug: "accessibility-in-web-design",
+    metaTitle: "Web Accessibility Guide — Design for Everyone (WCAG 2.2)",
+    metaDescription: "Make your website accessible to all users. Learn WCAG 2.2 guidelines, semantic HTML, keyboard navigation, screen reader compatibility, and color contrast.",
+    keywords: "web accessibility, WCAG, accessible design, a11y, screen reader, keyboard navigation, inclusive design",
+    h1: "Web Accessibility: How to Design for Everyone",
+    publishDate: "2026-03-25",
+    readTime: "10 min read",
+    category: "Web Development",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "Why Accessibility Matters", content: "Over 1 billion people worldwide have disabilities that affect how they use websites. Accessibility isn't optional — it's a legal requirement in many jurisdictions (ADA, EAA, Section 508) and a moral imperative.\n\nAccessible websites also benefit all users. Captions help users in noisy environments. Keyboard navigation helps power users. High contrast helps users in bright sunlight. Accessible design is better design.\n\nSEO benefits too. Many accessibility practices — semantic HTML, descriptive alt text, clear headings — align with SEO best practices." },
+      { heading: "Semantic HTML", content: "Use HTML elements for their intended purpose. <nav> for navigation, <main> for primary content, <article> for self-contained content, <button> for interactive elements.\n\nSemantic HTML provides meaning to assistive technologies. A screen reader can announce 'Navigation' when encountering <nav>, helping users understand page structure without seeing it.\n\nAvoid div-based interfaces where semantic elements exist. A <button> has built-in keyboard support, focus management, and screen reader announcements. A <div onClick> has none of these." },
+      { heading: "Keyboard Navigation", content: "All interactive elements must be usable with keyboard alone. Users should be able to Tab to all links, buttons, and form fields, Enter/Space to activate them, and Escape to close modals.\n\nVisible focus indicators show which element is currently selected. Never remove the default focus outline without providing a visible alternative.\n\nSkip links allow keyboard users to bypass repetitive navigation and jump directly to main content. EPIC implements this with a 'Skip to main content' link at the top of every page." },
+      { heading: "Color and Contrast", content: "Maintain WCAG-compliant contrast ratios: 4.5:1 for normal text, 3:1 for large text. Low contrast makes text unreadable for users with visual impairments and in bright environments.\n\nNever convey information through color alone. Red/green color coding excludes color-blind users. Always pair colors with icons, patterns, or text labels.\n\nTest both light and dark modes for accessibility. EPIC's design system ensures proper contrast in both themes using semantic color tokens." },
+      { heading: "Images and Media", content: "All images need alt text describing their content and purpose. Decorative images get empty alt attributes (alt='') so screen readers skip them.\n\nVideos need captions for deaf/hard-of-hearing users and audio descriptions for blind users. Auto-generated captions need manual review for accuracy.\n\nComplex images (charts, diagrams) need detailed text descriptions. A sitemap diagram's alt text should describe the site structure, not just say 'sitemap.'" }
+    ],
+    faqs: [
+      { question: "What is WCAG?", answer: "Web Content Accessibility Guidelines — the international standard for web accessibility. WCAG 2.2 AA is the most commonly required compliance level." },
+      { question: "How do I test accessibility?", answer: "Use automated tools (axe, Lighthouse) for quick scans. Test with keyboard only (no mouse). Test with a screen reader (VoiceOver, NVDA). Nothing replaces manual testing." },
+      { question: "Is accessibility required by law?", answer: "In many jurisdictions, yes. The ADA (US), European Accessibility Act (EU), and Section 508 (US government) all require digital accessibility." }
+    ],
+    relatedArticles: ["web-design-color-theory", "responsive-design-guide", "design-system-guide"]
+  },
+  "startup-website-planning": {
+    slug: "startup-website-planning",
+    metaTitle: "Startup Website Planning — Ship Your First Site Fast",
+    metaDescription: "Plan your startup website from scratch. Learn which pages to include, how to structure navigation, and how to launch quickly without a big budget.",
+    keywords: "startup website, website planning, startup web design, MVP website, launch website fast, startup landing page",
+    h1: "Startup Website Planning: From Zero to Launch",
+    publishDate: "2026-03-26",
+    readTime: "7 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker", "website-flow-generator"],
+    sections: [
+      { heading: "Essential Startup Pages", content: "Most startups need only 5-7 pages to launch effectively. Don't over-build — ship fast and iterate based on real user feedback.\n\nHomepage: Your elevator pitch, primary CTA, and key benefits. This is your most important page — it converts or loses visitors in seconds.\n\nProduct/Features: What you offer, how it works, and why it's better. Use screenshots, demos, or videos to show the product in action.\n\nPricing: Clear, simple pricing tiers. Don't hide pricing — it frustrates users and wastes everyone's time. Include a comparison table if you have multiple plans.\n\nAbout: Your story, team, and mission. Startups are personal — users want to know who's behind the product.\n\nBlog: 5-10 articles targeting your key SEO terms. Blog content drives organic traffic and builds authority.\n\nContact: Email, form, or chat. Make it easy for potential customers to reach you.\n\nLegal: Terms of service and privacy policy. Required for compliance." },
+      { heading: "Planning Your Structure in EPIC", content: "Use EPIC's navigation maker to plan your startup website structure. Drag each page onto the canvas, connect them with navigation flows, and see your entire site at a glance.\n\nStart with the homepage in the center. Connect primary pages (product, pricing, about) directly. Connect secondary pages (blog, contact, legal) from the primary sections.\n\nExport the sitemap as JSON for your developer or as PNG for team discussion. This 10-minute exercise saves hours of back-and-forth during development." },
+      { heading: "MVP Website Strategy", content: "Your first website is not your final website. Ship the minimum viable site that can convert visitors, then improve based on data.\n\nWeek 1: Plan structure (in EPIC), write copy for core pages, choose a template or design system.\n\nWeek 2: Build homepage, product page, and pricing page. Set up analytics.\n\nWeek 3: Add blog with 3-5 articles targeting your primary keywords. Add contact and legal pages.\n\nWeek 4: Launch, promote, and start measuring. Begin iterating based on what you learn.\n\nDon't wait for perfection. A launched imperfect website beats an unlaunched perfect website every time." },
+      { heading: "Common Startup Website Mistakes", content: "Over-engineering: Building a complex site before validating product-market fit. Start simple.\n\nNo clear CTA: Every page should drive visitors toward one clear action. If users don't know what to do, they leave.\n\nHidden pricing: Hiding pricing doesn't increase leads — it wastes unqualified leads' time and yours.\n\nNo analytics: Without data, you can't improve. Set up Google Analytics and conversion tracking before launch.\n\nIgnoring mobile: Over 60% of traffic is mobile. A non-responsive startup site loses the majority of visitors." }
+    ],
+    faqs: [
+      { question: "How many pages does a startup website need?", answer: "5-7 pages minimum: homepage, product, pricing, about, blog, contact, and legal. Add more only when you have a clear purpose for each additional page." },
+      { question: "Should I build my own website or use a builder?", answer: "Use a builder (EPIC, Webflow, Framer) for speed. Custom development only makes sense when you need unique functionality that builders can't provide." },
+      { question: "How long does it take to launch a startup website?", answer: "2-4 weeks for a solid MVP site with 5-7 pages and basic blog. 6-8 weeks if you need custom design and development." }
+    ],
+    relatedArticles: ["how-to-plan-website-architecture", "landing-page-ux-optimization", "seo-friendly-website-structure"]
+  },
+  "ecommerce-site-structure": {
+    slug: "ecommerce-site-structure",
+    metaTitle: "E-commerce Site Structure — Plan Your Online Store Architecture",
+    metaDescription: "Design the perfect e-commerce site structure. Learn category hierarchy, product page optimization, checkout flow, and navigation patterns for online stores.",
+    keywords: "ecommerce site structure, online store architecture, ecommerce navigation, product page design, checkout flow, ecommerce UX",
+    h1: "E-commerce Site Structure: How to Organize Your Online Store",
+    publishDate: "2026-03-27",
+    readTime: "9 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker", "website-flow-generator"],
+    sections: [
+      { heading: "E-commerce Architecture Overview", content: "E-commerce sites have unique structural requirements: large product catalogs, multiple navigation paths, and critical checkout flows. The architecture must support browsing, searching, comparing, and purchasing.\n\nCore pages: homepage, category pages, product pages, cart, checkout, account, and informational pages (about, shipping, returns). The hierarchy: Homepage → Categories → Sub-categories → Products.\n\nThe goal: minimize clicks from homepage to purchase. The ideal path is 3-4 clicks: Homepage → Category → Product → Cart/Checkout." },
+      { heading: "Category Hierarchy", content: "Group products into logical categories that match how users think about your products. If you sell clothing: Men's → Shirts → Casual Shirts. Not: Cotton → Blue → Size M.\n\nLimit top-level categories to 5-8. Too many categories overwhelm users. Sub-categories can be more numerous, organized under clear parent categories.\n\nUse faceted navigation (filters) instead of deep sub-categories. Let users narrow by size, color, price, and brand without navigating through multiple category levels.\n\nPlan your category structure in EPIC before building. Map all products to categories, ensure no category has too few products (merge) or too many (split)." },
+      { heading: "Product Page Optimization", content: "Product pages are where purchase decisions happen. Essential elements: product images (multiple angles, zoom capability), clear pricing, description with key specs, add-to-cart button, reviews/ratings, and related products.\n\nAbove the fold: image, title, price, and add-to-cart button. Users must see these immediately without scrolling.\n\nRelated products and 'frequently bought together' sections increase average order value. Place them below the main product details.\n\nInclude trust signals on product pages: return policy, shipping information, security badges. These reduce purchase anxiety at the critical decision moment." },
+      { heading: "Checkout Flow", content: "Checkout abandonment averages 70%. Every friction point in checkout costs sales. Simplify ruthlessly.\n\nOffer guest checkout. Forcing account creation before purchase is the #1 reason for checkout abandonment.\n\nMinimize form fields. Ship to billing address by default. Auto-detect country from IP. Use address autocomplete.\n\nShow progress: step 1 of 3, step 2 of 3. Users need to know how much effort remains. Uncertainty increases abandonment.\n\nMap your checkout flow in EPIC. Visualize each step, identify unnecessary fields, and optimize for minimum friction." }
+    ],
+    faqs: [
+      { question: "How deep should e-commerce navigation go?", answer: "Maximum 3 levels: Category → Sub-category → Product. Use filters (faceted navigation) for deeper drill-down instead of more sub-category levels." },
+      { question: "How many products can a page show?", answer: "12-48 products per category page, depending on layout. Grid layouts show more; list layouts show fewer but with more detail. Always include pagination or infinite scroll." },
+      { question: "Should I use mega menus for e-commerce?", answer: "Yes, if you have many categories. Mega menus show the full category structure at once, helping users navigate directly to specific sub-categories without multiple clicks." }
+    ],
+    relatedArticles: ["website-navigation-design-patterns", "how-to-plan-website-architecture", "landing-page-ux-optimization"]
+  },
+  "saas-website-best-practices": {
+    slug: "saas-website-best-practices",
+    metaTitle: "SaaS Website Best Practices — Build a Site That Converts",
+    metaDescription: "Design a high-converting SaaS website. Learn homepage structure, feature pages, pricing presentation, and signup flow optimization for SaaS products.",
+    keywords: "SaaS website, SaaS design, SaaS homepage, SaaS pricing page, SaaS conversion, B2B website design",
+    h1: "SaaS Website Best Practices: Build a Site That Converts",
+    publishDate: "2026-03-28",
+    readTime: "9 min read",
+    category: "SaaS Design",
+    pillarLinks: ["website-flow-generator", "visual-sitemap-maker"],
+    sections: [
+      { heading: "SaaS Homepage Structure", content: "Your SaaS homepage follows a proven formula: Hero (headline + CTA) → Social Proof (logos, metrics) → Problem/Solution → Features → Testimonials → Pricing Preview → Final CTA.\n\nThe hero must answer three questions in 5 seconds: What is this? Who is it for? What do I do next? EPIC's homepage answers: 'Visual Sitemap Builder' (what) → 'for designers, developers, and founders' (who) → 'Start Building Your Sitemap' (action).\n\nEvery section should push users toward the CTA. Features explain why. Testimonials validate why. Pricing shows it's affordable. The CTA captures intent." },
+      { heading: "Feature and Product Pages", content: "Dedicated feature pages target specific keywords and user needs. Instead of listing all features on one page, create individual pages for major features.\n\nStructure: Headline (what the feature does) → Visual demo (screenshot or video) → Benefits (not just capabilities) → Use cases → CTA to try it.\n\nConnect feature pages with internal links. Each feature page should link to related features, creating a web of content that search engines value.\n\nUse EPIC to plan your feature page hierarchy. Map each feature and its sub-features, then connect them with logical navigation paths." },
+      { heading: "Pricing Page Design", content: "SaaS pricing pages need clarity above all. Display 2-3 tiers with clear feature differentiation. Highlight the recommended tier. Include a feature comparison table.\n\nFree tier: Low-commitment entry point. List what's included and what's limited. The goal is getting users into the product.\n\nPaid tiers: Show the price prominently. Annual billing? Show monthly equivalent with annual savings. Include a clear CTA on each tier.\n\nEnterprise: Don't list a price. 'Contact Sales' with a form. Enterprise buyers expect custom pricing and want a conversation." },
+      { heading: "Signup and Onboarding Flow", content: "Minimize signup friction. Email + password is the maximum for initial signup. Social login (Google, GitHub) reduces friction further.\n\nGet users to value as fast as possible. The best SaaS onboarding guides users through one core action — creating their first project, sending their first message, or building their first sitemap.\n\nProgress indicators and checklists help users complete onboarding. 'Step 2 of 3' creates momentum. 'Complete your setup' creates urgency.\n\nMap your entire signup-to-activation flow in EPIC. Identify where users drop off and add nudges at those points." }
+    ],
+    faqs: [
+      { question: "How many pricing tiers should a SaaS have?", answer: "2-3 tiers for most SaaS products. Free, Pro, and Enterprise is the most common. More than 4 tiers creates decision paralysis." },
+      { question: "Should SaaS websites have a blog?", answer: "Absolutely. Blog content drives organic traffic, builds authority, and supports SEO. Target keywords your potential users search for." },
+      { question: "What's the most important SaaS website page?", answer: "The pricing page. It's the highest-intent page — visitors are evaluating whether to pay. Optimize it relentlessly." }
+    ],
+    relatedArticles: ["saas-onboarding-flow-design", "landing-page-ux-optimization", "startup-website-planning"]
+  },
+  "portfolio-website-structure": {
+    slug: "portfolio-website-structure",
+    metaTitle: "Portfolio Website Structure — Showcase Your Best Work",
+    metaDescription: "Plan the perfect portfolio website structure. Learn page hierarchy, project presentation, and navigation for designers, developers, and creative professionals.",
+    keywords: "portfolio website, portfolio structure, design portfolio, developer portfolio, portfolio layout, showcase work online",
+    h1: "Portfolio Website Structure: How to Showcase Your Work",
+    publishDate: "2026-03-29",
+    readTime: "7 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "Essential Portfolio Pages", content: "A portfolio website needs 4-6 pages: Homepage (hero with best work), Work/Projects (gallery of all projects), individual Case Study pages, About page, Contact page, and optionally a Blog.\n\nThe homepage is your elevator pitch. Feature your 3-5 best projects prominently. Include a brief professional summary and clear CTA to view more work or get in touch.\n\nQuality over quantity. 6 outstanding projects make a stronger impression than 20 mediocre ones. Curate ruthlessly." },
+      { heading: "Case Study Structure", content: "Each case study should tell a story: Context (what was the challenge?) → Process (what did you do?) → Solution (what did you create?) → Results (what was the impact?).\n\nInclude visuals at every stage: research artifacts, wireframes, design iterations, final deliverables, and metrics. Visual progression shows your thinking process, not just your output.\n\nKeep case studies scannable. Use clear headings, bullet points, and large images. Visitors won't read dense paragraphs — they'll scan and stop at interesting visuals." },
+      { heading: "Navigation and User Flow", content: "Portfolio navigation should be minimal: Home, Work, About, Contact. Users come to see your work — don't distract them with complex navigation.\n\nThe primary flow: Homepage → Project Gallery → Case Study → Contact. Every page should ultimately lead to contact. Include a CTA at the bottom of every case study.\n\nUse EPIC to plan your portfolio structure. Map your case studies, plan the gallery layout, and ensure a clear path from browsing to contacting you." },
+      { heading: "Portfolio SEO Tips", content: "Target your name + profession: 'Jane Smith UX Designer.' This captures people searching for you specifically.\n\nCreate case studies around relevant keywords: 'SaaS dashboard redesign,' 'e-commerce mobile app.' These attract potential clients searching for specific work.\n\nBlog about your process. Articles like 'How I Redesigned a SaaS Dashboard' attract both clients and recruiters while building authority." }
+    ],
+    faqs: [
+      { question: "How many projects should a portfolio show?", answer: "6-12 projects. Show your best work, not all your work. If a project doesn't demonstrate your skills at their current level, remove it." },
+      { question: "Should I include personal projects?", answer: "Yes, if they demonstrate relevant skills. Personal projects show passion and initiative. Just label them clearly so clients know the context." },
+      { question: "How often should I update my portfolio?", answer: "Every 3-6 months or when you complete a significant project. An outdated portfolio suggests you're not actively working. Keep it current." }
+    ],
+    relatedArticles: ["startup-website-planning", "how-to-plan-website-architecture", "landing-page-ux-optimization"]
+  },
+  "web-design-trends-2026": {
+    slug: "web-design-trends-2026",
+    metaTitle: "Web Design Trends 2026 — What's Hot in Digital Design",
+    metaDescription: "Explore the top web design trends for 2026. From AI-powered design to brutalism, glassmorphism, and sustainable design practices.",
+    keywords: "web design trends 2026, design trends, UI trends, modern web design, web design inspiration",
+    h1: "Top Web Design Trends for 2026",
+    publishDate: "2026-03-30",
+    readTime: "8 min read",
+    category: "Design Tips",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "AI-Assisted Design Tools", content: "AI is transforming how designers work. Tools like EPIC use AI to generate design templates, auto-adjust contrast, and suggest layouts based on content type.\n\nAI doesn't replace designers — it accelerates them. Instead of spending 30 minutes on layout variations, designers generate 10 options in seconds and refine their favorites.\n\nThe trend is toward 'AI-first' design workflows where the initial draft is AI-generated and human-refined. This dramatically reduces time-to-design while maintaining creative quality." },
+      { heading: "Minimalism with Purpose", content: "Minimalism continues to dominate, but with a twist: purposeful minimalism. Instead of removing elements for aesthetic reasons, 2026 minimalism removes elements that don't serve user goals.\n\nWhitespace is used strategically to direct attention. Typography does the heavy lifting — large, bold headings with refined body text. Color palettes are restrained but intentional.\n\nFunctional minimalism means fewer clicks, simpler navigation, and clearer CTAs. EPIC's homepage exemplifies this: one clear headline, one primary action, minimal distraction." },
+      { heading: "Glassmorphism and Depth", content: "Glass-like interfaces with frosted backgrounds, subtle transparency, and layered depth create sophisticated, modern UIs. This trend extends from Apple's iOS design language to web applications.\n\nImplementation: backdrop-filter: blur() with semi-transparent backgrounds. Combined with subtle borders and shadows, it creates an elegant layered effect.\n\nUse glassmorphism sparingly. It works for cards, modals, and navigation — not for every element. Too much transparency reduces readability and accessibility." },
+      { heading: "Sustainable Web Design", content: "Green web design minimizes digital carbon footprint. Every byte transferred, every computation performed, and every server request consumes energy.\n\nPractical steps: optimize images aggressively, minimize JavaScript, use system fonts, implement dark mode (OLED screens use less power), and choose green hosting providers.\n\nSustainable design aligns with performance: lighter pages load faster, use less bandwidth, and cost less to serve. Good for the planet and good for users." },
+      { heading: "Micro-interactions and Motion", content: "Subtle animations that respond to user actions make interfaces feel alive and intuitive. A button that subtly scales on hover, a card that tilts in 3D on mouse move, a progress bar that fills smoothly.\n\nMotion should be meaningful, not decorative. Each animation should serve a purpose: draw attention, indicate state change, or provide feedback.\n\nPerformance matters: use CSS transitions and transforms instead of JavaScript animation. Hardware-accelerated properties (transform, opacity) run at 60fps without jank." }
+    ],
+    faqs: [
+      { question: "What's the biggest web design trend in 2026?", answer: "AI-assisted design. Tools that generate layouts, suggest colors, and create content are fundamentally changing the design workflow." },
+      { question: "Is dark mode still trending?", answer: "It's no longer a trend — it's a standard expectation. All new products should support both light and dark modes." },
+      { question: "Should I follow design trends?", answer: "Selectively. Adopt trends that improve user experience. Avoid trends that sacrifice usability for aesthetics. Your users' needs come before design fashion." }
+    ],
+    relatedArticles: ["design-system-guide", "web-design-color-theory", "ux-design-process-explained"]
+  },
+  "website-content-strategy": {
+    slug: "website-content-strategy",
+    metaTitle: "Website Content Strategy — Plan Content That Converts",
+    metaDescription: "Build a content strategy for your website. Learn content planning, SEO content creation, editorial calendars, and how to align content with business goals.",
+    keywords: "content strategy, website content plan, content marketing, SEO content, editorial calendar, content planning",
+    h1: "Website Content Strategy: Plan Content That Converts",
+    publishDate: "2026-03-31",
+    readTime: "8 min read",
+    category: "SEO",
+    pillarLinks: ["visual-sitemap-maker", "website-flow-generator"],
+    sections: [
+      { heading: "Content Strategy Foundations", content: "Content strategy defines what content to create, for whom, and how it supports business goals. Without strategy, you're publishing randomly and hoping something works.\n\nStart with your audience. Who are they? What questions do they have? What problems need solving? What language do they use? Your content should answer real questions your audience is asking.\n\nAlign content with business goals. Every piece of content should serve a purpose: attract traffic (SEO), build trust (thought leadership), or drive conversions (product-focused). Content that doesn't serve any purpose is wasted effort." },
+      { heading: "Content Mapping to User Journey", content: "Map content types to stages of the user journey. Awareness stage: educational blog posts, guides, and trend articles. Users don't know about your product yet — they're looking for information.\n\nConsideration stage: comparison articles, case studies, and feature guides. Users know their problem and are evaluating solutions.\n\nDecision stage: pricing pages, customer testimonials, free trials, and demo offers. Users are ready to choose — make the decision easy.\n\nUse EPIC to create a visual content map. Place content types at each journey stage and draw connections showing how content guides users toward conversion." },
+      { heading: "SEO Content Creation", content: "Keyword research first. Find terms your audience searches for with decent volume and achievable competition. Target long-tail keywords for blog posts and short-tail keywords for main pages.\n\nCreate pillar content: comprehensive, authoritative pages (2000+ words) on broad topics. Then create cluster content: shorter, specific articles that link back to the pillar. This topical clustering signals authority to search engines.\n\nEvery article needs: optimized title tag (<60 characters), meta description (140-160 characters), structured headings (H1, H2, H3), internal links to related content, and a clear CTA.\n\nEPIC practices this strategy: pillar pages like 'Visual Sitemap Maker' link to cluster articles about sitemaps, user flows, and website architecture." },
+      { heading: "Editorial Calendar", content: "Consistency beats volume. Publishing 2 quality articles per week outperforms 10 mediocre ones per week.\n\nPlan content 4-8 weeks ahead. Balance content types: informational (70%), product-focused (20%), and promotional (10%).\n\nUpdate existing content regularly. Refreshing old articles with current information and improved structure often performs better than creating new content from scratch." }
+    ],
+    faqs: [
+      { question: "How often should I publish blog content?", answer: "1-4 times per week for active growth. Quality matters more than quantity. One excellent article per week outperforms daily mediocre posts." },
+      { question: "How long should blog posts be?", answer: "1500-2500 words for most topics. Pillar content: 3000+ words. Quick guides: 800-1200 words. Match length to topic depth — don't pad for word count." },
+      { question: "Should I use AI to write content?", answer: "AI is useful for drafts, outlines, and research. But human editing, expertise, and voice are essential. Pure AI content lacks depth and authenticity that readers and search engines value." }
+    ],
+    relatedArticles: ["seo-friendly-website-structure", "how-to-plan-website-architecture", "landing-page-ux-optimization"]
+  },
+  "ui-design-principles": {
+    slug: "ui-design-principles",
+    metaTitle: "UI Design Principles — 10 Rules for Better Interfaces",
+    metaDescription: "Master the 10 essential UI design principles. Learn visual hierarchy, consistency, feedback, and other principles that make digital interfaces intuitive and effective.",
+    keywords: "UI design principles, interface design, visual hierarchy, UI UX principles, design fundamentals, UI rules",
+    h1: "10 UI Design Principles Every Designer Must Know",
+    publishDate: "2026-04-01",
+    readTime: "8 min read",
+    category: "UI Design",
+    pillarLinks: ["visual-sitemap-maker", "user-flow-diagram-tool"],
+    sections: [
+      { heading: "Visual Hierarchy", content: "Visual hierarchy guides users' eyes to the most important elements first. Size, color, contrast, spacing, and position all create hierarchy.\n\nThe most important element should be the largest and most prominent. Primary CTAs should contrast with their surroundings. Headlines should be larger than body text. Active states should be more prominent than inactive ones.\n\nCreate a clear reading order: users scan in F or Z patterns. Place critical information along these natural scan paths. Important actions go in the top-right or bottom-center where users naturally look." },
+      { heading: "Consistency", content: "Consistent interfaces are learnable. Once a user learns how one part works, they can predict how other parts work.\n\nVisual consistency: same colors, typography, and spacing throughout. If primary buttons are blue, all primary buttons should be blue.\n\nBehavioral consistency: same interactions produce same results. If swiping right archives an email, swiping right should archive everywhere (or not be used at all).\n\nDesign systems enforce consistency automatically. When every component comes from the same library, inconsistency becomes impossible." },
+      { heading: "Feedback and Affordance", content: "Every user action should produce visible feedback. Button clicks should change the button state. Form submissions should show loading and success/error. Drag operations should show the element moving.\n\nAffordance means elements look like what they do. Buttons look clickable (raised, colored). Links look tappable (underlined, colored). Input fields look typeable (bordered, inset).\n\nWithout feedback, users don't know if their action worked. Without affordance, users don't know what they can do." },
+      { heading: "Progressive Disclosure", content: "Show only what's needed at each step. Don't overwhelm users with all options at once. Present basic options first, reveal advanced options on demand.\n\nExamples: accordion menus that expand on click, 'Show more' buttons that reveal additional content, tooltips that provide extra information on hover.\n\nProgressive disclosure reduces cognitive load. Users process information more easily when it's presented in manageable chunks rather than all at once." },
+      { heading: "Error Prevention and Recovery", content: "Prevent errors before they happen. Validate input in real-time. Disable actions that aren't available. Use confirmation dialogs for destructive actions.\n\nWhen errors occur, make recovery easy. Clear error messages should explain what went wrong and how to fix it. 'Invalid email address. Please include an @ symbol.' is better than 'Error: invalid input.'\n\nUndo functionality is the ultimate error recovery. Let users reverse actions without consequences. It encourages exploration and reduces anxiety." }
+    ],
+    faqs: [
+      { question: "What's the most important UI design principle?", answer: "Visual hierarchy. If users can't quickly identify what's important on a page, no other principle matters. Guide their eyes to key elements first." },
+      { question: "How do I learn UI design?", answer: "Study existing interfaces you admire. Practice redesigning real products. Learn design tools (Figma, EPIC). Read about design principles and test with real users." },
+      { question: "What's the difference between UI and UX design?", answer: "UI design focuses on visual elements and interactions (how it looks and feels). UX design encompasses the entire user experience including research, architecture, and testing." }
+    ],
+    relatedArticles: ["ux-design-process-explained", "design-system-guide", "web-design-color-theory"]
+  },
 };
 
 export const blogSlugs = Object.keys(blogPosts);
