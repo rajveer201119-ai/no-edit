@@ -548,9 +548,9 @@ const Index = () => {
   return (
     <>
       <SEO
-        title="EPIC — AI Design Generator | Create Professional Graphics Instantly"
-        description="Create stunning posters, logos, social media graphics, YouTube thumbnails, and more in seconds. No design skills needed. Free to use."
-        keywords="AI design generator, logo maker, poster creator, YouTube thumbnail maker, Instagram post creator, social media graphics, free design tool, no-prompt AI"
+        title="EPIC — Visual Sitemap Builder | Plan Your Website Structure"
+        description="Build visual sitemaps, plan website architecture, and export clean JSON or HD images. The fastest UX sitemap tool for designers, developers, and founders."
+        keywords="visual sitemap builder, sitemap generator, UX sitemap tool, user flow builder, website architecture tool, wireframing tool, design sitemap online"
         canonicalUrl="https://no-edit.lovable.app/"
         structuredData={homePageSchema}
       />
