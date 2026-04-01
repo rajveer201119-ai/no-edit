@@ -8,7 +8,14 @@ interface UserPlan {
   isLoading: boolean;
   isPremium: boolean; // student or pro
   isPro: boolean; // pro only
-  canExportJSON: boolean; // pro only
+  canExportPDF: boolean; // pro only
+  canExportPNG: boolean; // pro only
+  canExportJSON: boolean; // free + pro
+  canUseUXTester: boolean; // pro only
+  canUseAnalyzer: boolean; // pro only
+  canUseLibrary: boolean; // pro only
+  maxProjects: number; // free: 1, pro: unlimited
+  maxPages: number; // free: 10, pro: unlimited
   hasWatermark: boolean; // free only
   userId: string | null;
 }
@@ -39,7 +46,6 @@ export function useUserPlan(): UserPlan {
         if (error) throw error;
 
         if (data) {
-          // Check if plan is expired
           if (data.premium_until && new Date(data.premium_until) < new Date()) {
             setPlan("free");
           } else {
@@ -65,12 +71,21 @@ export function useUserPlan(): UserPlan {
     return () => subscription.unsubscribe();
   }, []);
 
+  const isPro = plan === "pro" || plan === "student";
+
   return {
     plan,
     isLoading,
     isPremium: plan !== "free",
     isPro: plan === "pro",
-    canExportJSON: plan === "pro",
+    canExportPDF: isPro,
+    canExportPNG: isPro,
+    canExportJSON: true, // free users can export JSON
+    canUseUXTester: isPro,
+    canUseAnalyzer: isPro,
+    canUseLibrary: isPro,
+    maxProjects: isPro ? Infinity : 1,
+    maxPages: isPro ? Infinity : 10,
     hasWatermark: plan === "free",
     userId,
   };
