@@ -31,14 +31,22 @@ const Auth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // title managed by SEO component
+    const redirectTo = () => {
+      const saved = sessionStorage.getItem("epic_redirect_after_login");
+      if (saved) {
+        sessionStorage.removeItem("epic_redirect_after_login");
+        navigate(saved, { replace: true });
+      } else {
+        navigate("/");
+      }
+    };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) navigate("/");
+      if (session) redirectTo();
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) navigate("/");
+      if (session) redirectTo();
     });
 
     return () => subscription.unsubscribe();
