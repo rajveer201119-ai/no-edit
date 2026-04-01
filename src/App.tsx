@@ -8,6 +8,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import React, { Suspense } from "react";
+import { RequireAuth } from "@/components/RequireAuth";
 import Index from "./pages/Index";
 
 // Lazy-loaded pages for code splitting
