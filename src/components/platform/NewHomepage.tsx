@@ -495,14 +495,14 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
               <p className="text-muted-foreground text-xs mb-6">Perfect for getting started</p>
               <div className="text-3xl font-semibold text-foreground mb-6">₹0 <span className="text-sm font-normal text-muted-foreground">forever</span></div>
               <ul className="space-y-3 mb-8">
-                {["Visual sitemap builder", "Basic PNG export", "50+ templates", "Watermarked exports", "3 exports per day"].map(f => (
+                {["1 visual sitemap project", "First 10 pages per sitemap", "JSON Export", "Basic templates"].map(f => (
                   <li key={f} className="flex items-start gap-2 text-sm text-foreground">
                     <CheckCircle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" /> {f}
                   </li>
                 ))}
               </ul>
               <Button onClick={() => navigate("/navigation-maker")} variant="outline" className="w-full rounded-lg">
-                Start Free
+                Try EPIC Free
               </Button>
             </motion.div>
 
@@ -516,23 +516,23 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
                 <Crown className="h-4 w-4 text-primary" /> Pro
               </h3>
               <p className="text-muted-foreground text-xs mb-6">For professionals who ship</p>
-              <div className="text-3xl font-semibold text-foreground mb-6">₹299 <span className="text-sm font-normal text-muted-foreground">lifetime</span></div>
+              <div className="text-3xl font-semibold text-foreground mb-1">₹299 <span className="text-sm font-normal text-muted-foreground">/month</span></div>
+              <p className="text-xs text-muted-foreground mb-6">or ₹1,500 lifetime</p>
               <ul className="space-y-3 mb-8">
                 {[
-                  "Unlimited exports",
-                  "No watermarks",
-                  "High-res PNG & PDF",
-                  "JSON sitemap export",
-                  "Shareable public links",
-                  "All premium templates",
-                  "Priority processing",
+                  "Unlimited visual sitemaps",
+                  "Unlimited pages per sitemap",
+                  "PDF & PNG Export",
+                  "UX Tester & Analyzer",
+                  "Website Structure Library",
+                  "All advanced features",
                 ].map(f => (
                   <li key={f} className="flex items-start gap-2 text-sm text-foreground">
                     <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" /> {f}
                   </li>
                 ))}
               </ul>
-              <Button onClick={() => navigate("/auth")} className="w-full rounded-lg">
+              <Button onClick={() => navigate("/pricing-india")} className="w-full rounded-lg">
                 Upgrade to Pro
               </Button>
             </motion.div>
