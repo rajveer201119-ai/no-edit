@@ -336,9 +336,10 @@ const NavigationMaker = () => {
       } else {
         // Check limit
         const { count } = await supabase.from("sitemap_projects" as any).select("id", { count: "exact", head: true }).eq("user_id", userId);
-        const limit = isPremium ? 999 : 3;
+        const limit = isPremium ? 999 : 1;
         if ((count || 0) >= limit) {
-          toast.error(isPremium ? "Project limit reached" : "Free plan: 3 projects max. Upgrade to Pro for unlimited.");
+          toast.error(isPremium ? "Project limit reached" : "Free plan: 1 project max. Upgrade to Pro for unlimited.");
+          setShowPaywall(true);
           setSavingProject(false);
           return;
         }
