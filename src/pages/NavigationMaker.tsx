@@ -1073,7 +1073,7 @@ const NavigationMaker = () => {
             </Button>
             <Button size="sm" onClick={exportNavigation} className="gap-1.5 h-8 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90">
               <Download className="h-3.5 w-3.5" /> Export PNG
-              {!isAuthed && <Lock className="h-3 w-3" />}
+              {!isAuthed ? <Lock className="h-3 w-3" /> : !canExportPNG ? <Crown className="h-3 w-3 text-amber-500" /> : null}
             </Button>
           </div>
 
