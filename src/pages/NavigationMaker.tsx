@@ -279,7 +279,7 @@ const NavigationMaker = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-  const { canExportJSON, isPremium, userId } = useUserPlan();
+  const { canExportJSON, canExportPNG, isPremium, maxPages, userId } = useUserPlan();
 
   // Check auth state for download gating
   useEffect(() => {
