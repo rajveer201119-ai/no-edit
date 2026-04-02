@@ -279,7 +279,7 @@ const NavigationMaker = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-  const { canExportJSON, isPremium, userId } = useUserPlan();
+  const { canExportJSON, canExportPNG, isPremium, maxPages, userId } = useUserPlan();
 
   // Check auth state for download gating
   useEffect(() => {
@@ -336,9 +336,10 @@ const NavigationMaker = () => {
       } else {
         // Check limit
         const { count } = await supabase.from("sitemap_projects" as any).select("id", { count: "exact", head: true }).eq("user_id", userId);
-        const limit = isPremium ? 999 : 3;
+        const limit = isPremium ? 999 : 1;
         if ((count || 0) >= limit) {
-          toast.error(isPremium ? "Project limit reached" : "Free plan: 3 projects max. Upgrade to Pro for unlimited.");
+          toast.error(isPremium ? "Project limit reached" : "Free plan: 1 project max. Upgrade to Pro for unlimited.");
+          setShowPaywall(true);
           setSavingProject(false);
           return;
         }
@@ -412,6 +413,12 @@ const NavigationMaker = () => {
   const addPageToCanvas = (page: typeof stockPages[0]) => {
     const existing = nodes.find(n => n.pageId === page.id);
     if (existing) { toast.info(`${page.label} already on canvas`); return; }
+    // Enforce page limit for free users
+    if (nodes.length >= maxPages && !isPremium) {
+      toast.error(`Free plan limit: ${maxPages} pages. Upgrade to Pro for unlimited pages.`);
+      setShowPaywall(true);
+      return;
+    }
     const newNode: CanvasNode = {
       id: `node-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       pageId: page.id,
@@ -674,6 +681,7 @@ const NavigationMaker = () => {
   // Export PNG
   const exportNavigation = async () => {
     if (!isAuthed) { toast.error("Please sign up to download your design"); navigate("/auth"); return; }
+    if (!canExportPNG) { setShowPaywall(true); return; }
     if (nodes.length === 0) { toast.error("Add some pages first!"); return; }
     const canvas = document.createElement("canvas");
     const padding = 80;
@@ -1065,7 +1073,7 @@ const NavigationMaker = () => {
             </Button>
             <Button size="sm" onClick={exportNavigation} className="gap-1.5 h-8 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90">
               <Download className="h-3.5 w-3.5" /> Export PNG
-              {!isAuthed && <Lock className="h-3 w-3" />}
+              {!isAuthed ? <Lock className="h-3 w-3" /> : !canExportPNG ? <Crown className="h-3 w-3 text-amber-500" /> : null}
             </Button>
           </div>
 
@@ -1081,8 +1089,11 @@ const NavigationMaker = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => setShowUXScore(!showUXScore)}>
-                  <TrendingUp className="h-4 w-4 mr-2" /> UX Score
+                <DropdownMenuItem onClick={() => {
+                  if (!isPremium) { setShowPaywall(true); return; }
+                  setShowUXScore(!showUXScore);
+                }}>
+                  <TrendingUp className="h-4 w-4 mr-2" /> UX Score {!isPremium && <Crown className="h-3 w-3 text-amber-500 ml-auto" />}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={saveProject} disabled={savingProject}>
