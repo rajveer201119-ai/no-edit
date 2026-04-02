@@ -132,13 +132,13 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
 
         {/* Headline — outcome-focused */}
         <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5 }}
-          className="text-balance bg-gradient-to-b from-white to-white/60 bg-clip-text py-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-[-0.04em] text-transparent relative z-10 max-w-3xl">
+          className="text-balance bg-gradient-to-b from-foreground to-foreground/60 dark:from-white dark:to-white/60 bg-clip-text py-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-[-0.04em] text-transparent relative z-10 max-w-3xl">
           Build Visual Sitemaps &amp; Plan Your UX Flow
         </motion.h1>
 
         {/* Subheadline — SEO + outcome */}
         <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}
-          className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-white/60 max-w-lg mx-auto relative z-10 leading-relaxed">
+          className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-foreground/60 dark:text-white/60 max-w-lg mx-auto relative z-10 leading-relaxed">
           The fastest visual sitemap builder for designers, developers, and founders. Create website architecture, export JSON or HD images — in under 2 minutes.
         </motion.p>
 
