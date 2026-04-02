@@ -146,14 +146,14 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5 }}
           className="flex flex-col sm:flex-row items-center gap-3 relative z-20">
           <Button onClick={() => navigate("/navigation-maker")} size="lg"
-            className="gap-2 min-w-[260px] min-h-[52px] rounded-[0.625rem] bg-white text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-lg shadow-white/10">
+            className="gap-2 min-w-[260px] min-h-[52px] rounded-[0.625rem] bg-foreground text-background hover:bg-foreground/90 font-semibold text-sm shadow-lg">
             <Network className="h-4 w-4" /> Start Building Your Sitemap
           </Button>
           <Button onClick={() => {
             const demo = document.getElementById("live-demo");
             demo?.scrollIntoView({ behavior: "smooth" });
           }} variant="outline" size="lg"
-            className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
+            className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border-foreground/20 dark:border-white/20 text-foreground dark:text-white hover:bg-foreground/10 dark:hover:bg-white/10 font-medium text-sm">
             <Play className="h-4 w-4" /> See Live Demo
           </Button>
         </motion.div>
@@ -162,14 +162,14 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.5 }}
           className="mt-3 relative z-20">
           <Button onClick={onStartDesigning} variant="outline" size="lg"
-            className="gap-2 min-w-[200px] min-h-[48px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
+            className="gap-2 min-w-[200px] min-h-[48px] rounded-[0.625rem] border-foreground/20 dark:border-white/20 text-foreground dark:text-white hover:bg-foreground/10 dark:hover:bg-white/10 font-medium text-sm">
             <Layers className="h-4 w-4" /> Plan Your UX Flow Visually
           </Button>
         </motion.div>
 
         {/* Micro-trust indicators */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-          className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-white/40 relative z-10">
+          className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-foreground/40 dark:text-white/40 relative z-10">
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> Free to start</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> No credit card</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> JSON + PNG export</span>

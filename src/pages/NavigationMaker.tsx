@@ -1089,8 +1089,11 @@ const NavigationMaker = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => setShowUXScore(!showUXScore)}>
-                  <TrendingUp className="h-4 w-4 mr-2" /> UX Score
+                <DropdownMenuItem onClick={() => {
+                  if (!isPremium) { setShowPaywall(true); return; }
+                  setShowUXScore(!showUXScore);
+                }}>
+                  <TrendingUp className="h-4 w-4 mr-2" /> UX Score {!isPremium && <Crown className="h-3 w-3 text-amber-500 ml-auto" />}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={saveProject} disabled={savingProject}>
