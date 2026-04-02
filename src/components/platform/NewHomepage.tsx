@@ -124,7 +124,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
       {/* ═══════ HERO — CRO Optimized ═══════ */}
       <section className="relative mx-auto w-full pt-28 md:pt-44 px-6 text-center min-h-[calc(100vh-64px)] overflow-hidden flex flex-col items-center justify-center">
         <div className="absolute inset-0 -z-20"><WebGLShader /></div>
-        <div className="absolute inset-0 -z-10 bg-black/20 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 -z-10 bg-background/60 dark:bg-black/20 backdrop-blur-[1px]" />
 
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.4 }} className="flex justify-center mb-6 relative z-10">
           <img src={epicLogo} alt="EPIC — Visual Sitemap & Design Platform" className="w-20 h-20 md:w-28 md:h-28 drop-shadow-2xl" width={112} height={112} loading="eager" />
