@@ -412,6 +412,12 @@ const NavigationMaker = () => {
   const addPageToCanvas = (page: typeof stockPages[0]) => {
     const existing = nodes.find(n => n.pageId === page.id);
     if (existing) { toast.info(`${page.label} already on canvas`); return; }
+    // Enforce page limit for free users
+    if (nodes.length >= maxPages && !isPremium) {
+      toast.error(`Free plan limit: ${maxPages} pages. Upgrade to Pro for unlimited pages.`);
+      setShowPaywall(true);
+      return;
+    }
     const newNode: CanvasNode = {
       id: `node-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       pageId: page.id,
