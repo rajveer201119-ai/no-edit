@@ -80,7 +80,7 @@ export function useUserPlan(): UserPlan {
     isPro: plan === "pro",
     canExportPDF: isPro,
     canExportPNG: isPro,
-    canExportJSON: true, // free users can export JSON
+    canExportJSON: true,
     canUseUXTester: isPro,
     canUseAnalyzer: isPro,
     canUseLibrary: isPro,
