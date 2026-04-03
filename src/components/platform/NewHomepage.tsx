@@ -124,7 +124,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
       {/* ═══════ HERO — CRO Optimized ═══════ */}
       <section className="relative mx-auto w-full pt-28 md:pt-44 px-6 text-center min-h-[calc(100vh-64px)] overflow-hidden flex flex-col items-center justify-center">
         <div className="absolute inset-0 -z-20"><WebGLShader /></div>
-        <div className="absolute inset-0 -z-10 bg-background/60 dark:bg-black/20 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 -z-10 bg-black/20 backdrop-blur-[1px]" />
 
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.4 }} className="flex justify-center mb-6 relative z-10">
           <img src={epicLogo} alt="EPIC — Visual Sitemap & Design Platform" className="w-20 h-20 md:w-28 md:h-28 drop-shadow-2xl" width={112} height={112} loading="eager" />
@@ -132,13 +132,13 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
 
         {/* Headline — outcome-focused */}
         <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5 }}
-          className="text-balance bg-gradient-to-b from-foreground to-foreground/60 dark:from-white dark:to-white/60 bg-clip-text py-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-[-0.04em] text-transparent relative z-10 max-w-3xl">
+          className="text-balance bg-gradient-to-b from-white to-white/60 bg-clip-text py-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-[-0.04em] text-transparent relative z-10 max-w-3xl">
           Build Visual Sitemaps &amp; Plan Your UX Flow
         </motion.h1>
 
         {/* Subheadline — SEO + outcome */}
         <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}
-          className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-foreground/60 dark:text-white/60 max-w-lg mx-auto relative z-10 leading-relaxed">
+          className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-white/60 max-w-lg mx-auto relative z-10 leading-relaxed">
           The fastest visual sitemap builder for designers, developers, and founders. Create website architecture, export JSON or HD images — in under 2 minutes.
         </motion.p>
 
@@ -146,14 +146,14 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5 }}
           className="flex flex-col sm:flex-row items-center gap-3 relative z-20">
           <Button onClick={() => navigate("/navigation-maker")} size="lg"
-            className="gap-2 min-w-[260px] min-h-[52px] rounded-[0.625rem] bg-foreground text-background hover:bg-foreground/90 font-semibold text-sm shadow-lg">
+            className="gap-2 min-w-[260px] min-h-[52px] rounded-[0.625rem] bg-white text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-lg shadow-white/10">
             <Network className="h-4 w-4" /> Start Building Your Sitemap
           </Button>
           <Button onClick={() => {
             const demo = document.getElementById("live-demo");
             demo?.scrollIntoView({ behavior: "smooth" });
           }} variant="outline" size="lg"
-            className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border-foreground/20 dark:border-white/20 text-foreground dark:text-white hover:bg-foreground/10 dark:hover:bg-white/10 font-medium text-sm">
+            className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
             <Play className="h-4 w-4" /> See Live Demo
           </Button>
         </motion.div>
@@ -162,14 +162,14 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.5 }}
           className="mt-3 relative z-20">
           <Button onClick={onStartDesigning} variant="outline" size="lg"
-            className="gap-2 min-w-[200px] min-h-[48px] rounded-[0.625rem] border-foreground/20 dark:border-white/20 text-foreground dark:text-white hover:bg-foreground/10 dark:hover:bg-white/10 font-medium text-sm">
+            className="gap-2 min-w-[200px] min-h-[48px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
             <Layers className="h-4 w-4" /> Plan Your UX Flow Visually
           </Button>
         </motion.div>
 
         {/* Micro-trust indicators */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-          className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-foreground/40 dark:text-white/40 relative z-10">
+          className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-white/40 relative z-10">
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> Free to start</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> No credit card</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> JSON + PNG export</span>
