@@ -19,7 +19,6 @@ const SitemapLibrary = () => {
   const [dbSitemaps, setDbSitemaps] = useState<any[]>([]);
   const { canUseLibrary, isLoading: planLoading } = useUserPlan();
   const [showPaywall, setShowPaywall] = useState(false);
-  const [dbSitemaps, setDbSitemaps] = useState<any[]>([]);
 
   useEffect(() => {
     supabase
