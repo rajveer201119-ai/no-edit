@@ -119,8 +119,23 @@ const SitemapLibrary = () => {
           {/* Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12">
             {filtered.map(s => (
-              <Link key={s.slug} to={`/sitemap/${s.slug}`}>
-                <Card className="p-4 hover:border-primary/50 hover:shadow-md transition-all h-full">
+              <div
+                key={s.slug}
+                onClick={() => {
+                  if (!canUseLibrary) {
+                    setShowPaywall(true);
+                    return;
+                  }
+                  navigate(`/sitemap/${s.slug}`);
+                }}
+                className="cursor-pointer"
+              >
+                <Card className="p-4 hover:border-primary/50 hover:shadow-md transition-all h-full relative">
+                  {!canUseLibrary && (
+                    <div className="absolute top-2 right-2">
+                      <Lock className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 mb-3">
                     <Globe className="h-4 w-4 text-primary" />
                     <span className="font-semibold text-sm">{s.domain}</span>
@@ -142,7 +157,7 @@ const SitemapLibrary = () => {
                     </div>
                   </div>
                 </Card>
-              </Link>
+              </div>
             ))}
           </div>
 
