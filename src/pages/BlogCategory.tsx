@@ -14,6 +14,13 @@ const categories: Record<string, { title: string; description: string; keywords:
   "web-planning": { title: "Web Planning", description: "Master website planning with guides on sitemaps, architecture, and structure. Plan better websites with EPIC.", keywords: "web planning guide, website architecture, sitemap planning" },
   "saas-design": { title: "SaaS Design", description: "SaaS design guides covering onboarding flows, navigation, and dashboard UX. Build better SaaS products with EPIC.", keywords: "SaaS design tips, SaaS onboarding, SaaS UX" },
   "design-tips": { title: "Design Tips", description: "Practical design tips for beginners and creators. Learn wireflows, landing page design, and visual planning.", keywords: "design tips, graphic design guide, beginner design" },
+  "web-development": { title: "Web Development", description: "Web development guides covering frontend, backend, and full-stack development. Build better websites with EPIC.", keywords: "web development guide, frontend development, website coding" },
+  "ui-design": { title: "UI Design", description: "UI design guides covering visual design, component design, and interface patterns. Design better UIs with EPIC.", keywords: "UI design blog, interface design, visual design tips" },
+  "seo": { title: "SEO", description: "SEO guides covering site structure, technical SEO, and content optimization. Improve your search rankings with EPIC.", keywords: "SEO guide, search engine optimization, website SEO" },
+  "product-design": { title: "Product Design", description: "Product design guides covering user research, prototyping, and product strategy. Build better products with EPIC.", keywords: "product design blog, product strategy, UX research" },
+  "marketing": { title: "Marketing", description: "Marketing guides covering digital marketing, landing pages, and conversion optimization. Grow your business with EPIC.", keywords: "marketing guide, digital marketing, conversion optimization" },
+  "app-design": { title: "App Design", description: "App design guides covering mobile UX, app architecture, and design patterns. Design better apps with EPIC.", keywords: "app design blog, mobile UX, app architecture" },
+  "entrepreneurship": { title: "Entrepreneurship", description: "Entrepreneurship guides for founders, startups, and makers. Launch and grow your product with EPIC.", keywords: "entrepreneurship guide, startup tips, founder resources" },
   "student-resources": { title: "Student Resources", description: "Free design resources and tools for student founders, projects, and portfolios. Get started with EPIC.", keywords: "student design tools, free design resources, student founder tools" },
 };
 
@@ -22,6 +29,13 @@ const categoryMap: Record<string, string> = {
   "Web Planning": "web-planning",
   "SaaS Design": "saas-design",
   "Design Tips": "design-tips",
+  "Web Development": "web-development",
+  "UI Design": "ui-design",
+  "SEO": "seo",
+  "Product Design": "product-design",
+  "Marketing": "marketing",
+  "App Design": "app-design",
+  "Entrepreneurship": "entrepreneurship",
   "Student Resources": "student-resources",
 };
 

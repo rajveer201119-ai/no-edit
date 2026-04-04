@@ -39,7 +39,7 @@ export const ProPaywall = ({ open, onOpenChange, featureName }: ProPaywallProps)
     }
     setEmailError("");
 
-    const upiId = "8638910252@upi";
+    const upiId = "8638910252-2@ybl";
     const txnNote = encodeURIComponent("EPIC Pro Upgrade");
     const upiUrl = `upi://pay?pa=${upiId}&pn=EPIC%20Pro&am=${amount}&cu=INR&tn=${txnNote}`;
 

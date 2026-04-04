@@ -18,6 +18,13 @@ const categories = [
   { slug: "web-planning", label: "Web Planning" },
   { slug: "saas-design", label: "SaaS Design" },
   { slug: "design-tips", label: "Design Tips" },
+  { slug: "web-development", label: "Web Development" },
+  { slug: "ui-design", label: "UI Design" },
+  { slug: "seo", label: "SEO" },
+  { slug: "product-design", label: "Product Design" },
+  { slug: "marketing", label: "Marketing" },
+  { slug: "app-design", label: "App Design" },
+  { slug: "entrepreneurship", label: "Entrepreneurship" },
   { slug: "student-resources", label: "Student Resources" },
 ];
 
