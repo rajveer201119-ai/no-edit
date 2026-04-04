@@ -1,3 +1,4 @@
+import { useState, useRef } from "react";
 import { WebGLShader } from "@/components/ui/web-gl-shader";
 import epicLogo from "@/assets/epic-logo.png";
 import logoLovable from "@/assets/logo-lovable.png";
