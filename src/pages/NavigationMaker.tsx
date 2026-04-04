@@ -680,6 +680,7 @@ const NavigationMaker = () => {
   // Export PNG
   const exportNavigation = async () => {
     if (!isAuthed) { toast.error("Please sign up to download your design"); navigate("/auth"); return; }
+    if (!canExportPNG) { setShowPaywall(true); toast.error("Upgrade to EPIC Pro to unlock PNG export."); return; }
     if (nodes.length === 0) { toast.error("Add some pages first!"); return; }
     const canvas = document.createElement("canvas");
     const padding = 80;
