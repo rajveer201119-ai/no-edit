@@ -16,19 +16,24 @@ import { WebGLShader } from "@/components/ui/web-gl-shader";
 
 const PricingInternational = () => {
   const navigate = useNavigate();
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<"student" | "pro">("student");
+  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "lifetime">("lifetime");
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
 
-  const handleUpgradeClick = (plan: "student" | "pro") => {
-    setSelectedPlan(plan);
-    setShowPaymentDialog(true);
-  };
+  const amount = selectedPlan === "monthly" ? 5 : 15;
 
-  const handleEmailClick = () => {
-    const planLabel = selectedPlan === "pro" ? "Pro Lifetime ($5)" : "Student Helper ($1/month)";
-    const subject = encodeURIComponent(`EPIC ${planLabel} Upgrade Request`);
-    const body = encodeURIComponent(`Hi,\n\nI would like to upgrade to EPIC ${planLabel}.\n\nMy account email: [your EPIC account email]\n\nPlease share the payment details so I can complete the upgrade.\n\nThank you!`);
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=rajveer201119@gmail.com&su=${subject}&body=${body}`, "_blank");
+  const handleUPIPay = () => {
+    const result = z.string().trim().min(1, "Email is required").email("Enter a valid email").safeParse(email);
+    if (!result.success) {
+      setEmailError(result.error.errors[0].message);
+      return;
+    }
+    setEmailError("");
+    const upiId = "8638910252-2@ybl";
+    const txnNote = encodeURIComponent("EPIC Pro Upgrade");
+    const upiUrl = `upi://pay?pa=${upiId}&pn=EPIC%20Pro&am=${amount}&cu=USD&tn=${txnNote}`;
+    window.location.href = upiUrl;
+    toast.info("Opening your UPI app. Complete the payment to activate Pro.", { duration: 6000 });
   };
 
   return (

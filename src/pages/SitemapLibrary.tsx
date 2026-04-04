@@ -182,6 +182,7 @@ const SitemapLibrary = () => {
         </div>
         <Footer />
       </main>
+      <ProPaywall open={showPaywall} onOpenChange={setShowPaywall} featureName="Website Structure Library" />
     </>
   );
 };
