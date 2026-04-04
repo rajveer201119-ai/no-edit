@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { UXScorePanel } from "@/components/UXScorePanel";
-import { CreatorModePaywall } from "@/components/CreatorModePaywall";
+import { ProPaywall } from "@/components/ProPaywall";
 import {
   Select,
   SelectContent,
@@ -279,7 +279,7 @@ const NavigationMaker = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-  const { canExportJSON, isPremium, userId } = useUserPlan();
+  const { canExportJSON, isPremium, userId, canExportPNG, maxProjects, maxPages } = useUserPlan();
 
   // Check auth state for download gating
   useEffect(() => {
@@ -336,9 +336,10 @@ const NavigationMaker = () => {
       } else {
         // Check limit
         const { count } = await supabase.from("sitemap_projects" as any).select("id", { count: "exact", head: true }).eq("user_id", userId);
-        const limit = isPremium ? 999 : 3;
+        const limit = isPremium ? 999 : maxProjects;
         if ((count || 0) >= limit) {
-          toast.error(isPremium ? "Project limit reached" : "Free plan: 3 projects max. Upgrade to Pro for unlimited.");
+          toast.error(isPremium ? "Project limit reached" : `Free plan: ${maxProjects} project max. Upgrade to Pro for unlimited.`);
+          setShowPaywall(true);
           setSavingProject(false);
           return;
         }
@@ -412,6 +413,12 @@ const NavigationMaker = () => {
   const addPageToCanvas = (page: typeof stockPages[0]) => {
     const existing = nodes.find(n => n.pageId === page.id);
     if (existing) { toast.info(`${page.label} already on canvas`); return; }
+    // Enforce page limit for free users
+    if (!isPremium && nodes.length >= maxPages) {
+      toast.error(`Free plan: ${maxPages} pages max. Upgrade to Pro for unlimited pages.`);
+      setShowPaywall(true);
+      return;
+    }
     const newNode: CanvasNode = {
       id: `node-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       pageId: page.id,
@@ -674,6 +681,7 @@ const NavigationMaker = () => {
   // Export PNG
   const exportNavigation = async () => {
     if (!isAuthed) { toast.error("Please sign up to download your design"); navigate("/auth"); return; }
+    if (!canExportPNG) { setShowPaywall(true); toast.error("Upgrade to EPIC Pro to unlock PNG export."); return; }
     if (nodes.length === 0) { toast.error("Add some pages first!"); return; }
     const canvas = document.createElement("canvas");
     const padding = 80;
@@ -1065,7 +1073,7 @@ const NavigationMaker = () => {
             </Button>
             <Button size="sm" onClick={exportNavigation} className="gap-1.5 h-8 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90">
               <Download className="h-3.5 w-3.5" /> Export PNG
-              {!isAuthed && <Lock className="h-3 w-3" />}
+              {!isAuthed ? <Lock className="h-3 w-3" /> : !canExportPNG ? <Crown className="h-3 w-3 text-amber-500" /> : null}
             </Button>
           </div>
 
@@ -1783,10 +1791,9 @@ const NavigationMaker = () => {
         </div>
       </div>
 
-      <CreatorModePaywall 
+      <ProPaywall 
         open={showPaywall} 
         onOpenChange={setShowPaywall} 
-        triggerReason="json-export"
       />
     </>
   );

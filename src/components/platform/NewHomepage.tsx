@@ -1,3 +1,4 @@
+import { useState, useRef } from "react";
 import { WebGLShader } from "@/components/ui/web-gl-shader";
 import epicLogo from "@/assets/epic-logo.png";
 import logoLovable from "@/assets/logo-lovable.png";
@@ -118,8 +119,27 @@ const showcaseCategories = [
 
 export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeClick }: NewHomepageProps) => {
   const navigate = useNavigate();
+  const [showDemoVideo, setShowDemoVideo] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   return (
+    <>
+      {/* Video Modal */}
+      {showDemoVideo && (
+        <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4" onClick={() => setShowDemoVideo(false)}>
+          <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setShowDemoVideo(false)} className="absolute -top-10 right-0 text-white hover:text-white/80 text-sm font-medium">✕ Close</button>
+            <video
+              ref={videoRef}
+              src="/epic-demo.mp4"
+              controls
+              autoPlay
+              className="w-full rounded-xl shadow-2xl"
+              onLoadedData={() => videoRef.current?.play()}
+            />
+          </div>
+        </div>
+      )}
     <div className="w-full">
       {/* ═══════ HERO — CRO Optimized ═══════ */}
       <section className="relative mx-auto w-full pt-28 md:pt-44 px-6 text-center min-h-[calc(100vh-64px)] overflow-hidden flex flex-col items-center justify-center">
@@ -150,8 +170,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
             <Network className="h-4 w-4" /> Start Building Your Sitemap
           </Button>
           <Button onClick={() => {
-            const demo = document.getElementById("live-demo");
-            demo?.scrollIntoView({ behavior: "smooth" });
+            setShowDemoVideo(true);
           }} variant="outline" size="lg"
             className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
             <Play className="h-4 w-4" /> See Live Demo
@@ -595,5 +614,6 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         </div>
       </section>
     </div>
+    </>
   );
 };
