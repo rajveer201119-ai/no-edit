@@ -119,8 +119,27 @@ const showcaseCategories = [
 
 export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeClick }: NewHomepageProps) => {
   const navigate = useNavigate();
+  const [showDemoVideo, setShowDemoVideo] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   return (
+    <>
+      {/* Video Modal */}
+      {showDemoVideo && (
+        <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4" onClick={() => setShowDemoVideo(false)}>
+          <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setShowDemoVideo(false)} className="absolute -top-10 right-0 text-white hover:text-white/80 text-sm font-medium">✕ Close</button>
+            <video
+              ref={videoRef}
+              src="/epic-demo.mp4"
+              controls
+              autoPlay
+              className="w-full rounded-xl shadow-2xl"
+              onLoadedData={() => videoRef.current?.play()}
+            />
+          </div>
+        </div>
+      )}
     <div className="w-full">
       {/* ═══════ HERO — CRO Optimized ═══════ */}
       <section className="relative mx-auto w-full pt-28 md:pt-44 px-6 text-center min-h-[calc(100vh-64px)] overflow-hidden flex flex-col items-center justify-center">
