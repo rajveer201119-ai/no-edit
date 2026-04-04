@@ -52,6 +52,22 @@ const Auth = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  const handleGoogleSignIn = async () => {
+  setLoading(true);
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: window.location.origin
+    }
+  });
+
+  if (error) {
+    toast.error(error.message);
+    setLoading(false);
+  }
+};
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -119,6 +135,17 @@ const Auth = () => {
             Sign up
           </Button>
         </nav>
+
+        <Button
+  type="button"
+  variant="outline"
+  className="w-full"
+  onClick={handleGoogleSignIn}
+>
+  Continue with Google
+</Button>
+
+<div className="text-center text-sm text-muted-foreground">or</div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
