@@ -151,8 +151,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
             <Network className="h-4 w-4" /> Start Building Your Sitemap
           </Button>
           <Button onClick={() => {
-            const demo = document.getElementById("live-demo");
-            demo?.scrollIntoView({ behavior: "smooth" });
+            setShowDemoVideo(true);
           }} variant="outline" size="lg"
             className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
             <Play className="h-4 w-4" /> See Live Demo
