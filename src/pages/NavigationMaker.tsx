@@ -1791,10 +1791,9 @@ const NavigationMaker = () => {
         </div>
       </div>
 
-      <CreatorModePaywall 
+      <ProPaywall 
         open={showPaywall} 
         onOpenChange={setShowPaywall} 
-        triggerReason="json-export"
       />
     </>
   );
