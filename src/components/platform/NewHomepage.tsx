@@ -614,5 +614,6 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         </div>
       </section>
     </div>
+    </>
   );
 };
