@@ -173,6 +173,17 @@ const Admin = () => {
     }
   };
 
+  const fetchPaymentLeads = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('payment_leads' as any).select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      setPaymentLeads((data || []) as PaymentLead[]);
+    } catch (error) {
+      console.error("Error fetching payment leads:", error);
+    }
+  };
+
   const createAnnouncement = async () => {
     if (!newAnnouncement.title || !newAnnouncement.message) {
       toast.error("Please fill in all fields"); return;
