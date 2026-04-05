@@ -57,6 +57,7 @@ const Admin = () => {
     message: '',
     type: 'info' as 'info' | 'warning' | 'success' | 'alert'
   });
+  const [paymentLeads, setPaymentLeads] = useState<PaymentLead[]>([]);
 
   useEffect(() => {
     checkAdminAccess();
