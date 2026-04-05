@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Shield, ArrowLeft, Crown, Calendar, Users, Megaphone, X, Zap, Badge } from "lucide-react";
+import { Shield, ArrowLeft, Crown, Calendar, Users, Megaphone, X, Zap, Badge, Mail } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface UserData {
@@ -26,6 +26,14 @@ interface Announcement {
   message: string;
   type: 'info' | 'warning' | 'success' | 'alert';
   is_active: boolean;
+  created_at: string;
+}
+
+interface PaymentLead {
+  id: string;
+  email: string;
+  plan_selected: string;
+  amount: number;
   created_at: string;
 }
 
@@ -49,6 +57,7 @@ const Admin = () => {
     message: '',
     type: 'info' as 'info' | 'warning' | 'success' | 'alert'
   });
+  const [paymentLeads, setPaymentLeads] = useState<PaymentLead[]>([]);
 
   useEffect(() => {
     checkAdminAccess();
@@ -66,7 +75,7 @@ const Admin = () => {
       if (!roleData) { toast.error("Unauthorized: Admin access required"); navigate("/"); return; }
 
       setIsAdmin(true);
-      await Promise.all([fetchUsers(), fetchAnnouncements()]);
+      await Promise.all([fetchUsers(), fetchAnnouncements(), fetchPaymentLeads()]);
     } catch (error) {
       console.error("Error checking admin access:", error);
       toast.error("Error verifying admin access");
@@ -161,6 +170,17 @@ const Admin = () => {
     } catch (error) {
       console.error("Error fetching announcements:", error);
       toast.error("Failed to fetch announcements");
+    }
+  };
+
+  const fetchPaymentLeads = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('payment_leads' as any).select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      setPaymentLeads((data || []) as unknown as PaymentLead[]);
+    } catch (error) {
+      console.error("Error fetching payment leads:", error);
     }
   };
 
@@ -312,6 +332,31 @@ const Admin = () => {
               )}
             </div>
           </div>
+        </Card>
+
+        {/* Payment Leads */}
+        <Card className="p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Mail className="h-6 w-6 text-primary" />
+            <h2 className="text-2xl font-bold">Payment Leads</h2>
+            <span className="text-sm text-muted-foreground ml-2">({paymentLeads.length})</span>
+          </div>
+          {paymentLeads.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No payment leads yet</p>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {paymentLeads.map((lead) => (
+                <div key={lead.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{lead.email}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {lead.plan_selected} — ₹{lead.amount} — {new Date(lead.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
 
         {/* Plan Management */}
