@@ -9,12 +9,14 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Globe, Search, Loader2, FileText, Layers, AlertTriangle,
-  BarChart3, Download, Share2, TreePine
+  BarChart3, Download, Share2, TreePine, Lock, Crown
 } from "lucide-react";
 import { seedSitemaps, type SitemapNode } from "@/data/seedSitemaps";
 import { Footer } from "@/components/Footer";
 import { MainNavigation } from "@/components/platform/MainNavigation";
 import { firecrawlApi } from "@/lib/api/firecrawl";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import { ProPaywall } from "@/components/ProPaywall";
 
 interface AnalysisReport {
   domain: string;
@@ -27,7 +29,6 @@ interface AnalysisReport {
   tree: SitemapNode[];
 }
 
-// Count all nodes in tree
 const countNodes = (nodes: SitemapNode[]): number => {
   let count = 0;
   for (const n of nodes) {
@@ -37,7 +38,6 @@ const countNodes = (nodes: SitemapNode[]): number => {
   return count;
 };
 
-// Get max depth
 const getMaxDepth = (nodes: SitemapNode[], depth = 1): number => {
   let max = depth;
   for (const n of nodes) {
@@ -46,7 +46,6 @@ const getMaxDepth = (nodes: SitemapNode[], depth = 1): number => {
   return max;
 };
 
-// Find largest cluster
 const findLargestCluster = (nodes: SitemapNode[]): { name: string; size: number } => {
   let largest = { name: "Root", size: 0 };
   for (const n of nodes) {
@@ -60,15 +59,11 @@ const findLargestCluster = (nodes: SitemapNode[]): { name: string; size: number 
   return largest;
 };
 
-/**
- * Convert a flat list of URLs into a hierarchical tree structure.
- */
 const urlsToTree = (urls: string[], domain: string): SitemapNode[] => {
   const root: SitemapNode = { name: "Home", url: "/" };
   const pathMap = new Map<string, SitemapNode>();
   pathMap.set("/", root);
 
-  // Sort URLs so parents come before children
   const paths = urls
     .map(u => {
       try {
@@ -79,12 +74,11 @@ const urlsToTree = (urls: string[], domain: string): SitemapNode[] => {
       }
     })
     .filter((p): p is string => p !== null && p !== "")
-    .filter((v, i, a) => a.indexOf(v) === i) // dedupe
+    .filter((v, i, a) => a.indexOf(v) === i)
     .sort();
 
   for (const path of paths) {
     if (path === "/") continue;
-
     const segments = path.split("/").filter(Boolean);
     let currentPath = "";
     let parent = root;
@@ -92,18 +86,13 @@ const urlsToTree = (urls: string[], domain: string): SitemapNode[] => {
     for (let i = 0; i < segments.length; i++) {
       currentPath += "/" + segments[i];
       let node = pathMap.get(currentPath);
-
       if (!node) {
-        const name = segments[i]
-          .replace(/[-_]/g, " ")
-          .replace(/\b\w/g, c => c.toUpperCase());
+        const name = segments[i].replace(/[-_]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
         node = { name, url: currentPath };
         pathMap.set(currentPath, node);
-
         if (!parent.children) parent.children = [];
         parent.children.push(node);
       }
-
       parent = node;
     }
   }
@@ -115,7 +104,9 @@ const WebsiteAnalyzer = () => {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<AnalysisReport | null>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
   const navigate = useNavigate();
+  const { isPremium, canUseAnalyzer } = useUserPlan();
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,7 +118,6 @@ const WebsiteAnalyzer = () => {
     const domain = url.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "").toLowerCase();
     setLoading(true);
 
-    // Check seed data first
     const seed = seedSitemaps.find(s => s.domain === domain);
     if (seed) {
       setReport({
@@ -145,18 +135,14 @@ const WebsiteAnalyzer = () => {
       return;
     }
 
-    // Use Firecrawl Map API for real crawling
     try {
       const response = await firecrawlApi.map(domain, { limit: 200 });
-
       if (response.success && response.links && response.links.length > 0) {
         const tree = urlsToTree(response.links, domain);
         const total = countNodes(tree);
         const depth = getMaxDepth(tree);
         const cluster = findLargestCluster(tree);
         const topLevel = tree[0]?.children?.length || 0;
-        
-        // Estimate orphan pages (pages at max depth with no children)
         let orphans = 0;
         const countOrphans = (nodes: SitemapNode[], d: number) => {
           for (const n of nodes) {
@@ -178,7 +164,6 @@ const WebsiteAnalyzer = () => {
         });
         toast.success(`Crawled ${response.links.length} URLs from ${domain}!`);
       } else {
-        // Fallback: generate simulated structure
         toast.info("Could not crawl this domain. Showing estimated structure.");
         generateFallbackReport(domain);
       }
@@ -266,7 +251,7 @@ const WebsiteAnalyzer = () => {
           name: "EPIC Website Structure Analyzer",
           applicationCategory: "DesignApplication",
           operatingSystem: "Web",
-          description: "Analyze any website's architecture with real crawl data. Get a visual sitemap, structure report, and UX insights.",
+          description: "Analyze any website's architecture with real crawl data.",
           url: "https://no-edit.lovable.app/analyzer",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }}
@@ -278,16 +263,15 @@ const WebsiteAnalyzer = () => {
         }}
       />
       <main className="min-h-screen bg-background pt-14">
-        {/* Header */}
         <header className="border-b border-border px-6 py-4 flex items-center gap-4">
           <div>
-            <h1 className="text-xl font-bold">Website Structure Analyzer</h1>
+            <h1 className="text-xl font-bold text-foreground">Website Structure Analyzer</h1>
             <p className="text-sm text-muted-foreground">Crawl any website and visualize its architecture with real data</p>
           </div>
         </header>
 
         <div className="max-w-5xl mx-auto px-6 py-12">
-          {/* Input */}
+          {/* Input — always accessible */}
           <Card className="p-6 mb-8">
             <form onSubmit={handleAnalyze} className="flex gap-3">
               <div className="relative flex-1">
@@ -309,62 +293,78 @@ const WebsiteAnalyzer = () => {
             </p>
           </Card>
 
-          {/* Report */}
+          {/* Report — blur for free users */}
           {report && (
-            <div className="space-y-8 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
-              {/* Stats */}
-              <div>
-                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                  <BarChart3 className="h-6 w-6 text-primary" />
-                  Website Structure Report — {report.domain}
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {[
-                    { label: "Pages Discovered", value: report.totalPages, icon: FileText },
-                    { label: "Nav Depth", value: `${report.maxDepth} Levels`, icon: Layers },
-                    { label: "Top Sections", value: report.topLevelSections, icon: TreePine },
-                    { label: "Largest Cluster", value: `${report.largestCluster} (${report.largestClusterSize})`, icon: BarChart3 },
-                    { label: "Orphan Pages", value: report.orphanPages, icon: AlertTriangle },
-                  ].map(stat => (
-                    <Card key={stat.label} className="p-4 text-center">
-                      <stat.icon className="h-5 w-5 mx-auto mb-2 text-primary" />
-                      <div className="text-xl font-bold">{stat.value}</div>
-                      <div className="text-xs text-muted-foreground">{stat.label}</div>
-                    </Card>
-                  ))}
+            <div className="space-y-8 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 relative">
+              {/* Overlay for free users */}
+              {!canUseAnalyzer && (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/60 backdrop-blur-sm rounded-xl">
+                  <Lock className="h-8 w-8 text-muted-foreground mb-3" />
+                  <h3 className="text-lg font-bold text-foreground mb-1">Pro Feature</h3>
+                  <p className="text-sm text-muted-foreground mb-4 text-center max-w-sm">
+                    Upgrade to EPIC Pro to see the full analysis report, visual sitemap, and export options.
+                  </p>
+                  <Button onClick={() => setShowPaywall(true)} className="gap-2">
+                    <Crown className="h-4 w-4" /> Upgrade to Pro
+                  </Button>
                 </div>
-              </div>
+              )}
 
-              {/* Tree */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Visual Sitemap</h3>
-                <SitemapTree nodes={report.tree} />
-              </div>
+              <div className={!canUseAnalyzer ? "blur-md pointer-events-none select-none" : ""}>
+                {/* Stats */}
+                <div>
+                  <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-foreground">
+                    <BarChart3 className="h-6 w-6 text-primary" />
+                    Website Structure Report — {report.domain}
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {[
+                      { label: "Pages Discovered", value: report.totalPages, icon: FileText },
+                      { label: "Nav Depth", value: `${report.maxDepth} Levels`, icon: Layers },
+                      { label: "Top Sections", value: report.topLevelSections, icon: TreePine },
+                      { label: "Largest Cluster", value: `${report.largestCluster} (${report.largestClusterSize})`, icon: BarChart3 },
+                      { label: "Orphan Pages", value: report.orphanPages, icon: AlertTriangle },
+                    ].map(stat => (
+                      <Card key={stat.label} className="p-4 text-center">
+                        <stat.icon className="h-5 w-5 mx-auto mb-2 text-primary" />
+                        <div className="text-xl font-bold text-foreground">{stat.value}</div>
+                        <div className="text-xs text-muted-foreground">{stat.label}</div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
 
-              {/* Actions */}
-              <div className="flex flex-wrap gap-3">
-                <Button onClick={handlePublish} className="gap-2">
-                  <Share2 className="h-4 w-4" />
-                  Publish This Sitemap
-                </Button>
-                <Button variant="outline" className="gap-2" onClick={() => {
-                  const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
-                  const a = document.createElement("a");
-                  a.href = URL.createObjectURL(blob);
-                  a.download = `${report.domain}-sitemap.json`;
-                  a.click();
-                }}>
-                  <Download className="h-4 w-4" />
-                  Export JSON
-                </Button>
+                {/* Tree */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 text-foreground">Visual Sitemap</h3>
+                  <SitemapTree nodes={report.tree} />
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-wrap gap-3">
+                  <Button onClick={handlePublish} className="gap-2">
+                    <Share2 className="h-4 w-4" />
+                    Publish This Sitemap
+                  </Button>
+                  <Button variant="outline" className="gap-2" onClick={() => {
+                    const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+                    const a = document.createElement("a");
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `${report.domain}-sitemap.json`;
+                    a.click();
+                  }}>
+                    <Download className="h-4 w-4" />
+                    Export JSON
+                  </Button>
+                </div>
               </div>
             </div>
           )}
 
-          {/* If no report, show quick links */}
+          {/* Quick links when no report */}
           {!report && !loading && (
             <div className="text-center py-12">
-              <h2 className="text-lg font-semibold mb-4">Or explore popular website structures</h2>
+              <h2 className="text-lg font-semibold mb-4 text-foreground">Or explore popular website structures</h2>
               <div className="flex flex-wrap justify-center gap-2">
                 {seedSitemaps.slice(0, 12).map(s => (
                   <Button
@@ -382,6 +382,8 @@ const WebsiteAnalyzer = () => {
         </div>
         <Footer />
       </main>
+
+      <ProPaywall open={showPaywall} onOpenChange={setShowPaywall} featureName="Website Analyzer" />
     </>
   );
 };
