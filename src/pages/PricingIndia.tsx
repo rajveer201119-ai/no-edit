@@ -22,13 +22,24 @@ const PricingIndia = () => {
 
   const amount = selectedPlan === "monthly" ? 299 : 1500;
 
-  const handleUPIPay = () => {
+  const handleUPIPay = async () => {
     const result = emailSchema.safeParse(email);
     if (!result.success) {
       setEmailError(result.error.errors[0].message);
       return;
     }
     setEmailError("");
+
+    // Save lead to admin panel
+    try {
+      await supabase.from("payment_leads" as any).insert({
+        email: email.trim(),
+        plan_selected: selectedPlan,
+        amount,
+      } as any);
+    } catch (e) {
+      console.error("Failed to save payment lead:", e);
+    }
 
     const upiId = "8638910252-2@ybl";
     const txnNote = encodeURIComponent("EPIC Pro Upgrade");
