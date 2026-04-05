@@ -75,7 +75,7 @@ const Admin = () => {
       if (!roleData) { toast.error("Unauthorized: Admin access required"); navigate("/"); return; }
 
       setIsAdmin(true);
-      await Promise.all([fetchUsers(), fetchAnnouncements()]);
+      await Promise.all([fetchUsers(), fetchAnnouncements(), fetchPaymentLeads()]);
     } catch (error) {
       console.error("Error checking admin access:", error);
       toast.error("Error verifying admin access");
