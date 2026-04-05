@@ -334,6 +334,31 @@ const Admin = () => {
           </div>
         </Card>
 
+        {/* Payment Leads */}
+        <Card className="p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Mail className="h-6 w-6 text-primary" />
+            <h2 className="text-2xl font-bold">Payment Leads</h2>
+            <span className="text-sm text-muted-foreground ml-2">({paymentLeads.length})</span>
+          </div>
+          {paymentLeads.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No payment leads yet</p>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {paymentLeads.map((lead) => (
+                <div key={lead.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{lead.email}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {lead.plan_selected} — ₹{lead.amount} — {new Date(lead.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
         {/* Plan Management */}
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <Crown className="h-6 w-6 text-primary" />
