@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Shield, ArrowLeft, Crown, Calendar, Users, Megaphone, X, Zap, Badge } from "lucide-react";
+import { Shield, ArrowLeft, Crown, Calendar, Users, Megaphone, X, Zap, Badge, Mail } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface UserData {
