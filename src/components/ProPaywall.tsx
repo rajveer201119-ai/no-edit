@@ -32,7 +32,7 @@ export const ProPaywall = ({ open, onOpenChange, featureName }: ProPaywallProps)
   const amount = selectedPlan === "monthly" ? 299 : 1500;
   const planLabel = selectedPlan === "monthly" ? "₹299/month" : "₹1,500 lifetime";
 
-  const handleUPIPay = () => {
+  const handleUPIPay = async () => {
     const result = emailSchema.safeParse(email);
     if (!result.success) {
       setEmailError(result.error.errors[0].message);
@@ -40,11 +40,21 @@ export const ProPaywall = ({ open, onOpenChange, featureName }: ProPaywallProps)
     }
     setEmailError("");
 
+    // Save lead to admin panel
+    try {
+      await supabase.from("payment_leads" as any).insert({
+        email: email.trim(),
+        plan_selected: selectedPlan,
+        amount,
+      } as any);
+    } catch (e) {
+      console.error("Failed to save payment lead:", e);
+    }
+
     const upiId = "8638910252-2@ybl";
     const txnNote = encodeURIComponent("EPIC Pro Upgrade");
     const upiUrl = `upi://pay?pa=${upiId}&pn=EPIC%20Pro&am=${amount}&cu=INR&tn=${txnNote}`;
 
-    // Try opening the UPI deep link
     window.location.href = upiUrl;
 
     toast.info("Opening your UPI app. Complete the payment to activate Pro.", { duration: 6000 });
