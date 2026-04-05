@@ -29,6 +29,14 @@ interface Announcement {
   created_at: string;
 }
 
+interface PaymentLead {
+  id: string;
+  email: string;
+  plan_selected: string;
+  amount: number;
+  created_at: string;
+}
+
 const planBadge = (plan: string) => {
   switch (plan) {
     case "pro": return <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-500">Pro Lifetime</span>;
