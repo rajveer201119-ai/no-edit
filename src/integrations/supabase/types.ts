@@ -147,6 +147,30 @@ export type Database = {
           },
         ]
       }
+      payment_leads: {
+        Row: {
+          amount: number
+          created_at: string
+          email: string
+          id: string
+          plan_selected: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          email: string
+          id?: string
+          plan_selected?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          email?: string
+          id?: string
+          plan_selected?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           content: string
