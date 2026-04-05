@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertTriangle, CheckCircle, Info, TrendingUp, X } from "lucide-react";
+import { AlertTriangle, CheckCircle, Info, TrendingUp, X, Lock, Crown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface PageNode {
   id: string;
@@ -23,6 +24,8 @@ interface UXScorePanelProps {
   connections: Connection[];
   visible: boolean;
   onClose: () => void;
+  isPremium?: boolean;
+  onUpgrade?: () => void;
 }
 
 interface ScoreBreakdown {
@@ -44,7 +47,6 @@ function calculateUXScore(nodes: PageNode[], connections: Connection[]): ScoreBr
   const suggestions: string[] = [];
   let depth = 20, hierarchy = 20, redundancy = 20, flow = 15, cta = 10, balance = 15;
 
-  // 1. Navigation depth analysis (max 20)
   const incomingMap = new Map<string, string[]>();
   const outgoingMap = new Map<string, string[]>();
   nodes.forEach(n => { incomingMap.set(n.id, []); outgoingMap.set(n.id, []); });
@@ -53,7 +55,6 @@ function calculateUXScore(nodes: PageNode[], connections: Connection[]): ScoreBr
     outgoingMap.get(c.fromId)?.push(c.toId);
   });
 
-  // BFS to find max depth from roots
   const roots = nodes.filter(n => (incomingMap.get(n.id)?.length || 0) === 0);
   let maxDepth = 0;
   if (roots.length > 0) {
@@ -76,7 +77,6 @@ function calculateUXScore(nodes: PageNode[], connections: Connection[]): ScoreBr
     suggestions.push("No connections between pages. Connect them to define the flow.");
   }
 
-  // 2. Hierarchy clarity (max 20)
   if (roots.length === 0 && nodes.length > 0) {
     hierarchy = 8;
     suggestions.push("No clear root page (e.g. Home). Add a starting point.");
@@ -91,7 +91,6 @@ function calculateUXScore(nodes: PageNode[], connections: Connection[]): ScoreBr
     suggestions.push(`${orphans.length} orphan page(s) with no connections.`);
   }
 
-  // 3. Redundancy check (max 20)
   const labelCounts = new Map<string, number>();
   nodes.forEach(n => {
     const key = n.label.toLowerCase().trim();
@@ -103,14 +102,12 @@ function calculateUXScore(nodes: PageNode[], connections: Connection[]): ScoreBr
     suggestions.push(`Duplicate page names found: ${duplicates.map(([name]) => name).join(", ")}.`);
   }
 
-  // 4. Flow analysis (max 15)
   const deadEnds = nodes.filter(n => (outgoingMap.get(n.id)?.length || 0) === 0 && (incomingMap.get(n.id)?.length || 0) > 0);
   if (deadEnds.length > nodes.length * 0.5 && nodes.length > 2) {
     flow = Math.max(3, 15 - deadEnds.length * 2);
     suggestions.push("Many pages are dead ends. Add navigation paths from them.");
   }
 
-  // 5. CTA distribution (max 10)
   const pagesWithCTA = nodes.filter(n => n.sections?.some(s => s.label.toLowerCase().includes("cta")));
   const ctaRatio = nodes.length > 0 ? pagesWithCTA.length / nodes.length : 0;
   if (ctaRatio < 0.2 && nodes.length > 2) {
@@ -118,7 +115,6 @@ function calculateUXScore(nodes: PageNode[], connections: Connection[]): ScoreBr
     suggestions.push("Add CTA sections to more pages to drive conversions.");
   }
 
-  // 6. Structural balance (max 15)
   if (nodes.length < 3) {
     balance = 8;
     suggestions.push("Add more pages for a complete sitemap.");
@@ -149,7 +145,7 @@ function getScoreLabel(score: number): string {
   return "Poor";
 }
 
-export const UXScorePanel = ({ nodes, connections, visible, onClose }: UXScorePanelProps) => {
+export const UXScorePanel = ({ nodes, connections, visible, onClose, isPremium = true, onUpgrade }: UXScorePanelProps) => {
   const score = useMemo(() => calculateUXScore(nodes, connections), [nodes, connections]);
   const color = getScoreColor(score.total);
   const label = getScoreLabel(score.total);
@@ -196,47 +192,63 @@ export const UXScorePanel = ({ nodes, connections, visible, onClose }: UXScorePa
             <span className="text-sm font-semibold mt-2" style={{ color }}>{label}</span>
           </div>
 
-          {/* Breakdown bars */}
-          <div className="px-4 pb-3 space-y-2">
-            {[
-              { label: "Depth", val: score.depth, max: 20 },
-              { label: "Hierarchy", val: score.hierarchy, max: 20 },
-              { label: "Redundancy", val: score.redundancy, max: 20 },
-              { label: "Flow", val: score.flow, max: 15 },
-              { label: "CTA", val: score.cta, max: 10 },
-              { label: "Balance", val: score.balance, max: 15 },
-            ].map(b => (
-              <div key={b.label} className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-foreground w-16 shrink-0">{b.label}</span>
-                <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${(b.val / b.max) * 100}%`,
-                      backgroundColor: getScoreColor((b.val / b.max) * 100),
-                    }}
-                  />
-                </div>
-                <span className="text-[10px] text-muted-foreground w-8 text-right">{b.val}/{b.max}</span>
+          {/* Blurred results for free users */}
+          <div className={cn("relative", !isPremium && "select-none")}>
+            {!isPremium && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-card/80 backdrop-blur-sm rounded-b-xl">
+                <Lock className="h-6 w-6 text-muted-foreground mb-2" />
+                <p className="text-xs font-semibold text-foreground mb-1">Pro Feature</p>
+                <p className="text-[10px] text-muted-foreground mb-3 text-center px-4">Upgrade to see detailed breakdown & suggestions</p>
+                <Button size="sm" onClick={onUpgrade} className="gap-1.5 text-xs">
+                  <Crown className="h-3 w-3" /> Upgrade to Pro
+                </Button>
               </div>
-            ))}
-          </div>
+            )}
 
-          {/* Suggestions */}
-          <div className="px-4 pb-4 space-y-1.5">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Suggestions</p>
-            {score.suggestions.slice(0, 3).map((s, i) => (
-              <div key={i} className="flex items-start gap-2 text-[11px] text-foreground/80 leading-snug">
-                {score.total >= 80 ? (
-                  <CheckCircle className="h-3 w-3 mt-0.5 shrink-0 text-green-500" />
-                ) : score.total >= 60 ? (
-                  <Info className="h-3 w-3 mt-0.5 shrink-0 text-amber-500" />
-                ) : (
-                  <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0 text-red-500" />
-                )}
-                {s}
+            <div className={cn(!isPremium && "blur-md pointer-events-none")}>
+              {/* Breakdown bars */}
+              <div className="px-4 pb-3 space-y-2">
+                {[
+                  { label: "Depth", val: score.depth, max: 20 },
+                  { label: "Hierarchy", val: score.hierarchy, max: 20 },
+                  { label: "Redundancy", val: score.redundancy, max: 20 },
+                  { label: "Flow", val: score.flow, max: 15 },
+                  { label: "CTA", val: score.cta, max: 10 },
+                  { label: "Balance", val: score.balance, max: 15 },
+                ].map(b => (
+                  <div key={b.label} className="flex items-center gap-2">
+                    <span className="text-[10px] text-muted-foreground w-16 shrink-0">{b.label}</span>
+                    <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${(b.val / b.max) * 100}%`,
+                          backgroundColor: getScoreColor((b.val / b.max) * 100),
+                        }}
+                      />
+                    </div>
+                    <span className="text-[10px] text-muted-foreground w-8 text-right">{b.val}/{b.max}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+
+              {/* Suggestions */}
+              <div className="px-4 pb-4 space-y-1.5">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Suggestions</p>
+                {score.suggestions.slice(0, 3).map((s, i) => (
+                  <div key={i} className="flex items-start gap-2 text-[11px] text-foreground/80 leading-snug">
+                    {score.total >= 80 ? (
+                      <CheckCircle className="h-3 w-3 mt-0.5 shrink-0 text-green-500" />
+                    ) : score.total >= 60 ? (
+                      <Info className="h-3 w-3 mt-0.5 shrink-0 text-amber-500" />
+                    ) : (
+                      <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0 text-red-500" />
+                    )}
+                    {s}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </motion.div>
       )}
