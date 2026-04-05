@@ -22,13 +22,24 @@ const PricingInternational = () => {
 
   const amount = selectedPlan === "monthly" ? 5 : 15;
 
-  const handleUPIPay = () => {
+  const handleUPIPay = async () => {
     const result = emailSchema.safeParse(email);
     if (!result.success) {
       setEmailError(result.error.errors[0].message);
       return;
     }
     setEmailError("");
+
+    try {
+      await supabase.from("payment_leads" as any).insert({
+        email: email.trim(),
+        plan_selected: selectedPlan,
+        amount,
+      } as any);
+    } catch (e) {
+      console.error("Failed to save payment lead:", e);
+    }
+
     const upiId = "8638910252-2@ybl";
     const txnNote = encodeURIComponent("EPIC Pro Upgrade");
     const upiUrl = `upi://pay?pa=${upiId}&pn=EPIC%20Pro&am=${amount}&cu=USD&tn=${txnNote}`;
