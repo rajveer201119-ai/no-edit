@@ -79,15 +79,22 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         <div className="absolute inset-0 -z-10 bg-black/20 backdrop-blur-[1px]" />
 
         {/* Headline — outcome-focused, single clear message */}
+        
+        <img
+          src="/epic-logo.png"
+          alt="EPIC logo"
+          classname="w-20 h-20 mx-auto mb-6 relative z-10"
+          />
+        
         <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5 }}
           className="text-balance bg-gradient-to-b from-white to-white/60 bg-clip-text py-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-[-0.04em] text-transparent relative z-10 max-w-3xl">
-          Turn any website into a visual sitemap in seconds
+          Plan Your Website Structure Visually
         </motion.h1>
 
         {/* Subheadline */}
         <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}
           className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-white/60 max-w-lg mx-auto relative z-10 leading-relaxed">
-          Plan, analyze, and organize website structures visually. Export JSON or HD images — no signup required.
+          Plan and analyze website structures and organize user-flow visually. Export JSON and PNG file — no signup required.
         </motion.p>
 
         {/* Single primary CTA + secondary */}
