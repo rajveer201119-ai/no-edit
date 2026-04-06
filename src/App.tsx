@@ -82,7 +82,7 @@ const App = () => (
               <Route path="/examples" element={<Examples />} />
               <Route path="/alternatives/:slug" element={<AlternativePage />} />
               <Route path="/analyzer" element={<WebsiteAnalyzer />} />
-              <Route path="/sitemaps" element={<RequireAuth><SitemapLibrary /></RequireAuth>} />
+              <Route path="/sitemaps" element={<SitemapLibrary />} />
               <Route path="/sitemap/:slug" element={<RequireAuth><PublicSitemap /></RequireAuth>} />
               <Route path="/shared/:id" element={<SharedSitemap />} />
               <Route path="/:slug" element={<PillarPage />} />
