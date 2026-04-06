@@ -28,9 +28,8 @@ export const MainNavigation = ({
   const navigate = useNavigate();
 
   const tabs = [
-    { id: "home" as const, label: "Home", icon: Home },
-    { id: "create" as const, label: "Create", icon: Palette },
-    { id: "library" as const, label: "Library", icon: Library },
+    { id: "home" as const, label: "Home", icon: Home }
+  
   ];
 
   const handleTabChange = (tab: MainTab) => {
