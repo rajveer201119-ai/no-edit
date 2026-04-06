@@ -1,15 +1,9 @@
 import { useState, useRef } from "react";
 import { WebGLShader } from "@/components/ui/web-gl-shader";
-import epicLogo from "@/assets/epic-logo.png";
-import logoLovable from "@/assets/logo-lovable.png";
-import logoSupabase from "@/assets/logo-supabase.jpg";
-import logoGoogle from "@/assets/logo-google.png";
-import logoChatGPT from "@/assets/logo-chatgpt.png";
-import logoExtra from "@/assets/logo-extra.png";
 import {
-  Layers, Download, Type, Image, Layout, Wand2, Star, ArrowRight,
   Network, CheckCircle, FileJson, GitBranch, MousePointerClick, Grip,
-  Play, Flame, Globe, Zap, Users, Shield, Crown, ExternalLink,
+  Play, Globe, Zap, Users, Shield, Crown, ArrowRight, Star,
+  Download, Layout,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -26,67 +20,25 @@ const fadeUp = {
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } }),
 };
 
-/* ── Logo carousel data ── */
-const partnerLogos = [
-  { src: logoLovable, alt: "Lovable", h: "h-7" },
-  { src: logoSupabase, alt: "Supabase", h: "h-6" },
-  { src: logoGoogle, alt: "Google", h: "h-7" },
-  { src: logoChatGPT, alt: "ChatGPT", h: "h-7" },
-  { src: logoExtra, alt: "Partner", h: "h-7" },
-  { src: logoLovable, alt: "Lovable", h: "h-7" },
-  { src: logoSupabase, alt: "Supabase", h: "h-6" },
-  { src: logoGoogle, alt: "Google", h: "h-7" },
-  { src: logoChatGPT, alt: "ChatGPT", h: "h-7" },
-  { src: logoExtra, alt: "Partner", h: "h-7" },
-];
-
 /* ── Testimonials ── */
 const testimonials = [
   {
     name: "Arjun P.",
     role: "Indie Founder",
-    text: "I planned my entire SaaS navigation in 5 minutes. Exported JSON and plugged it straight into my codebase. Nothing else does this.",
+    text: "I planned my entire SaaS navigation in 5 minutes. Exported JSON and plugged it straight into my codebase.",
     rating: 5,
   },
   {
     name: "Sarah L.",
     role: "UX Designer",
-    text: "Finally a tool that thinks in structure first. The visual sitemap maker is incredibly fast and the export quality is professional-grade.",
+    text: "Finally a tool that thinks in structure first. The visual sitemap maker is incredibly fast.",
     rating: 5,
   },
   {
     name: "Rahul M.",
     role: "Startup CTO",
-    text: "We use EPIC for every new project kickoff. Plan the sitemap, agree on structure, then build. Saves us hours of back-and-forth.",
+    text: "We use EPIC for every new project kickoff. Plan the sitemap, agree on structure, then build.",
     rating: 5,
-  },
-];
-
-/* ── Case Studies ── */
-const caseStudies = [
-  {
-    company: "FinTrack",
-    industry: "Fintech Startup",
-    result: "Planned a 24-page SaaS in 10 minutes",
-    detail: "Used EPIC's Navigation Maker to map user flows before development. Exported JSON directly into their Next.js router config. Saved 2 weeks of architecture meetings.",
-    metric: "2 weeks saved",
-    metricLabel: "Dev planning time",
-  },
-  {
-    company: "LearnPath",
-    industry: "EdTech Platform",
-    result: "Redesigned navigation, reduced bounce by 34%",
-    detail: "The UX Score feature identified 5 dead-end pages and missing CTAs. After restructuring with EPIC, their bounce rate dropped significantly.",
-    metric: "34%",
-    metricLabel: "Bounce rate reduction",
-  },
-  {
-    company: "NomadKit",
-    industry: "Travel Community",
-    result: "Shipped MVP sitemap in one afternoon",
-    detail: "Solo founder mapped 18 pages with connections, exported HD PNG for investor deck, and JSON for the developer. All in a single session.",
-    metric: "18 pages",
-    metricLabel: "Mapped in 1 session",
   },
 ];
 
@@ -95,26 +47,6 @@ const navFeatures = [
   { icon: Grip, title: "Drag & Drop Canvas", desc: "Visually arrange pages with fluid drag-and-drop. 50+ pre-built page templates." },
   { icon: GitBranch, title: "Smart Connections", desc: "Draw navigation flows between pages. Curved paths with auto-layout." },
   { icon: FileJson, title: "JSON + PNG Export", desc: "Export structured JSON sitemaps or high-res PNG maps. Builder-ready schemas." },
-];
-
-const platformFeatures = [
-  { icon: Layers, title: "200+ Templates", desc: "Professional designs for every occasion" },
-  { icon: Type, title: "Smart Text Engine", desc: "Auto-fit, auto-contrast, beautiful typography" },
-  { icon: Image, title: "Elements Library", desc: "Icons, shapes, badges, frames & more" },
-  { icon: Download, title: "HD Export", desc: "Download in PNG, JPG, PDF instantly" },
-  { icon: Layout, title: "Smart Resize", desc: "One-click resize to any social format" },
-  { icon: Wand2, title: "AI Mode", desc: "Generate designs with AI prompts" },
-];
-
-const showcaseCategories = [
-  { label: "Posters", emoji: "🎨" },
-  { label: "Certificates", emoji: "📜" },
-  { label: "Social Media", emoji: "📱" },
-  { label: "Thumbnails", emoji: "▶️" },
-  { label: "Business Cards", emoji: "💼" },
-  { label: "Presentations", emoji: "📊" },
-  { label: "Resumes", emoji: "📝" },
-  { label: "Festival Designs", emoji: "🎉" },
 ];
 
 export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeClick }: NewHomepageProps) => {
@@ -146,51 +78,35 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         <div className="absolute inset-0 -z-20"><WebGLShader /></div>
         <div className="absolute inset-0 -z-10 bg-black/20 backdrop-blur-[1px]" />
 
-        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.4 }} className="flex justify-center mb-6 relative z-10">
-          <img src={epicLogo} alt="EPIC — Visual Sitemap & Design Platform" className="w-20 h-20 md:w-28 md:h-28 drop-shadow-2xl" width={112} height={112} loading="eager" />
-        </motion.div>
-
-        {/* Headline — outcome-focused */}
+        {/* Headline — outcome-focused, single clear message */}
         <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5 }}
           className="text-balance bg-gradient-to-b from-white to-white/60 bg-clip-text py-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-[-0.04em] text-transparent relative z-10 max-w-3xl">
-          Build Visual Sitemaps &amp; Plan Your UX Flow
+          Turn any website into a visual sitemap in seconds
         </motion.h1>
 
-        {/* Subheadline — SEO + outcome */}
+        {/* Subheadline */}
         <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}
           className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-white/60 max-w-lg mx-auto relative z-10 leading-relaxed">
-          The fastest visual sitemap builder for designers, developers, and founders. Create website architecture, export JSON or HD images — in under 2 minutes.
+          Plan, analyze, and organize website structures visually. Export JSON or HD images — no signup required.
         </motion.p>
 
-        {/* Dual CTA */}
+        {/* Single primary CTA + secondary */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5 }}
           className="flex flex-col sm:flex-row items-center gap-3 relative z-20">
           <Button onClick={() => navigate("/navigation-maker")} size="lg"
             className="gap-2 min-w-[260px] min-h-[52px] rounded-[0.625rem] bg-white text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-lg shadow-white/10">
-            <Network className="h-4 w-4" /> Start Building Your Sitemap
+            <Network className="h-4 w-4" /> Start Sitemap Builder — Free
           </Button>
-          <Button onClick={() => {
-            setShowDemoVideo(true);
-          }} variant="outline" size="lg"
+          <Button onClick={() => navigate("/analyzer")} variant="outline" size="lg"
             className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
-            <Play className="h-4 w-4" /> See Live Demo
-          </Button>
-        </motion.div>
-
-        {/* Secondary CTA */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.5 }}
-          className="mt-3 relative z-20">
-          <Button onClick={onStartDesigning} variant="outline" size="lg"
-            className="gap-2 min-w-[200px] min-h-[48px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
-            <Layers className="h-4 w-4" /> Plan Your UX Flow Visually
+            <Globe className="h-4 w-4" /> Analyze a Website
           </Button>
         </motion.div>
 
         {/* Micro-trust indicators */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
           className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-white/40 relative z-10">
-          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> Free to start</span>
-          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> No credit card</span>
+          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> No signup needed</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> JSON + PNG export</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> 33+ website templates</span>
         </motion.div>
@@ -198,46 +114,45 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       </section>
 
-      {/* ═══════ SOCIAL PROOF — Logo Carousel ═══════ */}
-      <section className="py-12 md:py-16 bg-background border-b border-border overflow-hidden">
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-center text-xs uppercase tracking-widest text-muted-foreground mb-8 font-medium">
-            Trusted by founders and builders worldwide
-          </p>
+      {/* ═══════ HOW IT WORKS — 3 Steps ═══════ */}
+      <section className="py-16 md:py-20 bg-background border-b border-border">
+        <div className="max-w-4xl mx-auto px-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-semibold text-foreground tracking-tight mb-3">
+              Your sitemap in 3 steps
+            </h2>
+            <p className="text-muted-foreground max-w-lg mx-auto text-sm">
+              No tutorials needed. Open, build, export.
+            </p>
+          </motion.div>
 
-          {/* Sliding carousel */}
-          <div className="relative overflow-hidden">
-            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-            <div className="flex animate-logo-scroll gap-16 items-center w-max">
-              {[...partnerLogos, ...partnerLogos].map((logo, i) => (
-                <img key={i} src={logo.src} alt={logo.alt} className={`${logo.h} object-contain opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300`} />
-              ))}
-            </div>
-          </div>
-
-          {/* Hacker News + metrics */}
-          <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card">
-              <Flame className="h-3 w-3 text-orange-500" /> Featured on Hacker News
-            </span>
-            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card">
-              <Users className="h-3 w-3" /> 280+ active users
-            </span>
-            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card">
-              <Globe className="h-3 w-3" /> Used in 15+ countries
-            </span>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              { step: "1", title: "Drag pages onto canvas", desc: "Pick from 50+ stock page types or add your own. Structure appears instantly.", icon: Grip },
+              { step: "2", title: "Connect & arrange", desc: "Draw navigation flows between pages. Auto-layout keeps everything clean.", icon: GitBranch },
+              { step: "3", title: "Export & ship", desc: "Download as HD PNG for decks or developer-ready JSON for your codebase.", icon: Download },
+            ].map((item, i) => (
+              <motion.div key={item.step} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i + 1} variants={fadeUp}
+                className="relative p-6 rounded-xl bg-card border border-border">
+                <div className="absolute -top-2.5 -left-2.5 w-6 h-6 rounded-md bg-foreground text-background font-semibold text-xs flex items-center justify-center">
+                  {item.step}
+                </div>
+                <item.icon className="h-5 w-5 mb-4 text-foreground" strokeWidth={1.5} />
+                <h3 className="font-medium text-sm mb-1.5 text-foreground">{item.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ═══════ LIVE DEMO — Navigation Maker Hero Feature ═══════ */}
-      <section id="live-demo" className="py-24 md:py-32 px-6 bg-background">
+      <section id="live-demo" className="py-20 md:py-28 px-6 bg-background">
         <div className="max-w-6xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-center mb-14">
             <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-primary mb-3 px-3 py-1 rounded-full border border-primary/20 bg-primary/5">✦ Flagship Tool</span>
             <h2 className="text-2xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-[-0.03em] mb-4">
-              Website Navigation Maker
+              Visual Sitemap Builder
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
               Stop planning websites in spreadsheets. Drag, connect, export — your entire site structure in minutes.
@@ -261,9 +176,9 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
             className="relative rounded-xl border border-border bg-card overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/30">
               <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-neutral-300 dark:bg-neutral-600" />
-                <div className="w-3 h-3 rounded-full bg-neutral-300 dark:bg-neutral-600" />
-                <div className="w-3 h-3 rounded-full bg-neutral-300 dark:bg-neutral-600" />
+                <div className="w-3 h-3 rounded-full bg-muted-foreground/20" />
+                <div className="w-3 h-3 rounded-full bg-muted-foreground/20" />
+                <div className="w-3 h-3 rounded-full bg-muted-foreground/20" />
               </div>
               <div className="flex-1 mx-4 h-6 rounded-md bg-muted flex items-center px-3">
                 <span className="text-[10px] text-muted-foreground">epic.app/navigation-maker</span>
@@ -284,11 +199,11 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
                 ))}
               </div>
               <div className="flex-1 h-64 md:h-80 relative bg-[radial-gradient(circle_at_1px_1px,hsl(var(--border)/0.3)_1px,transparent_0)] bg-[size:20px_20px]">
-                <div className="absolute top-8 left-[15%] w-28 h-10 rounded-lg bg-foreground text-primary-foreground flex items-center justify-center text-[11px] font-medium shadow-sm">Home</div>
-                <div className="absolute top-8 right-[15%] w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium">Login</div>
-                <div className="absolute top-[55%] left-[30%] w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium">Dashboard</div>
-                <div className="absolute top-[55%] right-[30%] w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium">Products</div>
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium">Blog</div>
+                <div className="absolute top-8 left-[15%] w-28 h-10 rounded-lg bg-foreground text-background flex items-center justify-center text-[11px] font-medium shadow-sm">Home</div>
+                <div className="absolute top-8 right-[15%] w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium text-foreground">Login</div>
+                <div className="absolute top-[55%] left-[30%] w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium text-foreground">Dashboard</div>
+                <div className="absolute top-[55%] right-[30%] w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium text-foreground">Products</div>
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-28 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-[11px] font-medium text-foreground">Blog</div>
                 <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
                   <line x1="22%" y1="18%" x2="78%" y2="18%" stroke="hsl(var(--foreground))" strokeWidth="1" opacity="0.15" />
                   <line x1="22%" y1="22%" x2="36%" y2="55%" stroke="hsl(var(--foreground))" strokeWidth="1" opacity="0.15" />
@@ -311,7 +226,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={3} variants={fadeUp} className="text-center mt-10">
             <Button onClick={() => navigate("/navigation-maker")} size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
-              <Network className="h-4 w-4" /> Open Navigation Maker <ArrowRight className="h-4 w-4" />
+              <Network className="h-4 w-4" /> Try the Sitemap Builder <ArrowRight className="h-4 w-4" />
             </Button>
           </motion.div>
         </div>
@@ -325,7 +240,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
               Why EPIC?
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto text-sm leading-relaxed">
-              Not another Canva clone. EPIC is built for people who think in structure first, visuals second.
+              Built for people who think in structure first.
             </p>
           </motion.div>
 
@@ -339,12 +254,12 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
               {
                 icon: Zap,
                 title: "Speed over complexity",
-                desc: "No layers, no panels, no learning curve. Create professional outputs in under 2 minutes.",
+                desc: "No layers, no panels, no learning curve. Create a professional sitemap in under 2 minutes.",
               },
               {
                 icon: Shield,
                 title: "Structure → Design → Ship",
-                desc: "The only tool that combines website planning with visual design. From sitemap to social graphics, one platform.",
+                desc: "Plan your sitemap, test UX score, export and hand off to your developer. One workflow.",
               },
             ].map((f, i) => (
               <motion.div key={f.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
@@ -358,48 +273,8 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         </div>
       </section>
 
-      {/* ═══════ CASE STUDIES — Real Success Stories ═══════ */}
-      <section className="py-20 px-6 bg-background">
-        <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-center mb-4">
-            <span className="inline-block text-[11px] font-semibold tracking-widest uppercase text-primary mb-3 px-3 py-1 rounded-full border border-primary/20 bg-primary/5">
-              ✦ Success Stories
-            </span>
-            <h2 className="text-2xl md:text-3xl font-semibold text-foreground tracking-tight mb-3">
-              How teams ship faster with EPIC
-            </h2>
-            <p className="text-muted-foreground max-w-lg mx-auto text-sm">
-              Real results from founders, designers, and developers using EPIC.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
-            {caseStudies.map((cs, i) => (
-              <motion.div key={cs.company} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i + 1} variants={fadeUp}
-                className="bg-card border border-border rounded-xl p-6 flex flex-col">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
-                    {cs.company.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">{cs.company}</p>
-                    <p className="text-[10px] text-muted-foreground">{cs.industry}</p>
-                  </div>
-                </div>
-                <p className="text-sm font-medium text-foreground mb-2">{cs.result}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed flex-1">{cs.detail}</p>
-                <div className="mt-4 pt-3 border-t border-border flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-primary">{cs.metric}</span>
-                  <span className="text-[10px] text-muted-foreground">{cs.metricLabel}</span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ═══════ TESTIMONIALS ═══════ */}
-      <section className="py-20 px-6 bg-muted/10">
+      <section className="py-20 px-6 bg-background">
         <div className="max-w-5xl mx-auto">
           <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp}
             className="text-2xl md:text-3xl font-semibold text-center mb-12 text-foreground tracking-tight">
@@ -426,12 +301,12 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
       </section>
 
       {/* ═══════ TRUST & SECURITY STRIP ═══════ */}
-      <section className="py-12 px-6 bg-background border-y border-border">
+      <section className="py-12 px-6 bg-muted/20 border-y border-border">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
               { icon: Shield, label: "No Data Stored", desc: "Designs stay on your device" },
-              { icon: Zap, label: "Instant Load", desc: "No signup wall" },
+              { icon: Zap, label: "Instant Load", desc: "No signup required" },
               { icon: Globe, label: "Works Everywhere", desc: "Browser-based, any device" },
               { icon: CheckCircle, label: "Free Forever", desc: "Core features always free" },
             ].map((item, i) => (
@@ -446,48 +321,32 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         </div>
       </section>
 
-      {/* ═══════ SHOWCASE CATEGORIES ═══════ */}
-      <section className="py-20 px-6 bg-muted/20">
-        <div className="max-w-6xl mx-auto">
+      {/* ═══════ TOOLS STRIP ═══════ */}
+      <section className="py-16 px-6 bg-background border-b border-border">
+        <div className="max-w-5xl mx-auto">
           <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp}
             className="text-2xl md:text-3xl font-semibold text-center mb-3 text-foreground tracking-tight">
-            Create Anything You Imagine
+            Explore Our Tools
           </motion.h2>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp}
-            className="text-muted-foreground text-center mb-12 max-w-lg mx-auto text-sm">
-            From social media posts to professional presentations.
+            className="text-muted-foreground text-center mb-10 max-w-lg mx-auto text-sm">
+            Everything you need to plan, analyze, and build better websites.
           </motion.p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {showcaseCategories.map((cat, i) => (
-              <motion.div key={cat.label} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
-                onClick={onStartDesigning}
-                className="group cursor-pointer rounded-xl border border-border bg-card p-6 text-center hover:border-foreground/20 hover:shadow-sm transition-all duration-300">
-                <span className="text-2xl mb-2 block">{cat.emoji}</span>
-                <span className="text-sm font-medium text-foreground">{cat.label}</span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════ FEATURES ═══════ */}
-      <section className="py-20 px-6 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp}
-            className="text-2xl md:text-3xl font-semibold text-center mb-3 text-foreground tracking-tight">
-            Everything You Need to Design
-          </motion.h2>
-          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp}
-            className="text-muted-foreground text-center mb-12 max-w-lg mx-auto text-sm">
-            Powerful features that make EPIC the easiest design tool on the planet.
-          </motion.p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {platformFeatures.map((f, i) => (
-              <motion.div key={f.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
-                className="bg-card border border-border rounded-xl p-6 hover:border-foreground/20 transition-colors duration-300 group">
-                <f.icon className="h-5 w-5 text-foreground mb-4" strokeWidth={1.5} />
-                <h3 className="text-sm font-semibold text-foreground mb-1.5">{f.title}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              { title: "Website Analyzer", desc: "Enter any domain and get a full architecture report with visual sitemap.", icon: Globe, href: "/analyzer" },
+              { title: "Sitemap Library", desc: "Browse visual sitemaps of 30+ popular websites for inspiration.", icon: Layout, href: "/sitemaps" },
+              { title: "Sitemap Builder", desc: "Build your website's navigation structure visually and export as JSON or PNG.", icon: Network, href: "/navigation-maker" },
+            ].map((tool, i) => (
+              <motion.div key={tool.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
+                onClick={() => navigate(tool.href)}
+                className="group cursor-pointer bg-card border border-border rounded-xl p-6 hover:border-primary/30 hover:shadow-md transition-all duration-300">
+                <tool.icon className="h-6 w-6 text-primary mb-3" strokeWidth={1.5} />
+                <h3 className="text-sm font-semibold text-foreground mb-1.5">{tool.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-3">{tool.desc}</p>
+                <span className="text-xs font-medium text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Try it free <ArrowRight className="h-3 w-3" />
+                </span>
               </motion.div>
             ))}
           </div>
@@ -514,14 +373,14 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
               <p className="text-muted-foreground text-xs mb-6">Perfect for getting started</p>
               <div className="text-3xl font-semibold text-foreground mb-6">₹0 <span className="text-sm font-normal text-muted-foreground">forever</span></div>
               <ul className="space-y-3 mb-8">
-                {["1 visual sitemap project", "First 10 pages per sitemap", "JSON Export", "Basic templates"].map(f => (
+                {["1 visual sitemap project", "Up to 10 pages per sitemap", "JSON Export", "Basic templates"].map(f => (
                   <li key={f} className="flex items-start gap-2 text-sm text-foreground">
                     <CheckCircle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" /> {f}
                   </li>
                 ))}
               </ul>
               <Button onClick={() => navigate("/navigation-maker")} variant="outline" className="w-full rounded-lg">
-                Try EPIC Free
+                Start Building Free
               </Button>
             </motion.div>
 
@@ -541,10 +400,10 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
                 {[
                   "Unlimited visual sitemaps",
                   "Unlimited pages per sitemap",
-                  "PDF & PNG Export",
+                  "PNG Export (HD)",
                   "UX Tester & Analyzer",
                   "Website Structure Library",
-                  "All advanced features",
+                  "Priority support",
                 ].map(f => (
                   <li key={f} className="flex items-start gap-2 text-sm text-foreground">
                     <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" /> {f}
@@ -559,56 +418,20 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         </div>
       </section>
 
-      {/* ═══════ TOOLS STRIP ═══════ */}
-      <section className="py-16 px-6 bg-muted/20 border-t border-border">
-        <div className="max-w-5xl mx-auto">
-          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp}
-            className="text-2xl md:text-3xl font-semibold text-center mb-3 text-foreground tracking-tight">
-            Explore Our Tools
-          </motion.h2>
-          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp}
-            className="text-muted-foreground text-center mb-10 max-w-lg mx-auto text-sm">
-            Everything you need to plan, analyze, and build better websites.
-          </motion.p>
-          <div className="grid md:grid-cols-3 gap-4">
-            {[
-              { title: "Website Analyzer", desc: "Enter any domain and get a full architecture report with visual sitemap.", icon: Globe, href: "/analyzer" },
-              { title: "Sitemap Library", desc: "Browse visual sitemaps of 30+ popular websites for inspiration.", icon: Layout, href: "/sitemaps" },
-              { title: "Navigation Maker", desc: "Build your website's navigation structure visually and export as JSON.", icon: Network, href: "/navigation-maker" },
-            ].map((tool, i) => (
-              <motion.div key={tool.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}
-                onClick={() => navigate(tool.href)}
-                className="group cursor-pointer bg-card border border-border rounded-xl p-6 hover:border-primary/30 hover:shadow-md transition-all duration-300">
-                <tool.icon className="h-6 w-6 text-primary mb-3" strokeWidth={1.5} />
-                <h3 className="text-sm font-semibold text-foreground mb-1.5">{tool.title}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-3">{tool.desc}</p>
-                <span className="text-xs font-medium text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
-                  Try it free <ArrowRight className="h-3 w-3" />
-                </span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ═══════ FINAL CTA ═══════ */}
       <section className="py-20 px-6 bg-background">
         <div className="max-w-2xl mx-auto text-center">
           <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp}
             className="text-2xl md:text-3xl font-semibold mb-3 text-foreground tracking-tight">
-            Create Your Website Structure Now
+            Start building your sitemap now
           </motion.h2>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp}
             className="text-muted-foreground mb-8 text-sm">
-            Join hundreds of founders and designers using EPIC to plan better websites.
+            No signup required. Try the builder instantly.
           </motion.p>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2} variants={fadeUp}
-            className="flex flex-col sm:flex-row gap-3 justify-center">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2} variants={fadeUp}>
             <Button onClick={() => navigate("/navigation-maker")} size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
-              <Network className="h-4 w-4" /> Start Building Your Sitemap
-            </Button>
-            <Button onClick={() => navigate("/pricing-india")} variant="outline" size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
-              <Crown className="h-4 w-4" /> View Pro Plans
+              <Network className="h-4 w-4" /> Open Sitemap Builder
             </Button>
           </motion.div>
         </div>

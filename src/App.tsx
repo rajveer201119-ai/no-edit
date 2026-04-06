@@ -69,7 +69,7 @@ const App = () => (
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/tools/:tool" element={<ToolLanding />} />
-              <Route path="/navigation-maker" element={<RequireAuth><NavigationMaker /></RequireAuth>} />
+              <Route path="/navigation-maker" element={<NavigationMaker />} />
               <Route path="/my-projects" element={<RequireAuth><MyProjects /></RequireAuth>} />
               <Route path="/pricing-india" element={<PricingIndia />} />
               <Route path="/pricing-international" element={<PricingInternational />} />
@@ -81,9 +81,9 @@ const App = () => (
               <Route path="/roadmap" element={<Roadmap />} />
               <Route path="/examples" element={<Examples />} />
               <Route path="/alternatives/:slug" element={<AlternativePage />} />
-              <Route path="/analyzer" element={<RequireAuth><WebsiteAnalyzer /></RequireAuth>} />
-              <Route path="/sitemaps" element={<RequireAuth><SitemapLibrary /></RequireAuth>} />
-              <Route path="/sitemap/:slug" element={<RequireAuth><PublicSitemap /></RequireAuth>} />
+              <Route path="/analyzer" element={<WebsiteAnalyzer />} />
+              <Route path="/sitemaps" element={<SitemapLibrary />} />
+              <Route path="/sitemap/:slug" element={<PublicSitemap />} />
               <Route path="/shared/:id" element={<SharedSitemap />} />
               <Route path="/:slug" element={<PillarPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
