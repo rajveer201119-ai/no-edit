@@ -94,7 +94,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
 
         {/* Subheadline */}
         <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}
-          className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-white/60 max-w-lg mx-auto relative z-10 leading-relaxed">
+          className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-neutral-600 dark:text-white/60 max-w-lg mx-auto relative z-10 leading-relaxed">
           Plan and analyze website structures and organize user-flow visually. Export JSON and PNG file — no signup required.
         </motion.p>
 
@@ -106,7 +106,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
             <Network className="h-4 w-4" /> Start Sitemap Builder — Free
           </Button>
           <Button onClick={() => navigate("/analyzer")} variant="outline" size="lg"
-            className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border-white/20 text-white hover:bg-white/10 font-medium text-sm">
+            className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border border-neutral-300 text-neutral-800 dark:border-white/20 dark:text-white hover:bg-neutral-100 dark:hover:bg-white/10 font-medium text-sm">
             <Globe className="h-4 w-4" /> Analyze a Website
           </Button>
         </motion.div>
