@@ -116,7 +116,7 @@ export const MainNavigation = ({
             className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium w-full text-left text-foreground hover:bg-muted border border-border"
           >
             <Network className="h-4 w-4 flex-shrink-0" />
-            <span>Navigation Maker</span>
+            <span>Sitemap Builder</span>
           </button>
           
           <button
@@ -176,7 +176,7 @@ export const MainNavigation = ({
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[0.625rem] text-xs font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 transition-colors duration-200"
             >
               <Network className="h-3.5 w-3.5" />
-              Nav Maker
+              Sitemap Builder
               <span className="text-[9px] font-semibold bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full ml-0.5">NEW</span>
             </button>
           </div>
