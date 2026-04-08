@@ -113,7 +113,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
 
         {/* Micro-trust indicators */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-          className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-white/40 relative z-10">
+          className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-neutral-600 dark:text-white/40 relative z-10">
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> Easy to Build</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> JSON + PNG export</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> 33+ SITEMAP templates</span>
@@ -126,6 +126,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           src="/Site mapping and user flow tool.png"
           alt="Site mapping and user flow tool"
           classname="w-20 h-20 mx-auto mb-8 relative z-10"
+          style={{ width:"200px"}}
           />
         
       
