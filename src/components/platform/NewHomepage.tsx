@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import Heroimage from '../assets//Site mapping and user flow tool.png'
+import Heroimage from '../assets/Site mapping and user flow tool.png'
 
 interface NewHomepageProps {
   onStartDesigning: () => void;
