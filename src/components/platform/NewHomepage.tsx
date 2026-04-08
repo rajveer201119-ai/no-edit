@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import Heroimage from '../assets//Site mapping and user flow tool.png'
 
 interface NewHomepageProps {
   onStartDesigning: () => void;
@@ -23,19 +24,19 @@ const fadeUp = {
 /* ── Testimonials ── */
 const testimonials = [
   {
-    name: "Arjun P.",
+    name: "Arjun",
     role: "Indie Founder",
     text: "I planned my entire SaaS navigation in 5 minutes. Exported JSON and plugged it straight into my codebase.",
     rating: 5,
   },
   {
-    name: "Sarah L.",
+    name: "Sarah",
     role: "UX Designer",
     text: "Finally a tool that thinks in structure first. The visual sitemap maker is incredibly fast.",
     rating: 5,
   },
   {
-    name: "Rahul M.",
+    name: "Rahul",
     role: "Startup CTO",
     text: "We use EPIC for every new project kickoff. Plan the sitemap, agree on structure, then build.",
     rating: 5,
@@ -123,10 +124,10 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         </section>
         
         <img
-          src="/Site mapping and user flow tool.png"
+          src={Heroimage}
           alt="Site mapping and user flow tool"
           classname="w-20 h-20 mx-auto mb-8 relative z-10"
-          style={{ width:"200px"}}
+          
           />
         
       
