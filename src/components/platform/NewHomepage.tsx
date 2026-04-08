@@ -102,7 +102,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5 }}
           className="flex flex-col sm:flex-row items-center gap-3 relative z-20">
           <Button onClick={() => navigate("/navigation-maker")} size="lg"
-            className="gap-2 min-w-[260px] min-h-[52px] rounded-[0.625rem] bg-white text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-lg shadow-white/10">
+            className="gap-2 min-w-[260px] min-h-[52px] rounded-[0.625rem] bg-neutral-100 dark:hover:bg-white/10: text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-lg shadow-white/10">
             <Network className="h-4 w-4" /> Build sitemap
           </Button>
           <Button onClick={() => navigate("/analyzer")} variant="outline" size="lg"
