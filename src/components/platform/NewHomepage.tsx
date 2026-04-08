@@ -103,20 +103,20 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           className="flex flex-col sm:flex-row items-center gap-3 relative z-20">
           <Button onClick={() => navigate("/navigation-maker")} size="lg"
             className="gap-2 min-w-[260px] min-h-[52px] rounded-[0.625rem] bg-white text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-lg shadow-white/10">
-            <Network className="h-4 w-4" /> Start Sitemap Builder — Free
+            <Network className="h-4 w-4" /> Build sitemap
           </Button>
           <Button onClick={() => navigate("/analyzer")} variant="outline" size="lg"
             className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border border-neutral-300 text-neutral-800 dark:border-white/20 dark:text-white hover:bg-neutral-100 dark:hover:bg-white/10 font-medium text-sm">
-            <Globe className="h-4 w-4" /> Analyze a Website
+            <Globe className="h-4 w-4" /> Analyze any Website
           </Button>
         </motion.div>
 
         {/* Micro-trust indicators */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
           className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-white/40 relative z-10">
-          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> No signup needed</span>
+          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> Easy to Build</span>
           <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> JSON + PNG export</span>
-          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> 33+ website templates</span>
+          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> 33+ SITEMAP templates</span>
         </motion.div>
 
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
@@ -136,7 +136,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
 
           <div className="grid md:grid-cols-3 gap-4">
             {[
-              { step: "1", title: "Drag pages onto canvas", desc: "Pick from 50+ stock page types or add your own. Structure appears instantly.", icon: Grip },
+              { step: "1", title: "Drag pages onto canvas", desc: "Pick from 60+ stock page types or add your own. Structure appears instantly.", icon: Grip },
               { step: "2", title: "Connect & arrange", desc: "Draw navigation flows between pages. Auto-layout keeps everything clean.", icon: GitBranch },
               { step: "3", title: "Export & ship", desc: "Download as HD PNG for decks or developer-ready JSON for your codebase.", icon: Download },
             ].map((item, i) => (
@@ -439,7 +439,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           </motion.p>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2} variants={fadeUp}>
             <Button onClick={() => navigate("/navigation-maker")} size="lg" className="gap-2 rounded-lg text-sm min-h-[48px] px-8">
-              <Network className="h-4 w-4" /> Open Sitemap Builder
+              <Network className="h-4 w-4" /> Build Sitemap
             </Button>
           </motion.div>
         </div>
