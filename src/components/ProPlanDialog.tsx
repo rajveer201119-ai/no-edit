@@ -52,12 +52,12 @@ export const ProPlanDialog = ({ open, onOpenChange }: ProPlanDialogProps) => {
             <div className="space-y-1 p-3 rounded-lg border-2 border-primary">
               <div className="text-xs font-semibold text-primary">Monthly</div>
               <div className="font-bold">₹299/mo</div>
-              <div className="text-[10px] text-muted-foreground">10/day</div>
+              <div className="text-[10px] text-muted-foreground">Unlimited/monthly</div>
             </div>
             <div className="space-y-1 p-3 rounded-lg border-2 border-yellow-500">
               <div className="text-xs font-semibold text-yellow-500">Lifetime</div>
               <div className="font-bold">₹1500</div>
-              <div className="text-[10px] text-muted-foreground">Unlimited</div>
+              <div className="text-[10px] text-muted-foreground">Unlimited/lifetime</div>
             </div>
           </div>
 
