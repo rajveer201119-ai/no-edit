@@ -37,7 +37,7 @@ export const ProPlanDialog = ({ open, onOpenChange }: ProPlanDialogProps) => {
             </div>
             <DialogTitle className="text-2xl font-bold">Unlock Your Creative Power</DialogTitle>
             <DialogDescription className="text-base text-muted-foreground">
-              Choose Student Helper or Pro Lifetime
+              Choose Monthly or Pro Lifetime
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -50,13 +50,13 @@ export const ProPlanDialog = ({ open, onOpenChange }: ProPlanDialogProps) => {
               <div className="text-[10px] text-muted-foreground">2/day</div>
             </div>
             <div className="space-y-1 p-3 rounded-lg border-2 border-primary">
-              <div className="text-xs font-semibold text-primary">Student</div>
-              <div className="font-bold">₹10/mo</div>
+              <div className="text-xs font-semibold text-primary">Monthly</div>
+              <div className="font-bold">₹299/mo</div>
               <div className="text-[10px] text-muted-foreground">10/day</div>
             </div>
             <div className="space-y-1 p-3 rounded-lg border-2 border-yellow-500">
-              <div className="text-xs font-semibold text-yellow-500">Pro</div>
-              <div className="font-bold">₹299</div>
+              <div className="text-xs font-semibold text-yellow-500">Lifetime</div>
+              <div className="font-bold">₹1500</div>
               <div className="text-[10px] text-muted-foreground">Unlimited</div>
             </div>
           </div>
