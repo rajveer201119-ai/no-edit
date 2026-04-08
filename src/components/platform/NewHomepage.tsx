@@ -120,6 +120,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         </motion.div>
 
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+        </section>
         
         <img
           src="/Site mapping and user flow tool.png"
@@ -127,7 +128,7 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           classname="w-20 h-20 mx-auto mb-8 relative z-10"
           />
         
-      </section>
+      
 
       {/* ═══════ HOW IT WORKS — 3 Steps ═══════ */}
       <section className="py-16 md:py-20 bg-background border-b border-border">
