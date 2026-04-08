@@ -8,7 +8,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import Heroimage from '../assets/Site mapping and user flow tool.png'
 
 interface NewHomepageProps {
   onStartDesigning: () => void;
@@ -124,10 +123,9 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         </section>
         
         <img
-          src={Heroimage}
+          src=/Site mapping and user flow tool.png
           alt="Site mapping and user flow tool"
-          classname="w-20 h-20 mx-auto mb-8 relative z-10"
-          
+          classname="w-full max-w-xl"
           />
         
       
