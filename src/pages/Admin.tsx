@@ -382,11 +382,7 @@ const Admin = () => {
           </div>
         </Card>
 
-        {/* Payment Leads */}
-        <Card className="p-6 mb-8">
-          {/* Payment Verification Queue */}
-        </Card>
-
+        {/* Payment Verification Queue */}
         <Card className="p-6 mb-8">
           <div className="flex items-center gap-2 mb-4 flex-wrap">
             <ClipboardCheck className="h-6 w-6 text-primary" />
