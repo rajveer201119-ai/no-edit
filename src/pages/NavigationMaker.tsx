@@ -121,7 +121,7 @@ const stockPages = [
   { id: "flow-action", label: "Flow: User Action", icon: MousePointer, category: "User Flow" },
   { id: "flow-decision", label: "Flow: Decision", icon: HelpCircle, category: "User Flow" },
   { id: "flow-api", label: "Flow: API / Backend", icon: Database, category: "User Flow" },
-  { id: "flow-success", label: "Flow: Success", icon: Check as any, category: "User Flow" },
+  { id: "flow-success", label: "Flow: Success", icon: Star, category: "User Flow" },
   { id: "flow-error", label: "Flow: Error", icon: Shield, category: "User Flow" },
 ];
 
