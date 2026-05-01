@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Shield, ArrowLeft, Crown, Calendar, Users, Megaphone, X, Zap, Badge, Mail } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { CheckCircle2, XCircle, ClipboardCheck, Loader2 } from "lucide-react";
 
 interface UserData {
   id: string;
@@ -37,6 +38,19 @@ interface PaymentLead {
   created_at: string;
 }
 
+interface PaymentSubmission {
+  id: string;
+  user_id: string | null;
+  user_name: string | null;
+  user_email: string;
+  plan_selected: "monthly" | "lifetime";
+  amount: number;
+  utr: string;
+  status: "pending" | "approved" | "rejected";
+  created_at: string;
+  reviewed_at: string | null;
+}
+
 const planBadge = (plan: string) => {
   switch (plan) {
     case "pro": return <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-500">Pro Lifetime</span>;
@@ -58,6 +72,9 @@ const Admin = () => {
     type: 'info' as 'info' | 'warning' | 'success' | 'alert'
   });
   const [paymentLeads, setPaymentLeads] = useState<PaymentLead[]>([]);
+  const [paymentSubmissions, setPaymentSubmissions] = useState<PaymentSubmission[]>([]);
+  const [submissionFilter, setSubmissionFilter] = useState<"pending" | "approved" | "rejected" | "all">("pending");
+  const [reviewing, setReviewing] = useState<string | null>(null);
 
   useEffect(() => {
     checkAdminAccess();
@@ -75,7 +92,7 @@ const Admin = () => {
       if (!roleData) { toast.error("Unauthorized: Admin access required"); navigate("/"); return; }
 
       setIsAdmin(true);
-      await Promise.all([fetchUsers(), fetchAnnouncements(), fetchPaymentLeads()]);
+      await Promise.all([fetchUsers(), fetchAnnouncements(), fetchPaymentLeads(), fetchPaymentSubmissions()]);
     } catch (error) {
       console.error("Error checking admin access:", error);
       toast.error("Error verifying admin access");
@@ -181,6 +198,37 @@ const Admin = () => {
       setPaymentLeads((data || []) as unknown as PaymentLead[]);
     } catch (error) {
       console.error("Error fetching payment leads:", error);
+    }
+  };
+
+  const fetchPaymentSubmissions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('payment_submissions' as any)
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setPaymentSubmissions((data || []) as unknown as PaymentSubmission[]);
+    } catch (error) {
+      console.error("Error fetching payment submissions:", error);
+    }
+  };
+
+  const reviewPayment = async (id: string, action: 'approve' | 'reject') => {
+    setReviewing(id);
+    try {
+      const { error } = await supabase.rpc('admin_review_payment' as any, {
+        submission_id: id,
+        action,
+      } as any);
+      if (error) throw error;
+      toast.success(action === 'approve' ? "Payment approved & Pro activated" : "Payment rejected");
+      await Promise.all([fetchPaymentSubmissions(), fetchUsers()]);
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || "Failed to review payment");
+    } finally {
+      setReviewing(null);
     }
   };
 
@@ -335,6 +383,88 @@ const Admin = () => {
         </Card>
 
         {/* Payment Leads */}
+        <Card className="p-6 mb-8">
+          {/* Payment Verification Queue */}
+        </Card>
+
+        <Card className="p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
+            <ClipboardCheck className="h-6 w-6 text-primary" />
+            <h2 className="text-2xl font-bold">Payment Verification Queue</h2>
+            <span className="text-sm text-muted-foreground">
+              ({paymentSubmissions.filter(s => submissionFilter === 'all' || s.status === submissionFilter).length})
+            </span>
+            <div className="ml-auto flex gap-1">
+              {(['pending','approved','rejected','all'] as const).map(f => (
+                <Button
+                  key={f}
+                  size="sm"
+                  variant={submissionFilter === f ? 'default' : 'outline'}
+                  onClick={() => setSubmissionFilter(f)}
+                  className="capitalize"
+                >
+                  {f}
+                </Button>
+              ))}
+            </div>
+          </div>
+          {paymentSubmissions.filter(s => submissionFilter === 'all' || s.status === submissionFilter).length === 0 ? (
+            <p className="text-muted-foreground text-sm py-6 text-center">
+              No {submissionFilter === 'all' ? '' : submissionFilter} submissions
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {paymentSubmissions
+                .filter(s => submissionFilter === 'all' || s.status === submissionFilter)
+                .map(s => (
+                <Card key={s.id} className="p-4 bg-muted/20 border-border/60">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-foreground">{s.user_name || '—'}</span>
+                        <span className="text-sm text-muted-foreground">{s.user_email}</span>
+                        <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
+                          s.status === 'approved' ? 'bg-green-500/20 text-green-500' :
+                          s.status === 'rejected' ? 'bg-red-500/20 text-red-500' :
+                          'bg-yellow-500/20 text-yellow-500'
+                        }`}>{s.status}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground flex flex-wrap gap-3">
+                        <span><strong className="text-foreground">Plan:</strong> {s.plan_selected}</span>
+                        <span><strong className="text-foreground">Amount:</strong> ₹{s.amount}</span>
+                        <span><strong className="text-foreground">UTR:</strong> <code className="font-mono">{s.utr}</code></span>
+                        <span>{new Date(s.created_at).toLocaleString()}</span>
+                      </div>
+                    </div>
+                    {s.status === 'pending' && (
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => reviewPayment(s.id, 'approve')}
+                          disabled={reviewing === s.id}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          {reviewing === s.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3 mr-1" />}
+                          Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => reviewPayment(s.id, 'reject')}
+                          disabled={reviewing === s.id}
+                        >
+                          <XCircle className="h-3 w-3 mr-1" />
+                          Reject
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </Card>
+
         <Card className="p-6 mb-8">
           <div className="flex items-center gap-2 mb-4">
             <Mail className="h-6 w-6 text-primary" />
