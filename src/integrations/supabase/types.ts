@@ -171,6 +171,48 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_submissions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          plan_selected: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          user_email: string
+          user_id: string | null
+          user_name: string | null
+          utr: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          plan_selected: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_email: string
+          user_id?: string | null
+          user_name?: string | null
+          utr: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          plan_selected?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_email?: string
+          user_id?: string | null
+          user_name?: string | null
+          utr?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           content: string
@@ -227,6 +269,44 @@ export type Database = {
           username?: string
         }
         Relationships: []
+      }
+      project_comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          node_id: string | null
+          project_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          node_id?: string | null
+          project_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          node_id?: string | null
+          project_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_comments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "sitemap_projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_versions: {
         Row: {
@@ -425,6 +505,7 @@ export type Database = {
           nodes: Json
           updated_at: string
           user_id: string
+          workspace_id: string | null
         }
         Insert: {
           connections?: Json
@@ -434,6 +515,7 @@ export type Database = {
           nodes?: Json
           updated_at?: string
           user_id: string
+          workspace_id?: string | null
         }
         Update: {
           connections?: Json
@@ -443,8 +525,17 @@ export type Database = {
           nodes?: Json
           updated_at?: string
           user_id?: string
+          workspace_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sitemap_projects_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -497,11 +588,116 @@ export type Database = {
         }
         Relationships: []
       }
+      workspace_invites: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          id: string
+          invited_by: string
+          role: string
+          token: string
+          workspace_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          invited_by: string
+          role?: string
+          token?: string
+          workspace_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          invited_by?: string
+          role?: string
+          token?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_invites_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_members: {
+        Row: {
+          invited_email: string | null
+          joined_at: string
+          role: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          invited_email?: string | null
+          joined_at?: string
+          role?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          invited_email?: string | null
+          joined_at?: string
+          role?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_members_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspaces: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      accept_workspace_invite: {
+        Args: { invite_token: string }
+        Returns: string
+      }
+      admin_review_payment: {
+        Args: { action: string; submission_id: string }
+        Returns: undefined
+      }
       admin_set_plan: {
         Args: {
           new_plan_type: string
@@ -521,6 +717,10 @@ export type Database = {
       assign_admin_role_by_email: {
         Args: { user_email: string }
         Returns: undefined
+      }
+      can_access_project: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
       }
       check_daily_limit: {
         Args: { user_id_param: string }
@@ -567,6 +767,14 @@ export type Database = {
         Returns: undefined
       }
       is_premium_user: { Args: { user_id_param: string }; Returns: boolean }
+      is_workspace_member: {
+        Args: { _user_id: string; _workspace_id: string }
+        Returns: boolean
+      }
+      is_workspace_owner: {
+        Args: { _user_id: string; _workspace_id: string }
+        Returns: boolean
+      }
       redeem_coupon: { Args: { code_input: string }; Returns: Json }
       validate_coupon: { Args: { code_input: string }; Returns: Json }
     }
