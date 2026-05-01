@@ -24,9 +24,9 @@ const baseUrl = "https://no-edit.lovable.app";
 export { baseUrl };
 
 export const SEO = ({
-  title = "EPIC — Free Sitemap Builder & Design Tool | Ship Faster",
-  description = "Plan your website structure visually, export developer-ready JSON sitemaps, and create stunning graphics — all free. Used by 280+ founders in 15+ countries.",
-  keywords = "sitemap builder, website navigation planner, visual sitemap maker, free design tool, JSON sitemap export, website structure tool, UX planning, canva alternative, site architecture, website wireframe",
+  title = "EPIC — Visual Sitemap Builder & User Flow Planner for Founders",
+  description = "Plan website structure and user flows visually. Free for indie hackers, startup founders, and product builders in India. Export JSON, PDF, PNG sitemaps in minutes.",
+  keywords = "visual sitemap builder, sitemap builder India, website structure planner, user flow builder, startup planning tool India, product planning tool, indie hacker tools India, website architecture, UX planning India, sitemap maker, navigation maker, founder tools",
   canonicalUrl,
   ogImage = defaultOgImage,
   ogType = "website",
@@ -52,6 +52,11 @@ export const SEO = ({
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+      {/* India-targeted geo signals */}
+      <meta name="geo.region" content="IN" />
+      <meta name="geo.country" content="India" />
+      <meta name="language" content="English" />
       
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
@@ -69,7 +74,8 @@ export const SEO = ({
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:site_name" content="EPIC Design Generator" />
-      <meta property="og:locale" content="en_US" />
+      <meta property="og:locale" content="en_IN" />
+      <meta property="og:locale:alternate" content="en_US" />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />

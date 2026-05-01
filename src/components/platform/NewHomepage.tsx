@@ -83,9 +83,9 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         <img
           src="/epic-logo.png"
           alt="EPIC logo"
-          classname="w-10 h-10 mx-auto mb-4 relative z-10"
-          style={{ width:"100px"}}
-          />
+          className="mx-auto mb-4 relative z-10"
+          style={{ width: "100px" }}
+        />
         
         <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5 }}
           className="text-balance bg-gradient-to-b from-black to-neutral-500 dark:from-white dark:to-white/60 bg-clip-text py-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-[-0.04em] text-transparent relative z-10 max-w-3xl">

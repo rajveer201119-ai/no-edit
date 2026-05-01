@@ -1,52 +1,19 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Check, Crown, Shield, X, Lock, Zap } from "lucide-react";
 import { SEO, pricingPageSchema } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
 import { WebGLShader } from "@/components/ui/web-gl-shader";
-import { toast } from "sonner";
-import { z } from "zod";
-
-const emailSchema = z.string().trim().min(1, "Email is required").email("Enter a valid email");
+import { UPIPaymentDialog } from "@/components/UPIPaymentDialog";
 
 const PricingIndia = () => {
   const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "lifetime">("lifetime");
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
+  const [payOpen, setPayOpen] = useState(false);
 
   const amount = selectedPlan === "monthly" ? 299 : 1500;
-
-  const handleUPIPay = async () => {
-    const result = emailSchema.safeParse(email);
-    if (!result.success) {
-      setEmailError(result.error.errors[0].message);
-      return;
-    }
-    setEmailError("");
-
-    // Save lead to admin panel
-    try {
-      await supabase.from("payment_leads" as any).insert({
-        email: email.trim(),
-        plan_selected: selectedPlan,
-        amount,
-      } as any);
-    } catch (e) {
-      console.error("Failed to save payment lead:", e);
-    }
-
-    const upiId = "8638910252-2@ybl";
-    const txnNote = encodeURIComponent("EPIC Pro Upgrade");
-    const upiUrl = `upi://pay?pa=${upiId}&pn=EPIC%20Pro&am=${amount}&cu=INR&tn=${txnNote}`;
-    window.location.href = upiUrl;
-    toast.info("Opening your UPI app. Complete the payment to activate Pro.", { duration: 6000 });
-  };
 
   return (
     <>
@@ -191,34 +158,15 @@ const PricingIndia = () => {
 
                 {/* Email + UPI Pay */}
                 <div className="space-y-3 pt-2">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="pricing-email" className="text-sm font-medium text-foreground">
-                      Email Address <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="pricing-email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        if (emailError) setEmailError("");
-                      }}
-                      className={emailError ? "border-destructive" : ""}
-                    />
-                    {emailError && (
-                      <p className="text-xs text-destructive">{emailError}</p>
-                    )}
-                  </div>
                   <Button
-                    onClick={handleUPIPay}
+                    onClick={() => setPayOpen(true)}
                     className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold h-12 text-base"
                   >
                     <Zap className="mr-2 h-4 w-4" />
                     Pay with UPI — {selectedPlan === "monthly" ? "₹299" : "₹1,500"}
                   </Button>
                   <p className="text-center text-[11px] text-muted-foreground">
-                    Opens Google Pay, PhonePe, Paytm, BHIM, or any UPI app
+                    Mobile: opens your UPI app · Desktop: scan QR · UTR verified by our team
                   </p>
                 </div>
               </div>
@@ -260,6 +208,13 @@ const PricingIndia = () => {
 
         <Footer />
       </div>
+
+      <UPIPaymentDialog
+        open={payOpen}
+        onOpenChange={setPayOpen}
+        plan={selectedPlan}
+        amount={amount}
+      />
     </>
   );
 };
