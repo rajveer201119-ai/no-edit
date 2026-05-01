@@ -116,6 +116,13 @@ const stockPages = [
   { id: "qr-code", label: "QR Code", icon: Globe, category: "Misc" },
   { id: "coupon", label: "Coupon", icon: Scissors, category: "Misc" },
   { id: "survey", label: "Survey", icon: FileText, category: "Misc" },
+  // ===== User Flow node types (drag onto canvas to build user flows) =====
+  { id: "flow-page", label: "Flow: Page", icon: FileText, category: "User Flow" },
+  { id: "flow-action", label: "Flow: User Action", icon: MousePointer, category: "User Flow" },
+  { id: "flow-decision", label: "Flow: Decision", icon: HelpCircle, category: "User Flow" },
+  { id: "flow-api", label: "Flow: API / Backend", icon: Database, category: "User Flow" },
+  { id: "flow-success", label: "Flow: Success", icon: Check as any, category: "User Flow" },
+  { id: "flow-error", label: "Flow: Error", icon: Shield, category: "User Flow" },
 ];
 
 const pageTypes = ["Landing", "Blog", "Product", "Dashboard", "Auth", "Utility", "Content", "Marketing"] as const;
