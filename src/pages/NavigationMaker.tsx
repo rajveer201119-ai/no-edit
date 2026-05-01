@@ -1249,7 +1249,7 @@ const NavigationMaker = () => {
           </button>
 
           {/* Canvas */}
-          <div className="flex-1 relative overflow-auto" style={{ background: "radial-gradient(circle, #e5e7eb 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
+          <div className="flex-1 relative overflow-auto canvas-dot-grid">
             {/* UX Score Panel */}
             <UXScorePanel nodes={nodes} connections={connections} visible={showUXScore} onClose={() => setShowUXScore(false)} isPremium={isPremium} onUpgrade={() => setShowPaywall(true)} />
             <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px] origin-top-left transition-transform duration-150" style={{ transform: `scale(${zoomLevel})` }}>
@@ -1257,9 +1257,12 @@ const NavigationMaker = () => {
               <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0">
                 <defs>
                   <linearGradient id="conn-gradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#93c5fd" />
-                    <stop offset="100%" stopColor="#c4b5fd" />
+                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.85" />
+                    <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity="0.85" />
                   </linearGradient>
+                  <marker id="arrow-end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="hsl(var(--primary))" />
+                  </marker>
                 </defs>
                 {connections.map(conn => {
                   const from = nodes.find(n => n.id === conn.fromId);
@@ -1274,16 +1277,27 @@ const NavigationMaker = () => {
                   
                   return (
                     <g key={conn.id}>
+                      {/* Subtle base line for depth */}
                       <path
                         d={`M ${fx} ${fy} C ${fx} ${midY}, ${tx} ${midY}, ${tx} ${ty}`}
                         fill="none"
                         stroke="url(#conn-gradient)"
                         strokeWidth={2.5}
                         strokeLinecap="round"
+                        opacity={0.35}
+                      />
+                      {/* Animated flowing dashes */}
+                      <path
+                        d={`M ${fx} ${fy} C ${fx} ${midY}, ${tx} ${midY}, ${tx} ${ty}`}
+                        fill="none"
+                        stroke="url(#conn-gradient)"
+                        strokeWidth={2.5}
+                        strokeLinecap="round"
+                        className="connection-flow"
                       />
                       {/* Connection end dot */}
-                      <circle cx={tx} cy={ty} r={4} fill="#93c5fd" />
-                      <circle cx={fx} cy={fy} r={4} fill="#c4b5fd" />
+                      <circle cx={tx} cy={ty} r={4} fill="hsl(var(--primary))" />
+                      <circle cx={fx} cy={fy} r={4} fill="hsl(var(--accent))" />
                       {/* Connection label */}
                       {conn.label && (
                         <g>
