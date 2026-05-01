@@ -1,145 +1,215 @@
+# EPIC Upgrade Plan
 
+Strict rule respected: no new top-level pages, no nav restructuring, no new tabs. All changes extend existing components/pages.
 
-# SEO Optimization Plan: Maximize Organic Traffic for EPIC
+---
 
-## Current State Assessment
+## Part 1 — UI Polish (visual + interactive only)
 
-The site already has strong foundations:
-- 8 pillar pages (1500+ words each) with FAQ schema
-- 12 blog articles (1200+ words) interlinked with pillars
-- 15+ tool landing pages with structured data
-- Sitemap with 55+ URLs, robots.txt, canonical tags
-- Google Search Console verified
+Files: `src/index.css`, `tailwind.config.ts`, `src/components/ui/button.tsx`, `src/components/ui/card.tsx`, `src/pages/NavigationMaker.tsx` (canvas only), existing page wrappers.
 
-## Gaps Identified (What's Holding Back Traffic)
+- Add reusable utility classes in `index.css`:
+  - `.glass-card` (backdrop-blur + soft border + shadow)
+  - `.elevated` (layered shadow with hover lift)
+  - `.btn-glow` (subtle primary-tinted glow on hover/focus)
+  - `.fade-up`, `.scale-in`, `.shimmer-loading`
+- Extend Tailwind keyframes: `float`, `pulse-glow`, `connection-flow` (for animated dashed lines).
+- Update `Button` variants to add hover lift (`hover:-translate-y-[1px]`), active scale already exists, plus optional `glow` prop.
+- Apply `.glass-card`/`.elevated` to existing Cards on Pricing, Blog, Sitemap Library, Admin, Homepage sections — no structural changes, only className updates.
+- Typography pass: tighten heading line-heights, normalize body to `text-[15px] leading-7`, consistent section spacing (`py-16 md:py-24`).
+- Builder canvas (in `NavigationMaker.tsx`):
+  - Replace flat background with subtle dot-grid (CSS radial-gradient, theme-aware).
+  - Connection lines: animate `stroke-dashoffset` for "flowing" effect.
+  - Node drag: add spring easing via framer-motion (`layout` + `transition`), light shadow on drag.
+  - Smooth zoom/pan: wheel zoom around cursor, momentum on pan-end.
+  - Loading states use shimmer skeletons instead of spinners where applicable.
 
-### 1. Missing Breadcrumb Navigation on All Content Pages
-Search engines reward breadcrumbs with rich snippets. Currently, only `index.html` has a static BreadcrumbList schema. Pillar pages, blog posts, and tool pages have **no breadcrumbs** -- neither visible UI nor schema markup.
+No nav, no routes, no page additions.
 
-### 2. No "How To" Schema on Actionable Pages
-Google shows "How To" rich results prominently. The pillar pages and blog posts contain step-by-step instructions but lack `HowTo` schema markup -- a missed opportunity for rich snippets.
+---
 
-### 3. Blog Posts Missing `dateModified` and `image` in Article Schema
-The BlogPost.tsx Article schema has `dateModified` set to `publishDate` (same value) and no `image` property. Google prefers articles with distinct modification dates and featured images for Discover and News surfaces.
+## Part 2 — User Flow Builder (inside existing builder)
 
-### 4. No Dedicated "Alternatives" / Comparison Pages
-High-intent searches like "Canva alternative free", "Figma alternative for beginners", "Miro alternative free" drive massive traffic. Only the pillar page `/canva-alternative-for-students` partially covers this. Missing dedicated comparison landing pages.
+Single page: `src/pages/NavigationMaker.tsx`. No new route.
 
-### 5. Missing `hreflang` for India-Specific Pricing
-Two pricing pages exist (`/pricing-india`, `/pricing-international`) but no `hreflang` tags signal regional targeting to Google.
+- Add a **Mode switch** in the existing top toolbar (segmented control): `Sitemap` | `User Flow`. Persisted in URL `?mode=flow` and localStorage per project.
+- New node kinds (only visible in Flow mode): `Page`, `User Action`, `Decision`, `API/Backend`, `Success`, `Error`. Each with distinct icon + color token.
+- Decision node renders a diamond shape with two outgoing handles (Yes/No).
+- Connections become **directional arrows** (arrowhead marker on SVG path) and animate in flow mode.
+- Page Library sidebar gets a second tab "Flow Steps" listing the 6 node types (re-uses the existing sidebar UI; not a new page).
+- Storage: extend the existing `sitemap_projects.nodes` JSON — each node already free-form; add `kind: 'page' | 'action' | 'decision' | 'api' | 'success' | 'error'` and `mode: 'sitemap' | 'flow'` at project level. Backwards compatible (defaults to `sitemap`).
+- Export (PDF/PNG/JSON) reuses existing pipeline; no gating changes.
 
-### 6. Open Graph Title/Description Missing from `index.html` Head
-Lines 28-29 in `index.html` show empty `og:title` and `og:description` tags (content is duplicated at lines 163-166 but the first empty ones may confuse parsers).
+---
 
-### 7. No Internal Search Functionality
-Users and bots can't search the site content. Adding a simple blog/tools search would increase time-on-site and reduce bounce rate (both ranking signals).
+## Part 3 — UPI Payment (mobile + desktop) with UTR
 
-### 8. Footer Missing Several Tool Links
-The footer only lists 9 of 15+ tools. Missing: flyer maker, certificate maker, business card maker, menu maker, brochure maker, ebook cover maker, album cover maker. These orphaned pages get less PageRank.
+Files: `src/components/ProPaywall.tsx`, `src/pages/PricingIndia.tsx`, `src/pages/PricingInternational.tsx`. No new pages.
 
-### 9. Blog Index Has No Category Filtering
-All 12 articles show in a single grid. Category pages (`/blog/category/ux-design`, etc.) would create additional indexable URLs targeting category-level keywords.
+- Detect device: `navigator.userAgent` mobile check + `matchMedia('(pointer: coarse)')`.
+- **Mobile flow**:
+  1. "Pay with UPI" deep-links `upi://pay?...` (existing).
+  2. Show optional QR code (generated client-side via `qrcode` lib) as fallback.
+  3. After redirect-back, show "Enter your 12-digit UTR" form.
+- **Desktop flow**:
+  1. Show large QR code prominently with UPI ID + amount + plan.
+  2. Show **"I have paid"** button → reveals UTR entry form.
+- UTR form: single 12-digit numeric field (zod: `/^\d{12}$/`), submit button.
+- On submit, insert into `payment_submissions` table (see Part 4) with status `pending`. Show confirmation message:
+  > "Your payment has been submitted for verification. Our team will review it and activate your plan shortly."
+- **No automatic plan upgrade.** Plan stays free until admin approves.
+- Add `qrcode` package (`bun add qrcode @types/qrcode`).
 
-## Implementation Plan
+---
 
-### Phase 1: Technical SEO Fixes (High Impact, Quick Wins)
+## Part 4 — Admin Verification Queue
 
-**A. Fix Duplicate/Empty OG Tags in `index.html`**
-- Remove the empty `og:title`/`og:description` at lines 28-29 (duplicates exist at lines 163-166)
+DB migration (one new table, plus extend existing `payment_leads` is kept as-is for backward compat):
 
-**B. Add Visible Breadcrumbs + BreadcrumbList Schema**
-- Add a reusable `Breadcrumb` component used by `PillarPage.tsx`, `BlogPost.tsx`, `ToolLanding.tsx`, `Blog.tsx`
-- Each page renders clickable breadcrumbs (Home > Blog > Article Title) AND injects `BreadcrumbList` JSON-LD
-- This directly enables Google breadcrumb rich results
+```sql
+create table public.payment_submissions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
+  user_name text,
+  user_email text not null,
+  plan_selected text not null check (plan_selected in ('monthly','lifetime')),
+  amount integer not null,
+  utr text not null check (utr ~ '^[0-9]{12}$'),
+  status text not null default 'pending' check (status in ('pending','approved','rejected')),
+  reviewed_by uuid,
+  reviewed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+alter table public.payment_submissions enable row level security;
 
-**C. Add `HowTo` Schema to Pillar Pages**
-- For pillar pages that contain step-by-step instructions (website-flow-generator, visual-sitemap-maker, etc.), add `HowTo` JSON-LD alongside existing schemas
-- Enables "How To" rich results in Google
+-- anyone (incl. anon) can submit; admins can read/update
+create policy "anyone can submit" on public.payment_submissions
+  for insert to anon, authenticated with check (true);
+create policy "admins can view" on public.payment_submissions
+  for select to authenticated using (has_role(auth.uid(),'admin'));
+create policy "admins can update" on public.payment_submissions
+  for update to authenticated using (has_role(auth.uid(),'admin'));
+create policy "users can view own" on public.payment_submissions
+  for select to authenticated using (auth.uid() = user_id);
+```
 
-**D. Fix Article Schema in BlogPost.tsx**
-- Add `image` property to article schema (use EPIC logo or a generated OG image URL)
-- Ensure `dateModified` differs from `datePublished` when content is updated
+RPC for approval that also flips `user_subscriptions`:
 
-### Phase 2: New High-Intent Pages (Traffic Multipliers)
+```sql
+create or replace function public.admin_review_payment(submission_id uuid, action text)
+returns void language plpgsql security definer set search_path=public as $$
+declare s record;
+begin
+  if not has_role(auth.uid(),'admin') then raise exception 'forbidden'; end if;
+  if action not in ('approve','reject') then raise exception 'bad action'; end if;
+  select * into s from payment_submissions where id = submission_id for update;
+  if not found then raise exception 'not found'; end if;
 
-**E. Create 5 "Alternative To" Comparison Pages**
-New programmatic pages targeting competitor comparison searches:
-1. `/alternatives/canva-alternative` -- "Best Free Canva Alternative 2026"
-2. `/alternatives/figma-alternative` -- "Best Figma Alternative for Beginners"
-3. `/alternatives/miro-alternative` -- "Free Miro Alternative for Flow Diagrams"
-4. `/alternatives/lucidchart-alternative` -- "Free Lucidchart Alternative Online"
-5. `/alternatives/adobe-express-alternative` -- "Adobe Express Alternative Free"
+  update payment_submissions
+    set status = case when action='approve' then 'approved' else 'rejected' end,
+        reviewed_by = auth.uid(), reviewed_at = now()
+    where id = submission_id;
 
-Each page: comparison table, feature breakdown, FAQ schema, CTA. These target extremely high commercial-intent keywords.
+  if action='approve' and s.user_id is not null then
+    perform admin_set_plan(
+      s.user_id,
+      'pro',
+      case when s.plan_selected='monthly' then now()+interval '30 days' else null end
+    );
+  end if;
+end$$;
+```
 
-- Create `src/data/alternativePages.ts` with content data
-- Create `src/pages/AlternativePage.tsx` as template
-- Add route `/alternatives/:slug` in `App.tsx`
+Admin UI (extend existing `src/pages/Admin.tsx` — no new page, just a new section card):
+- "Payment Verification Queue" section above existing "Payment Leads".
+- Table: name, email, plan, amount, UTR, submitted at, status badge, [Approve] [Reject] buttons.
+- Uses `admin_review_payment` RPC. Refreshes list after action; toast feedback.
 
-**F. Create 3 Additional Blog Articles (Long-Tail Expansion)**
-New articles targeting untapped long-tail keywords:
-1. `how-to-plan-website-before-coding` -- targets developers and founders
-2. `best-free-design-tools-for-students-2026` -- targets student audience
-3. `website-navigation-design-examples` -- targets UX designers
+---
 
-Add to `blogPosts.ts` with full 1200+ word content, FAQ, pillar links.
+## Part 5 — India-focused SEO
 
-### Phase 3: Internal Linking & Crawlability
+Files: `src/components/SEO.tsx`, `index.html`, `public/sitemap.xml`, page-level `<SEO />` props on `Index.tsx`, `NavigationMaker.tsx`, `PricingIndia.tsx`, `Blog.tsx`, `WebsiteAnalyzer.tsx`.
 
-**G. Complete the Footer Link Mesh**
-- Add ALL remaining tool pages to footer (certificate maker, flyer maker, business card maker, presentation maker, brochure maker, album cover maker, ebook cover maker)
-- Add "Alternatives" section linking to all 5 comparison pages
+- Add India-targeted keywords to default + per-page meta: *visual sitemap builder India, website structure planner, startup planning tool India, user flow builder, product planning tool, indie hacker tools India*.
+- Add `<meta name="geo.region" content="IN">`, `og:locale="en_IN"`, `hreflang="en-IN"`.
+- Add JSON-LD `SoftwareApplication` with `offers.priceCurrency: INR` and Indian audience.
+- Refresh `lastmod` in `sitemap.xml`; ensure Pricing India page is prioritized.
+- No structural page changes.
 
-**H. Update Sitemap with All New URLs**
-- Add 5 alternative pages + 3 new blog posts to `sitemap.xml`
-- Total indexed URLs: 63+
+---
 
-**I. Add Blog Category Pages**
-- Create `/blog/category/:category` route that filters articles by category
-- Categories: "UX Design", "Web Planning", "SaaS Design", "Design Tips", "Student Resources"
-- Each category page has unique meta title/description targeting category keywords
-- Adds 5+ new indexable URLs
+## Part 6 — Workspace / Collaboration (within existing builder)
 
-### Phase 4: On-Page SEO Enhancements
+No new page. Surfaces appear inside `NavigationMaker.tsx` (a "Share" dropdown already exists) and `MyProjects.tsx`.
 
-**J. Add "Last Updated" Display on Blog Posts and Pillar Pages**
-- Show "Last updated: Feb 2026" below the title
-- Signals freshness to both users and Google
+DB migration:
 
-**K. Add Estimated Reading Progress Bar on Blog/Pillar Pages**
-- Increases engagement metrics (time on page, scroll depth)
-- Reduces bounce rate
+```sql
+create table public.workspaces (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  owner_id uuid not null,
+  created_at timestamptz default now()
+);
+create table public.workspace_members (
+  workspace_id uuid references workspaces(id) on delete cascade,
+  user_id uuid not null,
+  role text not null check (role in ('owner','editor','viewer')) default 'editor',
+  invited_email text,
+  joined_at timestamptz default now(),
+  primary key (workspace_id, user_id)
+);
+create table public.workspace_invites (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid references workspaces(id) on delete cascade,
+  email text not null,
+  role text not null default 'editor',
+  token text unique not null,
+  invited_by uuid not null,
+  accepted_at timestamptz,
+  created_at timestamptz default now()
+);
+create table public.project_comments (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid references sitemap_projects(id) on delete cascade,
+  node_id text,
+  author_id uuid not null,
+  body text not null,
+  created_at timestamptz default now()
+);
+alter table sitemap_projects add column workspace_id uuid references workspaces(id);
+```
 
-**L. Add "Table of Contents" Component for Long-Form Content**
-- Auto-generated from H2 headings on pillar pages and blog posts
-- Enables jump-links (anchor fragments)
-- Google sometimes shows these as sitelinks in search results
+Security-definer helper `is_workspace_member(uuid, uuid)` to avoid recursive RLS, then RLS:
+- workspaces/members readable by members, writable by owner.
+- `sitemap_projects` SELECT/UPDATE policy extended: `auth.uid() = user_id OR is_workspace_member(workspace_id, auth.uid())`.
+- `project_comments`: visible to project members; insert by members.
 
-## Files to Create
-- `src/components/Breadcrumbs.tsx` -- reusable breadcrumb + schema component
-- `src/components/TableOfContents.tsx` -- auto-generated TOC from headings
-- `src/components/ReadingProgress.tsx` -- scroll progress bar
-- `src/data/alternativePages.ts` -- comparison page content (5 pages)
-- `src/pages/AlternativePage.tsx` -- comparison page template
-- `src/pages/BlogCategory.tsx` -- category filtered blog listing
+Realtime: enable `replica identity full` + add `sitemap_projects` and `project_comments` to `supabase_realtime` publication. Client subscribes inside builder so edits & comments stream live.
 
-## Files to Modify
-- `index.html` -- fix duplicate OG tags
-- `src/pages/BlogPost.tsx` -- add breadcrumbs, TOC, reading progress, fix article schema
-- `src/pages/PillarPage.tsx` -- add breadcrumbs, TOC, reading progress, HowTo schema
-- `src/pages/ToolLanding.tsx` -- add breadcrumbs
-- `src/pages/Blog.tsx` -- add category links, breadcrumbs
-- `src/components/Footer.tsx` -- complete tool link mesh, add alternatives section
-- `src/App.tsx` -- add routes for alternatives and blog categories
-- `public/sitemap.xml` -- add all new URLs
-- `src/data/blogPosts.ts` -- add 3 new articles
+UI surfaces (no new pages):
+- In existing Share dropdown of the builder: "Invite to workspace" → modal with email + role.
+- Existing `MyProjects` page: small workspace switcher dropdown at top.
+- Right-click / select node in builder → existing detail panel gets a new **Comments** tab.
+- Presence avatars in toolbar (Supabase Realtime presence).
 
-## Expected Impact
-- Breadcrumbs + HowTo schema = rich results in Google (higher CTR)
-- 5 "Alternative To" pages = capture high commercial-intent traffic (these keywords have 10K-100K monthly searches)
-- 3 new blog articles = additional long-tail entry points
-- 5 category pages = 5 new indexable URLs targeting mid-funnel keywords
-- Complete internal link mesh = better PageRank flow to all pages
-- TOC with anchor links = potential sitelinks in search results
-- Reading progress + freshness signals = better engagement metrics
+Edge function `send-workspace-invite` (uses Resend if available, else returns shareable accept URL `/auth?invite=<token>` — `Auth.tsx` reads token and calls `accept_workspace_invite` RPC). No new route; reuses `/auth`.
 
+---
+
+## Implementation order
+
+1. DB migrations (payment_submissions + workspace tables + RPCs) — single migration.
+2. UPI flow + UTR + admin queue (revenue critical).
+3. UI polish pass (tokens, buttons, cards, canvas grid, animated connectors).
+4. User Flow mode in builder.
+5. SEO meta updates.
+6. Collaboration (workspaces, comments, realtime, invite function).
+
+## Notes / risks
+
+- All existing routes, navigation, and the current sitemap builder behavior remain unchanged.
+- `payment_leads` table is kept for backward compatibility; new submissions also recorded in `payment_submissions`.
+- Realtime adds bandwidth; gated to opened project only.
+- `qrcode` is a tiny client lib (~15kb gzipped).
