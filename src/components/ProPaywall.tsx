@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -9,13 +7,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { X, Crown, Lock, Shield, Zap } from "lucide-react";
-import { toast } from "sonner";
-import { z } from "zod";
-
-const emailSchema = z.string().trim().min(1, "Email is required").email("Enter a valid email");
+import { Crown, Lock, Shield, Zap, X } from "lucide-react";
+import { UPIPaymentDialog } from "@/components/UPIPaymentDialog";
 
 interface ProPaywallProps {
   open: boolean;
@@ -24,44 +17,15 @@ interface ProPaywallProps {
 }
 
 export const ProPaywall = ({ open, onOpenChange, featureName }: ProPaywallProps) => {
-  const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "lifetime">("lifetime");
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
+  const [payOpen, setPayOpen] = useState(false);
 
   const amount = selectedPlan === "monthly" ? 299 : 1500;
   const planLabel = selectedPlan === "monthly" ? "₹299/month" : "₹1,500 lifetime";
 
-  const handleUPIPay = async () => {
-    const result = emailSchema.safeParse(email);
-    if (!result.success) {
-      setEmailError(result.error.errors[0].message);
-      return;
-    }
-    setEmailError("");
-
-    // Save lead to admin panel
-    try {
-      await supabase.from("payment_leads" as any).insert({
-        email: email.trim(),
-        plan_selected: selectedPlan,
-        amount,
-      } as any);
-    } catch (e) {
-      console.error("Failed to save payment lead:", e);
-    }
-
-    const upiId = "8638910252-2@ybl";
-    const txnNote = encodeURIComponent("EPIC Pro Upgrade");
-    const upiUrl = `upi://pay?pa=${upiId}&pn=EPIC%20Pro&am=${amount}&cu=INR&tn=${txnNote}`;
-
-    window.location.href = upiUrl;
-
-    toast.info("Opening your UPI app. Complete the payment to activate Pro.", { duration: 6000 });
-  };
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+    <Dialog open={open && !payOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-2 border-primary/30">
         {/* Header */}
         <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-6 pb-4">
@@ -141,30 +105,9 @@ export const ProPaywall = ({ open, onOpenChange, featureName }: ProPaywallProps)
             ))}
           </div>
 
-          {/* Email input */}
-          <div className="space-y-2">
-            <Label htmlFor="upgrade-email" className="text-sm font-medium">
-              Email Address <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="upgrade-email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (emailError) setEmailError("");
-              }}
-              className={emailError ? "border-destructive" : ""}
-            />
-            {emailError && (
-              <p className="text-xs text-destructive">{emailError}</p>
-            )}
-          </div>
-
           {/* UPI Pay button */}
           <Button
-            onClick={handleUPIPay}
+            onClick={() => setPayOpen(true)}
             className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90"
           >
             Pay {planLabel} with UPI
@@ -189,5 +132,17 @@ export const ProPaywall = ({ open, onOpenChange, featureName }: ProPaywallProps)
         </div>
       </DialogContent>
     </Dialog>
+
+    <UPIPaymentDialog
+      open={payOpen}
+      onOpenChange={(o) => {
+        setPayOpen(o);
+        if (!o) onOpenChange(false);
+      }}
+      plan={selectedPlan}
+      amount={amount}
+      featureName={featureName}
+    />
+    </>
   );
 };
