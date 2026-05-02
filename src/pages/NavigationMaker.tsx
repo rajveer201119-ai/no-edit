@@ -43,7 +43,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // ====== STOCK PAGES ======
 const stockPages = [
@@ -427,6 +428,10 @@ const NavigationMaker = () => {
     p.label.toLowerCase().includes(search.toLowerCase()) ||
     p.category.toLowerCase().includes(search.toLowerCase())
   );
+
+  const primaryEmptyStatePage = builderMode === "flow"
+    ? stockPages.find((page) => page.id === "flow-page") ?? stockPages[0]
+    : stockPages[0];
 
   const addPageToCanvas = (page: typeof stockPages[0]) => {
     const existing = nodes.find(n => n.pageId === page.id);
@@ -1097,9 +1102,34 @@ const NavigationMaker = () => {
 
           {/* Mobile action menu — visible only on mobile */}
           <div className="flex md:hidden items-center gap-1 shrink-0">
+            <div className="inline-flex items-center rounded-xl border border-border/60 bg-background/85 p-0.5 shadow-sm backdrop-blur">
+              <button
+                onClick={() => setBuilderMode("sitemap")}
+                className={cn(
+                  "min-w-[64px] rounded-[10px] px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200",
+                  builderMode === "sitemap"
+                    ? "bg-foreground text-background shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Site
+              </button>
+              <button
+                onClick={() => setBuilderMode("flow")}
+                className={cn(
+                  "min-w-[64px] rounded-[10px] px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200",
+                  builderMode === "flow"
+                    ? "bg-foreground text-background shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Flow
+              </button>
+            </div>
             <Button size="sm" onClick={exportNavigation} className="gap-1 h-8 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 px-2.5">
               <Download className="h-3.5 w-3.5" /> PNG
             </Button>
+            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg">
@@ -1226,6 +1256,9 @@ const NavigationMaker = () => {
             <SheetContent side="bottom" className="md:hidden h-[70vh] rounded-t-2xl p-0">
               <SheetHeader className="p-4 pb-2 border-b border-border/40">
                 <SheetTitle className="text-sm font-semibold">📦 {builderMode === "flow" ? "Flow Steps" : "Page Library"}</SheetTitle>
+                <SheetDescription className="text-xs">
+                  {builderMode === "flow" ? "Choose user flow steps to map the journey." : "Choose pages to build your sitemap visually."}
+                </SheetDescription>
                 <div className="mt-2 inline-flex w-full p-0.5 rounded-xl bg-muted/60 border border-border/60">
                   <button
                     onClick={() => setBuilderMode("sitemap")}
@@ -1300,6 +1333,34 @@ const NavigationMaker = () => {
 
           {/* Canvas */}
           <div className="flex-1 relative overflow-auto canvas-dot-grid">
+            {nodes.length === 0 && (
+              <div className="pointer-events-none absolute inset-x-0 top-20 z-20 flex justify-center px-4 md:hidden">
+                <div className="pointer-events-auto w-full max-w-sm rounded-[28px] border border-border/70 bg-background/95 p-5 text-center shadow-[0_24px_80px_-40px_hsla(var(--foreground)/0.28)] backdrop-blur-xl">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border/60 bg-muted/70">
+                    {builderMode === "flow" ? <MousePointer className="h-7 w-7 text-primary" /> : <Globe className="h-7 w-7 text-primary" />}
+                  </div>
+                  <div className="mb-2 inline-flex items-center rounded-full border border-border/60 bg-muted/70 px-3 py-1 text-[11px] font-medium text-muted-foreground">
+                    {builderMode === "flow" ? "User Flow Builder" : "Visual Sitemap Builder"}
+                  </div>
+                  <h3 className="mb-2 text-lg font-semibold text-foreground">
+                    {builderMode === "flow" ? "Start Mapping The User Journey" : "Start Building Your Sitemap"}
+                  </h3>
+                  <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
+                    {builderMode === "flow"
+                      ? "Add steps, decisions, and backend actions to map how users move through your product."
+                      : "Add pages from the library and connect them into a clear website structure."}
+                  </p>
+                  <div className="flex flex-col gap-2.5">
+                    <Button size="sm" onClick={() => addPageToCanvas(primaryEmptyStatePage)} className="gap-1.5 rounded-lg btn-glow">
+                      <Plus className="h-3.5 w-3.5" /> {builderMode === "flow" ? "Add First Flow Step" : "Add Home Page"}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setMobileLibraryOpen(true)} className="gap-1.5 rounded-lg">
+                      <Menu className="h-3.5 w-3.5" /> Open {builderMode === "flow" ? "Flow Library" : "Page Library"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* UX Score Panel */}
             <UXScorePanel nodes={nodes} connections={connections} visible={showUXScore} onClose={() => setShowUXScore(false)} isPremium={isPremium} onUpgrade={() => setShowPaywall(true)} />
             <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px] origin-top-left transition-transform duration-150" style={{ transform: `scale(${zoomLevel})` }}>
@@ -1526,22 +1587,35 @@ const NavigationMaker = () => {
               {/* Empty State */}
               {nodes.length === 0 && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center max-w-md bg-white dark:bg-card rounded-2xl p-10 shadow-sm border border-neutral-200 dark:border-border">
-                    <div className="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-muted/50 flex items-center justify-center mx-auto mb-5">
-                      <Globe className="h-8 w-8 text-neutral-400" />
+                  <div className="mx-4 hidden w-full max-w-md rounded-[28px] border border-border/70 bg-background/92 p-6 text-center shadow-[0_24px_80px_-40px_hsla(var(--foreground)/0.28)] backdrop-blur-xl md:block md:p-10">
+                    <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-border/60 bg-muted/70">
+                      {builderMode === "flow" ? <MousePointer className="h-8 w-8 text-primary" /> : <Globe className="h-8 w-8 text-primary" />}
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">Build Your Sitemap</h3>
-                    <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-                      Add pages from the library, drag to arrange, and connect them to build your website's navigation structure.
+                    <div className="mb-3 inline-flex items-center rounded-full border border-border/60 bg-muted/70 px-3 py-1 text-[11px] font-medium text-muted-foreground">
+                      {builderMode === "flow" ? "User Flow Builder" : "Visual Sitemap Builder"}
+                    </div>
+                    <h3 className="mb-2 text-xl font-semibold text-foreground">
+                      {builderMode === "flow" ? "Start Mapping The User Journey" : "Start Building Your Sitemap"}
+                    </h3>
+                    <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
+                      {builderMode === "flow"
+                        ? "Add steps, decisions, and backend actions to create a clean product flow without changing your current EPIC structure."
+                        : "Add pages from the library, drag to arrange them, and connect them into a clear website structure."}
                     </p>
-                    <div className="flex gap-3 justify-center">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
                       <Button variant="outline" size="sm" onClick={importJSON} className="gap-1.5 rounded-lg">
                         <FileUp className="h-3.5 w-3.5" /> Import JSON
                       </Button>
-                      <Button size="sm" onClick={() => addPageToCanvas(stockPages[0])} className="gap-1.5 rounded-lg">
-                        <Plus className="h-3.5 w-3.5" /> Add Home Page
+                      <Button size="sm" onClick={() => addPageToCanvas(primaryEmptyStatePage)} className="gap-1.5 rounded-lg btn-glow">
+                        <Plus className="h-3.5 w-3.5" /> {builderMode === "flow" ? "Add First Flow Step" : "Add Home Page"}
                       </Button>
                     </div>
+                    <button
+                      onClick={() => setMobileLibraryOpen(true)}
+                      className="mt-4 text-xs font-medium text-primary transition-opacity hover:opacity-80 md:hidden"
+                    >
+                      Open {builderMode === "flow" ? "flow library" : "page library"}
+                    </button>
                   </div>
                 </div>
               )}
