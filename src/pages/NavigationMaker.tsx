@@ -418,8 +418,12 @@ const NavigationMaker = () => {
     return () => window.removeEventListener("keydown", handler);
   }, [undo, redo]);
 
-  const categories = [...new Set(stockPages.map(p => p.category))];
-  const filteredPages = stockPages.filter(p => 
+  // Builder mode filters the palette: Sitemap hides "User Flow", Flow shows only it.
+  const modeFilteredPages = stockPages.filter(p =>
+    builderMode === "flow" ? p.category === "User Flow" : p.category !== "User Flow"
+  );
+  const categories = [...new Set(modeFilteredPages.map(p => p.category))];
+  const filteredPages = modeFilteredPages.filter(p =>
     p.label.toLowerCase().includes(search.toLowerCase()) ||
     p.category.toLowerCase().includes(search.toLowerCase())
   );
