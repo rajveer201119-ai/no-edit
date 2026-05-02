@@ -43,7 +43,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // ====== STOCK PAGES ======
 const stockPages = [
@@ -427,6 +428,10 @@ const NavigationMaker = () => {
     p.label.toLowerCase().includes(search.toLowerCase()) ||
     p.category.toLowerCase().includes(search.toLowerCase())
   );
+
+  const primaryEmptyStatePage = builderMode === "flow"
+    ? stockPages.find((page) => page.id === "flow-page") ?? stockPages[0]
+    : stockPages[0];
 
   const addPageToCanvas = (page: typeof stockPages[0]) => {
     const existing = nodes.find(n => n.pageId === page.id);
