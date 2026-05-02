@@ -12,7 +12,7 @@ export const ThemeToggle = () => {
   }, []);
 
   if (!mounted) {
-    return <Button variant="outline" size="icon" className="w-10 h-10" />;
+    return <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl" />;
   }
 
   return (
@@ -20,7 +20,7 @@ export const ThemeToggle = () => {
       variant="outline"
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="w-10 h-10"
+      className="h-9 w-9 rounded-xl border-border/60 bg-background/85 shadow-sm backdrop-blur transition-all hover:scale-[1.02]"
     >
       {theme === "dark" ? (
         <Sun className="h-5 w-5" />
