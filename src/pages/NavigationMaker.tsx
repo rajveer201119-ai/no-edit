@@ -274,6 +274,13 @@ const NavigationMaker = () => {
   const [savingProject, setSavingProject] = useState(false);
   const [mobileLibraryOpen, setMobileLibraryOpen] = useState(false);
   const [mobileNodeEditId, setMobileNodeEditId] = useState<string | null>(null);
+  const [builderMode, setBuilderMode] = useState<"sitemap" | "flow">(() => {
+    if (typeof window === "undefined") return "sitemap";
+    return (localStorage.getItem("epic.builderMode") as "sitemap" | "flow") || "sitemap";
+  });
+  useEffect(() => {
+    try { localStorage.setItem("epic.builderMode", builderMode); } catch {}
+  }, [builderMode]);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
   const svgRef = useRef<SVGSVGElement>(null);
