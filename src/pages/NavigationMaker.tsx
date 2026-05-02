@@ -1333,6 +1333,34 @@ const NavigationMaker = () => {
 
           {/* Canvas */}
           <div className="flex-1 relative overflow-auto canvas-dot-grid">
+            {nodes.length === 0 && (
+              <div className="pointer-events-none absolute inset-x-0 top-20 z-20 flex justify-center px-4 md:hidden">
+                <div className="pointer-events-auto w-full max-w-sm rounded-[28px] border border-border/70 bg-background/95 p-5 text-center shadow-[0_24px_80px_-40px_hsla(var(--foreground)/0.28)] backdrop-blur-xl">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border/60 bg-muted/70">
+                    {builderMode === "flow" ? <MousePointer className="h-7 w-7 text-primary" /> : <Globe className="h-7 w-7 text-primary" />}
+                  </div>
+                  <div className="mb-2 inline-flex items-center rounded-full border border-border/60 bg-muted/70 px-3 py-1 text-[11px] font-medium text-muted-foreground">
+                    {builderMode === "flow" ? "User Flow Builder" : "Visual Sitemap Builder"}
+                  </div>
+                  <h3 className="mb-2 text-lg font-semibold text-foreground">
+                    {builderMode === "flow" ? "Start Mapping The User Journey" : "Start Building Your Sitemap"}
+                  </h3>
+                  <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
+                    {builderMode === "flow"
+                      ? "Add steps, decisions, and backend actions to map how users move through your product."
+                      : "Add pages from the library and connect them into a clear website structure."}
+                  </p>
+                  <div className="flex flex-col gap-2.5">
+                    <Button size="sm" onClick={() => addPageToCanvas(primaryEmptyStatePage)} className="gap-1.5 rounded-lg btn-glow">
+                      <Plus className="h-3.5 w-3.5" /> {builderMode === "flow" ? "Add First Flow Step" : "Add Home Page"}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setMobileLibraryOpen(true)} className="gap-1.5 rounded-lg">
+                      <Menu className="h-3.5 w-3.5" /> Open {builderMode === "flow" ? "Flow Library" : "Page Library"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* UX Score Panel */}
             <UXScorePanel nodes={nodes} connections={connections} visible={showUXScore} onClose={() => setShowUXScore(false)} isPremium={isPremium} onUpgrade={() => setShowPaywall(true)} />
             <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px] origin-top-left transition-transform duration-150" style={{ transform: `scale(${zoomLevel})` }}>
@@ -1559,7 +1587,7 @@ const NavigationMaker = () => {
               {/* Empty State */}
               {nodes.length === 0 && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="mx-4 w-full max-w-md rounded-[28px] border border-border/70 bg-background/92 p-6 text-center shadow-[0_24px_80px_-40px_hsla(var(--foreground)/0.28)] backdrop-blur-xl md:p-10">
+                  <div className="mx-4 hidden w-full max-w-md rounded-[28px] border border-border/70 bg-background/92 p-6 text-center shadow-[0_24px_80px_-40px_hsla(var(--foreground)/0.28)] backdrop-blur-xl md:block md:p-10">
                     <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-border/60 bg-muted/70">
                       {builderMode === "flow" ? <MousePointer className="h-8 w-8 text-primary" /> : <Globe className="h-8 w-8 text-primary" />}
                     </div>
