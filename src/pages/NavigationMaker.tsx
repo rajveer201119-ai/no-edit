@@ -1155,11 +1155,27 @@ const NavigationMaker = () => {
           {/* Sidebar — Stock Pages */}
           <aside className="w-60 border-r border-neutral-200 dark:border-border/40 bg-white dark:bg-card/50 flex flex-col shrink-0 hidden md:flex">
             <div className="p-4 border-b border-neutral-100 dark:border-border/40">
-              <p className="text-xs font-semibold text-foreground mb-3">📦 Page Library</p>
+              <p className="text-xs font-semibold text-foreground mb-3">📦 {builderMode === "flow" ? "Flow Steps" : "Page Library"}</p>
+              <div className="mb-3 inline-flex w-full p-0.5 rounded-xl bg-muted/60 border border-border/60">
+                <button
+                  onClick={() => setBuilderMode("sitemap")}
+                  className={cn(
+                    "flex-1 text-[11px] font-medium py-1.5 rounded-lg transition-all duration-200",
+                    builderMode === "sitemap" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >Sitemap</button>
+                <button
+                  onClick={() => setBuilderMode("flow")}
+                  className={cn(
+                    "flex-1 text-[11px] font-medium py-1.5 rounded-lg transition-all duration-200",
+                    builderMode === "flow" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >User Flow</button>
+              </div>
               <div className="relative">
                 <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
                 <Input 
-                  placeholder="Search pages..." 
+                  placeholder={builderMode === "flow" ? "Search steps..." : "Search pages..."}
                   value={search} 
                   onChange={e => setSearch(e.target.value)}
                   className="pl-8 h-8 text-xs rounded-lg bg-neutral-50 dark:bg-muted/30 border-neutral-200 dark:border-border/40"
@@ -1209,11 +1225,27 @@ const NavigationMaker = () => {
           <Sheet open={mobileLibraryOpen} onOpenChange={setMobileLibraryOpen}>
             <SheetContent side="bottom" className="md:hidden h-[70vh] rounded-t-2xl p-0">
               <SheetHeader className="p-4 pb-2 border-b border-border/40">
-                <SheetTitle className="text-sm font-semibold">📦 Page Library</SheetTitle>
+                <SheetTitle className="text-sm font-semibold">📦 {builderMode === "flow" ? "Flow Steps" : "Page Library"}</SheetTitle>
+                <div className="mt-2 inline-flex w-full p-0.5 rounded-xl bg-muted/60 border border-border/60">
+                  <button
+                    onClick={() => setBuilderMode("sitemap")}
+                    className={cn(
+                      "flex-1 text-xs font-medium py-1.5 rounded-lg transition-all",
+                      builderMode === "sitemap" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+                    )}
+                  >Sitemap</button>
+                  <button
+                    onClick={() => setBuilderMode("flow")}
+                    className={cn(
+                      "flex-1 text-xs font-medium py-1.5 rounded-lg transition-all",
+                      builderMode === "flow" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+                    )}
+                  >User Flow</button>
+                </div>
                 <div className="relative mt-2">
                   <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
                   <Input 
-                    placeholder="Search pages..." 
+                    placeholder={builderMode === "flow" ? "Search steps..." : "Search pages..."}
                     value={search} 
                     onChange={e => setSearch(e.target.value)}
                     className="pl-8 h-8 text-xs rounded-lg bg-muted/30 border-border/40"
