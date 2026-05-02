@@ -331,6 +331,50 @@ All colors MUST be HSL.
     animation: shimmer 1.6s linear infinite;
   }
 
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes connection-flow {
+    to { stroke-dashoffset: -24; }
+  }
+
+  @keyframes fade-up {
+    0%   { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scale-in {
+    0%   { opacity: 0; transform: scale(0.96); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Soft elevated surface — cards, panels, modal-like containers */
+  .surface-soft {
+    @apply rounded-2xl border border-border bg-card;
+    box-shadow:
+      0 1px 2px hsla(0 0% 0% / 0.04),
+      0 6px 20px -10px hsla(0 0% 0% / 0.08);
+    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 220ms cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 220ms ease;
+  }
+  .surface-soft:hover {
+    transform: translateY(-2px);
+    border-color: hsla(var(--primary) / 0.25);
+    box-shadow:
+      0 1px 2px hsla(0 0% 0% / 0.05),
+      0 14px 32px -12px hsla(var(--primary) / 0.20);
+  }
+
+  /* Press feedback — pair with buttons that don't already include it */
+  .btn-press {
+    transition: transform 120ms ease, box-shadow 200ms ease, background-color 200ms ease;
+  }
+  .btn-press:active {
+    transform: scale(0.97);
+  }
+
   /* Subtle entrance helpers */
   .anim-fade-up {
     animation: fade-up 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
