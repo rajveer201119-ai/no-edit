@@ -305,6 +305,31 @@ All colors MUST be HSL.
     background-image: radial-gradient(circle, hsla(var(--foreground) / 0.10) 1px, transparent 1px);
   }
 
+  /* Soft whiteboard-style background — for sections that need subtle texture */
+  .bg-soft-grid {
+    background-image:
+      radial-gradient(circle at 20% 10%, hsla(var(--primary) / 0.06), transparent 45%),
+      radial-gradient(circle at 85% 80%, hsla(var(--accent) / 0.05), transparent 50%),
+      radial-gradient(circle, hsla(var(--foreground) / 0.05) 1px, transparent 1px);
+    background-size: auto, auto, 28px 28px;
+  }
+  .dark .bg-soft-grid {
+    background-image:
+      radial-gradient(circle at 20% 10%, hsla(var(--primary) / 0.10), transparent 45%),
+      radial-gradient(circle at 85% 80%, hsla(var(--accent) / 0.07), transparent 50%),
+      radial-gradient(circle, hsla(var(--foreground) / 0.07) 1px, transparent 1px);
+  }
+
+  /* Floating ambient blobs for hero/feature backgrounds */
+  .ambient-blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+    animation: float 10s ease-in-out infinite;
+  }
+
   /* Animated dashed connection line for the builder */
   .connection-flow {
     stroke-dasharray: 6 6;
