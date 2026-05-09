@@ -26,6 +26,39 @@ export const Hero = () => {
       <div className="absolute inset-0 -z-10 bg-black/30 backdrop-blur-[2px]" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white/[0.02] to-transparent" />
 
+      {/* Whiteboard-style faint grid */}
+      <div
+        className="absolute inset-0 -z-10 opacity-[0.12] pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, hsla(0,0%,100%,0.08) 1px, transparent 1px), linear-gradient(to bottom, hsla(0,0%,100%,0.08) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+          maskImage:
+            "radial-gradient(ellipse at center, black 50%, transparent 85%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse at center, black 50%, transparent 85%)",
+        }}
+      />
+
+      {/* Soft grain / noise texture */}
+      <div
+        className="absolute inset-0 -z-10 opacity-[0.08] mix-blend-overlay pointer-events-none"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+          backgroundSize: "160px 160px",
+        }}
+      />
+
+      {/* Floating decorative shapes */}
+      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute top-[12%] left-[8%] w-24 h-24 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-primary/30 to-transparent blur-2xl animate-[float_9s_ease-in-out_infinite]" />
+        <div className="absolute top-[22%] right-[10%] w-28 h-28 md:w-44 md:h-44 rounded-3xl rotate-12 bg-gradient-to-br from-accent/25 to-transparent blur-2xl animate-[float_11s_ease-in-out_infinite_reverse]" />
+        <div className="absolute bottom-[18%] left-[14%] w-20 h-20 md:w-32 md:h-32 rounded-2xl -rotate-6 border border-white/15 bg-white/[0.03] backdrop-blur-md animate-[float_13s_ease-in-out_infinite]" />
+        <div className="absolute bottom-[12%] right-[16%] w-16 h-16 md:w-24 md:h-24 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-md animate-[float_10s_ease-in-out_infinite_reverse]" />
+        <div className="absolute top-[45%] right-[6%] w-10 h-10 md:w-14 md:h-14 rotate-45 border border-white/15 bg-white/[0.03] backdrop-blur-sm animate-[float_12s_ease-in-out_infinite]" />
+      </div>
+
       <div className="flex justify-center mb-4 md:mb-5 relative z-10">
         <img 
           src="/epic-logo-256.png" 
