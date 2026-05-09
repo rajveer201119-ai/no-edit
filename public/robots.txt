@@ -1,6 +1,19 @@
-# EPIC Design Platform - Robots.txt
+# EPIC Design Platform — Robots.txt
 # https://no-edit.lovable.app
+
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /my-projects
+Disallow: /shared/
 
+# Crawl-delay for noisy bots only
+User-agent: AhrefsBot
+Crawl-delay: 5
+User-agent: SemrushBot
+Crawl-delay: 5
+
+Host: https://no-edit.lovable.app
 Sitemap: https://no-edit.lovable.app/sitemap.xml

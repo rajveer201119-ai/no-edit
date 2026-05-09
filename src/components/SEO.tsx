@@ -56,7 +56,10 @@ export const SEO = ({
       {/* India-targeted geo signals */}
       <meta name="geo.region" content="IN" />
       <meta name="geo.country" content="India" />
+      <meta name="geo.placename" content="India" />
       <meta name="language" content="English" />
+      <meta name="distribution" content="global" />
+      <meta name="target" content="all" />
       
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
@@ -76,6 +79,7 @@ export const SEO = ({
       <meta property="og:site_name" content="EPIC Design Generator" />
       <meta property="og:locale" content="en_IN" />
       <meta property="og:locale:alternate" content="en_US" />
+      <meta property="og:locale:alternate" content="hi_IN" />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -138,11 +142,20 @@ export const homePageSchema = {
         "https://instagram.com/epicdesigngen",
         "https://linkedin.com/company/epicdesigngen"
       ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "IN",
+        "addressRegion": "India"
+      },
+      "areaServed": [
+        { "@type": "Country", "name": "India" },
+        { "@type": "Country", "name": "Worldwide" }
+      ],
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "customer support",
         "url": `${baseUrl}/contact`,
-        "availableLanguage": "English"
+        "availableLanguage": ["English", "Hindi"]
       }
     },
     {
