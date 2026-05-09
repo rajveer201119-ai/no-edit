@@ -462,6 +462,147 @@ export const pillarPages: Record<string, PillarPageData> = {
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
   },
+  "sitemap-builder-india": {
+    slug: "sitemap-builder-india",
+    metaTitle: "Free Sitemap Builder for Indian Founders & Students | EPIC",
+    metaDescription: "EPIC is the #1 free visual sitemap builder for Indian startups, students, and developers. Plan websites, export JSON/PNG, pay in INR via UPI. Made for India.",
+    keywords: "sitemap builder india, free sitemap tool india, website planner india, sitemap maker for indian startups, ux tool india, indie hacker india, website structure india",
+    h1: "Free Sitemap Builder for India",
+    heroSubtitle: "Plan your website, app, or SaaS in minutes — built for Indian founders, students, and freelancers. Pay in INR with UPI / GPay / PhonePe / Paytm.",
+    sections: [
+      {
+        heading: "Why Indian Founders Choose EPIC",
+        content: "India's startup ecosystem is exploding — Bangalore, Mumbai, Delhi NCR, Hyderabad, Pune and Chennai are home to thousands of new SaaS, D2C, edtech, fintech and quick-commerce companies every year. But most planning tools (FlowMapp, Octopus.do, Slickplan) charge in USD, lock features behind expensive subscriptions, and don't accept Indian payment methods.\n\nEPIC fixes that. Pricing in INR, payments through UPI, GPay, PhonePe and Paytm, and a free tier generous enough to plan your first 3-5 projects without paying anything. The tool runs entirely in your browser — no install, no account required to start, works fine on a 3G connection from a Tier-2 city."
+      },
+      {
+        heading: "Built for Students & College Founders",
+        content: "If you're a BCA, B.Tech, MCA or design student in India working on a final-year project, hackathon submission, or your first startup — EPIC was built for you. Drag pages onto a canvas, connect navigation flows, and export your sitemap as JSON for your developer or as PNG for your project report. No design background needed.\n\nMany students at IITs, NITs, BITS, VIT, SRM and IIITs use EPIC for capstone projects, Smart India Hackathon entries, and to pitch ideas at college incubators."
+      },
+      {
+        heading: "INR Pricing — No Hidden Fees",
+        content: "Free forever for the basics. Upgrade to EPIC Pro for ₹299/month or ₹1,500 lifetime — pay once, own it forever. Lifetime pricing is unique to India and unlocks unlimited exports, no watermarks, JSON sitemap export, the website analyzer, and priority support. UPI checkout completes in under 10 seconds via your favourite UPI app."
+      },
+      {
+        heading: "Use Cases — From Mumbai to Madurai",
+        content: "Quick-commerce startup planning category pages. Edtech founder mapping a course portal. Freelance developer in Pune sharing site architecture with a client. UX student in Bangalore building a portfolio. Agency in Delhi delivering wireframes faster. EPIC adapts to every Indian use case."
+      }
+    ],
+    comparison: [
+      { feature: "INR pricing", epic: true, others: false },
+      { feature: "UPI / GPay / PhonePe checkout", epic: true, others: false },
+      { feature: "Lifetime plan available", epic: true, others: false },
+      { feature: "Free tier (real, not 7-day trial)", epic: true, others: false },
+      { feature: "Works on 3G / low-bandwidth", epic: true, others: true },
+      { feature: "No signup required", epic: true, others: false },
+    ],
+    faqs: [
+      { question: "Is EPIC really free for Indian users?", answer: "Yes — the core sitemap builder, 50+ page templates, and PNG export are free forever for everyone, including Indian users." },
+      { question: "Can I pay in INR?", answer: "Yes. Visit /pricing-india for INR pricing (₹299/month or ₹1,500 lifetime) and pay instantly via UPI, GPay, PhonePe or Paytm." },
+      { question: "Is there a lifetime plan?", answer: "Yes — ₹1,500 one-time payment unlocks EPIC Pro forever. This plan is currently available only to Indian customers." },
+      { question: "Will it work on slow internet?", answer: "Yes. EPIC is built as a lightweight PWA and works on 3G connections common in Tier-2 and Tier-3 Indian cities." },
+    ],
+    relatedPillars: ["visual-sitemap-maker", "website-flow-generator", "saas-navigation-planner"],
+    cta: { title: "Plan Your First Website Free", description: "Open the sitemap builder and start mapping your idea — no signup, no credit card." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "EPIC Sitemap Builder India",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/sitemap-builder-india`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+      areaServed: { "@type": "Country", name: "India" },
+    },
+  },
+  "website-planner-for-students-india": {
+    slug: "website-planner-for-students-india",
+    metaTitle: "Website Planner for Students in India — Free | EPIC",
+    metaDescription: "Free visual website planner for Indian college and engineering students. Plan final-year projects, hackathon entries, and portfolio sites. No signup.",
+    keywords: "website planner india, sitemap tool for students, final year project tool, hackathon india, IIT BITS NIT student tools, free design tool india",
+    h1: "Free Website Planner for Indian Students",
+    heroSubtitle: "Plan your college project, hackathon submission, or first startup website — drag, drop, export. Built for Indian students.",
+    sections: [
+      {
+        heading: "Final-Year Projects Made Easy",
+        content: "Whether you're submitting a B.Tech, BCA or MCA final-year project, EPIC helps you produce professional-looking sitemap diagrams and user flows for your project report. Drag from 50+ page templates, connect them visually, and export as PNG to paste straight into your report PDF."
+      },
+      {
+        heading: "Hackathon-Ready in Minutes",
+        content: "Smart India Hackathon, Hack the North, MLH events, college fests — when the clock is ticking and you need to pitch your idea fast, EPIC lets you wireframe a complete site in under 10 minutes. Share a public link with judges or download the JSON for your developer to scaffold the build."
+      },
+      {
+        heading: "Portfolio Site Planning",
+        content: "Planning your personal portfolio for placement season? Map out the homepage, projects page, blog, and contact flow visually before writing a single line of code. Saves hours of trial-and-error in Figma or Webflow."
+      }
+    ],
+    comparison: [
+      { feature: "Free for students", epic: true, others: false },
+      { feature: "Export as PNG for project reports", epic: true, others: true },
+      { feature: "JSON export for developers", epic: true, others: false },
+      { feature: "No signup required", epic: true, others: false },
+    ],
+    faqs: [
+      { question: "Do I need to pay as a student?", answer: "No. The core builder, templates, and PNG export are free forever." },
+      { question: "Can I use EPIC for SIH or college hackathons?", answer: "Yes — many SIH and college hackathon teams use EPIC to wireframe their entries quickly." },
+      { question: "Will the export look good in my project report?", answer: "Yes. EPIC exports HD PNGs that look crisp when pasted into a Word/Google Docs project report." },
+    ],
+    relatedPillars: ["sitemap-builder-india", "visual-sitemap-maker", "canva-alternative-for-students"],
+    cta: { title: "Start Your Project Now", description: "Open the planner and map your first website in minutes — free, no signup." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "EPIC Website Planner for Students India",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/website-planner-for-students-india`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+      areaServed: { "@type": "Country", name: "India" },
+    },
+  },
+  "saas-tools-india": {
+    slug: "saas-tools-india",
+    metaTitle: "Best SaaS Planning Tools for Indian Startups 2026 | EPIC",
+    metaDescription: "Discover the best SaaS planning, sitemap, and UX tools for Indian startups in 2026. INR pricing, UPI payments, free tier. Used by founders in Bangalore, Mumbai, Delhi.",
+    keywords: "saas tools india, indian startup tools, planning tool india, ux tool indian founders, sitemap india, indie hacker india, bangalore startup tool",
+    h1: "Best SaaS Planning Tools for Indian Startups",
+    heroSubtitle: "Made-in-India tooling for founders building the next generation of SaaS, D2C, edtech, fintech and AI startups. Pay in INR.",
+    sections: [
+      {
+        heading: "Why Indian Startups Need Local Tools",
+        content: "Most planning and design SaaS is priced for the US/EU market — $15-30/month adds up fast when you're bootstrapping from Bangalore or Bhopal. EPIC is built with Indian pricing economics in mind: a meaningful free tier, ₹299/month Pro, and a one-time ₹1,500 lifetime option that doesn't exist on most Western tools."
+      },
+      {
+        heading: "Used by Founders Across India",
+        content: "From Koramangala studios to Andheri co-working spaces, from Gurgaon agencies to Hyderabad startups, EPIC is used by founders shipping real products. Quick-commerce, agritech, edtech, fintech — every category benefits from clean upfront planning."
+      },
+      {
+        heading: "Pay How India Pays",
+        content: "UPI, GPay, PhonePe, Paytm, Amazon Pay — pay the way you already pay for everything else. No international cards required, no forex fees, no awkward conversion at the bank."
+      }
+    ],
+    comparison: [
+      { feature: "INR + UPI checkout", epic: true, others: false },
+      { feature: "Lifetime pricing", epic: true, others: false },
+      { feature: "Free tier", epic: true, others: false },
+      { feature: "GST invoice", epic: true, others: true },
+    ],
+    faqs: [
+      { question: "Do you provide GST invoices?", answer: "Yes — every paid plan includes a GST-compliant invoice for your records." },
+      { question: "Is there a discount for early-stage startups?", answer: "The ₹1,500 lifetime plan is already heavily discounted for Indian early-stage founders. Reach out via /contact for additional team plans." },
+    ],
+    relatedPillars: ["sitemap-builder-india", "saas-navigation-planner", "website-planner-for-students-india"],
+    cta: { title: "Try EPIC Free", description: "Plan your SaaS structure today — no signup, INR pricing when you're ready to upgrade." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "EPIC for Indian SaaS Startups",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/saas-tools-india`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+      areaServed: { "@type": "Country", name: "India" },
+    },
+  },
 };
 
 export const pillarSlugs = Object.keys(pillarPages);

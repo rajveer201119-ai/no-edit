@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,21 @@ const emailSchema = z.string().trim().min(1, "Email is required").email("Enter a
 
 const PricingInternational = () => {
   const navigate = useNavigate();
+
+  // Auto-redirect Indian visitors to the INR pricing page (IST timezone heuristic)
+  useEffect(() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      const lang = (navigator.language || "").toLowerCase();
+      const isIndia = tz === "Asia/Kolkata" || tz === "Asia/Calcutta" || lang.endsWith("-in");
+      const skip = sessionStorage.getItem("epic-skip-india-redirect");
+      if (isIndia && !skip) {
+        sessionStorage.setItem("epic-skip-india-redirect", "1");
+        navigate("/pricing-india", { replace: true });
+      }
+    } catch {}
+  }, [navigate]);
+
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "lifetime">("lifetime");
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");

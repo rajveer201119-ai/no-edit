@@ -145,4 +145,26 @@
   <url><loc>https://no-edit.lovable.app/contact</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://no-edit.lovable.app/privacy</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://no-edit.lovable.app/terms</loc><lastmod>2026-03-05</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+
+  <!-- India-targeted Pillar Pages (en-IN, 0.85) -->
+  <url>
+    <loc>https://no-edit.lovable.app/sitemap-builder-india</loc><lastmod>2026-05-09</lastmod><changefreq>weekly</changefreq><priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en-IN" href="https://no-edit.lovable.app/sitemap-builder-india"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://no-edit.lovable.app/visual-sitemap-maker"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://no-edit.lovable.app/visual-sitemap-maker"/>
+  </url>
+  <url>
+    <loc>https://no-edit.lovable.app/website-planner-for-students-india</loc><lastmod>2026-05-09</lastmod><changefreq>weekly</changefreq><priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en-IN" href="https://no-edit.lovable.app/website-planner-for-students-india"/>
+  </url>
+  <url>
+    <loc>https://no-edit.lovable.app/saas-tools-india</loc><lastmod>2026-05-09</lastmod><changefreq>weekly</changefreq><priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en-IN" href="https://no-edit.lovable.app/saas-tools-india"/>
+  </url>
+
+  <!-- Pricing India hreflang reinforcement -->
+  <url>
+    <loc>https://no-edit.lovable.app/pricing-india</loc><lastmod>2026-05-09</lastmod><changefreq>weekly</changefreq><priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="hi-IN" href="https://no-edit.lovable.app/pricing-india"/>
+  </url>
 </urlset>
