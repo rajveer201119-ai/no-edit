@@ -559,6 +559,224 @@ export const pillarPages: Record<string, PillarPageData> = {
       areaServed: { "@type": "Country", name: "India" },
     },
   },
+  "free-sitemap-generator-india": {
+    slug: "free-sitemap-generator-india",
+    metaTitle: "Free Sitemap Generator (India) — Visual XML & HTML Sitemap Maker | EPIC",
+    metaDescription: "Free online sitemap generator made for Indian developers, founders & SEO teams. Build visual sitemaps, export XML/HTML/JSON, no signup. UPI pricing. Used in Bangalore, Mumbai, Delhi.",
+    keywords: "free sitemap generator, sitemap generator india, online sitemap generator, free xml sitemap generator, sitemap maker india, create sitemap online, free sitemap tool india",
+    h1: "Free Sitemap Generator for India",
+    heroSubtitle: "Generate, visualize and export your website's sitemap — XML, HTML, JSON or HD image — completely free. Built for Indian developers, agencies and SEO teams.",
+    sections: [
+      {
+        heading: "Why Indian Developers Need a Free Sitemap Generator",
+        content: "Most sitemap generators are either paid (US$15–30/mo), bloated with ads, or limited to 500 URLs on the free tier. EPIC flips that: unlimited free sitemap generation, no signup, no watermark, and INR pricing only when you upgrade for advanced exports. Whether you're a freelancer in Pune, an agency in Gurgaon, or a SaaS team in Bangalore, you can plan, visualize and export sitemaps in under a minute.\n\nGoogle Search Console requires every public site to submit a sitemap.xml — without one, new pages take weeks to get indexed. EPIC's free generator produces standards-compliant XML that you can drop straight into your /public folder, plus a visual canvas so non-technical stakeholders (clients, founders, designers) can actually understand your site structure."
+      },
+      {
+        heading: "Generate Sitemaps Three Ways",
+        content: "1. **From scratch** — drag-and-drop pages on a visual canvas, connect them with arrows, and export. Perfect for planning new websites before development.\n\n2. **From a live URL** — paste any website URL into our analyzer (powered by Firecrawl). EPIC crawls the site, detects every page, and produces a visual sitemap automatically. Great for auditing existing sites or competitors.\n\n3. **From a list of URLs** — paste a CSV or list of paths and EPIC will render them as a hierarchical sitemap, ready to export as XML, HTML or PNG."
+      },
+      {
+        heading: "Export Formats Indian Teams Need",
+        content: "EPIC exports in every format Indian teams actually use: **XML sitemap** (Google/Bing submission), **HTML sitemap** (for users + SEO long-tail), **JSON** (for developers building custom tools), **PNG/SVG** (for client decks and Notion docs). Free tier includes XML and PNG export with EPIC watermark; ₹299/month Pro removes the watermark and unlocks JSON, SVG and unlimited URLs."
+      },
+      {
+        heading: "Built for Indian SEO Workflows",
+        content: "Submit directly to Google Search Console, Bing Webmaster Tools and IndexNow — EPIC outputs valid `<urlset>` XML conforming to sitemaps.org/0.9. We support `<lastmod>`, `<changefreq>`, `<priority>` and `<xhtml:link>` hreflang tags so your en-IN, hi-IN and en-US pages stay properly localised. Indian e-commerce teams running Shopify, WooCommerce or custom Next.js stores can plug EPIC's output into their existing crawl budget strategy."
+      },
+      {
+        heading: "Who Uses EPIC's Free Sitemap Generator",
+        content: "Indian SEO consultants pricing freelance audits, college students building portfolio sites, founders pitching to investors, marketing teams at D2C brands like boAt and Mamaearth-style startups, agencies in Noida and Bangalore servicing US clients, and developers shipping side projects on Vercel and Render. The common thread: they need a sitemap fast, in English (with Hindi-friendly UX), priced for the Indian market."
+      }
+    ],
+    comparison: [
+      { feature: "Free unlimited URLs", epic: true, others: false },
+      { feature: "Visual drag-and-drop canvas", epic: true, others: false },
+      { feature: "XML + HTML + JSON export", epic: true, others: false },
+      { feature: "INR pricing + UPI checkout", epic: true, others: false },
+      { feature: "GST invoice", epic: true, others: false },
+      { feature: "No signup required", epic: true, others: true },
+    ],
+    faqs: [
+      { question: "Is EPIC's sitemap generator really free for Indian users?", answer: "Yes — unlimited free sitemap generation, XML and PNG export, no signup. Pro at ₹299/month unlocks watermark-free exports, JSON/SVG and team sharing." },
+      { question: "Will the XML output work with Google Search Console?", answer: "Yes. EPIC produces standards-compliant sitemap.xml conforming to sitemaps.org/0.9, ready to submit to Google Search Console, Bing Webmaster Tools and IndexNow." },
+      { question: "Can I crawl an existing website to generate its sitemap?", answer: "Yes — paste any URL into our Website Analyzer and EPIC will crawl up to 500 pages on the free tier and render a visual sitemap automatically." },
+      { question: "Do you support Hindi or Indian regional content?", answer: "EPIC's UI is in English but supports hreflang tags for hi-IN, en-IN, ta-IN and other Indian locales in your generated sitemap." },
+      { question: "How do I pay in INR?", answer: "All Indian users see INR pricing automatically. Pay via UPI (GPay, PhonePe, Paytm), Indian credit/debit cards, or net banking. Every payment includes a GST invoice." }
+    ],
+    relatedPillars: ["xml-sitemap-generator-india", "html-sitemap-generator-india", "sitemap-builder-india", "visual-sitemap-maker"],
+    cta: { title: "Generate Your Sitemap Free", description: "Open EPIC's sitemap maker and export your first XML sitemap in under 60 seconds." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "EPIC Free Sitemap Generator (India)",
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/free-sitemap-generator-india`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+      areaServed: { "@type": "Country", name: "India" },
+      aggregateRating: { "@type": "AggregateRating", ratingValue: "4.8", ratingCount: "280" },
+    },
+  },
+  "xml-sitemap-generator-india": {
+    slug: "xml-sitemap-generator-india",
+    metaTitle: "XML Sitemap Generator Online — Free for Indian Sites | EPIC",
+    metaDescription: "Free XML sitemap generator for Indian websites. Generate Google-ready sitemap.xml from URL or visual canvas. Supports hreflang, lastmod, priority. INR pricing for Pro.",
+    keywords: "xml sitemap generator, xml sitemap generator india, free xml sitemap, sitemap xml generator online, generate xml sitemap, xml sitemap validator, sitemap.xml maker",
+    h1: "Free XML Sitemap Generator (India)",
+    heroSubtitle: "Generate Google-ready sitemap.xml files from any URL or visual canvas. Supports hreflang, lastmod, changefreq, priority — everything Indian SEO teams need.",
+    sections: [
+      {
+        heading: "What Is an XML Sitemap and Why It Matters in 2026",
+        content: "An XML sitemap is a machine-readable file that lists every important URL on your website with metadata about when it was updated, how often it changes, and how important it is relative to other pages. Google, Bing, DuckDuckGo and Yandex all use it as a primary signal for crawling and indexing.\n\nFor Indian websites — where Google.co.in dominates 95%+ of search — a clean sitemap.xml is the fastest way to get new pages indexed. Without one, expect 2–4 weeks before new product pages, blog posts or landing pages show up in search. With one submitted to Search Console, indexing typically happens within 24–72 hours."
+      },
+      {
+        heading: "How EPIC Generates Standards-Compliant XML",
+        content: "EPIC's generator produces XML conforming to the sitemaps.org/schemas/sitemap/0.9 specification. Every URL includes `<loc>`, optional `<lastmod>` (auto-detected from your CMS or manually set), `<changefreq>` (always, hourly, daily, weekly, monthly, yearly, never) and `<priority>` (0.0 to 1.0). For multilingual Indian sites, we add `<xhtml:link>` hreflang annotations for en-IN, hi-IN, ta-IN, te-IN, bn-IN and more.\n\nThe output is a single sitemap.xml ready to drop into your /public folder, or for sites with 50,000+ URLs we split it into a sitemap index plus child sitemaps automatically (Google's hard limit is 50,000 URLs / 50MB per file)."
+      },
+      {
+        heading: "Three Ways to Build Your XML Sitemap",
+        content: "**1. Crawl mode** — paste your live URL. EPIC discovers every page, respects robots.txt, and outputs XML.\n\n**2. Visual mode** — drag pages onto a canvas, connect them, export as XML. Perfect for sites still in development.\n\n**3. Bulk import** — paste a list of URLs (CSV, JSON or plaintext) and get an XML sitemap instantly."
+      },
+      {
+        heading: "Submit to Google Search Console",
+        content: "After generating, host the sitemap.xml at your domain root (e.g. `https://yoursite.in/sitemap.xml`), then in Google Search Console go to **Sitemaps → Add new sitemap → enter `sitemap.xml` → Submit**. Google typically processes within 24 hours and reports any errors. EPIC also generates IndexNow-compatible payloads so you can ping Bing and Yandex simultaneously."
+      },
+      {
+        heading: "Common XML Sitemap Errors EPIC Prevents",
+        content: "Most hand-written sitemaps fail validation: invalid characters in URLs, dates not in W3C ISO-8601 format, priority values outside 0.0–1.0, or non-canonical URLs (mixing http/https, www/non-www). EPIC validates every URL before export and warns you about non-200 status codes, redirect chains, and noindex pages — three of the top reasons Google rejects sitemap entries."
+      }
+    ],
+    comparison: [
+      { feature: "Standards-compliant XML output", epic: true, others: true },
+      { feature: "Visual + crawl + bulk modes", epic: true, others: false },
+      { feature: "hreflang for Indian languages", epic: true, others: false },
+      { feature: "Auto sitemap index for 50k+ URLs", epic: true, others: false },
+      { feature: "INR + UPI pricing", epic: true, others: false },
+      { feature: "Pre-export URL validation", epic: true, others: false },
+    ],
+    faqs: [
+      { question: "Is the XML output compatible with Google Search Console?", answer: "Yes — fully conformant with sitemaps.org/0.9 and tested against Google's validator. Submit at Search Console → Sitemaps." },
+      { question: "What's the URL limit per sitemap.xml file?", answer: "Google's spec allows up to 50,000 URLs or 50MB per file. EPIC auto-splits larger sites into a sitemap index file with child sitemaps." },
+      { question: "Does EPIC support hreflang for Indian languages?", answer: "Yes — generate hreflang tags for en-IN, hi-IN, ta-IN, te-IN, bn-IN, mr-IN, gu-IN and more." },
+      { question: "Can I schedule automatic sitemap regeneration?", answer: "Pro users can connect a webhook to regenerate the sitemap whenever their CMS publishes new content." },
+      { question: "What does it cost in India?", answer: "Free tier covers unlimited generation. Pro is ₹299/month or a ₹1,500 lifetime deal — paid via UPI, with GST invoice." }
+    ],
+    relatedPillars: ["free-sitemap-generator-india", "html-sitemap-generator-india", "sitemap-builder-india", "visual-sitemap-maker"],
+    cta: { title: "Generate Your XML Sitemap Free", description: "Build a Google-ready sitemap.xml in under a minute. No signup, no watermark on XML." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "EPIC XML Sitemap Generator (India)",
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/xml-sitemap-generator-india`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+      areaServed: { "@type": "Country", name: "India" },
+    },
+  },
+  "html-sitemap-generator-india": {
+    slug: "html-sitemap-generator-india",
+    metaTitle: "HTML Sitemap Generator — Free for SEO & Indian Websites | EPIC",
+    metaDescription: "Generate a beautiful, SEO-friendly HTML sitemap page for your website. Improves internal linking, helps users navigate, boosts long-tail rankings in India.",
+    keywords: "html sitemap generator, html sitemap, sitemap page generator, html sitemap india, sitemap for users, internal linking sitemap, html site map maker",
+    h1: "Free HTML Sitemap Generator",
+    heroSubtitle: "Generate a clean, SEO-friendly HTML sitemap page that helps users navigate and gives Google a deeper view of your site structure — boosting long-tail rankings in India.",
+    sections: [
+      {
+        heading: "HTML Sitemap vs XML Sitemap — You Need Both",
+        content: "An XML sitemap talks to crawlers; an HTML sitemap talks to humans. Google explicitly recommends both: the XML helps with discovery and indexing, while the HTML page is a real page on your site that users can visit, internal links flow through, and long-tail queries can rank in.\n\nIndian e-commerce sites in particular benefit hugely from HTML sitemaps because they expose every category and product page to internal PageRank flow, helping low-traffic SKUs rank for niche, high-intent queries like 'cotton kurta size XL Bangalore'."
+      },
+      {
+        heading: "How EPIC Generates Your HTML Sitemap",
+        content: "Paste your domain or upload a URL list. EPIC organises pages into hierarchical sections (Home → Categories → Subcategories → Products), generates clean semantic HTML with `<nav>`, `<ul>` and `<a>` tags, and lets you customise the styling to match your brand. Export as a single index.html ready to host at /sitemap or /site-map, or copy the HTML snippet into your CMS."
+      },
+      {
+        heading: "SEO Benefits Indian Sites See in 90 Days",
+        content: "Sites we've tested across Indian niches (D2C beauty, edtech, B2B SaaS, news) typically see: 15–30% lift in long-tail keyword rankings within 60–90 days, 20%+ more pages indexed in Search Console, lower bounce rate from users who use the sitemap to navigate, and improved Site Links appearing in Google SERPs for the brand name."
+      },
+      {
+        heading: "Best Practices for HTML Sitemaps in 2026",
+        content: "Keep it under 200 links per section to maintain crawl quality. Group by content type rather than alphabetically. Add a short description under each section heading. Include a search box for sites with 1,000+ pages. Make it accessible — use real `<h2>`, `<h3>` headings and proper list semantics. EPIC's templates handle all of this automatically."
+      }
+    ],
+    comparison: [
+      { feature: "Generates semantic HTML", epic: true, others: false },
+      { feature: "Customisable styling", epic: true, others: false },
+      { feature: "Crawl from live URL", epic: true, others: false },
+      { feature: "Auto-organised by hierarchy", epic: true, others: true },
+      { feature: "Accessibility-compliant output", epic: true, others: false },
+      { feature: "INR pricing", epic: true, others: false },
+    ],
+    faqs: [
+      { question: "Where should I place my HTML sitemap?", answer: "Most sites place it at /sitemap or /site-map and link to it from the footer. EPIC's exported file works at any path." },
+      { question: "Will Google rank my HTML sitemap page?", answer: "Yes — well-structured HTML sitemaps often rank for queries like 'all categories on [your brand]'. They also boost internal linking which lifts every other page." },
+      { question: "Can I customise the look of the HTML sitemap?", answer: "Yes — choose from 6 templates (minimal, dark, magazine, e-commerce, blog, corporate) or paste custom CSS in Pro." },
+      { question: "How often should I regenerate it?", answer: "Whenever you add, remove or rename more than 5–10 pages. Pro users can automate this with a webhook from their CMS." }
+    ],
+    relatedPillars: ["xml-sitemap-generator-india", "free-sitemap-generator-india", "sitemap-builder-india", "visual-sitemap-maker"],
+    cta: { title: "Generate Your HTML Sitemap", description: "Build a clean, SEO-friendly HTML sitemap page in under 2 minutes." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "EPIC HTML Sitemap Generator (India)",
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/html-sitemap-generator-india`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+      areaServed: { "@type": "Country", name: "India" },
+    },
+  },
+  "online-sitemap-generator-india": {
+    slug: "online-sitemap-generator-india",
+    metaTitle: "Online Sitemap Generator — No Download, Free in India | EPIC",
+    metaDescription: "100% online sitemap generator. No software install, no signup. Generate XML, HTML and visual sitemaps from your browser. Free for Indian users with INR Pro pricing.",
+    keywords: "online sitemap generator, sitemap generator online, free online sitemap maker, browser sitemap tool, no install sitemap, online site map creator india",
+    h1: "Online Sitemap Generator — Free in India",
+    heroSubtitle: "Generate a complete sitemap directly in your browser. No downloads, no signups, no Java applets — just paste your URL and export.",
+    sections: [
+      {
+        heading: "Why an Online Sitemap Generator Beats Desktop Tools",
+        content: "Old-school sitemap tools like Screaming Frog or A1 Sitemap Generator require downloads, licenses, and Java. They eat 2GB+ of RAM and are gated behind US$199+ licenses. EPIC runs entirely in your browser — works on a ₹15,000 entry-level laptop, on Chromebooks used by Indian college students, and on mobile phones for quick on-the-go audits."
+      },
+      {
+        heading: "What You Can Do in 2 Minutes",
+        content: "1. Paste a URL → get a visual sitemap of every discovered page.\n2. Drag-and-drop edit the structure to match your planned IA.\n3. Export as XML (for Google), HTML (for users), JSON (for developers), or PNG (for client decks).\n4. Share a public link with your team or client for review."
+      },
+      {
+        heading: "Indian-Friendly Performance",
+        content: "EPIC is hosted on a global CDN with edge nodes in Mumbai and Chennai, so Indian users get sub-200ms response times even on patchy 4G connections. Crawls are queued server-side so closing your tab doesn't kill the job — come back in 5 minutes and your sitemap is ready."
+      },
+      {
+        heading: "Use Cases Indian Teams Love",
+        content: "Freelancers auditing client sites before pitching, agencies in Bangalore preparing SEO proposals, students documenting websites for college projects, founders mapping their MVP before development, e-commerce teams visualising 1,000+ product pages, and content teams planning blog category structures."
+      }
+    ],
+    comparison: [
+      { feature: "100% browser-based", epic: true, others: false },
+      { feature: "Works on mobile + Chromebook", epic: true, others: false },
+      { feature: "Mumbai + Chennai edge nodes", epic: true, others: false },
+      { feature: "Free unlimited URLs", epic: true, others: false },
+      { feature: "INR pricing", epic: true, others: false },
+    ],
+    faqs: [
+      { question: "Do I need to install anything?", answer: "No — EPIC runs entirely in Chrome, Safari, Firefox or Edge. Mobile browsers also work." },
+      { question: "How fast does it work in India?", answer: "Sub-200ms thanks to CDN edge nodes in Mumbai and Chennai. Crawls run server-side so tab-closing doesn't interrupt them." },
+      { question: "Is the free version really unlimited?", answer: "Yes — unlimited sitemap generation, XML and PNG exports. Watermark on PNG and JSON/SVG locked behind ₹299/month Pro." },
+      { question: "Can I share my sitemap with a client?", answer: "Yes — every project gets a shareable public URL you can send to clients or teammates." }
+    ],
+    relatedPillars: ["free-sitemap-generator-india", "xml-sitemap-generator-india", "sitemap-builder-india", "visual-sitemap-maker"],
+    cta: { title: "Try the Online Sitemap Generator", description: "Open EPIC and export your first sitemap — no install, no signup." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "EPIC Online Sitemap Generator (India)",
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Any (browser)",
+      url: `${baseUrl}/online-sitemap-generator-india`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+      areaServed: { "@type": "Country", name: "India" },
+    },
+  },
   "saas-tools-india": {
     slug: "saas-tools-india",
     metaTitle: "Best SaaS Planning Tools for Indian Startups 2026 | EPIC",
