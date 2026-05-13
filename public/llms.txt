@@ -1,0 +1,29 @@
+# EPIC
+
+> EPIC is a free visual sitemap builder and design tool. Plan website structure, export developer-ready JSON sitemaps, and create professional graphics — built for founders, developers, and UX designers.
+
+## Pages
+
+- [Home](/): Visual sitemap builder and design platform overview.
+- [Sitemap Builder](/navigation-maker): Drag-and-drop visual sitemap maker with UX scoring and JSON/PNG export.
+- [Website Analyzer](/analyzer): Crawl any site and generate a visual sitemap automatically.
+- [Sitemap Library](/sitemaps): Public gallery of community-shared website sitemaps.
+- [Examples](/examples): Real sitemap examples across industries.
+- [Blog](/blog): Articles on UX, sitemap design, and website planning.
+- [Pricing (India)](/pricing-india): INR plans with UPI checkout for Indian users.
+- [Pricing (International)](/pricing-international): USD plans for global users.
+- [About](/about): What EPIC is and who it's for.
+- [Contact](/contact): Reach the EPIC team.
+- [Roadmap](/roadmap): Upcoming features.
+- [Changelog](/changelog): Recent product updates.
+
+## India-focused landing pages
+
+- [Sitemap Builder India](/sitemap-builder-india): Sitemap builder optimized for Indian founders and agencies.
+- [Website Planner for Students (India)](/website-planner-for-students-india): For Indian university students planning websites.
+- [SaaS Tools India](/saas-tools-india): SaaS planning tools with INR pricing.
+
+## Optional
+
+- [Privacy](/privacy): Privacy policy.
+- [Terms](/terms): Terms of service.
