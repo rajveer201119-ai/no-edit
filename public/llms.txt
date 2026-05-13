@@ -19,6 +19,10 @@
 
 ## India-focused landing pages
 
+- [Free Sitemap Generator India](/free-sitemap-generator-india): Free unlimited XML/HTML sitemap generation with INR pricing.
+- [XML Sitemap Generator India](/xml-sitemap-generator-india): Google-ready sitemap.xml with hreflang for Indian languages.
+- [HTML Sitemap Generator India](/html-sitemap-generator-india): SEO-friendly HTML sitemap pages for users + crawlers.
+- [Online Sitemap Generator India](/online-sitemap-generator-india): 100% browser-based, optimized for Indian network conditions.
 - [Sitemap Builder India](/sitemap-builder-india): Sitemap builder optimized for Indian founders and agencies.
 - [Website Planner for Students (India)](/website-planner-for-students-india): For Indian university students planning websites.
 - [SaaS Tools India](/saas-tools-india): SaaS planning tools with INR pricing.
