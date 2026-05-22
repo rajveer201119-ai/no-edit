@@ -24,6 +24,15 @@ export function WebGLShader() {
   useEffect(() => {
     if (!canvasRef.current) return
 
+    // Respect reduced-motion preference and skip on low-power devices.
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches
+    const lowPower =
+      typeof navigator !== "undefined" &&
+      ((navigator as any).deviceMemory && (navigator as any).deviceMemory <= 2)
+    if (prefersReducedMotion || lowPower) return
+
     const canvas = canvasRef.current
     const { current: refs } = sceneRef
 
@@ -61,8 +70,9 @@ export function WebGLShader() {
 
     const initScene = () => {
       refs.scene = new THREE.Scene()
-      refs.renderer = new THREE.WebGLRenderer({ canvas })
-      refs.renderer.setPixelRatio(window.devicePixelRatio)
+      refs.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: "low-power" })
+      // Cap DPR at 1.5 to avoid GPU thrash on retina/mobile displays.
+      refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
       refs.renderer.setClearColor(new THREE.Color(0x000000))
 
       refs.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, -1)
@@ -102,6 +112,11 @@ export function WebGLShader() {
     }
 
     const animate = () => {
+      // Pause when tab not visible to save battery.
+      if (typeof document !== "undefined" && document.hidden) {
+        refs.animationId = requestAnimationFrame(animate)
+        return
+      }
       if (refs.uniforms) refs.uniforms.time.value += 0.01
       if (refs.renderer && refs.scene && refs.camera) {
         refs.renderer.render(refs.scene, refs.camera)
@@ -138,6 +153,7 @@ export function WebGLShader() {
   return (
     <canvas
       ref={canvasRef}
+      aria-hidden="true"
       className="fixed top-0 left-0 w-full h-full block -z-10"
     />
   )
