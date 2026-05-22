@@ -418,7 +418,7 @@ const Index = () => {
   const renderUserMenu = () => (
     <div className="flex items-center gap-1 md:gap-2">
       {isInstallable && !isMobile && (
-        <Button variant="ghost" size="icon" onClick={promptInstall} title="Install App" className="h-9 w-9">
+        <Button variant="ghost" size="icon" onClick={promptInstall} title="Install App" aria-label="Install app" className="h-9 w-9">
           <Download className="h-4 w-4" />
         </Button>
       )}
@@ -441,7 +441,8 @@ const Index = () => {
         variant="ghost" 
         size="icon" 
         onClick={() => setShowProDialog(true)} 
-        title="Creator Mode" 
+        title="Creator Mode"
+        aria-label="Open Creator Mode"
         className="h-9 w-9 text-primary hover:text-primary/80"
       >
         <Crown className="h-4 w-4" />
@@ -449,7 +450,7 @@ const Index = () => {
 
       {/* Admin Button - visible on all screens if admin */}
       {isAdmin && (
-        <Button variant="ghost" size="icon" onClick={() => navigate("/admin")} title="Admin" className="h-9 w-9">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/admin")} title="Admin" aria-label="Admin dashboard" className="h-9 w-9">
           <Shield className="h-4 w-4" />
         </Button>
       )}
@@ -460,7 +461,7 @@ const Index = () => {
       <ThemeToggle />
 
       {isAuthed ? (
-        <Button variant="ghost" size="icon" onClick={signOut} title="Sign Out" className="h-9 w-9">
+        <Button variant="ghost" size="icon" onClick={signOut} title="Sign Out" aria-label="Sign out" className="h-9 w-9">
           <LogOut className="h-4 w-4" />
         </Button>
       ) : (
