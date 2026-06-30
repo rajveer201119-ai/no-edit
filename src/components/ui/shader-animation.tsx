@@ -18,6 +18,15 @@ export function ShaderAnimation() {
 
     const container = containerRef.current
 
+    // Respect reduced motion / very low memory devices.
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches
+    const lowPower =
+      typeof navigator !== "undefined" &&
+      (navigator as any).deviceMemory && (navigator as any).deviceMemory <= 2
+    if (prefersReducedMotion || lowPower) return
+
     // Vertex shader
     const vertexShader = `
       void main() {
@@ -71,27 +80,37 @@ export function ShaderAnimation() {
     const mesh = new THREE.Mesh(geometry, material)
     scene.add(mesh)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true })
-    renderer.setPixelRatio(window.devicePixelRatio)
-
-    container.appendChild(renderer.domElement)
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "low-power" })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
+    const canvasEl = renderer.domElement
+    canvasEl.style.display = "block"
+    canvasEl.style.width = "100%"
+    canvasEl.style.height = "100%"
+    container.appendChild(canvasEl)
 
     // Handle window resize
     const onWindowResize = () => {
-      const width = container.clientWidth
-      const height = container.clientHeight
-      renderer.setSize(width, height)
-      uniforms.resolution.value.x = renderer.domElement.width
-      uniforms.resolution.value.y = renderer.domElement.height
+      const width = container.clientWidth || window.innerWidth
+      const height = container.clientHeight || window.innerHeight
+      renderer.setSize(width, height, false)
+      uniforms.resolution.value.x = width * renderer.getPixelRatio()
+      uniforms.resolution.value.y = height * renderer.getPixelRatio()
     }
 
-    // Initial resize
+    // Initial resize (defer to next frame so layout is measured).
     onWindowResize()
+    requestAnimationFrame(onWindowResize)
     window.addEventListener("resize", onWindowResize, false)
+    const ro = new ResizeObserver(onWindowResize)
+    ro.observe(container)
 
     // Animation loop
     const animate = () => {
       const animationId = requestAnimationFrame(animate)
+      if (typeof document !== "undefined" && document.hidden) {
+        if (sceneRef.current) sceneRef.current.animationId = animationId
+        return
+      }
       uniforms.time.value += 0.05
       renderer.render(scene, camera)
 
@@ -115,6 +134,7 @@ export function ShaderAnimation() {
     // Cleanup function
     return () => {
       window.removeEventListener("resize", onWindowResize)
+      ro.disconnect()
 
       if (sceneRef.current) {
         cancelAnimationFrame(sceneRef.current.animationId)
@@ -133,7 +153,7 @@ export function ShaderAnimation() {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full"
+      className="w-full h-full absolute inset-0"
       style={{
         background: "#000",
         overflow: "hidden",
