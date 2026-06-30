@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO, pricingPageSchema } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
-import { WebGLShader } from "@/components/ui/web-gl-shader";
+import { ShaderAnimation } from "@/components/ui/shader-animation";
 import { UPIPaymentDialog } from "@/components/UPIPaymentDialog";
 
 const PricingIndia = () => {
