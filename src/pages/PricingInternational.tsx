@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Check, Crown, Zap, Shield, Lock, X } from "lucide-react";
 import { SEO, pricingPageSchema } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
-import { WebGLShader } from "@/components/ui/web-gl-shader";
+import { ShaderAnimation } from "@/components/ui/shader-animation";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -78,7 +78,7 @@ const PricingInternational = () => {
         ]}
       />
       <div className="min-h-screen bg-background relative">
-        <WebGLShader />
+        <div className="absolute inset-0 z-0"><ShaderAnimation /></div>
 
         <div className="relative z-10 container mx-auto px-4 py-12">
           <Button variant="outline" onClick={() => navigate("/")} className="mb-8 backdrop-blur-sm bg-background/20 border-border/50">
