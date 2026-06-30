@@ -79,7 +79,13 @@ export function ShaderAnimation() {
     const mesh = new THREE.Mesh(geometry, material)
     scene.add(mesh)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "low-power" })
+    let renderer: THREE.WebGLRenderer
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "default" })
+    } catch (err) {
+      console.error("[ShaderAnimation] WebGL init failed", err)
+      return
+    }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
     const canvasEl = renderer.domElement
     canvasEl.style.display = "block"
