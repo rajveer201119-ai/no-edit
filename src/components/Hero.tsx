@@ -22,8 +22,8 @@ export const Hero = () => {
       className="relative mx-auto w-full pt-24 md:pt-40 px-6 text-center md:px-8 
       min-h-[calc(100vh-40px)] overflow-hidden rounded-b-xl"
     >
-      <div className="absolute inset-0 -z-20"><ShaderAnimation /></div>
-      <div className="absolute inset-0 -z-10 bg-black/40 backdrop-blur-[2px]" />
+      <div className="absolute inset-0 z-0"><ShaderAnimation /></div>
+      <div className="absolute inset-0 z-[1] bg-black/30 backdrop-blur-[1px] pointer-events-none" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white/[0.02] to-transparent" />
 
       {/* Whiteboard-style faint grid */}
