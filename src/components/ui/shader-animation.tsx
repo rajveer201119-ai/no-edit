@@ -18,14 +18,13 @@ export function ShaderAnimation() {
 
     const container = containerRef.current
 
-    // Respect reduced motion / very low memory devices.
-    const prefersReducedMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches
+    // Only bail on truly low-memory devices (<=1GB). Reduced-motion users
+    // still get the static-feeling slow shader; bailing entirely left the
+    // background black for too many real users in production.
     const lowPower =
       typeof navigator !== "undefined" &&
-      (navigator as any).deviceMemory && (navigator as any).deviceMemory <= 2
-    if (prefersReducedMotion || lowPower) return
+      (navigator as any).deviceMemory && (navigator as any).deviceMemory <= 1
+    if (lowPower) return
 
     // Vertex shader
     const vertexShader = `
