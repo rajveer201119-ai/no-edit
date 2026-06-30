@@ -22,13 +22,13 @@ export const Hero = () => {
       className="relative mx-auto w-full pt-24 md:pt-40 px-6 text-center md:px-8 
       min-h-[calc(100vh-40px)] overflow-hidden rounded-b-xl"
     >
-      <div className="absolute inset-0 -z-20"><ShaderAnimation /></div>
-      <div className="absolute inset-0 -z-10 bg-black/40 backdrop-blur-[2px]" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white/[0.02] to-transparent" />
+      <div className="absolute inset-0 z-0"><ShaderAnimation /></div>
+      <div className="absolute inset-0 z-[1] bg-black/30 backdrop-blur-[1px] pointer-events-none" />
+      <div className="absolute inset-0 z-[2] pointer-events-none bg-gradient-to-b from-white/[0.02] to-transparent" />
 
       {/* Whiteboard-style faint grid */}
       <div
-        className="absolute inset-0 -z-10 opacity-[0.12] pointer-events-none"
+        className="absolute inset-0 z-[2] opacity-[0.12] pointer-events-none"
         style={{
           backgroundImage:
             "linear-gradient(to right, hsla(0,0%,100%,0.08) 1px, transparent 1px), linear-gradient(to bottom, hsla(0,0%,100%,0.08) 1px, transparent 1px)",
@@ -42,7 +42,7 @@ export const Hero = () => {
 
       {/* Soft grain / noise texture */}
       <div
-        className="absolute inset-0 -z-10 opacity-[0.08] mix-blend-overlay pointer-events-none"
+        className="absolute inset-0 z-[2] opacity-[0.08] mix-blend-overlay pointer-events-none"
         style={{
           backgroundImage:
             "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
@@ -51,7 +51,7 @@ export const Hero = () => {
       />
 
       {/* Floating decorative shapes */}
-      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 z-[2] overflow-hidden pointer-events-none">
         <div className="absolute top-[12%] left-[8%] w-24 h-24 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-primary/30 to-transparent blur-2xl animate-[float_9s_ease-in-out_infinite]" />
         <div className="absolute top-[22%] right-[10%] w-28 h-28 md:w-44 md:h-44 rounded-3xl rotate-12 bg-gradient-to-br from-accent/25 to-transparent blur-2xl animate-[float_11s_ease-in-out_infinite_reverse]" />
         <div className="absolute bottom-[18%] left-[14%] w-20 h-20 md:w-32 md:h-32 rounded-2xl -rotate-6 border border-white/15 bg-white/[0.03] backdrop-blur-md animate-[float_13s_ease-in-out_infinite]" />

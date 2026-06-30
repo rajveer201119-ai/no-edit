@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { WebGLShader } from "@/components/ui/web-gl-shader";
+import { ShaderAnimation } from "@/components/ui/shader-animation";
 import {
   Network, CheckCircle, FileJson, GitBranch, MousePointerClick, Grip,
   Play, Globe, Zap, Users, Shield, Crown, ArrowRight, Star,
@@ -75,8 +75,8 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
     <div className="w-full">
       {/* ═══════ HERO — CRO Optimized ═══════ */}
       <section className="relative mx-auto w-full pt-28 md:pt-44 px-6 text-center min-h-[calc(100vh-64px)] overflow-hidden flex flex-col items-center justify-center">
-        <div className="absolute inset-0 -z-20"><WebGLShader /></div>
-        <div className="absolute inset-0 -z-10 bg-black/20 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 z-0"><ShaderAnimation /></div>
+        <div className="absolute inset-0 z-[1] bg-black/30 backdrop-blur-[1px] pointer-events-none" />
 
         {/* Headline — outcome-focused, single clear message */}
         
