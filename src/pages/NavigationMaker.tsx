@@ -1399,7 +1399,7 @@ const NavigationMaker = () => {
             <UXScorePanel nodes={nodes} connections={connections} visible={showUXScore} onClose={() => setShowUXScore(false)} isPremium={isPremium} onUpgrade={() => setShowPaywall(true)} />
             <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px] origin-top-left transition-transform duration-150" style={{ transform: `scale(${zoomLevel})` }}>
               {/* SVG Connections — Curved Bezier lines */}
-              <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0">
+              <svg ref={svgRef} className="absolute inset-0 w-full h-full z-0" style={{ pointerEvents: "none" }}>
                 <defs>
                   <linearGradient id="conn-gradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.85" />
@@ -1419,41 +1419,69 @@ const NavigationMaker = () => {
                   const tx = to.x + nodeW / 2;
                   const ty = to.y;
                   const midY = (fy + ty) / 2;
+                  const d = `M ${fx} ${fy} C ${fx} ${midY}, ${tx} ${midY}, ${tx} ${ty}`;
                   
                   return (
-                    <g key={conn.id}>
+                    <g key={conn.id} style={{ pointerEvents: "auto", cursor: "pointer" }}>
+                      {/* Invisible fat hit target for easy clicking */}
+                      <path
+                        d={d}
+                        fill="none"
+                        stroke="transparent"
+                        strokeWidth={16}
+                      >
+                        <title>Click to delete connection</title>
+                      </path>
                       {/* Subtle base line for depth */}
                       <path
-                        d={`M ${fx} ${fy} C ${fx} ${midY}, ${tx} ${midY}, ${tx} ${ty}`}
+                        d={d}
                         fill="none"
                         stroke="url(#conn-gradient)"
                         strokeWidth={2.5}
                         strokeLinecap="round"
                         opacity={0.35}
+                        style={{ pointerEvents: "none" }}
                       />
                       {/* Animated flowing dashes */}
                       <path
-                        d={`M ${fx} ${fy} C ${fx} ${midY}, ${tx} ${midY}, ${tx} ${ty}`}
+                        d={d}
                         fill="none"
                         stroke="url(#conn-gradient)"
                         strokeWidth={2.5}
                         strokeLinecap="round"
                         className="connection-flow"
+                        style={{ pointerEvents: "none" }}
                       />
                       {/* Connection end dot */}
-                      <circle cx={tx} cy={ty} r={4} fill="hsl(var(--primary))" />
-                      <circle cx={fx} cy={fy} r={4} fill="hsl(var(--accent))" />
+                      <circle cx={tx} cy={ty} r={4} fill="hsl(var(--primary))" style={{ pointerEvents: "none" }} />
+                      <circle cx={fx} cy={fy} r={4} fill="hsl(var(--accent))" style={{ pointerEvents: "none" }} />
+                      {/* Delete-on-click overlay (visible on hover of the group) */}
+                      <g
+                        onClick={(e) => { e.stopPropagation(); removeConnection(conn.id); }}
+                        className="opacity-0 hover:opacity-100 transition-opacity"
+                      >
+                        <circle cx={(fx + tx) / 2} cy={(fy + ty) / 2} r={10} fill="hsl(var(--destructive))" />
+                        <text
+                          x={(fx + tx) / 2}
+                          y={(fy + ty) / 2 + 4}
+                          textAnchor="middle"
+                          fill="hsl(var(--destructive-foreground))"
+                          style={{ fontSize: "12px", fontWeight: 700, pointerEvents: "none", userSelect: "none" }}
+                        >
+                          ×
+                        </text>
+                      </g>
                       {/* Connection label */}
                       {conn.label && (
-                        <g>
+                        <g style={{ pointerEvents: "none" }}>
                           <rect
                             x={(fx + tx) / 2 - conn.label.length * 3 - 6}
                             y={(fy + ty) / 2 - 9}
                             width={conn.label.length * 6 + 12}
                             height={18}
                             rx={9}
-                            fill="white"
-                            stroke="#e5e7eb"
+                            fill="hsl(var(--card))"
+                            stroke="hsl(var(--border))"
                             strokeWidth={1}
                             opacity={0.95}
                           />
@@ -1461,8 +1489,7 @@ const NavigationMaker = () => {
                             x={(fx + tx) / 2}
                             y={(fy + ty) / 2 + 3}
                             textAnchor="middle"
-                            className="text-[9px] fill-muted-foreground"
-                            style={{ fontSize: "9px", fill: "#6b7280" }}
+                            style={{ fontSize: "9px", fill: "hsl(var(--muted-foreground))" }}
                           >
                             {conn.label}
                           </text>
