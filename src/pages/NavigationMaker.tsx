@@ -586,6 +586,47 @@ const NavigationMaker = () => {
   const zoomOut = useCallback(() => setZoomLevel(z => Math.max(0.3, z - 0.15)), []);
   const zoomReset = useCallback(() => setZoomLevel(1), []);
 
+  // Delete a connection by id
+  const removeConnection = useCallback((connId: string) => {
+    const newConns = connections.filter(c => c.id !== connId);
+    setConnections(newConns);
+    pushHistory(nodes, newConns);
+    toast.success("Connection removed");
+  }, [connections, nodes, pushHistory]);
+
+  // Keyboard shortcuts (declared here so duplicateNode/deleteSelected are in scope)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      const typing =
+        tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" ||
+        (target?.isContentEditable ?? false);
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        if (e.shiftKey) redo();
+        else undo();
+        return;
+      }
+      if (typing) return;
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "d") {
+        if (selectedNode) { e.preventDefault(); duplicateNode(selectedNode); }
+        return;
+      }
+      if (e.key === "Delete" || e.key === "Backspace") {
+        if (selectedNodes.size > 0) { e.preventDefault(); deleteSelected(); return; }
+        if (selectedNode) { e.preventDefault(); removeNode(selectedNode); setSelectedNode(null); return; }
+      }
+      if (e.key === "Escape") {
+        if (connectingFrom) { setConnectingFrom(null); setConnectionLabel(""); return; }
+        if (selectedNode) { setSelectedNode(null); return; }
+        if (selectedNodes.size > 0) { setSelectedNodes(new Set()); return; }
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [undo, redo, selectedNode, selectedNodes, connectingFrom, duplicateNode, deleteSelected]);
+
   // Track if a touch was a drag or a tap
   const touchDraggedRef = useRef(false);
 
