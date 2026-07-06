@@ -406,41 +406,7 @@ const NavigationMaker = () => {
     setHistoryIndex(i => i + 1);
   }, [historyIndex, history]);
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      const tag = target?.tagName;
-      const typing =
-        tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" ||
-        (target && (target as HTMLElement).isContentEditable);
-      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
-        e.preventDefault();
-        if (e.shiftKey) redo();
-        else undo();
-        return;
-      }
-      if (typing) return;
-      // Duplicate selected (Ctrl/Cmd+D)
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "d") {
-        if (selectedNode) { e.preventDefault(); duplicateNode(selectedNode); }
-        return;
-      }
-      // Delete / Backspace removes selected node(s)
-      if (e.key === "Delete" || e.key === "Backspace") {
-        if (selectedNodes.size > 0) { e.preventDefault(); deleteSelected(); return; }
-        if (selectedNode) { e.preventDefault(); removeNode(selectedNode); setSelectedNode(null); return; }
-      }
-      // Escape cancels connect / clears selection
-      if (e.key === "Escape") {
-        if (connectingFrom) { setConnectingFrom(null); setConnectionLabel(""); return; }
-        if (selectedNode) { setSelectedNode(null); return; }
-        if (selectedNodes.size > 0) { setSelectedNodes(new Set()); return; }
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [undo, redo, selectedNode, selectedNodes, connectingFrom, duplicateNode, deleteSelected]);
+  // (Keyboard shortcuts effect declared later, after duplicateNode/deleteSelected exist.)
 
   // Builder mode filters the palette: Sitemap hides "User Flow", Flow shows only it.
   const modeFilteredPages = stockPages.filter(p =>
