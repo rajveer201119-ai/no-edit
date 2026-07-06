@@ -1053,13 +1053,13 @@ const NavigationMaker = () => {
           {connectingFrom && (
             <div className="hidden md:flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg">
               <Input 
-                placeholder="Link label..." 
+                placeholder="Link label (optional)…"
                 value={connectionLabel}
                 onChange={e => setConnectionLabel(e.target.value)}
                 className="w-28 h-7 text-xs border-blue-200 dark:border-blue-500/30"
               />
-              <span className="text-xs text-blue-600 dark:text-blue-400 animate-pulse whitespace-nowrap">Click target node...</span>
-              <Button size="sm" variant="ghost" onClick={() => setConnectingFrom(null)} className="h-7 text-xs">Cancel</Button>
+              <span className="text-xs text-blue-600 dark:text-blue-400 animate-pulse whitespace-nowrap">Click target node… (Esc to cancel)</span>
+              <Button size="sm" variant="ghost" onClick={() => { setConnectingFrom(null); setConnectionLabel(""); }} className="h-7 text-xs">Cancel</Button>
             </div>
           )}
 
