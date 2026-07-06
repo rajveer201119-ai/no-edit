@@ -434,8 +434,11 @@ const NavigationMaker = () => {
     : stockPages[0];
 
   const addPageToCanvas = (page: typeof stockPages[0]) => {
-    const existing = nodes.find(n => n.pageId === page.id);
-    if (existing) { toast.info(`${page.label} already on canvas`); return; }
+    // Allow the same page/flow-step type to be added multiple times.
+    // Sitemap pages get a numeric suffix when duplicated; flow steps are always
+    // treated as fresh instances (a real user flow often has many "Page" or "Action" nodes).
+    const sameTypeCount = nodes.filter(n => n.pageId === page.id).length;
+    const suffix = sameTypeCount > 0 ? ` ${sameTypeCount + 1}` : "";
     // Enforce page limit for free users
     if (!isPremium && nodes.length >= maxPages) {
       toast.error(`Free plan: ${maxPages} pages max. Upgrade to Pro for unlimited pages.`);
@@ -445,19 +448,20 @@ const NavigationMaker = () => {
     const newNode: CanvasNode = {
       id: `node-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       pageId: page.id,
-      label: page.label,
-      x: 100 + Math.random() * 400,
-      y: 100 + Math.random() * 300,
+      label: `${page.label}${suffix}`,
+      // Stack new nodes in a neat cascade instead of random scatter
+      x: 120 + (nodes.length % 6) * 40,
+      y: 100 + (nodes.length % 6) * 40,
       color: "hsl(var(--foreground))",
       pageType: page.category === "Auth" ? "Auth" : page.category === "Dashboard" ? "Dashboard" : "Content",
-      slug: `/${page.id}`,
+      slug: sameTypeCount > 0 ? `/${page.id}-${sameTypeCount + 1}` : `/${page.id}`,
       colorTag: "none",
       sections: getDefaultSections(page.id),
     };
     const newNodes = [...nodes, newNode];
     setNodes(newNodes);
     pushHistory(newNodes, connections);
-    toast.success(`Added ${page.label}`);
+    toast.success(`Added ${page.label}${suffix}`);
   };
 
   const removeNode = (nodeId: string) => {
