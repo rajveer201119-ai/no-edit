@@ -406,18 +406,7 @@ const NavigationMaker = () => {
     setHistoryIndex(i => i + 1);
   }, [historyIndex, history]);
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
-        e.preventDefault();
-        if (e.shiftKey) redo();
-        else undo();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [undo, redo]);
+  // (Keyboard shortcuts effect declared later, after duplicateNode/deleteSelected exist.)
 
   // Builder mode filters the palette: Sitemap hides "User Flow", Flow shows only it.
   const modeFilteredPages = stockPages.filter(p =>
@@ -434,8 +423,11 @@ const NavigationMaker = () => {
     : stockPages[0];
 
   const addPageToCanvas = (page: typeof stockPages[0]) => {
-    const existing = nodes.find(n => n.pageId === page.id);
-    if (existing) { toast.info(`${page.label} already on canvas`); return; }
+    // Allow the same page/flow-step type to be added multiple times.
+    // Sitemap pages get a numeric suffix when duplicated; flow steps are always
+    // treated as fresh instances (a real user flow often has many "Page" or "Action" nodes).
+    const sameTypeCount = nodes.filter(n => n.pageId === page.id).length;
+    const suffix = sameTypeCount > 0 ? ` ${sameTypeCount + 1}` : "";
     // Enforce page limit for free users
     if (!isPremium && nodes.length >= maxPages) {
       toast.error(`Free plan: ${maxPages} pages max. Upgrade to Pro for unlimited pages.`);
@@ -445,19 +437,20 @@ const NavigationMaker = () => {
     const newNode: CanvasNode = {
       id: `node-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       pageId: page.id,
-      label: page.label,
-      x: 100 + Math.random() * 400,
-      y: 100 + Math.random() * 300,
+      label: `${page.label}${suffix}`,
+      // Stack new nodes in a neat cascade instead of random scatter
+      x: 120 + (nodes.length % 6) * 40,
+      y: 100 + (nodes.length % 6) * 40,
       color: "hsl(var(--foreground))",
       pageType: page.category === "Auth" ? "Auth" : page.category === "Dashboard" ? "Dashboard" : "Content",
-      slug: `/${page.id}`,
+      slug: sameTypeCount > 0 ? `/${page.id}-${sameTypeCount + 1}` : `/${page.id}`,
       colorTag: "none",
       sections: getDefaultSections(page.id),
     };
     const newNodes = [...nodes, newNode];
     setNodes(newNodes);
     pushHistory(newNodes, connections);
-    toast.success(`Added ${page.label}`);
+    toast.success(`Added ${page.label}${suffix}`);
   };
 
   const removeNode = (nodeId: string) => {
@@ -592,6 +585,47 @@ const NavigationMaker = () => {
   const zoomIn = useCallback(() => setZoomLevel(z => Math.min(2, z + 0.15)), []);
   const zoomOut = useCallback(() => setZoomLevel(z => Math.max(0.3, z - 0.15)), []);
   const zoomReset = useCallback(() => setZoomLevel(1), []);
+
+  // Delete a connection by id
+  const removeConnection = useCallback((connId: string) => {
+    const newConns = connections.filter(c => c.id !== connId);
+    setConnections(newConns);
+    pushHistory(nodes, newConns);
+    toast.success("Connection removed");
+  }, [connections, nodes, pushHistory]);
+
+  // Keyboard shortcuts (declared here so duplicateNode/deleteSelected are in scope)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      const typing =
+        tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" ||
+        (target?.isContentEditable ?? false);
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        if (e.shiftKey) redo();
+        else undo();
+        return;
+      }
+      if (typing) return;
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "d") {
+        if (selectedNode) { e.preventDefault(); duplicateNode(selectedNode); }
+        return;
+      }
+      if (e.key === "Delete" || e.key === "Backspace") {
+        if (selectedNodes.size > 0) { e.preventDefault(); deleteSelected(); return; }
+        if (selectedNode) { e.preventDefault(); removeNode(selectedNode); setSelectedNode(null); return; }
+      }
+      if (e.key === "Escape") {
+        if (connectingFrom) { setConnectingFrom(null); setConnectionLabel(""); return; }
+        if (selectedNode) { setSelectedNode(null); return; }
+        if (selectedNodes.size > 0) { setSelectedNodes(new Set()); return; }
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [undo, redo, selectedNode, selectedNodes, connectingFrom, duplicateNode, deleteSelected]);
 
   // Track if a touch was a drag or a tap
   const touchDraggedRef = useRef(false);
@@ -1019,13 +1053,13 @@ const NavigationMaker = () => {
           {connectingFrom && (
             <div className="hidden md:flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg">
               <Input 
-                placeholder="Link label..." 
+                placeholder="Link label (optional)…"
                 value={connectionLabel}
                 onChange={e => setConnectionLabel(e.target.value)}
                 className="w-28 h-7 text-xs border-blue-200 dark:border-blue-500/30"
               />
-              <span className="text-xs text-blue-600 dark:text-blue-400 animate-pulse whitespace-nowrap">Click target node...</span>
-              <Button size="sm" variant="ghost" onClick={() => setConnectingFrom(null)} className="h-7 text-xs">Cancel</Button>
+              <span className="text-xs text-blue-600 dark:text-blue-400 animate-pulse whitespace-nowrap">Click target node… (Esc to cancel)</span>
+              <Button size="sm" variant="ghost" onClick={() => { setConnectingFrom(null); setConnectionLabel(""); }} className="h-7 text-xs">Cancel</Button>
             </div>
           )}
 
@@ -1365,7 +1399,7 @@ const NavigationMaker = () => {
             <UXScorePanel nodes={nodes} connections={connections} visible={showUXScore} onClose={() => setShowUXScore(false)} isPremium={isPremium} onUpgrade={() => setShowPaywall(true)} />
             <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px] origin-top-left transition-transform duration-150" style={{ transform: `scale(${zoomLevel})` }}>
               {/* SVG Connections — Curved Bezier lines */}
-              <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0">
+              <svg ref={svgRef} className="absolute inset-0 w-full h-full z-0" style={{ pointerEvents: "none" }}>
                 <defs>
                   <linearGradient id="conn-gradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.85" />
@@ -1385,41 +1419,69 @@ const NavigationMaker = () => {
                   const tx = to.x + nodeW / 2;
                   const ty = to.y;
                   const midY = (fy + ty) / 2;
+                  const d = `M ${fx} ${fy} C ${fx} ${midY}, ${tx} ${midY}, ${tx} ${ty}`;
                   
                   return (
-                    <g key={conn.id}>
+                    <g key={conn.id} style={{ pointerEvents: "auto", cursor: "pointer" }}>
+                      {/* Invisible fat hit target for easy clicking */}
+                      <path
+                        d={d}
+                        fill="none"
+                        stroke="transparent"
+                        strokeWidth={16}
+                      >
+                        <title>Click to delete connection</title>
+                      </path>
                       {/* Subtle base line for depth */}
                       <path
-                        d={`M ${fx} ${fy} C ${fx} ${midY}, ${tx} ${midY}, ${tx} ${ty}`}
+                        d={d}
                         fill="none"
                         stroke="url(#conn-gradient)"
                         strokeWidth={2.5}
                         strokeLinecap="round"
                         opacity={0.35}
+                        style={{ pointerEvents: "none" }}
                       />
                       {/* Animated flowing dashes */}
                       <path
-                        d={`M ${fx} ${fy} C ${fx} ${midY}, ${tx} ${midY}, ${tx} ${ty}`}
+                        d={d}
                         fill="none"
                         stroke="url(#conn-gradient)"
                         strokeWidth={2.5}
                         strokeLinecap="round"
                         className="connection-flow"
+                        style={{ pointerEvents: "none" }}
                       />
                       {/* Connection end dot */}
-                      <circle cx={tx} cy={ty} r={4} fill="hsl(var(--primary))" />
-                      <circle cx={fx} cy={fy} r={4} fill="hsl(var(--accent))" />
+                      <circle cx={tx} cy={ty} r={4} fill="hsl(var(--primary))" style={{ pointerEvents: "none" }} />
+                      <circle cx={fx} cy={fy} r={4} fill="hsl(var(--accent))" style={{ pointerEvents: "none" }} />
+                      {/* Delete-on-click overlay (visible on hover of the group) */}
+                      <g
+                        onClick={(e) => { e.stopPropagation(); removeConnection(conn.id); }}
+                        className="opacity-0 hover:opacity-100 transition-opacity"
+                      >
+                        <circle cx={(fx + tx) / 2} cy={(fy + ty) / 2} r={10} fill="hsl(var(--destructive))" />
+                        <text
+                          x={(fx + tx) / 2}
+                          y={(fy + ty) / 2 + 4}
+                          textAnchor="middle"
+                          fill="hsl(var(--destructive-foreground))"
+                          style={{ fontSize: "12px", fontWeight: 700, pointerEvents: "none", userSelect: "none" }}
+                        >
+                          ×
+                        </text>
+                      </g>
                       {/* Connection label */}
                       {conn.label && (
-                        <g>
+                        <g style={{ pointerEvents: "none" }}>
                           <rect
                             x={(fx + tx) / 2 - conn.label.length * 3 - 6}
                             y={(fy + ty) / 2 - 9}
                             width={conn.label.length * 6 + 12}
                             height={18}
                             rx={9}
-                            fill="white"
-                            stroke="#e5e7eb"
+                            fill="hsl(var(--card))"
+                            stroke="hsl(var(--border))"
                             strokeWidth={1}
                             opacity={0.95}
                           />
@@ -1427,8 +1489,7 @@ const NavigationMaker = () => {
                             x={(fx + tx) / 2}
                             y={(fy + ty) / 2 + 3}
                             textAnchor="middle"
-                            className="text-[9px] fill-muted-foreground"
-                            style={{ fontSize: "9px", fill: "#6b7280" }}
+                            style={{ fontSize: "9px", fill: "hsl(var(--muted-foreground))" }}
                           >
                             {conn.label}
                           </text>
