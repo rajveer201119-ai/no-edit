@@ -1342,6 +1342,461 @@ export const blogPosts: Record<string, BlogPostData> = {
     ],
     relatedArticles: ["ux-design-process-explained", "design-system-guide", "web-design-color-theory"]
   },
+  "what-is-a-visual-sitemap": {
+    slug: "what-is-a-visual-sitemap",
+    metaTitle: "What Is a Visual Sitemap? Complete Guide to Website Planning",
+    metaDescription: "A visual sitemap is a diagram of every page on a website. Learn what it is, why it matters, and how to create one in minutes with EPIC.",
+    keywords: "what is a visual sitemap, visual sitemap, website sitemap, visual sitemap builder, website structure diagram, information architecture",
+    h1: "What Is a Visual Sitemap? A Complete Guide to Planning Website Structure",
+    publishDate: "2026-06-01",
+    lastModified: "2026-07-12",
+    readTime: "9 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker", "website-flow-generator"],
+    sections: [
+      { heading: "Visual Sitemap: A Direct Definition", content: "A visual sitemap is a diagram that shows every page on a website and how those pages are organised into a hierarchy. Instead of describing a website in a spreadsheet or long document, a visual sitemap uses boxes for pages and lines for relationships so the whole structure can be understood at a glance.\n\nVisual sitemaps are created during the planning phase of a website — before wireframes, before design, and before development. Founders, designers, developers, agencies, and SEO teams use them to align on which pages will exist, how they nest under each other, and where the important content will live.\n\nA visual sitemap is different from an XML sitemap. XML sitemaps are text files submitted to search engines to help them crawl a live site. Visual sitemaps are made for humans and used before the site exists." },
+      { heading: "Why Visual Sitemaps Matter", content: "Websites fail when their structure is decided page by page as work progresses. Pages get duplicated, key journeys get buried three levels deep, and marketing, product, and engineering end up building against different mental models of the same site.\n\nA visual sitemap solves this by forcing every stakeholder to agree on the structure before any pixel is designed. It reveals gaps early — a missing pricing page, an orphan blog category, a support flow that has no landing page — while they are still cheap to fix.\n\nFor SEO, visual sitemaps make the site's topical hierarchy explicit. Cluster pages, pillar pages, and conversion pages can all be positioned deliberately so link equity and internal linking flow to the pages that matter most." },
+      { heading: "What a Good Visual Sitemap Contains", content: "A useful visual sitemap includes: the homepage at the top, main navigation sections one level down, sub-pages nested under each section, and utility pages (legal, contact, 404) grouped separately.\n\nEach node should carry the page's working title, its URL slug, and a short note on the page's purpose or primary user goal. Colour coding is helpful — one colour for marketing pages, one for product, one for blog, one for account/dashboard.\n\nAvoid stuffing wireframes, copy, or design references into the sitemap. Keep it structural. Its job is to answer 'what pages exist and how are they organised?' — nothing more." },
+      { heading: "How to Create a Visual Sitemap in EPIC", content: "Open EPIC's visual sitemap builder, drag a Home node onto the canvas, and start adding child pages by dragging from the built-in page library. Connect parents to children with the connection tool, group related pages, and label each node with its intended URL.\n\nYou can build the sitemap manually node by node, or use the optional AI sitemap generator to produce a first draft from a short description of your project. The AI output is fully editable — rename pages, delete branches, and restructure until the map matches your plan.\n\nExport as PNG or PDF for stakeholder review, or as JSON for developer handoff." },
+      { heading: "When to Use a Visual Sitemap", content: "Use a visual sitemap at the start of any new website project, before a redesign, when adding a major new section to an existing site, and when auditing an existing site for structural problems.\n\nSmall projects (under ten pages) still benefit — a five-minute sitemap prevents an afternoon of rework. Large projects (hundreds of pages) benefit even more, because the map becomes the single source of truth for scope discussions.\n\nOnce the site is live, keep the visual sitemap in a shared workspace and update it whenever the structure changes. It becomes documentation for future team members, agencies, and freelancers." }
+    ],
+    faqs: [
+      { question: "Is a visual sitemap the same as an XML sitemap?", answer: "No. A visual sitemap is a diagram for humans used during website planning. An XML sitemap is a machine-readable file used by search engines to crawl a live website." },
+      { question: "Do I need a visual sitemap for a small website?", answer: "Yes — even a five-page site benefits. Sketching the structure first prevents duplicate pages, orphaned content, and rework once design starts." },
+      { question: "Which tool should I use to create a visual sitemap?", answer: "EPIC is a free visual sitemap builder made for founders, designers, developers, and agencies. It supports manual building and optional AI-assisted generation, and exports to PNG, PDF, and JSON." }
+    ],
+    relatedArticles: ["how-to-plan-website-structure-before-designing", "visual-sitemap-vs-xml-sitemap", "how-to-create-a-visual-sitemap", "website-information-architecture-guide"]
+  },
+  "how-to-plan-website-structure-before-designing": {
+    slug: "how-to-plan-website-structure-before-designing",
+    metaTitle: "How to Plan a Website Structure Before You Start Designing",
+    metaDescription: "Plan your website structure before design starts. A step-by-step guide to defining pages, hierarchy, and navigation with a visual sitemap.",
+    keywords: "how to plan website structure before designing, plan website structure, website planning, visual sitemap, website architecture, website hierarchy",
+    h1: "How to Plan a Website Structure Before You Start Designing",
+    publishDate: "2026-06-02",
+    lastModified: "2026-07-12",
+    readTime: "10 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker", "saas-navigation-planner"],
+    sections: [
+      { heading: "Why Structure Comes Before Design", content: "Design decisions — typography, colour, layout, illustration — are cheap to change. Structural decisions — which pages exist, how they nest, what belongs in the main navigation — are expensive to change once designers, developers, and content writers are building against them.\n\nPlanning the structure first means the design phase has a clear brief: this many pages, in this hierarchy, serving these user goals. It also gives content writers, SEO specialists, and stakeholders a concrete artefact to review before any visuals are produced." },
+      { heading: "Step 1: List Every User Goal", content: "Before listing pages, list the goals visitors will arrive with. Common goals include: understand what the product does, compare pricing, sign up, find support, read a case study, and contact the team.\n\nEach goal becomes one or more pages later. Skipping this step is the most common cause of bloated sitemaps — teams add pages because competitors have them, not because a real user goal requires them." },
+      { heading: "Step 2: Draft the Top-Level Sections", content: "Group user goals into three to seven top-level sections. Typical sections for a SaaS product: Product, Solutions, Pricing, Resources, Company. Typical sections for an agency: Work, Services, About, Insights, Contact.\n\nKeep the top-level navigation short. Anything over seven items becomes hard to scan, and mobile navigation collapses badly." },
+      { heading: "Step 3: Nest Sub-Pages Under Each Section", content: "For each top-level section, list the sub-pages it needs. Under Product, that might be feature detail pages. Under Resources, blog, guides, changelog, and help centre.\n\nAvoid nesting more than three levels deep. Deep hierarchies confuse users and dilute internal-link strength. If a page needs to sit four levels deep, question whether it should exist at all or be merged upward." },
+      { heading: "Step 4: Build the Visual Sitemap", content: "Move the list into a visual sitemap builder. EPIC lets you drag page nodes onto a canvas, connect parents to children, and label each node with its intended slug and purpose.\n\nSeeing the structure spatially reveals problems the list hides: two pages doing the same job, an isolated node with no parent, a section with only one child page that could be merged up." },
+      { heading: "Step 5: Review, Refine, and Hand Off", content: "Share the visual sitemap with the whole team. Product owners check business goals are covered, SEO checks the hierarchy supports keyword targeting, developers check the URL structure is clean, and designers get their brief.\n\nOnce approved, export the sitemap as PNG for the design brief and as JSON for developer handoff. Only then start wireframing and designing." }
+    ],
+    faqs: [
+      { question: "How long does it take to plan a website structure?", answer: "For a typical marketing site, expect two to four hours of focused work — one hour listing user goals, one hour drafting sections, and one to two hours building and refining the visual sitemap." },
+      { question: "Can I plan a website structure without a designer?", answer: "Yes. Structural planning is a strategy task, not a design task. Founders and product managers can complete it using a visual sitemap builder like EPIC before involving designers." },
+      { question: "How many pages should a small business website have?", answer: "Most small business sites work well with 5–12 pages: home, about, services (or products), pricing, contact, plus a small number of supporting pages such as legal and blog." }
+    ],
+    relatedArticles: ["what-is-a-visual-sitemap", "how-to-create-a-visual-sitemap", "seo-friendly-website-structure", "how-to-plan-website-redesign-sitemap"]
+  },
+  "visual-sitemap-vs-xml-sitemap": {
+    slug: "visual-sitemap-vs-xml-sitemap",
+    metaTitle: "Visual Sitemap vs XML Sitemap: What Is the Difference?",
+    metaDescription: "Visual sitemaps help humans plan websites. XML sitemaps help search engines crawl them. Learn the differences, uses, and when you need each.",
+    keywords: "visual sitemap vs XML sitemap, difference between visual sitemap and XML sitemap, XML sitemap, visual sitemap, sitemap types",
+    h1: "Visual Sitemap vs XML Sitemap: What Is the Difference?",
+    publishDate: "2026-06-03",
+    lastModified: "2026-07-12",
+    readTime: "7 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "Direct Answer", content: "A visual sitemap is a diagram used by people to plan a website's structure before it is built. An XML sitemap is a text file submitted to search engines so they can discover and crawl the pages of a live website.\n\nThey solve different problems, are created at different stages, and are read by different audiences. Most websites need both — a visual sitemap during planning, and an XML sitemap after launch." },
+      { heading: "What a Visual Sitemap Is For", content: "Visual sitemaps live in the planning phase. Founders, product managers, designers, and agencies use them to agree on which pages the website will have, how they are organised, and what content each page will hold.\n\nA visual sitemap is created in a tool like EPIC and exported as PNG, PDF, or JSON for stakeholder review and developer handoff. It has no direct impact on search rankings; its value is strategic clarity." },
+      { heading: "What an XML Sitemap Is For", content: "XML sitemaps are technical files, usually located at /sitemap.xml on a live website. They list every URL that should be indexed and, optionally, the last-modified date, change frequency, and priority.\n\nSearch engines such as Google and Bing use XML sitemaps to discover pages more efficiently, particularly on large sites, sites with pages that are not well linked, and new sites without much backlink coverage.\n\nAn XML sitemap does not guarantee indexing — Google still decides which pages to include — but it improves discovery speed and coverage." },
+      { heading: "Side-by-Side Comparison", content: "Audience: visual sitemap = humans; XML sitemap = search-engine crawlers.\n\nFormat: visual sitemap = diagram (PNG, PDF, JSON, interactive canvas); XML sitemap = text file in XML format.\n\nCreated when: visual sitemap = before the website is built; XML sitemap = after the website is live.\n\nPurpose: visual sitemap = plan and align on structure; XML sitemap = help search engines crawl the site.\n\nMaintained by: visual sitemap = product/design team; XML sitemap = developers or CMS, usually generated automatically." },
+      { heading: "Do You Need Both?", content: "For any website that intends to rank in search, yes. Build the visual sitemap first to define what the site will contain, then generate the XML sitemap from the live site once pages exist.\n\nEPIC creates the visual sitemap. Your CMS, framework, or a small build script generates the XML sitemap. The visual sitemap should always be the source of truth — every URL in the XML sitemap should trace back to a page decided in the visual sitemap." }
+    ],
+    faqs: [
+      { question: "Does a visual sitemap help SEO?", answer: "Indirectly. A visual sitemap produces a cleaner site structure, better internal linking, and clearer topical hierarchy — all of which improve SEO — but search engines do not read the visual sitemap itself." },
+      { question: "Where should my XML sitemap live?", answer: "By convention, at /sitemap.xml on the root of your domain. Reference it in your robots.txt file and submit it in Google Search Console and Bing Webmaster Tools." },
+      { question: "Can EPIC generate an XML sitemap?", answer: "EPIC focuses on visual sitemaps used for planning. XML sitemaps are typically generated by your CMS or a build script once the site is live and every URL is known." }
+    ],
+    relatedArticles: ["what-is-a-visual-sitemap", "how-to-create-a-visual-sitemap", "seo-friendly-website-structure"]
+  },
+  "how-to-create-a-visual-sitemap": {
+    slug: "how-to-create-a-visual-sitemap",
+    metaTitle: "How to Create a Visual Sitemap for a Website (Step by Step)",
+    metaDescription: "A step-by-step guide to creating a visual sitemap for any website using EPIC. Includes examples, exports, and best practices.",
+    keywords: "how to create a visual sitemap for a website, create visual sitemap, visual sitemap tutorial, sitemap step by step, website sitemap builder",
+    h1: "How to Create a Visual Sitemap for a Website Step by Step",
+    publishDate: "2026-06-04",
+    lastModified: "2026-07-12",
+    readTime: "10 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker", "website-flow-generator"],
+    sections: [
+      { heading: "Overview", content: "Creating a visual sitemap has five practical steps: define user goals, list pages, group them into sections, arrange the hierarchy in a diagram, and export for review and handoff.\n\nThis guide walks through each step using EPIC's free visual sitemap builder. The process works for any type of website — marketing sites, SaaS products, e-commerce stores, portfolios, and agency sites." },
+      { heading: "Step 1: Define User Goals", content: "Before opening any tool, list the goals visitors will arrive with. For a SaaS product, that typically includes: learn what the product does, compare pricing plans, sign up, view documentation, and contact support.\n\nEach goal maps to at least one page. Writing goals first — rather than pages first — prevents 'competitor mimicry sitemaps' that include pages no visitor actually needs." },
+      { heading: "Step 2: List Every Page", content: "Turn each goal into concrete pages. 'Understand what the product does' becomes Home, Features overview, and per-feature detail pages. 'Compare pricing plans' becomes a Pricing page and, for regional sites, one variant per market.\n\nList utility pages too: legal (privacy, terms), account (login, signup, dashboard), support (help centre, contact), and error pages (404)." },
+      { heading: "Step 3: Group Pages into Sections", content: "Group pages under three to seven top-level sections. Typical top-level groups: Product, Solutions, Pricing, Resources, Company. Each group becomes a main navigation item.\n\nKeep nesting shallow — three levels maximum. Any page that would sit four levels deep is a candidate to be merged upward or promoted." },
+      { heading: "Step 4: Build the Diagram in EPIC", content: "Open EPIC's visual sitemap builder. Drag a Home node to the top of the canvas. Under it, add nodes for each top-level section. Under each section, add nodes for its child pages.\n\nUse the connection tool to link parents to children. Label each node with its working title and intended URL slug. Colour-code nodes by section so the structure is scannable.\n\nOptional: use EPIC's AI sitemap generator to produce a starting draft from a project description, then edit it manually until it matches your plan." },
+      { heading: "Step 5: Export and Hand Off", content: "Export the finished sitemap as PNG for stakeholder review, PDF for design briefs, and JSON for developer handoff. Share it in the project workspace so it becomes the reference document for the rest of the build." }
+    ],
+    faqs: [
+      { question: "How detailed should each sitemap node be?", answer: "Include a working page title, intended URL slug, and one line describing the page's purpose. Avoid stuffing wireframes or copy into the sitemap — that belongs in later artefacts." },
+      { question: "Should I sketch on paper before using a tool?", answer: "Optional. A five-minute paper sketch helps if the structure is unclear, but for most projects it is faster to draft directly in EPIC where the diagram is already editable and exportable." },
+      { question: "How often should I update the sitemap after launch?", answer: "Update it whenever a section is added, removed, or restructured. Keep the visual sitemap as living documentation, not a one-off artefact." }
+    ],
+    relatedArticles: ["what-is-a-visual-sitemap", "how-to-plan-website-structure-before-designing", "free-drag-and-drop-visual-sitemap-builder", "best-visual-sitemap-builder"]
+  },
+  "saas-website-sitemap-structure": {
+    slug: "saas-website-sitemap-structure",
+    metaTitle: "The Best Website Sitemap Structure for a SaaS Product",
+    metaDescription: "A proven sitemap structure for SaaS websites. Covers marketing, product, pricing, resources, and account pages with practical examples.",
+    keywords: "SaaS website sitemap structure, SaaS sitemap, SaaS website architecture, SaaS site structure, SaaS marketing site",
+    h1: "The Best Website Sitemap Structure for a SaaS Product",
+    publishDate: "2026-06-05",
+    lastModified: "2026-07-12",
+    readTime: "10 min read",
+    category: "SaaS Design",
+    pillarLinks: ["saas-navigation-planner", "visual-sitemap-maker"],
+    sections: [
+      { heading: "The Core SaaS Sitemap Pattern", content: "Most successful SaaS websites use a five-section top-level structure: Product, Solutions, Pricing, Resources, Company. Under Product sit feature detail pages. Under Solutions sit use-case or industry pages. Pricing usually has a single page. Resources holds blog, guides, changelog, and help. Company holds about, careers, contact, and legal.\n\nThis pattern works because it separates 'what the product does' (Product) from 'who it is for' (Solutions), which are the two questions every buyer asks." },
+      { heading: "Product Section", content: "The Product section should have an overview page and one detail page per major feature. Feature detail pages target long-tail keywords, house screenshots and demo videos, and give sales a page to link during outreach.\n\nDo not create feature detail pages for micro-features. Aim for four to eight feature pages that map to the value propositions on the homepage." },
+      { heading: "Solutions Section", content: "Solutions pages target buyer segments: role-based (for marketers, for engineers), industry-based (for fintech, for e-commerce), or use-case-based (for onboarding, for growth).\n\nEach solution page repositions the same product for one audience. Structure it as: audience-specific headline, three benefits framed for that audience, screenshots showing relevant features, and a case study from that segment." },
+      { heading: "Pricing, Resources, Company", content: "Pricing is one page with a clear plan comparison, an annual/monthly toggle, and an FAQ. For international products, add regional variants (e.g. /pricing, /pricing-india) with hreflang.\n\nResources scales over time — start with blog and help centre, add guides, templates, and a changelog as the company grows.\n\nCompany keeps trust pages (about, team, careers, contact) and legal (privacy, terms) grouped together." },
+      { heading: "Example: A B2B SaaS Sitemap in EPIC", content: "Home → Product (Overview, Feature A, Feature B, Feature C, Feature D) → Solutions (For Marketers, For Engineers, For Founders) → Pricing → Resources (Blog, Guides, Changelog, Help) → Company (About, Careers, Contact, Privacy, Terms).\n\nBuild this in EPIC by dragging the top-level nodes onto the canvas, then adding children under each. Export as PNG for the design brief and as JSON for the developer team." }
+    ],
+    faqs: [
+      { question: "How many pages does a SaaS website need?", answer: "A well-scoped B2B SaaS site typically launches with 20–35 pages: homepage, 4–8 feature pages, 3–5 solutions pages, pricing, blog with initial posts, help, and standard company and legal pages." },
+      { question: "Should the dashboard be in the sitemap?", answer: "Include it in the visual sitemap as a single 'App' node so structure is complete, but exclude it and every authenticated route from your XML sitemap — those pages should not be indexed by search engines." },
+      { question: "Where do landing pages fit?", answer: "Campaign landing pages usually sit outside the main navigation, often under a /go, /lp, or /campaigns folder. Include them in the visual sitemap in a separate group so they are not confused with core marketing pages." }
+    ],
+    relatedArticles: ["small-business-website-sitemap-example", "ecommerce-website-sitemap-structure", "digital-agency-website-sitemap-template", "seo-friendly-website-structure"]
+  },
+  "small-business-website-sitemap-example": {
+    slug: "small-business-website-sitemap-example",
+    metaTitle: "Small-Business Website Sitemap Examples and Templates",
+    metaDescription: "Ready-to-use sitemap examples for small business websites. Includes service business, local shop, and consultant templates you can copy in EPIC.",
+    keywords: "small business website sitemap example, small business sitemap, service business sitemap, local business website structure, small business website template",
+    h1: "Small-Business Website Sitemap Examples and Templates",
+    publishDate: "2026-06-06",
+    lastModified: "2026-07-12",
+    readTime: "9 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "What Every Small-Business Sitemap Needs", content: "A small-business website usually has one primary goal: get the visitor to contact, book, or buy. The sitemap should support that goal with as few pages as possible.\n\nCore pages every small-business site needs: Home, About, Services (or Products), Pricing (or Rates), Contact, and legal pages. Optional but often useful: Case Studies or Portfolio, Blog, FAQ, and a Booking or Enquiry page." },
+      { heading: "Template 1: Local Service Business", content: "Home → About → Services (Service A, Service B, Service C) → Service Areas (City 1, City 2) → Contact → Booking. Add Blog and FAQ as content grows.\n\nCity-specific pages help local SEO. Keep each city page unique — do not duplicate the same content with just the city name swapped." },
+      { heading: "Template 2: Small Product Shop", content: "Home → Shop (Category A, Category B) → Product Detail Pages → Cart → Checkout → About → Contact → FAQ → Shipping & Returns.\n\nCategory pages are the SEO workhorses of small shops. Give each category a short intro paragraph and organise products consistently within it." },
+      { heading: "Template 3: Independent Consultant", content: "Home → About → Services → Case Studies → Blog → Contact.\n\nCase studies build credibility — plan one page per project with the client's challenge, the solution, and the outcome. The blog supports long-tail search and gives referral sources something to share." },
+      { heading: "Building Any of These in EPIC", content: "Open EPIC's visual sitemap builder, drag the Home node onto the canvas, and add the top-level nodes shown above. Add child pages under each, label them with intended slugs, and export as PNG or PDF for stakeholders.\n\nEach template is a starting point. Rename sections to match your business language and remove sections you do not need. A five-page site is fine if that is all your business requires." }
+    ],
+    faqs: [
+      { question: "How many pages should a small-business website have?", answer: "Five to twelve is typical. Add more only when a real user need or ranking opportunity justifies it." },
+      { question: "Do I need a blog on a small-business site?", answer: "Only if you plan to publish consistently. A stale, six-month-out-of-date blog hurts more than no blog. Start without one and add it when you have a content plan." },
+      { question: "Should services live under one page or separate pages?", answer: "Separate pages when each service targets different search terms or serves different buyer types. One page when services are variations of the same thing and share the same buyer." }
+    ],
+    relatedArticles: ["how-to-create-a-visual-sitemap", "seo-friendly-website-structure", "ecommerce-website-sitemap-structure", "portfolio-website-sitemap-example"]
+  },
+  "ecommerce-website-sitemap-structure": {
+    slug: "ecommerce-website-sitemap-structure",
+    metaTitle: "E-commerce Website Sitemap Structure: Pages Every Store Needs",
+    metaDescription: "A complete e-commerce sitemap structure. Categories, product pages, cart, checkout, support, and SEO pages every online store should include.",
+    keywords: "ecommerce website sitemap structure, ecommerce sitemap, online store site structure, ecommerce website architecture, ecommerce information architecture",
+    h1: "E-commerce Website Sitemap Structure: Pages Every Store Needs",
+    publishDate: "2026-06-07",
+    lastModified: "2026-07-12",
+    readTime: "11 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "The Core E-commerce Sitemap", content: "Every online store, from a five-product boutique to a marketplace, uses the same core structure: Home → Categories → Sub-categories (if needed) → Product Detail Pages → Cart → Checkout → Confirmation. Around this core sit account pages, support pages, and content pages.\n\nThis structure works because it mirrors how shoppers browse: enter, narrow down by category, evaluate a product, and buy." },
+      { heading: "Category and Sub-Category Pages", content: "Category pages are the SEO backbone of an e-commerce site. Each category targets a mid-volume keyword and lists relevant products. Sub-categories exist only when a category has more than about 30 products or when sub-categories match distinct search intents.\n\nKeep the category tree shallow — three levels maximum. Any product that would sit four levels deep should be surfaced via cross-linking or promoted to a higher-level category." },
+      { heading: "Product Detail Pages", content: "Every product needs its own page with a unique URL, unique title, product-specific description, price, imagery, variants, and reviews. Do not stack multiple products on one page — search engines cannot rank them individually.\n\nInclude cross-links to related products, the parent category, and any relevant guides. Structured data (schema.org/Product) is essential." },
+      { heading: "Cart, Checkout, and Account", content: "Cart and checkout should be simple linear flows: Cart → Address → Payment → Confirmation. Every extra step drops conversion. Offer guest checkout — forcing account creation before purchase is one of the biggest conversion leaks in e-commerce.\n\nAccount pages (login, orders, addresses, wishlist) live under /account and are excluded from search indexing." },
+      { heading: "Support and Content Pages", content: "Every store needs: Shipping, Returns, FAQ, Contact, Size Guide (for apparel), and legal pages (Privacy, Terms). These reduce support load and answer buyer objections before purchase.\n\nContent pages (Blog, Buying Guides, Lookbooks) build organic traffic. Structure them under /blog and /guides with clean category taxonomies." },
+      { heading: "Example E-commerce Sitemap in EPIC", content: "Home → Shop (Category 1 (Sub A, Sub B), Category 2, Category 3) → Product Detail Pages → Cart → Checkout → Confirmation → Account (Login, Signup, Orders, Wishlist) → Support (Shipping, Returns, FAQ, Contact) → Content (Blog, Guides) → Legal (Privacy, Terms).\n\nBuild this in EPIC with drag-and-drop nodes, colour-code by section, and export for the design and development teams." }
+    ],
+    faqs: [
+      { question: "Should each product have its own URL?", answer: "Yes. Every product needs a unique, permanent URL so it can rank in search, be linked to, and appear in the XML sitemap." },
+      { question: "How many category levels should I use?", answer: "Two or three, at most. Deeper trees hurt SEO and confuse shoppers. If a product does not fit within three levels, restructure the categories." },
+      { question: "Should the blog live on the same domain as the shop?", answer: "Yes, whenever possible. A blog on the same domain builds authority for the whole site. Sub-domains split link equity and are harder to unify in analytics." }
+    ],
+    relatedArticles: ["saas-website-sitemap-structure", "seo-friendly-website-structure", "small-business-website-sitemap-example", "how-to-plan-website-redesign-sitemap"]
+  },
+  "portfolio-website-sitemap-example": {
+    slug: "portfolio-website-sitemap-example",
+    metaTitle: "Portfolio Website Sitemap: A Simple Structure for Designers and Creators",
+    metaDescription: "A clean sitemap structure for portfolio websites. Perfect for designers, developers, photographers, and creators who want to convert visitors into clients.",
+    keywords: "portfolio website sitemap example, portfolio site structure, designer portfolio sitemap, freelance portfolio website, creator portfolio structure",
+    h1: "Portfolio Website Sitemap: A Simple Structure for Designers and Creators",
+    publishDate: "2026-06-08",
+    lastModified: "2026-07-12",
+    readTime: "8 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "The Job of a Portfolio Website", content: "A portfolio website has one job: turn a visitor into a lead. Every page should either build credibility or move the visitor toward contact.\n\nThat means the sitemap should be small and focused. Most working portfolios rank and convert well with five to eight pages." },
+      { heading: "The Recommended Structure", content: "Home → Work (Case Study 1, Case Study 2, Case Study 3, ...) → About → Services → Contact. Optional: Blog or Journal, Testimonials, Now (a 'what I am working on now' page).\n\nHome carries the strongest work samples and a clear tagline. Work is the index of all case studies. Each case study lives on its own URL." },
+      { heading: "Case Study Pages", content: "Each case study should follow a consistent structure: project overview, the problem, the approach, the outcome, and imagery. Consistent structure makes case studies scannable and comparable.\n\nGive every case study its own URL — this makes each rankable and shareable. Link related case studies together and back to the Work index." },
+      { heading: "About, Services, Contact", content: "About sells the person behind the work — background, philosophy, and a photo. Services lists what you offer and, ideally, indicative pricing so visitors self-qualify before contacting.\n\nContact is the conversion page — a short form, an email address, and links to social profiles. Avoid asking for information you do not need." },
+      { heading: "Build It in EPIC", content: "In EPIC, drag Home, Work, About, Services, and Contact nodes onto the canvas. Under Work, add one child node per case study you plan to publish. Export as PNG for a client or agency brief, or JSON for developer handoff." }
+    ],
+    faqs: [
+      { question: "How many case studies should a portfolio show?", answer: "Between three and eight. Fewer than three looks thin; more than eight dilutes the strongest work. Rotate as new projects finish." },
+      { question: "Do I need a blog on my portfolio?", answer: "Only if you will maintain it. A dead blog signals inactivity. If you post occasionally, name the section 'Journal' or 'Notes' so infrequent updates feel intentional." },
+      { question: "Should pricing be on the site?", answer: "Yes when you can commit to indicative ranges. Public pricing pre-qualifies leads and saves both sides time. Custom-scoped work can note 'starts from X'." }
+    ],
+    relatedArticles: ["small-business-website-sitemap-example", "digital-agency-website-sitemap-template", "how-to-create-a-visual-sitemap"]
+  },
+  "digital-agency-website-sitemap-template": {
+    slug: "digital-agency-website-sitemap-template",
+    metaTitle: "Digital Agency Website Sitemap Template",
+    metaDescription: "A proven sitemap template for digital agencies. Covers services, work, insights, careers, and lead-generation pages that convert.",
+    keywords: "digital agency website sitemap template, agency website structure, agency site architecture, digital agency sitemap, design agency website",
+    h1: "Digital Agency Website Sitemap Template",
+    publishDate: "2026-06-09",
+    lastModified: "2026-07-12",
+    readTime: "9 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "How Agency Buyers Read a Site", content: "Agency prospects arrive with two questions: 'Have you done work like mine?' and 'Can I trust you to run this project?' Every section of an agency site should answer at least one of these questions.\n\nThat is why the winning structure puts Work and Services front and centre, backed by Insights, About, and Contact." },
+      { heading: "The Template", content: "Home → Work (Case Study 1, Case Study 2, ...) → Services (Service A, Service B, Service C) → Industries (optional: Industry A, Industry B) → Insights (Blog, Guides) → About (Team, Culture, Careers) → Contact.\n\nUnder Work, list case studies as separate URLs. Under Services, one page per offering. Under Industries, one page per vertical if you specialise." },
+      { heading: "Case Study Structure", content: "Consistent case study structure is the agency site's competitive advantage. A repeatable template — challenge, approach, deliverables, outcome, testimonial — makes case studies scannable and comparable.\n\nEnd every case study with a call to action for a similar engagement." },
+      { heading: "Service Pages", content: "Each service needs its own page targeting the search terms buyers use. 'Web design' as a single page is too broad — split into 'Website design', 'Brand identity', 'SEO', and 'Content strategy' where relevant, each with its own scope, process, and pricing indication." },
+      { heading: "Careers, About, Contact", content: "About should introduce the team, not just the founders. Team pages build trust and help candidates picture themselves working with you.\n\nCareers keeps the site alive between marketing pushes and is a strong recruitment channel. Contact should be a short form plus a direct email — no lead-magnet gates." },
+      { heading: "Build It in EPIC", content: "Drag the top-level nodes into EPIC, add case studies and service pages as children, and colour-code by section. Export the sitemap for the design brief and share it with the whole agency team before layouts start." }
+    ],
+    faqs: [
+      { question: "Should agencies show pricing?", answer: "Indicative ranges pre-qualify prospects and save discovery-call time. If projects are always custom, state the minimum engagement size instead." },
+      { question: "How many services should be listed?", answer: "Three to six. More looks unfocused. If you do more, group them into service families and use sub-pages for detail." },
+      { question: "Where do awards and press mentions belong?", answer: "As trust elements on Home, About, and relevant case studies — not as their own top-level page." }
+    ],
+    relatedArticles: ["saas-website-sitemap-structure", "portfolio-website-sitemap-example", "small-business-website-sitemap-example"]
+  },
+  "website-information-architecture-guide": {
+    slug: "website-information-architecture-guide",
+    metaTitle: "Information Architecture for Websites: A Beginner-Friendly Guide",
+    metaDescription: "Learn the fundamentals of website information architecture. Covers hierarchy, labelling, navigation, and how to plan IA with a visual sitemap.",
+    keywords: "website information architecture guide, information architecture, IA for websites, website IA, information architecture basics, IA design",
+    h1: "Information Architecture for Websites: A Beginner-Friendly Guide",
+    publishDate: "2026-06-10",
+    lastModified: "2026-07-12",
+    readTime: "12 min read",
+    category: "UX Design",
+    pillarLinks: ["visual-sitemap-maker", "user-flow-diagram-tool"],
+    sections: [
+      { heading: "What Information Architecture Is", content: "Information architecture (IA) is the practice of organising, structuring, and labelling content so users can find it and complete tasks. For websites, IA covers four things: the pages that exist, how they are grouped, what they are called, and how users move between them.\n\nGood IA is invisible. Users find what they need without thinking about the structure. Bad IA feels like getting lost in a supermarket." },
+      { heading: "The Four Pillars of IA", content: "1. Organisation systems — how pages are grouped (by topic, by audience, by task, by chronology).\n\n2. Labelling systems — the words used for pages, categories, and navigation links. Labels must match how users think, not how the business is structured internally.\n\n3. Navigation systems — the menus, breadcrumbs, and links users use to move around.\n\n4. Search systems — how users find specific content when browsing fails." },
+      { heading: "Hierarchy: Flat vs Deep", content: "Flat structures put most pages within one or two clicks of the homepage. Deep structures nest pages three or more levels down. Flat IA is easier to scan and better for SEO because link equity spreads more evenly.\n\nAim for flat where possible. A useful rule: no page should be more than three clicks from the homepage." },
+      { heading: "Card Sorting and IA Testing", content: "Before finalising an IA, test it. Open card sorting asks users to group content into categories they invent themselves. Closed card sorting asks users to place content into categories you propose.\n\nTree testing validates the finished IA by asking users to find specific items in the proposed structure. If more than 20 percent of users fail a task, revise the IA." },
+      { heading: "IA in Practice with a Visual Sitemap", content: "A visual sitemap is the primary artefact of IA work. It shows every page, the groupings, and the hierarchy in one diagram.\n\nBuild the sitemap in EPIC, run card-sorting or tree-testing exercises to validate the structure, then export the finished diagram as the reference document for design and development." }
+    ],
+    faqs: [
+      { question: "Is information architecture the same as UX design?", answer: "IA is one part of UX design. UX also covers interaction design, visual design, user research, and usability testing. IA specifically addresses structure and findability." },
+      { question: "How long does IA work take?", answer: "For a typical marketing website, two to five days: a day of research, a day of drafting, one to two days of testing, and half a day of refinement." },
+      { question: "Do small websites need IA?", answer: "Every website has an IA — the only question is whether it was designed deliberately. Even a five-page site benefits from a few hours of IA thinking." }
+    ],
+    relatedArticles: ["what-is-a-visual-sitemap", "seo-friendly-website-structure", "how-to-plan-website-structure-before-designing", "user-flow-vs-sitemap-vs-wireframe"]
+  },
+  "seo-friendly-website-structure-guide": {
+    slug: "seo-friendly-website-structure-guide",
+    metaTitle: "How Website Structure Affects SEO, User Experience, and Conversions",
+    metaDescription: "Website structure directly affects SEO rankings, UX, and conversion rate. Learn how to build an SEO-friendly site structure with a visual sitemap.",
+    keywords: "SEO friendly website structure, website structure SEO, site architecture SEO, SEO site structure, website hierarchy SEO",
+    h1: "How Website Structure Affects SEO, User Experience, and Conversions",
+    publishDate: "2026-06-11",
+    lastModified: "2026-07-12",
+    readTime: "11 min read",
+    category: "SEO",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "Direct Answer", content: "Website structure affects SEO because it determines how link equity flows between pages, how search engines understand topical relationships, and how easily users complete conversion tasks. Well-structured sites rank higher, retain visitors longer, and convert better than poorly structured sites with identical content." },
+      { heading: "How Structure Affects SEO", content: "Search engines use internal linking to understand which pages are most important. Pages linked from the homepage inherit more authority than pages buried five levels deep. Flat structures — where every page is two or three clicks from the homepage — spread authority more evenly.\n\nStructure also signals topical clusters. Pages grouped under a common parent are read as related to that topic. This is why pillar-and-cluster content models work: a pillar page collects authority from every cluster page linking to it." },
+      { heading: "How Structure Affects UX", content: "Users judge whether to stay on a website within seconds. Clear navigation, sensible categories, and predictable page names all reduce cognitive load and increase time on site.\n\nWhen structure matches user expectations, task completion rates rise. When it does not — 'Where is pricing? Why is contact under Support?' — bounce rates rise." },
+      { heading: "How Structure Affects Conversions", content: "Conversion paths depend on structure. A three-click path from landing page to checkout converts better than a seven-click path. Removing structural friction — merging redundant pages, exposing key CTAs, cutting unnecessary steps — is often the highest-ROI conversion work available." },
+      { heading: "Rules for SEO-Friendly Structure", content: "1. Keep the hierarchy shallow — maximum three levels.\n\n2. Use descriptive, keyword-relevant URL slugs.\n\n3. Build pillar pages for major topics and link cluster pages to them.\n\n4. Every important page should be reachable from the homepage in three clicks or fewer.\n\n5. Use breadcrumbs on every page that sits below the homepage.\n\n6. Avoid orphan pages — every page should have at least one internal link pointing to it." },
+      { heading: "Plan the Structure First", content: "The cheapest place to fix structural SEO issues is in a visual sitemap, before design or development starts. Build the sitemap in EPIC, validate that every important keyword has a home, and only then move to wireframes." }
+    ],
+    faqs: [
+      { question: "How many clicks should a page be from the homepage?", answer: "Three or fewer for any page you want to rank. Deeper pages inherit less authority and are crawled less often." },
+      { question: "Do URL structures affect SEO?", answer: "Yes. Short, descriptive, hyphen-separated slugs perform better than long or parameterised URLs. Match the URL to the primary keyword of the page." },
+      { question: "Are breadcrumbs worth adding?", answer: "Yes. Breadcrumbs help users, provide additional internal links, and can appear directly in Google search results when marked up with schema." }
+    ],
+    relatedArticles: ["website-information-architecture-guide", "how-to-plan-website-structure-before-designing", "how-to-plan-website-redesign-sitemap", "visual-sitemap-vs-xml-sitemap"]
+  },
+  "how-to-plan-website-redesign-sitemap": {
+    slug: "how-to-plan-website-redesign-sitemap",
+    metaTitle: "How to Plan a Website Redesign Without Losing Important Pages",
+    metaDescription: "A complete framework for planning a website redesign — audit, sitemap, redirects, and launch — without losing your existing SEO or key pages.",
+    keywords: "how to plan a website redesign sitemap, website redesign planning, website redesign checklist, redesign without losing SEO, website migration sitemap",
+    h1: "How to Plan a Website Redesign Without Losing Important Pages",
+    publishDate: "2026-06-12",
+    lastModified: "2026-07-12",
+    readTime: "12 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "Why Redesigns Fail", content: "Most redesigns fail in the same way: the new site launches, and organic traffic drops by 20 to 60 percent within a month. The cause is almost always structural — pages that ranked on the old site were deleted, merged, or moved without redirects.\n\nA redesign is fundamentally a structural exercise. Design is the visible part; sitemap and URL planning is where success or failure is decided." },
+      { heading: "Step 1: Audit the Existing Site", content: "Before touching a design tool, pull a complete list of the existing site's URLs from the current XML sitemap, Google Search Console, and analytics. Tag each URL with traffic, backlinks, and target keyword.\n\nSort by traffic. The top 20 percent of pages typically drive 80 percent of organic traffic — these are the pages the redesign must not lose." },
+      { heading: "Step 2: Build the New Visual Sitemap", content: "In EPIC, draft the new sitemap based on current goals — not the old structure. Then overlay the audit: for every high-traffic page on the old site, decide whether it moves, merges, or retires in the new structure.\n\nEvery decision needs a corresponding action: move = 301 redirect from old URL to new URL; merge = 301 to the merged page and combine the best content; retire = 301 to the most relevant parent page." },
+      { heading: "Step 3: Plan the Redirect Map", content: "Export the sitemap as JSON and build a redirect map alongside it. Every deprecated URL needs a 301 redirect to a live URL. Missing redirects are the single largest cause of redesign traffic loss." },
+      { heading: "Step 4: Launch and Monitor", content: "Launch during a low-traffic window. Immediately submit the new XML sitemap to Google Search Console. Monitor crawl errors daily for the first two weeks and weekly for the first two months.\n\nRankings will fluctuate for two to eight weeks after a structural change. If a specific high-traffic page drops significantly, check its new URL, redirect chain, and internal linking." }
+    ],
+    faqs: [
+      { question: "Will a redesign hurt my SEO?", answer: "Only if handled carelessly. With a solid audit, sitemap, and redirect map, most redesigns preserve or improve rankings within two to three months." },
+      { question: "Should I keep old URLs?", answer: "When URLs are already clean and rank well, keep them. Change URLs only when the old structure blocks the new design or when the current URLs are messy." },
+      { question: "How long does a redesign take?", answer: "For a typical marketing site, six to twelve weeks: one to two weeks planning and sitemap, two to four weeks design, two to four weeks build, and one to two weeks launch and QA." }
+    ],
+    relatedArticles: ["how-to-plan-website-structure-before-designing", "seo-friendly-website-structure", "website-information-architecture-guide"]
+  },
+  "user-flow-vs-sitemap-vs-wireframe": {
+    slug: "user-flow-vs-sitemap-vs-wireframe",
+    metaTitle: "User Flow vs Sitemap vs Wireframe: What Should You Create First?",
+    metaDescription: "User flows, sitemaps, and wireframes solve different problems. Learn what each is for and the order to create them in your website project.",
+    keywords: "user flow vs sitemap vs wireframe, sitemap vs wireframe, user flow vs wireframe, website planning artefacts, sitemap wireframe user flow difference",
+    h1: "User Flow vs Sitemap vs Wireframe: What Should You Create First?",
+    publishDate: "2026-06-13",
+    lastModified: "2026-07-12",
+    readTime: "9 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker", "user-flow-diagram-tool"],
+    sections: [
+      { heading: "Direct Answer", content: "Create the sitemap first, then the user flows, then the wireframes. Sitemaps answer 'what pages exist?', user flows answer 'how does a task get done across pages?', and wireframes answer 'how is each page laid out?'.\n\nWorking in this order prevents rework: a wireframe designed for a page that later gets merged is wasted effort." },
+      { heading: "Sitemap", content: "A visual sitemap shows every page on the website and how they are organised. It is the first artefact because every subsequent artefact assumes a fixed set of pages.\n\nCreate it in EPIC, review it with stakeholders, and treat it as the source of truth for scope." },
+      { heading: "User Flow", content: "A user flow shows the sequence of pages and decisions a user moves through to complete one specific task — sign up, purchase, book a demo, contact support.\n\nUser flows are built after the sitemap because they reference pages that must already exist. They reveal whether the sitemap actually supports key journeys." },
+      { heading: "Wireframe", content: "A wireframe is a low-fidelity layout of a single page — where the header goes, where the form sits, what the primary CTA is. Wireframes come last because they depend on knowing which pages exist (sitemap) and what job each page does in a journey (user flow).\n\nWireframes should be built only for pages that survived the sitemap and user-flow reviews." },
+      { heading: "How They Fit Together", content: "Sitemap → user flows → wireframes → visual design → build. Each artefact narrows the scope of the next.\n\nEPIC handles sitemaps and user flows in one canvas. Wireframes typically live in a dedicated tool such as Figma. Keep the sitemap open while wireframing so page context is always visible." }
+    ],
+    faqs: [
+      { question: "Can I skip the sitemap on a small project?", answer: "Not recommended. Even a two-minute sitemap prevents the most common small-project problem: forgetting a page until late in the build." },
+      { question: "Do I need wireframes for every page?", answer: "No. Wireframe pages that are unique or complex. Standard patterns (blog post, contact page, legal page) can share a single template wireframe." },
+      { question: "Where do user flows sit in an agile process?", answer: "Create user flows once per major feature, then reuse or update them as the feature evolves. Do not gate every sprint on a flow, but do not skip flows for high-stakes journeys either." }
+    ],
+    relatedArticles: ["what-is-a-visual-sitemap", "how-to-create-a-visual-sitemap", "how-to-plan-website-structure-before-designing"]
+  },
+  "how-to-use-ai-sitemap-generator": {
+    slug: "how-to-use-ai-sitemap-generator",
+    metaTitle: "How to Use an AI Sitemap Generator to Plan a Website",
+    metaDescription: "Learn how to use an AI sitemap generator to draft your website structure quickly, then refine the output manually for a production-ready sitemap.",
+    keywords: "how to use an AI sitemap generator, AI sitemap generator, AI website sitemap, AI website planning, editable AI sitemap",
+    h1: "How to Use an AI Sitemap Generator to Plan a Website",
+    publishDate: "2026-06-14",
+    lastModified: "2026-07-12",
+    readTime: "9 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker", "website-flow-generator"],
+    sections: [
+      { heading: "What an AI Sitemap Generator Does", content: "An AI sitemap generator takes a short description of a website project and produces a first-draft sitemap in seconds. The output is a set of pages organised into a hierarchy, ready to edit inside a visual sitemap builder.\n\nAI generation is best treated as a starting point, not a finished artefact. The generator gets 60 to 80 percent of the structure right and saves the manual work of naming and positioning every page from scratch." },
+      { heading: "Step 1: Write a Clear Prompt", content: "The quality of the output tracks the specificity of the prompt. Include: the type of website (SaaS, portfolio, e-commerce, agency), the audience, the primary conversion goal, and any known constraints (regions, languages, product lines).\n\n'B2B SaaS for finance teams, primary CTA is book a demo, one product with three modules, English-only' is a good prompt. 'A website' is not." },
+      { heading: "Step 2: Review the Draft", content: "Open the AI-generated sitemap in EPIC. Walk through it top-to-bottom and flag pages to keep, merge, or delete. Look for common AI mistakes: duplicate pages under different names, generic 'services' pages that should be split, and missing utility pages (legal, contact, 404)." },
+      { heading: "Step 3: Refine Manually", content: "Rename pages to match your product's language. Merge duplicates. Split generic pages into specific ones. Add missing utility, legal, and support pages. Adjust the hierarchy so no page sits more than three levels deep.\n\nThe refined sitemap should feel like your team's work, not the AI's." },
+      { heading: "Step 4: Validate and Export", content: "Share the refined sitemap with stakeholders. Once approved, export as PNG for design briefs and JSON for developer handoff." }
+    ],
+    faqs: [
+      { question: "Is an AI-generated sitemap production-ready?", answer: "No. Treat AI output as a rough draft. Every AI-generated sitemap needs manual review before it is used to brief design or development." },
+      { question: "How accurate is EPIC's AI sitemap generator?", answer: "Accuracy depends on prompt quality. With a specific prompt, expect a usable first draft in seconds; then plan 20–40 minutes of manual refinement." },
+      { question: "Should I ever build a sitemap fully by hand?", answer: "Yes, for small projects and for projects with unusual structures the AI has not seen. Manual building forces deeper thinking about the site and often produces cleaner results." }
+    ],
+    relatedArticles: ["manual-vs-ai-sitemap-generator", "how-to-create-a-visual-sitemap", "what-is-a-visual-sitemap"]
+  },
+  "manual-vs-ai-sitemap-generator": {
+    slug: "manual-vs-ai-sitemap-generator",
+    metaTitle: "Manual Sitemap Building vs AI Sitemap Generation",
+    metaDescription: "Compare manual sitemap building with AI sitemap generation. Learn when to use each approach and how to combine them for the best results.",
+    keywords: "manual vs AI sitemap generator, manual sitemap building, AI sitemap generation, sitemap workflow, AI website planning",
+    h1: "Manual Sitemap Building vs AI Sitemap Generation",
+    publishDate: "2026-06-15",
+    lastModified: "2026-07-12",
+    readTime: "8 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "The Two Approaches", content: "Manual sitemap building means placing every page node yourself, thinking about each one, and organising the hierarchy from scratch. AI sitemap generation produces a first draft automatically from a project description.\n\nBoth are valid. The right choice depends on how well-defined the project is and how much structural thinking has already happened." },
+      { heading: "When Manual Wins", content: "Manual is better when the project is unusual, small, or novel. Any structure the AI has not seen many examples of — a bespoke B2B workflow, a niche marketplace, a specialised community — is better hand-drafted.\n\nManual is also better when the founder or product manager needs to think through the site. The act of placing each node surfaces questions that shortcut-driven AI output hides." },
+      { heading: "When AI Wins", content: "AI is better for well-known patterns: standard SaaS marketing sites, small business websites, portfolios, and agency sites. The AI has strong reference material for these categories and can produce a solid draft in seconds.\n\nAI is also better under time pressure. A 30-minute AI-plus-refinement pass beats a 30-minute blank-canvas manual pass on structure quality." },
+      { heading: "The Combined Workflow", content: "The strongest workflow uses both. Start with an AI-generated draft to get past the blank-canvas problem. Then refine manually — merge duplicates, split generic pages, add missing utility pages, and adjust the hierarchy.\n\nEPIC supports both modes in one canvas: generate an AI draft, then edit every node manually until the sitemap matches your product's reality." }
+    ],
+    faqs: [
+      { question: "Is manual sitemap building slower?", answer: "For standard patterns, yes — often two to three times slower than AI-plus-refinement. For novel structures, manual can be faster because AI drafts require heavy correction." },
+      { question: "Does AI sitemap output improve over time?", answer: "Yes, as models improve. But manual review will remain necessary for the foreseeable future — no AI knows your business context." },
+      { question: "Can I edit the AI output in EPIC?", answer: "Yes. Every AI-generated node in EPIC is fully editable — rename, delete, move, and reconnect exactly like a manually placed node." }
+    ],
+    relatedArticles: ["how-to-use-ai-sitemap-generator", "how-to-create-a-visual-sitemap", "best-visual-sitemap-builder"]
+  },
+  "free-drag-and-drop-visual-sitemap-builder": {
+    slug: "free-drag-and-drop-visual-sitemap-builder",
+    metaTitle: "Free Drag-and-Drop Visual Sitemap Builder: What to Look For",
+    metaDescription: "The features that matter in a free drag-and-drop visual sitemap builder — canvas, exports, AI, collaboration — and how EPIC compares.",
+    keywords: "free drag and drop visual sitemap builder, drag and drop sitemap builder, free sitemap tool, visual sitemap builder, online sitemap builder",
+    h1: "Free Drag-and-Drop Visual Sitemap Builder: What to Look For",
+    publishDate: "2026-06-16",
+    lastModified: "2026-07-12",
+    readTime: "9 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "What 'Drag-and-Drop' Really Means", content: "A drag-and-drop sitemap builder lets you add, move, and connect page nodes directly on a canvas without menus or forms. The interaction feels closer to sketching on a whiteboard than filling in a spreadsheet.\n\nGood drag-and-drop reduces the time-to-first-sitemap from hours to minutes. It also lowers the barrier for non-designers to contribute — a founder or product manager can build a competent sitemap without training." },
+      { heading: "Features That Actually Matter", content: "Free-form canvas: pan and zoom, place nodes anywhere.\n\nPage library: a set of pre-built page types (Home, Product, Pricing, Blog, Contact, etc.) that can be dragged in.\n\nConnections: draw lines between parent and child pages with a click-and-drag.\n\nExports: PNG, PDF, and ideally JSON for developer handoff.\n\nAI assist: optional generation of a first-draft sitemap from a description.\n\nCollaboration: share the sitemap with a URL for stakeholder review." },
+      { heading: "Features to Ignore", content: "Overloaded tools try to do wireframing, prototyping, and design inside the sitemap builder. This turns a five-minute planning artefact into a two-day design project.\n\nA good sitemap builder does one thing well. Wireframes belong in Figma, prototypes belong in prototyping tools, and the sitemap should stay structural." },
+      { heading: "Why EPIC Fits This Brief", content: "EPIC is a free, browser-based, drag-and-drop visual sitemap builder made for founders, designers, developers, and agencies. It has a page library, connections, PNG/PDF/JSON exports, an optional AI sitemap generator, and shareable sitemap URLs.\n\nIt intentionally does not try to be a wireframing tool. The whole workflow — from blank canvas to exported sitemap — is designed to take fifteen minutes for a typical marketing site." }
+    ],
+    faqs: [
+      { question: "Is EPIC free?", answer: "Yes. The visual sitemap builder is free to use in the browser with no sign-up required for basic use." },
+      { question: "Do I need to install anything?", answer: "No. EPIC runs entirely in the browser. Open the visual sitemap builder and start dragging nodes onto the canvas." },
+      { question: "Can I export the sitemap?", answer: "Yes — PNG for reviews and presentations, PDF for briefs, and JSON for developer handoff." }
+    ],
+    relatedArticles: ["best-visual-sitemap-builder", "how-to-create-a-visual-sitemap", "manual-vs-ai-sitemap-generator"]
+  },
+  "website-sitemap-for-developers-and-designers": {
+    slug: "website-sitemap-for-developers-and-designers",
+    metaTitle: "How Developers and Designers Can Use a Sitemap for Better Handoffs",
+    metaDescription: "A shared visual sitemap smooths designer-to-developer handoffs. Learn how to structure the sitemap, annotate it, and export it for engineering.",
+    keywords: "website sitemap for developers and designers, sitemap handoff, designer developer handoff, sitemap for engineering, sitemap JSON export",
+    h1: "How Developers and Designers Can Use a Sitemap for Better Handoffs",
+    publishDate: "2026-06-17",
+    lastModified: "2026-07-12",
+    readTime: "9 min read",
+    category: "Web Development",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "Why Handoffs Break", content: "Design-to-development handoffs break for a predictable reason: the design file shows pages, but the developer needs to know what URL each page lives at, how it nests under other pages, and which pages are variants of the same template.\n\nA visual sitemap fills that gap. It is the missing bridge between the design file (how it looks) and the codebase (how it is structured)." },
+      { heading: "What Developers Need from a Sitemap", content: "Every URL. Every route parameter. Every page's parent. Every page's intended template. Access rules (public, authenticated, admin). SEO metadata targets (title, description, canonical).\n\nA sitemap that carries this metadata is more valuable to developers than a Figma file with prettier screens." },
+      { heading: "What Designers Get Back", content: "When the sitemap is authoritative, designers know exactly which screens they need to design and which they do not. Pages that share a template only need one design. Pages that vary need explicit variants.\n\nThis prevents the two most expensive handoff problems: designing screens no one asked for and shipping features with no designs at all." },
+      { heading: "Annotating the Sitemap", content: "Each node in EPIC can carry a working title, URL slug, and short note. Add the intended template, access rule, and any special behaviour to the note. Colour-code by section so the whole team can scan by discipline.\n\nExport JSON alongside the PNG. The JSON becomes a machine-readable specification of every route the developer needs to implement." },
+      { heading: "A Workflow That Works", content: "Product manager and designer draft the sitemap together in EPIC. Developer reviews and adds route or template notes. Designer builds screens only for approved nodes. Developer scaffolds routes from the JSON export. All three keep the sitemap open as the single source of truth during the build." }
+    ],
+    faqs: [
+      { question: "Should the sitemap live alongside the code?", answer: "The JSON export can. Commit it to the repo so every developer has the authoritative structure available in their editor." },
+      { question: "Does EPIC integrate with Figma?", answer: "EPIC exports PNG and PDF that can be pasted into Figma pages, and JSON that can be referenced in project docs. Deeper integration is not required — most teams keep sitemap and design tools separate for good reason." },
+      { question: "Who owns the sitemap?", answer: "In most teams, the product manager or lead designer owns it. Developers should have edit access to correct route or template details." }
+    ],
+    relatedArticles: ["how-to-create-a-visual-sitemap", "user-flow-vs-sitemap-vs-wireframe", "seo-friendly-website-structure"]
+  },
+  "best-visual-sitemap-builder": {
+    slug: "best-visual-sitemap-builder",
+    metaTitle: "Best Visual Sitemap Builders for Founders and Website Teams",
+    metaDescription: "A practical comparison of visual sitemap builders — EPIC, Miro, FigJam, Lucidchart, and Slickplan — and how to choose the right one.",
+    keywords: "best visual sitemap builder, top sitemap tools, visual sitemap tools compared, sitemap builder comparison, best sitemap software",
+    h1: "Best Visual Sitemap Builders for Founders and Website Teams",
+    publishDate: "2026-06-18",
+    lastModified: "2026-07-12",
+    readTime: "10 min read",
+    category: "Web Planning",
+    pillarLinks: ["visual-sitemap-maker"],
+    sections: [
+      { heading: "Disclosure", content: "This article is published by EPIC. It compares EPIC to other visual sitemap builders. We have kept the descriptions of competing tools accurate and neutral so the comparison is useful whether or not you choose EPIC in the end." },
+      { heading: "How to Choose", content: "Pick the tool whose primary job is closest to what you are doing. If you need a general-purpose whiteboard for many kinds of diagrams, a whiteboard tool is fine. If your primary artefact is a sitemap, a dedicated sitemap builder will be faster and produce cleaner results.\n\nAlso consider price, learning curve, export options, and whether your team already uses the tool for something else." },
+      { heading: "EPIC", content: "Purpose-built visual sitemap builder. Free browser-based tool with a page library, drag-and-drop connections, optional AI sitemap generation, and PNG/PDF/JSON exports. Best for founders, designers, developers, and agencies who want a fast, focused sitemap workflow." },
+      { heading: "Miro and FigJam", content: "General-purpose collaborative whiteboards. Excellent for workshops and brainstorming, and both support sitemap-style diagrams via templates. Trade-off: they are not specialised for sitemaps, so building a large site takes longer and the output is more free-form. Best for teams that already use them for workshops and want to keep sitemap work in the same tool." },
+      { heading: "Lucidchart", content: "Diagramming tool with strong shape libraries. Solid for structured diagrams including sitemaps. Trade-off: paid beyond a small free tier and heavier interaction model than a drag-and-drop-first tool. Best for teams that need many kinds of formal diagrams." },
+      { heading: "Slickplan", content: "Long-standing dedicated sitemap tool. Focused feature set covering sitemaps and content planning. Trade-off: paid subscription; the interaction model is older than modern browser-based tools. Best for teams that specifically want a legacy dedicated sitemap product." },
+      { heading: "Quick Recommendation", content: "For most founders and small teams, start with EPIC — free, focused, and fast. If your team lives in Miro or FigJam for other work, use those. Move to Lucidchart or a dedicated legacy tool only when you have specific enterprise or compliance needs those tools satisfy." }
+    ],
+    faqs: [
+      { question: "Is a free tool enough for a real project?", answer: "Yes, for the vast majority of projects. Paid sitemap tools rarely add features that change the outcome of a normal website build." },
+      { question: "Do I need a sitemap tool at all?", answer: "You need a sitemap. Whether you build it in a dedicated tool, a whiteboard, or on paper depends on team size and how the artefact will be shared." },
+      { question: "Can I switch tools mid-project?", answer: "Yes. Export the current sitemap as an image and rebuild it in the new tool. Sitemaps are usually small enough that migration takes minutes." }
+    ],
+    relatedArticles: ["free-drag-and-drop-visual-sitemap-builder", "how-to-create-a-visual-sitemap", "manual-vs-ai-sitemap-generator"]
+  }
 };
 
 export const blogSlugs = Object.keys(blogPosts);
