@@ -1596,8 +1596,8 @@ export const blogPosts: Record<string, BlogPostData> = {
     ],
     relatedArticles: ["what-is-a-visual-sitemap", "seo-friendly-website-structure", "how-to-plan-website-structure-before-designing", "user-flow-vs-sitemap-vs-wireframe"]
   },
-  "seo-friendly-website-structure": {
-    slug: "seo-friendly-website-structure",
+  "seo-friendly-website-structure-guide": {
+    slug: "seo-friendly-website-structure-guide",
     metaTitle: "How Website Structure Affects SEO, User Experience, and Conversions",
     metaDescription: "Website structure directly affects SEO rankings, UX, and conversion rate. Learn how to build an SEO-friendly site structure with a visual sitemap.",
     keywords: "SEO friendly website structure, website structure SEO, site architecture SEO, SEO site structure, website hierarchy SEO",
