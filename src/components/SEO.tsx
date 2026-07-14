@@ -19,7 +19,7 @@ interface SEOProps {
 }
 
 const defaultOgImage = "https://storage.googleapis.com/gpt-engineer-file-uploads/ywM0UvtJ3VdIZjuQEJN3LrvvOCt2/social-images/social-1769532119034-download (1).jpeg";
-const baseUrl = "https://no-edit.lovable.app";
+const baseUrl = "https://epic-builder.vercel.app";
 
 export { baseUrl };
 
