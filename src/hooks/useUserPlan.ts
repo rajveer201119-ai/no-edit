@@ -9,14 +9,14 @@ interface UserPlan {
   isPremium: boolean; // student or pro
   isPro: boolean; // pro only
   canExportPDF: boolean; // pro only
-  canExportPNG: boolean; // pro only
+  canExportPNG: boolean; // free (with badge) + pro (clean)
   canExportJSON: boolean; // free + pro
   canUseUXTester: boolean; // pro only
   canUseAnalyzer: boolean; // pro only
   canUseLibrary: boolean; // pro only
-  maxProjects: number; // free: 1, pro: unlimited
-  maxPages: number; // free: 10, pro: unlimited
-  hasWatermark: boolean; // free only
+  maxProjects: number; // free: 3, pro: unlimited
+  maxPages: number; // free: 25, pro: unlimited
+  hasWatermark: boolean; // free only — small "Made with EPIC" badge on PNG
   userId: string | null;
 }
 
@@ -79,13 +79,13 @@ export function useUserPlan(): UserPlan {
     isPremium: plan !== "free",
     isPro: plan === "pro",
     canExportPDF: isPro,
-    canExportPNG: isPro,
+    canExportPNG: true, // free users can export PNG with a "Made with EPIC" badge
     canExportJSON: true, // free users can export JSON
     canUseUXTester: isPro,
     canUseAnalyzer: isPro,
     canUseLibrary: isPro,
-    maxProjects: isPro ? Infinity : 1,
-    maxPages: isPro ? Infinity : 10,
+    maxProjects: isPro ? Infinity : 3,
+    maxPages: isPro ? Infinity : 25,
     hasWatermark: plan === "free",
     userId,
   };

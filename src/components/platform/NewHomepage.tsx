@@ -89,13 +89,13 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
         
         <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5 }}
           className="text-balance bg-gradient-to-b from-black to-neutral-500 dark:from-white dark:to-white/60 bg-clip-text py-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-[-0.04em] text-transparent relative z-10 max-w-3xl">
-          Plan Your Website Structure Visually
+          The visual sitemap &amp; user-flow builder for product teams
         </motion.h1>
 
         {/* Subheadline */}
         <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}
           className="mt-4 mb-8 text-balance text-sm md:text-base tracking-tight text-neutral-600 dark:text-white/60 max-w-lg mx-auto relative z-10 leading-relaxed">
-          Plan and analyze website structures and organize user-flow visually. Export JSON and PNG file — no signup required.
+          Plan your website structure in minutes. Drag, connect, export developer-ready JSON or HD PNG. 3 free projects — no signup required.
         </motion.p>
 
         {/* Single primary CTA + secondary */}
@@ -103,20 +103,20 @@ export const NewHomepage = ({ onStartDesigning, onBrowseInspiration, onAIModeCli
           className="flex flex-col sm:flex-row items-center gap-3 relative z-20">
           <Button onClick={() => navigate("/navigation-maker")} size="lg"
             className="gap-2 min-w-[260px] min-h-[52px] rounded-[0.625rem] bg-neutral-100 dark:hover:bg-white/50: text-neutral-900 hover:bg-white/90 font-semibold text-sm shadow-lg shadow-white/10">
-            <Network className="h-4 w-4" /> Build sitemap
+            <Network className="h-4 w-4" /> Generate my sitemap free
           </Button>
           <Button onClick={() => navigate("/analyzer")} variant="outline" size="lg"
             className="gap-2 min-w-[200px] min-h-[52px] rounded-[0.625rem] border border-neutral-300 text-neutral-800 dark:border-white/20 dark:text-white hover:bg-neutral-100 dark:hover:bg-white/10 font-medium text-sm">
-            <Globe className="h-4 w-4" /> Analyze any Website
+            <Globe className="h-4 w-4" /> Analyze any website
           </Button>
         </motion.div>
 
         {/* Micro-trust indicators */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
           className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-neutral-600 dark:text-white/40 relative z-10">
-          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> Easy to Build</span>
-          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> JSON + PNG export</span>
-          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> 33+ SITEMAP templates</span>
+          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> 3 free projects</span>
+          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> PNG + JSON export</span>
+          <span className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3" /> No signup required</span>
         </motion.div>
 
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
