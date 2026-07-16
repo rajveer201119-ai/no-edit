@@ -17,9 +17,23 @@ interface ProPaywallProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   featureName?: string;
+  /** Optional contextual reason — drives headline/body copy. */
+  reason?:
+    | "export"
+    | "limit"
+    | "premium-feature"
+    | "hd-export"
+    | "pdf-export"
+    | "png-export"
+    | "json-export"
+    | "ux-tester"
+    | "analyzer"
+    | "library"
+    | "project-limit"
+    | "page-limit";
 }
 
-export const ProPaywall = ({ open, onOpenChange, featureName }: ProPaywallProps) => {
+export const ProPaywall = ({ open, onOpenChange, featureName, reason }: ProPaywallProps) => {
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "lifetime">("lifetime");
   const [payOpen, setPayOpen] = useState(false);
   const [showCoupon, setShowCoupon] = useState(false);
@@ -30,6 +44,39 @@ export const ProPaywall = ({ open, onOpenChange, featureName }: ProPaywallProps)
   const amount = selectedPlan === "monthly" ? 299 : 1500;
   const planLabel = selectedPlan === "monthly" ? "₹299/month" : "₹1,500 lifetime";
   const anchorPrice = selectedPlan === "monthly" ? 799 : 3500;
+
+  const contextHeadline = (() => {
+    if (featureName) return `Unlock ${featureName}`;
+    switch (reason) {
+      case "project-limit": return "You've filled your 3 free projects";
+      case "page-limit": return "You've hit 25 pages on this sitemap";
+      case "pdf-export": return "Clean PDF exports are a Pro feature";
+      case "png-export": return "Remove the \"Made with EPIC\" badge";
+      case "ux-tester": return "UX Tester is a Pro feature";
+      case "analyzer": return "Website Analyzer is a Pro feature";
+      case "library": return "Structure Library is a Pro feature";
+      case "hd-export": return "Unlock HD exports";
+      case "export": return "Ready to export without limits?";
+      case "premium-feature": return "This is a Pro feature";
+      default: return "Upgrade to EPIC Pro";
+    }
+  })();
+
+  const contextBody = (() => {
+    if (featureName) return `${featureName} is a Pro feature. Unlock it plus everything below.`;
+    switch (reason) {
+      case "project-limit":
+        return "Free plan includes 3 sitemap projects. Go Pro for unlimited projects, pages, and clean exports.";
+      case "page-limit":
+        return "Free sitemaps cap at 25 pages. Go Pro for unlimited pages and clean PNG/PDF exports.";
+      case "png-export":
+        return "Pro exports have no \"Made with EPIC\" badge and unlock HD PDF too.";
+      case "pdf-export":
+        return "Pro unlocks client-ready PDF exports at full resolution.";
+      default:
+        return "Unlimited sitemaps, exports, and every premium feature — for the price of one coffee.";
+    }
+  })();
 
   const handleApplyCoupon = async () => {
     if (!coupon.trim()) return;
@@ -73,14 +120,10 @@ export const ProPaywall = ({ open, onOpenChange, featureName }: ProPaywallProps)
               </span>
             </div>
             <DialogTitle className="text-2xl font-bold text-foreground">
-              {featureName
-                ? `Unlock ${featureName}`
-                : "Upgrade to EPIC Pro"}
+              {contextHeadline}
             </DialogTitle>
             <DialogDescription className="text-base text-muted-foreground">
-              {featureName
-                ? `${featureName} is a Pro feature. Unlock it plus everything else below.`
-                : "Unlimited sitemaps, exports, and every premium feature — for the price of one coffee."}
+              {contextBody}
             </DialogDescription>
             {/* Social proof */}
             <div className="flex items-center gap-3 pt-1">
