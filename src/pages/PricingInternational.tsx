@@ -102,13 +102,25 @@ const PricingInternational = () => {
                   <p className="text-muted-foreground">Get started for free</p>
                 </div>
                 <ul className="space-y-3">
-                  {["1 visual sitemap project", "First 10 pages per sitemap", "JSON Export"].map((f, i) => (
+                  {[
+                    "3 sitemap projects",
+                    "25 pages per sitemap",
+                    "PNG + JSON export",
+                    "60+ page types",
+                    "Public share links",
+                  ].map((f, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <Check className="h-5 w-5 text-primary mt-0.5" />
                       <span className="text-foreground">{f}</span>
                     </li>
                   ))}
-                  {["PDF Export", "PNG Export", "UX Tester", "Analyze Features", "Website Structure Library"].map((f, i) => (
+                  {[
+                    "Clean PNG (no watermark)",
+                    "PDF Export",
+                    "UX Tester",
+                    "Website Analyzer",
+                    "Structure Library",
+                  ].map((f, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <Lock className="h-5 w-5 text-muted-foreground/50 mt-0.5" />
                       <span className="text-muted-foreground/50">{f}</span>

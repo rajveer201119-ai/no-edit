@@ -217,13 +217,24 @@ const PricingIndia = () => {
                   <p className="text-sm text-muted-foreground">Try the basics, hit limits fast</p>
                 </div>
                 <ul className="space-y-2.5 text-sm">
-                  {["1 sitemap project", "10 pages max", "JSON export only"].map((f, i) => (
+                  {[
+                    "3 sitemap projects",
+                    "25 pages per sitemap",
+                    "PNG + JSON export",
+                    "60+ page types",
+                    "Public share links",
+                  ].map((f, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                       <span className="text-foreground">{f}</span>
                     </li>
                   ))}
-                  {["No PDF / PNG", "No UX Tester", "No Analyzer", "No template library"].map((f, i) => (
+                  {[
+                    "Clean PNG (no \"Made with EPIC\" badge)",
+                    "PDF export",
+                    "UX Tester + Analyzer",
+                    "Template library",
+                  ].map((f, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <X className="h-4 w-4 text-muted-foreground/40 mt-0.5 shrink-0" />
                       <span className="text-muted-foreground/60 line-through">{f}</span>

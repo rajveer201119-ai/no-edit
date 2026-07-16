@@ -2,11 +2,10 @@ import { ShaderAnimation } from "@/components/ui/shader-animation";
 import { Button } from "@/components/ui/button";
 
 const badges = [
-  "No Design Skills",
-  "Plan Websites",
-  "Export JSON", 
-  "200+ Templates",
-  "Free to Start"
+  "3 free projects",
+  "PNG + JSON export",
+  "60+ page types",
+  "No signup required",
 ];
 
 export const Hero = () => {
@@ -78,7 +77,7 @@ export const Hero = () => {
         bg-clip-text py-4 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold leading-none tracking-[-0.04em] 
         text-transparent opacity-0 relative z-10"
       >
-        Plan, design &amp; export — effortlessly
+        The visual sitemap &amp; user-flow builder for product teams
       </h1>
       
       <p
@@ -86,7 +85,7 @@ export const Hero = () => {
         text-sm md:text-base lg:text-lg tracking-tight text-neutral-400 
         opacity-0 max-w-xl mx-auto relative z-10 [animation-delay:200ms]"
       >
-        Map your website structure. Create stunning graphics. Export clean JSON or HD images — no tools, no layers, no learning curve.
+        Plan your website structure in minutes. Drag, connect, export developer-ready JSON or HD PNG — no signup required.
       </p>
       
       <div className="my-5 md:my-6 flex flex-wrap items-center justify-center gap-2 relative z-10 animate-fade-in opacity-0 [animation-delay:400ms]">
@@ -107,10 +106,10 @@ export const Hero = () => {
           size="lg"
           onClick={scrollToChat}
         >
-          Start Designing Free
+          Generate my sitemap free
         </Button>
         <p className="text-xs text-neutral-500">
-          Free forever. Upgrade anytime for ₹10.
+          3 free projects · No credit card · Pro from ₹299/mo
         </p>
       </div>
 
