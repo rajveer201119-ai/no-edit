@@ -1,117 +1,130 @@
+# AI Sitemap Builder — Implementation Plan
 
-# EPIC Refocus + Conversion Plan
+Goal: let a user describe a website, generate a validated hierarchical sitemap via Lovable AI, and drop it into EPIC's existing `NavigationMaker` canvas as fully editable nodes/connections — without breaking the current manual builder, User Flow mode, autosave, undo/redo, or auth.
 
-Two tracks, executed together: **(A) narrow the product** to sitemap + user-flow builder so it stops feeling like AI slop, and **(B) rebuild the free tier and paywall timing** so more free users become paid users.
-
-No changes to URLs, redirects, or existing SEO content. No business-logic changes outside plan/paywall/onboarding surfaces.
-
----
-
-## Track A — Refocus on sitemap + user-flow only
-
-### 1. Reposition the app shell
-- Make `NavigationMaker` (sitemap + user-flow) the primary in-app surface.
-- Hide/retire the design-editor entry points from navigation: `WorkspaceToolbar`, `CanvasWorkspace`, `ImageEditor`, `InpaintingPanel`, `MaskCanvas`, `SketchTool`, `ExportSizePack`, `BlankCanvasModal`, `DesignTypeModal`, `NichePresets`, `TemplatePreview`.
-- Keep the files (don't delete yet — safe rollback), but remove them from routing, `MainNavigation`, and `NewHomepage` CTAs.
-- Update `MainNavigation` tabs to: **Builder · My Projects · Templates · Analyzer · Library**.
-
-### 2. Delete the AI-slop overlays from the sitemap experience
-Remove imports and UI mounts of: `DesignScore`, `PromptAnalyzer`, `DesignIntentSelector`, `ZeroEditMode`, `AIReasoningOverlay`, `RemixLineage`, `DesignMistakeDetector`, `AIModeModal`, `CommunityPrompts`.
-Keep files on disk; just stop rendering them.
-
-### 3. Sitemap builder UX polish (small, high-leverage)
-- Consolidate the top bar into: **Project name · Save status · Undo/Redo · Share · Export · Upgrade (if free)**.
-- Add a first-run empty state with 3 clear CTAs: **Start from URL** · **Start from template** · **Start blank**.
-- Wire "Start from URL" to existing `firecrawl-map` → auto-generate nodes (already available, just needs a proper entry point).
-- Add Presentation mode (full-screen, arrow-key node walk) — small addition, high perceived value for client review.
-
-### 4. Copy + naming pass
-- Global find/replace of slop names in visible UI:
-  - "AI Reasoning" → remove
-  - "Design Score" → remove
-  - "Zero Edit Mode" → remove
-  - "Design Mistake Detector" → remove
-- One tagline across landing, pricing, meta: **"The visual sitemap & user-flow builder for product teams."**
+Everything reuses EPIC's current `CanvasNode` / `Connection` shape and history stack. No new page routes, no new nav tabs, no second editor.
 
 ---
 
-## Track B — Free tier + paywall timing rework
+## 1. Secure edge function: `generate-sitemap`
 
-### 5. New plan limits (edit `useUserPlan.ts` only — no schema changes)
-| Capability | Free (today) | Free (new) | Pro |
-|---|---|---|---|
-| Projects | 1 | **3** | ∞ |
-| Pages per project | 10 | **25** | ∞ |
-| PNG export | ❌ | **✅ with small "Made with EPIC" badge** | ✅ clean |
-| PDF export | ❌ | ❌ | ✅ |
-| JSON export | ✅ | ✅ | ✅ |
-| Share link | basic | basic | password + view/edit perms |
-| Analyzer / UX Tester / Library | ❌ | ❌ | ✅ |
+New Supabase edge function `supabase/functions/generate-sitemap/index.ts` (`verify_jwt = false`, CORS enabled, same pattern as `generate-image`).
 
-Rationale: 1-project free is why word-of-mouth is dead. 3 projects + watermarked PNG = viral loop + real utility, still gives strong reasons to upgrade.
+- Uses `LOVABLE_API_KEY` via the AI Gateway (`https://ai.gateway.lovable.dev/v1`, `@ai-sdk/openai-compatible`).
+- Model: `google/gemini-2.5-flash` (fast, cheap, strong JSON).
+- Input body: `{ description, websiteType?, audience?, size: "small"|"medium"|"large", includeUtility?, includeSeoLanding?, language? }`.
+- Server-side:
+  - Zod-validate request; reject empty (<10 chars) or >2000-char descriptions.
+  - Enhance short descriptions by injecting the selected options into the system prompt.
+  - Ask model for **strict JSON** (schema in system prompt). Use AI SDK `generateText` + `Output.object` with a *flat, constraint-free* Zod schema per `ai-sdk-lovable-gateway` rules (no min/max/enum bounds; limits stated in the prompt instead).
+  - Handle 429/402 explicitly and forward as clean JSON errors.
+- Returns `{ sitemap: SitemapJSON }` or `{ error: "friendly message" }`.
+- Registered in `supabase/config.toml`.
 
-### 6. Paywall timing — "let them taste it"
-- On **project #1**, all Pro features are unlocked in a soft-trial state (labeled "Pro preview"). Clean PNG export, PDF export, unlimited pages — all work once.
-- On the **first Pro action in project #2**, the unified upgrade dialog appears.
-- Kill duplicate paywall components: merge `ProPaywall`, `CreatorModePaywall`, `ProPlanDialog` into a single `UpgradeDialog` with contextual copy ("Unlock unlimited projects", "Export clean PNG", etc.) driven by a `reason` prop.
+## 2. Sitemap schema + validation/repair (`src/lib/sitemap/schema.ts`)
 
-### 7. Pricing page updates
-- Add **annual toggle** with 30% off (visual only if backend billing already supports it; otherwise annual = "contact us" for now).
-- Add a **Team plan** row (2–10 seats, per-seat pricing) — even as "Coming soon / Join waitlist" it signals ACV and captures leads.
-- Tighten the feature matrix: 6 rows max, benefit-led ("Unlimited sitemaps", "Client-ready PDF exports", "Presentation mode", "Password-protected share links", "Priority support", "Early access to new features").
-- Move testimonials / logos above the pricing table (populate `LandingCredibility` with real quotes if available; otherwise use anonymized role-based quotes).
+Zod schema matching the spec (`projectName`, `websiteType`, `description`, `pages[]` recursive with `id, name, slug, pageType, description, parentId, order, children[]`).
 
-### 8. Landing page conversion pass (Home is unlocked per your answer)
-- Replace hero copy with the new tagline + one demo GIF/video of URL → sitemap flow.
-- Primary CTA: **"Generate my sitemap free"** → routes to `/navigation-maker` with the URL prompt open.
-- Secondary CTA: **"See pricing"**.
-- Add a "Loved by product teams at…" logo strip (placeholder logos if none yet — mark for user to swap).
-- Add 3 use-case tiles: SaaS · E-commerce · Agencies. Each links to the matching existing pillar/alternative page (preserves SEO).
+Validation/repair utility `validateAndRepair(raw)`:
+- Parse JSON safely (also strips code fences if model wraps it).
+- Ensure a Home page exists (create one wrapping other roots if missing).
+- Normalize slugs: Home = `/`; else lowercase, hyphenate, strip unsupported chars, prefix `/`; dedupe by appending `-2`, `-3`, ….
+- Regenerate any missing/duplicate IDs with `crypto.randomUUID()`; reassign `parentId` accordingly.
+- Detect and break circular parent chains.
+- Enforce max depth = 4 (flatten excess into parent).
+- Enforce page-count caps per size (5-12 / 12-25 / 25-50); trim leaf-first if over.
+- Drop pages with empty names.
+- Returns `{ ok, sitemap, issues[] }`.
 
-### 9. Onboarding
-- First login → single modal: **"Paste your website URL to generate a starter sitemap"** (skippable).
-- Retire `OnboardingGuide`, `OnboardingOverlay`, `DesignWizard` from mount points; keep files.
+## 3. JSON → editor converter + auto layout (`src/lib/sitemap/toCanvas.ts`)
+
+- Flatten tree into `CanvasNode[]` reusing existing shape (map `pageType` → EPIC's page color palette, reuse `getDefaultSections` for known page ids).
+- Build `Connection[]` from parent → child links.
+- Tidy-tree layout: Home centered at top, siblings evenly spaced horizontally (200px gap), 180px vertical per level, subtree-width aware so nothing overlaps.
+- Returns `{ nodes, connections, bounds }` so caller can fit-to-viewport (reuse existing zoom/pan setters).
+
+## 4. Client generation pipeline (`src/lib/sitemap/generate.ts`)
+
+- `generateSitemap(input, { signal })` calls the edge function, then runs `validateAndRepair`.
+- Retry up to 3 times on: invalid JSON, schema failure that repair can't fix, network error.
+- Supports `AbortController` for cancel.
+- Never mutates current sitemap on failure — resolves with `{ ok:false, message }`.
+
+## 5. UI: `AISitemapModal` (`src/components/AISitemapModal.tsx`)
+
+Reuses shadcn `Dialog`, EPIC's Liquid Glass tokens.
+
+- Large textarea with the SaaS example placeholder from the brief.
+- Optional controls: Website Type (input), Target Audience (input), Size (Small/Medium/Large segmented), toggles for Utility pages & SEO landing pages, Language (select, default English).
+- Primary "Generate Sitemap" button, disabled while running.
+- Loading state cycles the four progress messages ("Understanding your website" → "Preparing the visual sitemap") every ~1.5s.
+- Cancel button wired to `AbortController`.
+- Error state: friendly copy, "Try Again", "Use Suggested Description" (prefills the SaaS example).
+- Accessible: labeled inputs, focus trap via Dialog, `aria-live="polite"` for progress + result, visible focus rings.
+
+## 6. Editor integration (`src/pages/NavigationMaker.tsx`)
+
+- Add a prominent "Generate with AI" button (`Sparkles` icon) in the existing top toolbar next to Undo/Redo — no new nav.
+- Hidden when `builderMode === "flow"` (sitemap-only for v1).
+- On success:
+  - Push current state to history first (single undo step reverts the entire AI generation).
+  - Replace `nodes` + `connections` with converted output.
+  - Trigger existing autosave path and fit-to-viewport.
+  - Toast "AI sitemap ready — every page is editable."
+- Add small "AI Generated" pill in the top bar for AI-originated projects (stored in project metadata / localStorage flag).
+
+## 7. AI Actions menu (post-generation)
+
+Dropdown near the AI button, visible only when current sitemap has ≥1 node:
+- Add missing pages · Simplify · Expand · Improve SEO structure · Add conversion pages · Add legal pages · Add blog structure · Regenerate selected branch · Describe changes (free-text).
+
+All routed through the same edge function with an `action` field + current sitemap JSON. Server returns a **diff** (`add[]`, `remove[]`, `rename[]`, `reparent[]`). Client shows a preview dialog listing the changes; user confirms → single history entry applied.
+
+"Regenerate selected branch" only sends the subtree rooted at the currently selected node.
+
+## 8. Usage tracking (non-blocking)
+
+New table `ai_sitemap_generations` (id, user_id nullable, session_id, size, succeeded, page_count, retries, created_at) with GRANTs + RLS (owner or anon-insert-only). Edge function inserts one row per attempt. No hard limits enforced yet — hooks in place for later.
+
+## 9. Tests (`src/lib/sitemap/__tests__/`)
+
+Vitest unit tests for `validateAndRepair` and `toCanvas`:
+- valid JSON, malformed JSON, missing Home, duplicate ids, duplicate slugs, invalid parentId, circular parents, over-deep nesting, oversize count, empty names, slug normalization.
+- Converter: parent→child edges, no overlapping nodes, Home at top.
+- Retry logic: succeeds after N failures within cap, gives up after 3 (mocked fetch).
+- Cancellation via AbortController.
+
+(Playwright E2E for the 10 industry descriptions listed in the brief is documented in a follow-up — v1 ships with the pipeline tests above; live prompt tests are non-deterministic and belong in a manual QA checklist.)
+
+## 10. Security & hygiene
+
+- `LOVABLE_API_KEY` stays server-side (already stored). Client never touches it.
+- Body size limit (server): 4KB. Reject descriptions <10 or >2000 chars.
+- Basic per-IP rate limit: 10 requests / 5 min via in-memory map in the edge function (best-effort; upgrade later).
+- All user-facing errors are generic ("We couldn't generate a valid sitemap this time…"). Technical details logged server-side only.
+- Never render raw JSON, provider names, or stack traces in the UI.
 
 ---
 
-## Technical details
+## Technical notes / file map
 
-**Files to edit (Track A):**
-- `src/App.tsx` — remove unused routes if any; keep for now.
-- `src/components/platform/MainNavigation.tsx` — new tab set.
-- `src/components/platform/NewHomepage.tsx` — new hero + CTAs.
-- `src/components/Hero.tsx` — new copy.
-- `src/pages/NavigationMaker.tsx` — empty state, URL-import CTA, presentation mode.
-- `src/components/platform/index.ts`, `src/components/platform/editor/index.ts` — stop re-exporting slop modules (or leave; just don't mount).
+New:
+- `supabase/functions/generate-sitemap/index.ts`
+- `supabase/functions/_shared/ai-gateway.ts` (helper per `ai-sdk-lovable-gateway`)
+- `src/lib/sitemap/schema.ts`
+- `src/lib/sitemap/validateAndRepair.ts`
+- `src/lib/sitemap/toCanvas.ts`
+- `src/lib/sitemap/generate.ts`
+- `src/lib/sitemap/__tests__/*.test.ts`
+- `src/components/AISitemapModal.tsx`
+- `src/components/AIActionsMenu.tsx`
+- migration: `ai_sitemap_generations` table + GRANTs + RLS
 
-**Files to edit (Track B):**
-- `src/hooks/useUserPlan.ts` — new limits.
-- `src/components/ProPaywall.tsx` → become the unified `UpgradeDialog`; `CreatorModePaywall.tsx` + `ProPlanDialog.tsx` re-export the same component with preset `reason` props (no import breakage).
-- `src/pages/PricingIndia.tsx`, `src/pages/PricingInternational.tsx` — annual toggle, team row, tightened matrix.
-- `src/components/platform/LandingCredibility.tsx` — social proof block.
-- New: `src/components/UpgradeDialog.tsx` (contextual paywall).
-- New: `src/components/PresentationMode.tsx`.
+Edited:
+- `src/pages/NavigationMaker.tsx` — add AI button, actions menu, apply-generated-sitemap flow (respects existing history / autosave).
+- `supabase/config.toml` — register new function.
 
-**Do NOT touch:**
-- URLs / redirects / `sitemap.xml` / `robots.txt`.
-- Blog content, pillar pages, alternative pages, structured data.
-- Supabase schema, RLS, edge functions.
-- `user_subscriptions` write paths (admin-write-only per memory).
-
-**Verification after build:**
-- `/` renders new hero and CTAs.
-- `/navigation-maker` shows empty-state with URL/Template/Blank.
-- Free user with 0 projects can create + export PNG (with badge).
-- Free user creating project #2 hits `UpgradeDialog`.
-- Pricing page shows annual toggle and Team row.
-- No console errors; no removed-module import errors.
-
----
-
-## What this plan explicitly does NOT do
-
-- Does not add real-time collaboration (bigger project — flagged for next round).
-- Does not delete files (safe rollback path).
-- Does not touch image-editor code beyond hiding entry points.
-- Does not change payment provider or add new SKUs beyond a Team waitlist row.
-- Does not modify existing SEO content.
+Out of scope (explicitly not touched):
+- Home tab / landing page (immutable).
+- User Flow mode canvas.
+- Auth, pricing, existing editor tools.
