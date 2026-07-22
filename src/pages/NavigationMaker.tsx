@@ -2058,6 +2058,13 @@ const NavigationMaker = () => {
         open={showPaywall} 
         onOpenChange={setShowPaywall} 
       />
+
+      <AISitemapModal
+        open={aiModalOpen}
+        onOpenChange={setAiModalOpen}
+        onGenerated={applyGeneratedSitemap}
+        hasExistingSitemap={nodes.length > 0}
+      />
     </>
   );
 };
