@@ -287,6 +287,8 @@ const NavigationMaker = () => {
   }, [builderMode]);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [isAiGenerated, setIsAiGenerated] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const isMobileRef = useRef(false);
   
