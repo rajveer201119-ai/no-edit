@@ -48,7 +48,6 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { AISitemapModal } from "@/components/AISitemapModal";
 import { sitemapToCanvas } from "@/lib/sitemap/toCanvas";
 import type { AiSitemap } from "@/lib/sitemap/schema";
-import { Sparkles } from "lucide-react";
 
 // ====== STOCK PAGES ======
 const stockPages = [
