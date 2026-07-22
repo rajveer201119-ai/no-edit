@@ -411,6 +411,42 @@ const NavigationMaker = () => {
     setHistoryIndex(i => i + 1);
   }, [historyIndex, history]);
 
+  // Apply an AI-generated sitemap to the canvas. Replaces current nodes/connections
+  // with a single history entry so the whole generation can be undone with Ctrl/Cmd+Z.
+  const applyGeneratedSitemap = useCallback((sitemap: AiSitemap) => {
+    const { nodes: aiNodes, connections: aiConns } = sitemapToCanvas(sitemap);
+    const newNodes: CanvasNode[] = aiNodes.map((n) => ({
+      id: n.id,
+      pageId: n.pageId,
+      label: n.label,
+      x: n.x,
+      y: n.y,
+      color: n.color,
+      pageType: (n.pageType as PageType) || "Content",
+      slug: n.slug,
+      description: n.description,
+      colorTag: n.colorTag || "none",
+      sections: getDefaultSections(n.pageId),
+    }));
+    const newConns: Connection[] = aiConns.map((c) => ({
+      id: c.id,
+      fromId: c.fromId,
+      toId: c.toId,
+      label: c.label,
+    }));
+    setNodes(newNodes);
+    setConnections(newConns);
+    setSelectedNode(null);
+    setSelectedNodes(new Set());
+    pushHistory(newNodes, newConns);
+    setIsAiGenerated(true);
+    if (sitemap.projectName && !currentProjectId) {
+      setCurrentProjectName(sitemap.projectName);
+    }
+    // Reset zoom so the fresh layout is visible.
+    setZoomLevel(1);
+  }, [pushHistory, currentProjectId]);
+
   // (Keyboard shortcuts effect declared later, after duplicateNode/deleteSelected exist.)
 
   // Builder mode filters the palette: Sitemap hides "User Flow", Flow shows only it.
