@@ -1071,19 +1071,19 @@ const NavigationMaker = () => {
 
       <div className="min-h-screen bg-[#f8f9fb] dark:bg-background">
         {/* Top Bar */}
-        <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-white/90 dark:bg-card/90 backdrop-blur-xl border-b border-neutral-200 dark:border-border/40 flex items-center px-3 md:px-5 gap-2 md:gap-3">
+        <header className="fixed top-0 left-0 right-0 z-50 h-14 max-w-full overflow-hidden bg-white/90 dark:bg-card/90 backdrop-blur-xl border-b border-neutral-200 dark:border-border/40 flex items-center px-2 sm:px-3 md:px-5 gap-1.5 sm:gap-2 md:gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="h-9 w-9 rounded-lg shrink-0" aria-label="Back to home">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-sm">🏗</span>
-            <h1 className="text-sm font-semibold text-foreground truncate max-w-[100px] md:max-w-[180px]">{currentProjectName}</h1>
+          <div className="flex items-center gap-2 min-w-0 shrink">
+            <span className="text-sm hidden sm:inline">🏗</span>
+            <h1 className="text-sm font-semibold text-foreground truncate max-w-[70px] sm:max-w-[110px] md:max-w-[180px]">{currentProjectName}</h1>
           </div>
           
-          <div className="flex-1" />
+          <div className="flex-1 min-w-0" />
 
           {/* Undo/Redo — always visible */}
-          <div className="flex items-center gap-1 bg-neutral-100 dark:bg-muted/50 rounded-lg p-1 shrink-0">
+          <div className="hidden sm:flex items-center gap-1 bg-neutral-100 dark:bg-muted/50 rounded-lg p-1 shrink-0">
             <Button variant="ghost" size="icon" onClick={undo} disabled={historyIndex <= 0} className="h-7 w-7 rounded-md" title="Undo (⌘Z)" aria-label="Undo">
               <Undo2 className="h-3.5 w-3.5" />
             </Button>
