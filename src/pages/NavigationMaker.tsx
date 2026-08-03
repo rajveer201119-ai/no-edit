@@ -669,78 +669,140 @@ const NavigationMaker = () => {
     return () => window.removeEventListener("keydown", handler);
   }, [undo, redo, selectedNode, selectedNodes, connectingFrom, duplicateNode, deleteSelected]);
 
-  // Track if a touch was a drag or a tap
-  const touchDraggedRef = useRef(false);
+  // ====== DRAGGING (pointer-based, zoom-aware, rAF-smoothed) ======
+  const GRID = 8;
+  const NODE_W = 180;
+  const dragStateRef = useRef<{
+    origin: { x: number; y: number };
+    offsets: { id: string; dx: number; dy: number }[];
+    moved: boolean;
+  } | null>(null);
+  const suppressClickRef = useRef(false);
+  const rafRef = useRef<number | null>(null);
+  const pendingPointRef = useRef<{ x: number; y: number; snap: boolean } | null>(null);
 
-  const handleMouseDown = (e: React.MouseEvent, nodeId: string) => {
-    e.stopPropagation();
-    const node = nodes.find(n => n.id === nodeId);
-    if (!node || !canvasRef.current) return;
+  // Convert a viewport point into unscaled canvas coordinates.
+  const toCanvasPoint = useCallback((clientX: number, clientY: number) => {
+    const rect = canvasRef.current!.getBoundingClientRect();
+    return { x: (clientX - rect.left) / zoomLevel, y: (clientY - rect.top) / zoomLevel };
+  }, [zoomLevel]);
+
+  const applyDrag = useCallback(() => {
+    rafRef.current = null;
+    const state = dragStateRef.current;
+    const point = pendingPointRef.current;
+    if (!state || !point || !canvasRef.current) return;
     const rect = canvasRef.current.getBoundingClientRect();
+    const maxX = rect.width / zoomLevel - NODE_W;
+    const maxY = rect.height / zoomLevel - 60;
+    const positions: Record<string, { x: number; y: number }> = {};
+    state.offsets.forEach(o => {
+      let x = point.x - o.dx;
+      let y = point.y - o.dy;
+      if (point.snap) { x = Math.round(x / GRID) * GRID; y = Math.round(y / GRID) * GRID; }
+      positions[o.id] = { x: Math.max(0, Math.min(maxX, x)), y: Math.max(0, Math.min(maxY, y)) };
+    });
+    setNodes(prev => prev.map(n => (positions[n.id] ? { ...n, ...positions[n.id] } : n)));
+  }, [zoomLevel]);
+
+  const handlePointerDown = (e: React.PointerEvent, nodeId: string) => {
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    const target = e.target as HTMLElement;
+    if (target.closest("button, input, textarea, select, a")) return;
+    if (!canvasRef.current) return;
+    e.stopPropagation();
+    const point = toCanvasPoint(e.clientX, e.clientY);
+    // Drag the whole multi-selection when the grabbed node is part of it.
+    const group = selectedNodes.has(nodeId) ? nodes.filter(n => selectedNodes.has(n.id)) : nodes.filter(n => n.id === nodeId);
+    if (group.length === 0) return;
+    dragStateRef.current = {
+      origin: point,
+      offsets: group.map(n => ({ id: n.id, dx: point.x - n.x, dy: point.y - n.y })),
+      moved: false,
+    };
+    suppressClickRef.current = false;
     setDraggingNode(nodeId);
-    setDragOffset({ x: e.clientX - rect.left - node.x, y: e.clientY - rect.top - node.y });
+    try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { /* noop */ }
   };
 
-  const handleTouchStart = (e: React.TouchEvent, nodeId: string) => {
-    e.stopPropagation();
-    const node = nodes.find(n => n.id === nodeId);
-    if (!node || !canvasRef.current) return;
-    const touch = e.touches[0];
-    const rect = canvasRef.current.getBoundingClientRect();
-    setDraggingNode(nodeId);
-    setDragOffset({ x: touch.clientX - rect.left - node.x, y: touch.clientY - rect.top - node.y });
-    touchDraggedRef.current = false;
-  };
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!draggingNode || !canvasRef.current) return;
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(rect.width - 180, e.clientX - rect.left - dragOffset.x));
-    const y = Math.max(0, Math.min(rect.height - 60, e.clientY - rect.top - dragOffset.y));
-    setNodes(prev => prev.map(n => n.id === draggingNode ? { ...n, x, y } : n));
-  }, [draggingNode, dragOffset]);
-
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!draggingNode || !canvasRef.current) return;
-    e.preventDefault(); // Prevent scrolling while dragging
-    touchDraggedRef.current = true;
-    const touch = e.touches[0];
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(rect.width - 180, touch.clientX - rect.left - dragOffset.x));
-    const y = Math.max(0, Math.min(rect.height - 60, touch.clientY - rect.top - dragOffset.y));
-    setNodes(prev => prev.map(n => n.id === draggingNode ? { ...n, x, y } : n));
-  }, [draggingNode, dragOffset]);
-
-  const handleMouseUp = useCallback(() => {
-    if (draggingNode) {
-      pushHistory(nodes, connections);
+  const handlePointerMove = useCallback((e: PointerEvent) => {
+    const state = dragStateRef.current;
+    if (!state || !canvasRef.current) return;
+    const point = toCanvasPoint(e.clientX, e.clientY);
+    if (!state.moved) {
+      const dist = Math.hypot(point.x - state.origin.x, point.y - state.origin.y);
+      if (dist < 3) return; // ignore jitter so taps still register as clicks
+      state.moved = true;
+      suppressClickRef.current = true;
     }
-    setDraggingNode(null);
-  }, [draggingNode, nodes, connections, pushHistory]);
+    pendingPointRef.current = { ...point, snap: !e.altKey };
+    if (rafRef.current === null) rafRef.current = requestAnimationFrame(applyDrag);
+  }, [toCanvasPoint, applyDrag]);
 
-  const handleTouchEnd = useCallback(() => {
-    if (draggingNode) {
-      pushHistory(nodes, connections);
-      // If it was a tap (not dragged), open mobile edit sheet
-      if (!touchDraggedRef.current && isMobileRef.current) {
-        setMobileNodeEditId(draggingNode);
-      }
-    }
+  const handlePointerUp = useCallback(() => {
+    const state = dragStateRef.current;
+    if (rafRef.current !== null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; applyDrag(); }
+    dragStateRef.current = null;
+    pendingPointRef.current = null;
+    if (state?.moved) pushHistory(nodes, connections);
     setDraggingNode(null);
-  }, [draggingNode, nodes, connections, pushHistory]);
+  }, [nodes, connections, pushHistory, applyDrag]);
 
   useEffect(() => {
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
-    window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointercancel", handlePointerUp);
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointercancel", handlePointerUp);
     };
-  }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
+  }, [handlePointerMove, handlePointerUp]);
+
+  // ====== CANVAS PAN + WHEEL ZOOM ======
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const panRef = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
+  const [isPanning, setIsPanning] = useState(false);
+
+  const handleCanvasPointerDown = (e: React.PointerEvent) => {
+    if (!scrollRef.current) return;
+    // Only pan from empty canvas (left button) or middle-click anywhere.
+    const isBackground = e.target === e.currentTarget || (e.target as HTMLElement).dataset.canvasBackground === "true";
+    if (e.button !== 1 && !(e.button === 0 && isBackground)) return;
+    panRef.current = { x: e.clientX, y: e.clientY, left: scrollRef.current.scrollLeft, top: scrollRef.current.scrollTop };
+    setIsPanning(true);
+  };
+
+  useEffect(() => {
+    if (!isPanning) return;
+    const move = (e: PointerEvent) => {
+      const pan = panRef.current;
+      if (!pan || !scrollRef.current) return;
+      scrollRef.current.scrollLeft = pan.left - (e.clientX - pan.x);
+      scrollRef.current.scrollTop = pan.top - (e.clientY - pan.y);
+    };
+    const up = () => { panRef.current = null; setIsPanning(false); };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+    };
+  }, [isPanning]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      setZoomLevel(z => Math.min(2, Math.max(0.3, +(z - e.deltaY * 0.002).toFixed(3))));
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
 
   const handleNodeClick = (nodeId: string, e?: React.MouseEvent) => {
     // Multi-select with Shift+Click
@@ -1454,7 +1516,14 @@ const NavigationMaker = () => {
           </button>
 
           {/* Canvas */}
-          <div className="flex-1 relative overflow-auto canvas-dot-grid">
+          <div
+            ref={scrollRef}
+            onPointerDown={handleCanvasPointerDown}
+            className={cn(
+              "flex-1 relative overflow-auto canvas-dot-grid overscroll-contain",
+              isPanning ? "cursor-grabbing select-none" : "cursor-default"
+            )}
+          >
             {nodes.length === 0 && (
               <div className="pointer-events-none absolute inset-x-0 top-20 z-20 flex justify-center px-4 md:hidden">
                 <div className="pointer-events-auto w-full max-w-sm rounded-[28px] border border-border/70 bg-background/95 p-5 text-center shadow-[0_24px_80px_-40px_hsla(var(--foreground)/0.28)] backdrop-blur-xl">
@@ -1485,7 +1554,15 @@ const NavigationMaker = () => {
             )}
             {/* UX Score Panel */}
             <UXScorePanel nodes={nodes} connections={connections} visible={showUXScore} onClose={() => setShowUXScore(false)} isPremium={isPremium} onUpgrade={() => setShowPaywall(true)} />
-            <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px] origin-top-left transition-transform duration-150" style={{ transform: `scale(${zoomLevel})` }}>
+            <div
+              ref={canvasRef}
+              data-canvas-background="true"
+              className={cn(
+                "relative w-full h-full min-w-[1400px] min-h-[900px] origin-top-left",
+                !draggingNode && !isPanning && "transition-transform duration-150"
+              )}
+              style={{ transform: `scale(${zoomLevel})` }}
+            >
               {/* SVG Connections — Curved Bezier lines */}
               <svg ref={svgRef} className="absolute inset-0 w-full h-full z-0" style={{ pointerEvents: "none" }}>
                 <defs>
@@ -1610,9 +1687,12 @@ const NavigationMaker = () => {
                       style={{ left: node.x, top: node.y, width: nodeW }}
                     >
                       <div
-                        onMouseDown={e => handleMouseDown(e, node.id)}
-                        onTouchStart={e => handleTouchStart(e, node.id)}
-                        onClick={(e) => handleNodeClick(node.id, e)}
+                        onPointerDown={e => handlePointerDown(e, node.id)}
+                        onClick={(e) => {
+                          if (suppressClickRef.current) { suppressClickRef.current = false; return; }
+                          handleNodeClick(node.id, e);
+                        }}
+                        style={{ touchAction: "none" }}
                         className={cn(
                           "rounded-xl bg-white dark:bg-card cursor-grab active:cursor-grabbing transition-all duration-200",
                           "shadow-[0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-none border",
