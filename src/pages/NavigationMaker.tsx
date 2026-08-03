@@ -1075,9 +1075,9 @@ const NavigationMaker = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="h-9 w-9 rounded-lg shrink-0" aria-label="Back to home">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-2 min-w-0 shrink xl:shrink-0">
+          <div className="flex items-center gap-2 min-w-0 shrink 2xl:shrink-0">
             <span className="text-sm hidden sm:inline">🏗</span>
-            <h1 className="text-sm font-semibold text-foreground truncate max-w-[70px] sm:max-w-[110px] md:max-w-[180px] xl:max-w-[120px]">{currentProjectName}</h1>
+            <h1 className="text-sm font-semibold text-foreground truncate max-w-[70px] sm:max-w-[110px] md:max-w-[180px] 2xl:max-w-[120px]">{currentProjectName}</h1>
           </div>
           
           <div className="flex-1 min-w-0" />
@@ -1115,7 +1115,7 @@ const NavigationMaker = () => {
           )}
 
           {connectingFrom && (
-            <div className="hidden xl:flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg shrink-0">
+            <div className="hidden 2xl:flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg shrink-0">
               <Input 
                 placeholder="Link label (optional)…"
                 value={connectionLabel}
@@ -1128,7 +1128,7 @@ const NavigationMaker = () => {
           )}
 
           {/* Desktop action buttons — hidden below xl */}
-          <div className="hidden xl:flex items-center gap-2 shrink-0">
+          <div className="hidden 2xl:flex items-center gap-2 shrink-0">
             {/* Zoom controls */}
             <div className="flex items-center gap-0.5 bg-neutral-100 dark:bg-muted/50 rounded-lg p-1">
               <Button variant="ghost" size="icon" onClick={zoomOut} className="h-7 w-7 rounded-md" title="Zoom Out" aria-label="Zoom out">
@@ -1199,7 +1199,7 @@ const NavigationMaker = () => {
           </div>
 
           {/* Compact action menu — visible below xl */}
-          <div className="flex xl:hidden items-center gap-1 shrink-0">
+          <div className="flex 2xl:hidden items-center gap-1 shrink-0">
             <div className="inline-flex items-center rounded-xl border border-border/60 bg-background/85 p-0.5 shadow-sm backdrop-blur">
               <button
                 onClick={() => setBuilderMode("sitemap")}
@@ -1291,7 +1291,7 @@ const NavigationMaker = () => {
 
         {/* Compact connection-mode banner (below xl, where the header version is hidden) */}
         {connectingFrom && (
-          <div className="xl:hidden fixed top-14 left-0 right-0 z-40 flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-500/10 border-b border-blue-200 dark:border-blue-500/20">
+          <div className="2xl:hidden fixed top-14 left-0 right-0 z-40 flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-500/10 border-b border-blue-200 dark:border-blue-500/20">
             <Input
               placeholder="Link label (optional)…"
               value={connectionLabel}
