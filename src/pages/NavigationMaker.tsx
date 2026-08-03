@@ -1075,9 +1075,9 @@ const NavigationMaker = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="h-9 w-9 rounded-lg shrink-0" aria-label="Back to home">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-2 min-w-0 shrink">
+          <div className="flex items-center gap-2 min-w-0 shrink xl:shrink-0">
             <span className="text-sm hidden sm:inline">🏗</span>
-            <h1 className="text-sm font-semibold text-foreground truncate max-w-[70px] sm:max-w-[110px] md:max-w-[180px]">{currentProjectName}</h1>
+            <h1 className="text-sm font-semibold text-foreground truncate max-w-[70px] sm:max-w-[110px] md:max-w-[180px] xl:max-w-[120px]">{currentProjectName}</h1>
           </div>
           
           <div className="flex-1 min-w-0" />
