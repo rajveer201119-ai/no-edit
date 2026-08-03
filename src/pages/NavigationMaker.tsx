@@ -695,15 +695,14 @@ const NavigationMaker = () => {
     const rect = canvasRef.current.getBoundingClientRect();
     const maxX = rect.width / zoomLevel - NODE_W;
     const maxY = rect.height / zoomLevel - 60;
-    const positions = new Map(
-      state.offsets.map(o => {
-        let x = point.x - o.dx;
-        let y = point.y - o.dy;
-        if (point.snap) { x = Math.round(x / GRID) * GRID; y = Math.round(y / GRID) * GRID; }
-        return [o.id, { x: Math.max(0, Math.min(maxX, x)), y: Math.max(0, Math.min(maxY, y)) }] as const;
-      })
-    );
-    setNodes(prev => prev.map(n => (positions.has(n.id) ? { ...n, ...positions.get(n.id)! } : n)));
+    const positions: Record<string, { x: number; y: number }> = {};
+    state.offsets.forEach(o => {
+      let x = point.x - o.dx;
+      let y = point.y - o.dy;
+      if (point.snap) { x = Math.round(x / GRID) * GRID; y = Math.round(y / GRID) * GRID; }
+      positions[o.id] = { x: Math.max(0, Math.min(maxX, x)), y: Math.max(0, Math.min(maxY, y)) };
+    });
+    setNodes(prev => prev.map(n => (positions[n.id] ? { ...n, ...positions[n.id] } : n)));
   }, [zoomLevel]);
 
   const handlePointerDown = (e: React.PointerEvent, nodeId: string) => {
