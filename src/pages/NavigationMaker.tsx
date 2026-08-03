@@ -1672,9 +1672,12 @@ const NavigationMaker = () => {
                       style={{ left: node.x, top: node.y, width: nodeW }}
                     >
                       <div
-                        onMouseDown={e => handleMouseDown(e, node.id)}
-                        onTouchStart={e => handleTouchStart(e, node.id)}
-                        onClick={(e) => handleNodeClick(node.id, e)}
+                        onPointerDown={e => handlePointerDown(e, node.id)}
+                        onClick={(e) => {
+                          if (suppressClickRef.current) { suppressClickRef.current = false; return; }
+                          handleNodeClick(node.id, e);
+                        }}
+                        style={{ touchAction: "none" }}
                         className={cn(
                           "rounded-xl bg-white dark:bg-card cursor-grab active:cursor-grabbing transition-all duration-200",
                           "shadow-[0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-none border",
