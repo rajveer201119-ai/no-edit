@@ -1289,6 +1289,20 @@ const NavigationMaker = () => {
           </div>
         </header>
 
+        {/* Compact connection-mode banner (below xl, where the header version is hidden) */}
+        {connectingFrom && (
+          <div className="xl:hidden fixed top-14 left-0 right-0 z-40 flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-500/10 border-b border-blue-200 dark:border-blue-500/20">
+            <Input
+              placeholder="Link label (optional)…"
+              value={connectionLabel}
+              onChange={e => setConnectionLabel(e.target.value)}
+              className="h-7 flex-1 min-w-0 text-xs border-blue-200 dark:border-blue-500/30"
+            />
+            <span className="hidden sm:inline text-xs text-blue-600 dark:text-blue-400 animate-pulse whitespace-nowrap">Click target node…</span>
+            <Button size="sm" variant="ghost" onClick={() => { setConnectingFrom(null); setConnectionLabel(""); }} className="h-7 text-xs shrink-0">Cancel</Button>
+          </div>
+        )}
+
         <div className="flex pt-14 h-screen">
           {/* Sidebar — Stock Pages */}
           <aside className="w-60 border-r border-neutral-200 dark:border-border/40 bg-white dark:bg-card/50 flex flex-col shrink-0 hidden md:flex">
