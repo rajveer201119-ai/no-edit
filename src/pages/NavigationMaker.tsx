@@ -1115,7 +1115,7 @@ const NavigationMaker = () => {
           )}
 
           {connectingFrom && (
-            <div className="hidden md:flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg">
+            <div className="hidden xl:flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg shrink-0">
               <Input 
                 placeholder="Link label (optional)…"
                 value={connectionLabel}
@@ -1127,8 +1127,8 @@ const NavigationMaker = () => {
             </div>
           )}
 
-          {/* Desktop action buttons — hidden on mobile */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Desktop action buttons — hidden below xl */}
+          <div className="hidden xl:flex items-center gap-2 shrink-0">
             {/* Zoom controls */}
             <div className="flex items-center gap-0.5 bg-neutral-100 dark:bg-muted/50 rounded-lg p-1">
               <Button variant="ghost" size="icon" onClick={zoomOut} className="h-7 w-7 rounded-md" title="Zoom Out" aria-label="Zoom out">
@@ -1198,13 +1198,13 @@ const NavigationMaker = () => {
             </Button>
           </div>
 
-          {/* Mobile action menu — visible only on mobile */}
-          <div className="flex md:hidden items-center gap-1 shrink-0">
+          {/* Compact action menu — visible below xl */}
+          <div className="flex xl:hidden items-center gap-1 shrink-0">
             <div className="inline-flex items-center rounded-xl border border-border/60 bg-background/85 p-0.5 shadow-sm backdrop-blur">
               <button
                 onClick={() => setBuilderMode("sitemap")}
                 className={cn(
-                  "min-w-[64px] rounded-[10px] px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200",
+                  "min-w-[44px] sm:min-w-[60px] rounded-[10px] px-2 sm:px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200",
                   builderMode === "sitemap"
                     ? "bg-foreground text-background shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
@@ -1215,7 +1215,7 @@ const NavigationMaker = () => {
               <button
                 onClick={() => setBuilderMode("flow")}
                 className={cn(
-                  "min-w-[64px] rounded-[10px] px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200",
+                  "min-w-[44px] sm:min-w-[60px] rounded-[10px] px-2 sm:px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200",
                   builderMode === "flow"
                     ? "bg-foreground text-background shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
@@ -1224,7 +1224,7 @@ const NavigationMaker = () => {
                 Flow
               </button>
             </div>
-            <Button size="sm" onClick={exportNavigation} className="gap-1 h-8 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 px-2.5">
+            <Button size="sm" onClick={exportNavigation} className="hidden sm:flex gap-1 h-8 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 px-2.5">
               <Download className="h-3.5 w-3.5" /> PNG
             </Button>
             <ThemeToggle />
@@ -1235,6 +1235,16 @@ const NavigationMaker = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={exportNavigation} className="sm:hidden">
+                  <Download className="h-4 w-4 mr-2" /> Export PNG
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={undo} disabled={historyIndex <= 0} className="sm:hidden">
+                  <Undo2 className="h-4 w-4 mr-2" /> Undo
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={redo} disabled={historyIndex >= history.length - 1} className="sm:hidden">
+                  <Redo2 className="h-4 w-4 mr-2" /> Redo
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="sm:hidden" />
                 <DropdownMenuItem onClick={() => setShowUXScore(!showUXScore)}>
                   <TrendingUp className="h-4 w-4 mr-2" /> UX Score
                 </DropdownMenuItem>
