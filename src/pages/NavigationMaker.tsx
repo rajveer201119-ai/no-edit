@@ -1516,7 +1516,14 @@ const NavigationMaker = () => {
           </button>
 
           {/* Canvas */}
-          <div className="flex-1 relative overflow-auto canvas-dot-grid">
+          <div
+            ref={scrollRef}
+            onPointerDown={handleCanvasPointerDown}
+            className={cn(
+              "flex-1 relative overflow-auto canvas-dot-grid overscroll-contain",
+              isPanning ? "cursor-grabbing select-none" : "cursor-default"
+            )}
+          >
             {nodes.length === 0 && (
               <div className="pointer-events-none absolute inset-x-0 top-20 z-20 flex justify-center px-4 md:hidden">
                 <div className="pointer-events-auto w-full max-w-sm rounded-[28px] border border-border/70 bg-background/95 p-5 text-center shadow-[0_24px_80px_-40px_hsla(var(--foreground)/0.28)] backdrop-blur-xl">
@@ -1547,7 +1554,15 @@ const NavigationMaker = () => {
             )}
             {/* UX Score Panel */}
             <UXScorePanel nodes={nodes} connections={connections} visible={showUXScore} onClose={() => setShowUXScore(false)} isPremium={isPremium} onUpgrade={() => setShowPaywall(true)} />
-            <div ref={canvasRef} className="relative w-full h-full min-w-[1400px] min-h-[900px] origin-top-left transition-transform duration-150" style={{ transform: `scale(${zoomLevel})` }}>
+            <div
+              ref={canvasRef}
+              data-canvas-background="true"
+              className={cn(
+                "relative w-full h-full min-w-[1400px] min-h-[900px] origin-top-left",
+                !draggingNode && !isPanning && "transition-transform duration-150"
+              )}
+              style={{ transform: `scale(${zoomLevel})` }}
+            >
               {/* SVG Connections — Curved Bezier lines */}
               <svg ref={svgRef} className="absolute inset-0 w-full h-full z-0" style={{ pointerEvents: "none" }}>
                 <defs>
