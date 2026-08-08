@@ -49,6 +49,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { AISitemapModal } from "@/components/AISitemapModal";
 import { sitemapToCanvas } from "@/lib/sitemap/toCanvas";
 import type { AiSitemap } from "@/lib/sitemap/schema";
+import { sitemapTemplates, templateToAiSitemap } from "@/data/sitemapTemplates";
+import { trackEvent } from "@/lib/analytics";
 
 // ====== STOCK PAGES ======
 const stockPages = [
@@ -447,6 +449,21 @@ const NavigationMaker = () => {
     // Reset zoom so the fresh layout is visible.
     setZoomLevel(1);
   }, [pushHistory, currentProjectId]);
+
+  // Load a starter structure from /navigation-maker?template=saas (linked from the
+  // sitemap template library). Runs once per template value.
+  const appliedTemplateRef = useRef<string | null>(null);
+  useEffect(() => {
+    const templateSlug = searchParams.get("template");
+    if (!templateSlug || appliedTemplateRef.current === templateSlug) return;
+    const template = sitemapTemplates[templateSlug];
+    if (!template) return;
+    appliedTemplateRef.current = templateSlug;
+    applyGeneratedSitemap(templateToAiSitemap(template));
+    setIsAiGenerated(false);
+    setCurrentProjectName(template.name);
+    trackEvent("template_used", { template: templateSlug });
+  }, [searchParams, applyGeneratedSitemap]);
 
   // (Keyboard shortcuts effect declared later, after duplicateNode/deleteSelected exist.)
 

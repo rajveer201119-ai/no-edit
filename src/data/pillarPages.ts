@@ -821,6 +821,335 @@ export const pillarPages: Record<string, PillarPageData> = {
       areaServed: { "@type": "Country", name: "India" },
     },
   },
+  "ai-sitemap-generator": {
+    slug: "ai-sitemap-generator",
+    metaTitle: "AI Sitemap Generator — Describe It, EPIC Builds It | EPIC",
+    metaDescription: "Type a description of your website and let EPIC's AI generate a complete, editable visual sitemap in seconds. Free AI sitemap generator, no design skill needed.",
+    keywords: "ai sitemap generator, ai sitemap builder, generate sitemap with ai, ai website structure generator, automatic sitemap creator, ai site map maker",
+    h1: "AI Sitemap Generator",
+    heroSubtitle: "Describe your website in plain English. EPIC's AI instantly generates a complete page structure you can drag, edit, and export.",
+    sections: [
+      {
+        heading: "How EPIC's AI Sitemap Generator Works",
+        content: "Most sitemap tools start with a blank canvas and expect you to know exactly which pages your website needs. EPIC's AI sitemap generator flips that around. You type a short description — \"a subscription meal-kit service with a blog and a referral program\" — and the AI proposes a full page structure: homepage, category pages, plan pages, checkout, account dashboard, blog, referral landing page, and more.\n\nUnder the hood, the AI draws on patterns from thousands of real website structures to infer which pages a site like yours actually needs, including pages founders often forget, like a password-reset flow or a terms-of-service page. It doesn't just list pages — it also proposes the parent-child relationships between them, so the hierarchy is sensible from the first draft.\n\nThe output lands directly on EPIC's visual canvas as editable boxes and connectors, not a static image or a text list. That means the AI's first draft is a genuine starting point, not a dead end — every suggestion can be renamed, moved, deleted, or reconnected."
+      },
+      {
+        heading: "From Prompt to Editable Sitemap in Seconds",
+        content: "Generation happens in under a minute for most sites. Type your description, hit generate, and watch pages populate the canvas already connected in a logical hierarchy. There's no waiting on a designer or filling out a lengthy questionnaire — the AI asks nothing beyond your initial description, though you can regenerate with more detail if the first pass misses something.\n\nBecause the result is a live sitemap rather than a mockup, you can immediately start refining it: drag a page into a different section, add a page the AI didn't think of from the built-in template library, or delete pages that don't apply to your project. This is the core difference between EPIC and a chatbot that just writes you a bulleted list of page names — the AI output is already structured, positioned, and ready to work with.",
+      },
+      {
+        heading: "Why AI Beats Starting From a Blank Sitemap",
+        content: "Staring at an empty canvas is the biggest blocker to planning a website. Founders often either over-plan (listing 40 pages they'll never build) or under-plan (missing essential pages like a 404 page or an account-settings page). An AI-generated first draft solves both problems by giving you a realistic, right-sized starting structure based on what similar sites actually contain.\n\nThis is especially useful when you're exploring an idea that doesn't fit into a standard template. Describe a niche business — a local pottery studio with class bookings, or a two-sided marketplace for vintage furniture — and the AI adapts the structure accordingly, rather than forcing you into a generic e-commerce or SaaS template.\n\nIf you want to see what good site structures look like before generating your own, the sitemap examples library shows real-world layouts across different industries, and the blog guide \"What is a visual sitemap\" explains the thinking behind hierarchy and page grouping in more depth."
+      },
+      {
+        heading: "Editing and Exporting Your AI-Generated Sitemap",
+        content: "Once the AI generates your sitemap, EPIC's canvas tools take over. Rearrange pages by dragging them, redraw connections by clicking and dragging between connectors, and pull additional pages from the 50+ item template library if you want to add sections the AI didn't include. Every page box can be renamed to match your actual content plan.\n\nWhen the structure is ready, export it as a high-resolution PNG for a client proposal, a developer handoff, or your own project documentation. Because the AI produces a real hierarchy rather than a flat list, the exported diagram shows parent-child relationships clearly — useful for both stakeholder presentations and technical planning.\n\nTeams that want a reusable starting point instead of generating from scratch each time can also browse the sitemap templates library, which covers common site types like SaaS, e-commerce, and portfolio sites."
+      },
+      {
+        heading: "Who Benefits Most From an AI Sitemap Generator",
+        content: "Solo founders use it to turn a rough idea into a concrete page list before briefing a developer or designer. Agencies use it to speed up the discovery phase of client projects, generating a first-draft structure in a kickoff call rather than a follow-up meeting. Marketers planning a new campaign microsite use it to quickly scope out how many landing pages and supporting pages they'll actually need.\n\nIt's also useful for anyone who finds a blank page intimidating. Rather than trying to remember every page type a modern website needs, you describe the business in a sentence and let the AI surface the details."
+      }
+    ],
+    comparison: [
+      { feature: "AI-generated first draft", epic: true, others: false },
+      { feature: "Editable after generation", epic: true, others: false },
+      { feature: "Free to use", epic: true, others: false },
+      { feature: "No account required", epic: true, others: false },
+      { feature: "PNG export", epic: true, others: true },
+      { feature: "Drag-and-drop canvas", epic: true, others: true },
+    ],
+    faqs: [
+      { question: "How does EPIC's AI sitemap generator work?", answer: "You type a short description of your website, and the AI proposes a complete page structure with parent-child relationships, placed directly on EPIC's editable visual canvas." },
+      { question: "Can I edit the sitemap after the AI generates it?", answer: "Yes. The AI's output is a fully editable diagram — drag pages, rename them, add or remove connections, and pull in extra templates from the library." },
+      { question: "Is the AI sitemap generator free?", answer: "Yes, generating and editing your sitemap is free. No account is required to try it." },
+      { question: "What if the AI misses a page I need?", answer: "Add it manually from EPIC's 50+ page template library, or regenerate with a more detailed description." },
+      { question: "Does the AI sitemap generator work for any type of website?", answer: "Yes. It adapts to e-commerce, SaaS, portfolio, marketplace, blog, and niche business descriptions rather than forcing a single fixed template." },
+    ],
+    relatedPillars: ["visual-sitemap-builder", "sitemap-builder", "website-structure-generator", "visual-sitemap-maker"],
+    cta: { title: "Generate Your Sitemap With AI", description: "Describe your website and let EPIC's AI build your first draft in seconds." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "EPIC AI Sitemap Generator",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/ai-sitemap-generator`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+  },
+  "visual-sitemap-builder": {
+    slug: "visual-sitemap-builder",
+    metaTitle: "Visual Sitemap Builder — Drag, Connect, Export | EPIC",
+    metaDescription: "Build a visual sitemap with a true drag-and-drop canvas. Connect pages with arrows, rearrange freely, and export a clean diagram. Free visual sitemap builder.",
+    keywords: "visual sitemap builder, drag and drop sitemap, visual site map tool, sitemap canvas tool, website diagram builder, visual sitemap software",
+    h1: "Visual Sitemap Builder",
+    heroSubtitle: "A true drag-and-drop canvas for building website sitemaps — position pages freely, connect them with arrows, and export in one click.",
+    sections: [
+      {
+        heading: "What Makes a Sitemap Builder 'Visual'",
+        content: "A visual sitemap builder is defined by the canvas, not the page list. Instead of typing page names into a nested outline, you place boxes representing pages anywhere on an open canvas and physically draw connections between them. This spatial freedom matters because website structures are rarely perfectly hierarchical — some pages link across sections, some sit at the same level but serve very different purposes, and outline tools struggle to represent that.\n\nEPIC's canvas lets you drag a page box anywhere, resize sections by rearranging clusters of pages, and draw a connector between any two pages regardless of where they sit in the hierarchy. The connections render as clean SVG arrows rather than static lines, so the diagram stays legible even as it grows to 30 or 40 pages.\n\nBecause everything lives on one canvas, you see your entire site structure at a glance — something that's difficult to achieve in a spreadsheet or a text-based outline tool."
+      },
+      {
+        heading: "Building on the Canvas",
+        content: "Start by dragging page templates from EPIC's library of 50+ pre-built pages — homepage, product listing, blog post, pricing, checkout, account settings, and dozens more — onto the canvas. Arrange your top-level pages first, typically in a row representing your main navigation, then drag sub-pages beneath their parent.\n\nConnect pages by clicking a page's connector point and dragging to the page it should link to. You can create standard parent-child hierarchies as well as cross-links between unrelated sections, such as a blog post linking to a related product page. The canvas supports zooming and panning, so large sitemaps with dozens of pages remain manageable.\n\nEvery page box can be renamed, recolored, or removed at any time, and connections can be redrawn without starting over — the whole structure stays fluid until you're ready to export."
+      },
+      {
+        heading: "Exporting and Sharing Your Sitemap",
+        content: "Once your visual sitemap is complete, export it as a high-resolution PNG with one click. This makes it easy to drop into a client proposal, a Notion doc, a Slack message, or a printed presentation deck. Because the canvas preserves your exact layout and connections, the exported image looks the same as what you built — no reflowing or reformatting.\n\nAgencies commonly use the visual sitemap as a sign-off document before development starts: once a client approves the diagram, it becomes the reference structure the whole team builds against. If you want to see finished examples first, the sitemap examples library shows completed sitemaps for a range of business types."
+      },
+      {
+        heading: "Visual Builder vs. Outline and Spreadsheet Tools",
+        content: "Outline tools (nested bullet lists) and spreadsheets can technically capture a list of pages, but they can't show cross-links, they force a strict hierarchy that doesn't match how real websites are structured, and they're hard to review quickly — a stakeholder has to read every line rather than glance at a diagram.\n\nA visual, canvas-based builder solves all three problems at once: cross-links are just another arrow, hierarchy is optional rather than forced, and the whole structure is visible in a single screenshot. This is why most professional information-architecture work, referenced further on the website architecture tool page, defaults to diagrams over text lists.",
+      },
+      {
+        heading: "Who the Visual Canvas Is Built For",
+        content: "Freelancers and agencies use the visual builder to produce client-ready deliverables quickly, without opening a heavier design tool like Figma just to sketch a structure. Product teams use it to plan new sections of an existing site before assigning development tickets. Students and educators use it because the drag-and-drop interaction requires no prior design software experience — you can teach the concept of a sitemap in a five-minute demo."
+      }
+    ],
+    comparison: [
+      { feature: "True drag-and-drop canvas", epic: true, others: false },
+      { feature: "Cross-links between sections", epic: true, others: false },
+      { feature: "50+ page templates", epic: true, others: false },
+      { feature: "PNG export", epic: true, others: true },
+      { feature: "Free to use", epic: true, others: false },
+      { feature: "No install required", epic: true, others: true },
+    ],
+    faqs: [
+      { question: "What's the difference between a visual sitemap builder and an outline tool?", answer: "An outline tool forces pages into a strict nested list. A visual builder like EPIC lets you place pages freely on a canvas and draw connections, including cross-links that outlines can't represent." },
+      { question: "Can I rearrange pages after connecting them?", answer: "Yes. Dragging a page box automatically keeps its connections attached, so you can reorganize the layout at any time without redrawing arrows." },
+      { question: "Does the visual sitemap builder require design experience?", answer: "No. The interface is drag, drop, and connect — no wireframing or design-tool background needed." },
+      { question: "How do I export my finished sitemap?", answer: "Click export to download a high-resolution PNG of your canvas exactly as arranged." },
+      { question: "Is there a limit to how many pages I can add?", answer: "No hard limit — the canvas supports zooming and panning so larger sitemaps with dozens of pages stay manageable." },
+    ],
+    relatedPillars: ["ai-sitemap-generator", "sitemap-builder", "visual-sitemap-maker", "drag-drop-website-builder"],
+    cta: { title: "Build Your Visual Sitemap", description: "Open the canvas and start dragging pages into place." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "EPIC Visual Sitemap Builder",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/visual-sitemap-builder`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+  },
+  "sitemap-builder": {
+    slug: "sitemap-builder",
+    metaTitle: "Sitemap Builder — Visual, HTML & XML Sitemaps | EPIC",
+    metaDescription: "Build the right kind of sitemap for the job: a visual sitemap for planning, an HTML sitemap for users, or know when you need an XML sitemap for search engines.",
+    keywords: "sitemap builder, sitemap creator, sitemap maker, build a sitemap, sitemap generator online, types of sitemaps",
+    h1: "Sitemap Builder",
+    heroSubtitle: "One term, three very different tools. Build the visual sitemap you need to plan your site, and know when you need an HTML or XML sitemap too.",
+    sections: [
+      {
+        heading: "'Sitemap Builder' Means Different Things",
+        content: "Searching for a sitemap builder can lead to three very different tools, and picking the wrong one wastes time. A visual sitemap builder, like EPIC, is for planning: it produces a diagram of pages and how they connect, used before or during a website build. An HTML sitemap builder produces a real page on your live website listing links to every other page, mainly to help human visitors and search engine crawlers navigate a large site. An XML sitemap generator produces a machine-readable file (sitemap.xml) submitted to Google Search Console so search engines know which URLs exist and how often they change.\n\nEPIC focuses on the first category — visual planning — because that's the step every website needs regardless of size, and it's the step most existing tools skip. Once your structure is planned visually, generating the HTML or XML version becomes a much smaller, more mechanical task."
+      },
+      {
+        heading: "When You Need a Visual Sitemap",
+        content: "Build a visual sitemap before you write a single line of code or brief a designer. It answers the fundamental question every website project needs answered first: what pages exist, and how do they relate to each other? EPIC's builder lets you drag page templates onto a canvas, connect them with arrows, and export the result as a shareable diagram.\n\nThis is the right tool during discovery calls, client proposals, internal planning meetings, and any time you're restructuring an existing site's navigation. It's also useful mid-project — when a new feature needs three new pages, sketch where they fit into the existing structure before development starts, rather than bolting them on ad hoc."
+      },
+      {
+        heading: "When You Need an HTML Sitemap",
+        content: "An HTML sitemap is a page on your actual website — usually linked from the footer — that lists links to every important page in the site. It exists for two reasons: it helps visitors find content that isn't reachable from the main navigation, and it gives search engine crawlers an easy path to every page, which matters most for large sites with hundreds of pages.\n\nSmall sites with fewer than 20-30 pages and clear navigation rarely need one. Content-heavy sites, large e-commerce catalogs, and documentation sites usually do. If you've already planned your structure visually in EPIC, turning it into an HTML sitemap page is straightforward — the visual diagram already tells you exactly which links belong on the page."
+      },
+      {
+        heading: "When You Need an XML Sitemap",
+        content: "An XML sitemap is a technical file, not a visible page, submitted to search engines so they can discover and crawl your URLs efficiently. Most modern CMS platforms (WordPress via Yoast or RankMath, Shopify, Webflow) generate this automatically, so in practice you rarely need to build one by hand.\n\nWhat these tools can't do automatically is tell you whether your URL structure and page hierarchy actually make sense — that's a planning decision, not a technical one, and it's exactly what a visual sitemap builder is for. Plan the structure first with EPIC, then let your CMS handle the XML file generation once the pages exist."
+      },
+      {
+        heading: "A Practical Sitemap Workflow",
+        content: "Start in EPIC: describe your site or drag templates to build a visual sitemap covering every planned page and its relationships. Review it with stakeholders and refine the structure while changes are still free — moving a box on a canvas costs nothing, restructuring a live website costs real time. Once development begins, use the same diagram as a checklist so no planned page gets forgotten.\n\nAfter launch, if your site is large enough to need one, add an HTML sitemap page using the same page list, and confirm your CMS is generating an XML sitemap automatically. For structure and naming conventions, the sitemap templates library and the sitemap examples library are useful references for what a well-organized page list looks like across different site types."
+      }
+    ],
+    comparison: [
+      { feature: "Visual planning canvas", epic: true, others: false },
+      { feature: "AI-generated starting structure", epic: true, others: false },
+      { feature: "Free to use", epic: true, others: false },
+      { feature: "PNG export", epic: true, others: true },
+      { feature: "No account required", epic: true, others: false },
+    ],
+    faqs: [
+      { question: "What's the difference between a visual sitemap and an XML sitemap?", answer: "A visual sitemap is a human-readable diagram used for planning a site's structure. An XML sitemap is a machine-readable file submitted to search engines so they can crawl your URLs." },
+      { question: "Do I need an HTML sitemap page on my website?", answer: "Only if your site is large or has content that's hard to reach through normal navigation. Small sites with clear menus usually don't need one." },
+      { question: "Can EPIC generate an XML sitemap file?", answer: "No — EPIC is a visual planning tool. Most CMS platforms generate XML sitemaps automatically once your pages exist." },
+      { question: "Which type of sitemap should I build first?", answer: "Always start with a visual sitemap. It defines the pages and structure that your HTML sitemap and XML sitemap will later reflect." },
+      { question: "Is EPIC's sitemap builder free?", answer: "Yes, the visual sitemap builder is free to use, with no account required." },
+    ],
+    relatedPillars: ["visual-sitemap-builder", "ai-sitemap-generator", "html-sitemap-generator-india", "xml-sitemap-generator-india"],
+    cta: { title: "Plan Your Sitemap Visually First", description: "Build the structure before worrying about HTML or XML output." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "EPIC Sitemap Builder",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/sitemap-builder`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+  },
+  "website-structure-generator": {
+    slug: "website-structure-generator",
+    metaTitle: "Website Structure Generator — Idea to Architecture | EPIC",
+    metaDescription: "Turn a one-line website idea into a complete page structure automatically. EPIC's website structure generator maps hierarchy, sections, and page types.",
+    keywords: "website structure generator, generate website structure, website architecture generator, automatic website structure, website hierarchy generator, site structure tool",
+    h1: "Website Structure Generator",
+    heroSubtitle: "Turn a one-line idea into a complete website structure — automatically generated, fully editable, ready to build from.",
+    sections: [
+      {
+        heading: "From Idea to Structure, Automatically",
+        content: "Most people planning a new website struggle less with the idea itself and more with translating it into a concrete list of pages and sections. A website structure generator closes that gap: describe your business or project, and the tool infers the pages, groupings, and hierarchy a site like yours typically needs.\n\nEPIC's generator produces a working structure — top-level sections, sub-pages, and the connections between them — directly on an editable canvas rather than a static list. That distinction matters: a generated structure you can immediately rearrange is a genuine planning tool, while a generated list of page names is just a starting point for more manual work."
+      },
+      {
+        heading: "What 'Structure' Actually Means",
+        content: "A website's structure is more than a list of pages — it's the hierarchy (which pages are top-level sections versus sub-pages), the groupings (which pages belong together, like all product pages sitting under a shared Products parent), and the relationships (which pages link to which). Get the structure wrong and everything downstream suffers: navigation menus become cluttered, users can't predict where content lives, and search engines struggle to understand which pages matter most.\n\nEPIC's structure generator addresses all three dimensions at once. It doesn't just name pages; it places them in a hierarchy and draws the connections between them, so the output already reflects real architectural decisions rather than a flat brainstorm."
+      },
+      {
+        heading: "Generating and Refining Your Structure",
+        content: "Describe your website — its purpose, its main offerings, any known sections you want included — and generate a first structure. Review the proposed hierarchy: check whether top-level sections match your intended navigation, whether sub-pages are grouped under the right parent, and whether any important page type is missing.\n\nRefine from there using the same canvas tools available throughout EPIC: drag a page to a different parent, add a page from the 50+ item template library, delete anything that doesn't apply, or regenerate with more specific instructions if the first pass is too generic. Because the structure is a live diagram, refining it takes seconds rather than a rewrite."
+      },
+      {
+        heading: "Structure Generation for Different Site Types",
+        content: "An e-commerce description generates category pages, product pages, cart, checkout, and account sections nested appropriately. A SaaS description generates a marketing site structure (landing, pricing, features) alongside an app structure (dashboard, settings, billing). A content or media site description generates category, tag, and article page groupings that mirror how a CMS would organize them.\n\nBecause the generator adapts its output to the description rather than applying one fixed template, it's equally useful for conventional business types and unusual ones. If you'd rather explore proven structures before generating your own, the sitemap templates library and the sitemap examples library both show real structures across common site categories."
+      },
+      {
+        heading: "Handing Off a Generated Structure",
+        content: "Once your structure is finalized, export it as a PNG to hand to a developer, designer, or content writer. A clear structure diagram tells a developer exactly what routing to build, tells a designer which pages need layouts, and tells a content writer which pages need copy — all from a single artifact generated in minutes rather than hours of manual planning meetings."
+      }
+    ],
+    comparison: [
+      { feature: "Auto-generates hierarchy, not just a list", epic: true, others: false },
+      { feature: "Editable after generation", epic: true, others: false },
+      { feature: "Adapts to any business description", epic: true, others: false },
+      { feature: "Free to use", epic: true, others: false },
+      { feature: "PNG export", epic: true, others: true },
+    ],
+    faqs: [
+      { question: "How is a website structure generator different from a page-name generator?", answer: "A structure generator produces hierarchy and relationships between pages, not just a flat list of names. EPIC places generated pages on a connected canvas that reflects real architecture." },
+      { question: "Can I edit the generated structure?", answer: "Yes. Every generated page can be moved, renamed, reconnected, or deleted, and you can add more pages from the template library." },
+      { question: "Does it work for unusual business types?", answer: "Yes. The generator adapts its output to your description rather than forcing a fixed template, so niche businesses get a tailored structure." },
+      { question: "Is the website structure generator free?", answer: "Yes, generating and editing your structure is free with no account required." },
+    ],
+    relatedPillars: ["ai-sitemap-generator", "website-architecture-tool", "website-planning-tool", "saas-navigation-planner"],
+    cta: { title: "Generate Your Website Structure", description: "Describe your site and get a complete, editable structure in seconds." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "EPIC Website Structure Generator",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/website-structure-generator`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+  },
+  "website-planning-tool": {
+    slug: "website-planning-tool",
+    metaTitle: "Website Planning Tool for Founders & Agencies | EPIC",
+    metaDescription: "Plan your website before design or development starts. EPIC helps founders, designers, and agencies map pages, structure, and navigation visually.",
+    keywords: "website planning tool, plan a website, website planning software, pre-development website planner, website project planning tool, website planning for agencies",
+    h1: "Website Planning Tool",
+    heroSubtitle: "Plan your website before a single page is designed or a line of code is written — built for founders, designers, and agencies.",
+    sections: [
+      {
+        heading: "Why Planning Happens Before Design",
+        content: "The most expensive website mistakes happen at the planning stage, not the design stage — because a missing page or a confusing hierarchy discovered mid-build costs far more to fix than a box moved on a planning canvas. A dedicated website planning tool exists to catch these issues early: it forces you to enumerate every page your site needs and decide how they relate before anyone opens a design file.\n\nEPIC serves this exact stage. Instead of jumping straight into Figma or a page builder, you first lay out your site's full structure — every page, every section, every connection — on a visual canvas. Only once that structure is agreed on does design or development begin, with a clear, shared reference for what's being built."
+      },
+      {
+        heading: "Planning for Founders",
+        content: "As a founder, you're often the one translating a business idea into a website brief for a developer or agency, without necessarily having a background in site architecture. EPIC's AI-assisted generation gives you a working starting structure from a plain description of your business, which you can then adjust based on what you actually know about your product and customers.\n\nHaving a visual plan before hiring anyone also changes the conversations you have with developers and designers — instead of describing your website in vague terms, you hand over a diagram that specifies exactly which pages exist and how they connect, which tends to produce more accurate quotes and fewer scope surprises later."
+      },
+      {
+        heading: "Planning for Designers",
+        content: "Designers use website planning tools to lock down scope before opening a design file. Once the sitemap is approved by a client or product owner, a designer knows precisely how many unique page layouts are needed, which pages share templates, and how navigation should be structured — reducing the risk of designing pages that later get cut or discovering late that a page was missed entirely.\n\nEPIC's canvas also works well as a client-facing planning artifact during discovery: presenting a visual structure is easier for non-technical clients to review and approve than a wireframe or a written brief, and revisions at this stage are far cheaper than revisions after mockups exist."
+      },
+      {
+        heading: "Planning for Agencies",
+        content: "Agencies juggling multiple client projects benefit from a consistent planning step that produces a client-approvable artifact quickly. EPIC's AI generation shortens the discovery phase — generate a first-draft structure live in a kickoff call, refine it with the client on the same canvas, and export the agreed version as documentation for the project.\n\nThis structure then becomes the reference point for the rest of the engagement: content teams know what needs to be written, developers know what needs to be built, and account managers have a clear artifact to point to if scope questions come up later. Agencies planning many similar projects can also draw on the sitemap templates library to speed up repeat work for common site types."
+      },
+      {
+        heading: "From Plan to Build",
+        content: "A finished plan in EPIC exports as a PNG that can travel through the rest of the project — attached to a proposal, pasted into a project management tool, or printed for a kickoff meeting. Because it was built collaboratively on a shared canvas, there's little ambiguity about what was agreed, which reduces back-and-forth once actual design and development work starts."
+      }
+    ],
+    comparison: [
+      { feature: "AI-assisted planning from a description", epic: true, others: false },
+      { feature: "Client-friendly visual output", epic: true, others: false },
+      { feature: "Free to use", epic: true, others: false },
+      { feature: "PNG export for proposals", epic: true, others: true },
+      { feature: "No account required", epic: true, others: false },
+    ],
+    faqs: [
+      { question: "When should I use a website planning tool?", answer: "Before design or development starts — planning changes are free, while changes made after a site is built cost real time and money." },
+      { question: "Is EPIC suitable for client-facing planning?", answer: "Yes. Its visual output is easy for non-technical clients to review and approve, and exports cleanly into proposals or presentations." },
+      { question: "Can agencies use EPIC for multiple client projects?", answer: "Yes, each project gets its own sitemap, and the template library speeds up planning for recurring site types." },
+      { question: "Do I need design experience to plan a website in EPIC?", answer: "No. The tool is built for founders and non-designers as much as for design professionals." },
+    ],
+    relatedPillars: ["website-architecture-tool", "website-structure-generator", "ai-sitemap-generator", "saas-navigation-planner"],
+    cta: { title: "Start Planning Your Website", description: "Map your pages and structure before design or development begins." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "EPIC Website Planning Tool",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/website-planning-tool`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+  },
+  "website-architecture-tool": {
+    slug: "website-architecture-tool",
+    metaTitle: "Website Architecture Tool for IA & SEO | EPIC",
+    metaDescription: "Map information architecture and site hierarchy visually. EPIC helps UX and SEO professionals plan page relationships, depth, and internal linking.",
+    keywords: "website architecture tool, information architecture tool, site architecture planner, IA diagram tool, website hierarchy tool, seo site architecture",
+    h1: "Website Architecture Tool",
+    heroSubtitle: "Map information architecture visually — hierarchy, depth, and internal linking — built for UX and SEO professionals.",
+    sections: [
+      {
+        heading: "Website Architecture as a Discipline",
+        content: "Information architecture is the practice of organizing content so users and search engines can find what they need with minimal effort. It covers page hierarchy (what sits under what), navigation depth (how many clicks from the homepage to any given page), and content grouping (which pages belong in the same category or section).\n\nEPIC's architecture tool treats these as first-class concerns rather than an afterthought. The canvas naturally surfaces architectural problems: a page with no path back to the homepage, a category with dozens of children all at the same level, or a hierarchy that's four or five levels deep before reaching actual content — all of these are visible at a glance once your structure is laid out."
+      },
+      {
+        heading: "Hierarchy and Depth",
+        content: "A common IA guideline is keeping any page reachable within three clicks of the homepage; deeper hierarchies both frustrate users and dilute the SEO value passed down through internal links. On EPIC's canvas, depth is visually obvious — a hierarchy that's stacking up vertically with each generation more indented than the last is a sign the structure needs flattening.\n\nFixing this on a canvas is a matter of dragging a page up a level or introducing an intermediate category page to group siblings sensibly, both of which are far easier to test visually than to reason about in a spreadsheet of URLs."
+      },
+      {
+        heading: "Internal Linking and Cross-Links",
+        content: "SEO-conscious architecture isn't purely hierarchical — pages often need to link across sections to distribute authority and help users find related content, like a blog post linking to the product it discusses, or a case study linking back to the relevant service page. EPIC lets you draw these cross-links directly on the canvas alongside the standard parent-child hierarchy, so the finished diagram represents the actual link structure you intend to build, not just the navigational tree.\n\nReviewing a site's cross-links visually also makes it easy to spot orphan pages — pages with no incoming connections from elsewhere in the site — which are a common and easy-to-miss SEO issue."
+      },
+      {
+        heading: "Architecture for New Sites vs. Redesigns",
+        content: "For a new site, EPIC's architecture tool is used to design the hierarchy from scratch, ideally informed by keyword research and expected content volume per category. For a redesign or SEO audit, it's used to map the existing structure first — recreating the current site as a diagram — before proposing changes, which makes it much easier to communicate a URL restructuring plan to stakeholders and see the before-and-after side by side.\n\nFor structural reference, the sitemap templates library and sitemap examples library both include layouts that reflect healthy information architecture patterns across common site types, which can be a useful benchmark when auditing an existing site's structure."
+      },
+      {
+        heading: "Who This Tool Serves",
+        content: "UX professionals use it to design and validate navigation structures before wireframing. SEO specialists use it to plan URL hierarchy and internal linking strategy, particularly for large sites where crawl budget and link equity distribution matter. Content strategists use it to plan how categories and tags should group content so users and search engines can navigate large content libraries efficiently."
+      }
+    ],
+    comparison: [
+      { feature: "Visualizes hierarchy depth", epic: true, others: false },
+      { feature: "Supports cross-links, not just tree hierarchy", epic: true, others: false },
+      { feature: "Free to use", epic: true, others: false },
+      { feature: "PNG export for audits and proposals", epic: true, others: true },
+      { feature: "No account required", epic: true, others: false },
+    ],
+    faqs: [
+      { question: "Can EPIC map internal linking, not just page hierarchy?", answer: "Yes. You can draw cross-links between pages in different sections alongside the standard parent-child hierarchy." },
+      { question: "Is this tool useful for SEO audits?", answer: "Yes. Mapping an existing site's structure visually makes it easy to spot orphan pages, excessive depth, and poor content grouping." },
+      { question: "Can I use it to plan a site redesign?", answer: "Yes. Map the current structure first, then propose a new one on a separate canvas to compare before and after." },
+      { question: "Who typically uses a website architecture tool?", answer: "UX designers, SEO specialists, and content strategists working on navigation, URL hierarchy, or internal linking strategy." },
+    ],
+    relatedPillars: ["website-planning-tool", "website-structure-generator", "sitemap-builder", "user-flow-diagram-tool"],
+    cta: { title: "Map Your Website Architecture", description: "Design or audit your site's hierarchy and internal linking visually." },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "EPIC Website Architecture Tool",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      url: `${baseUrl}/website-architecture-tool`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+  },
 };
 
 export const pillarSlugs = Object.keys(pillarPages);
