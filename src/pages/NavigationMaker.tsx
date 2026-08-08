@@ -49,6 +49,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { AISitemapModal } from "@/components/AISitemapModal";
 import { sitemapToCanvas } from "@/lib/sitemap/toCanvas";
 import type { AiSitemap } from "@/lib/sitemap/schema";
+import { sitemapTemplates, templateToAiSitemap } from "@/data/sitemapTemplates";
+import { trackEvent } from "@/lib/analytics";
 
 // ====== STOCK PAGES ======
 const stockPages = [
