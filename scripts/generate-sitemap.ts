@@ -48,8 +48,15 @@ const toolSlugs = [
   "album-cover-maker", "ebook-cover-maker",
 ];
 
-const blogCategories = [...new Set(Object.values(blogPosts).map((p) => p.category))];
+// Only the category slugs the /blog/category/:category route actually renders.
+const blogCategorySlugs = [
+  "ux-design", "web-planning", "saas-design", "design-tips", "web-development",
+  "ui-design", "seo", "product-design", "marketing", "app-design",
+  "entrepreneurship", "student-resources",
+];
 const categorySlug = (c: string) => c.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+const blogCategories = [...new Set(Object.values(blogPosts).map((p) => categorySlug(p.category)))]
+  .filter((slug) => blogCategorySlugs.includes(slug));
 
 const entries: SitemapEntry[] = [
   ...staticEntries,
@@ -67,7 +74,7 @@ const entries: SitemapEntry[] = [
     changefreq: "monthly" as const,
     priority: "0.6",
   })),
-  ...blogCategories.map((c) => ({ path: `/blog/category/${categorySlug(c)}`, changefreq: "weekly" as const, priority: "0.5" })),
+  ...blogCategories.map((c) => ({ path: `/blog/category/${c}`, changefreq: "weekly" as const, priority: "0.5" })),
   ...Object.keys(alternativePages).map((s) => ({ path: `/alternatives/${s}`, changefreq: "monthly" as const, priority: "0.6" })),
   ...seedSitemaps.map((s) => ({ path: `/sitemap/${s.slug}`, changefreq: "monthly" as const, priority: "0.5" })),
 ];
