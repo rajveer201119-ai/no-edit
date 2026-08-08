@@ -14,6 +14,7 @@ import { blogPosts } from "../src/data/blogPosts";
 import { alternativePages } from "../src/data/alternativePages";
 import { sitemapTemplates } from "../src/data/sitemapTemplates";
 import { seedSitemaps } from "../src/data/seedSitemaps";
+import { comparisonPages } from "../src/data/comparisonPages";
 
 interface SitemapEntry {
   path: string;
@@ -76,6 +77,12 @@ const entries: SitemapEntry[] = [
   })),
   ...blogCategories.map((c) => ({ path: `/blog/category/${c}`, changefreq: "weekly" as const, priority: "0.5" })),
   ...Object.keys(alternativePages).map((s) => ({ path: `/alternatives/${s}`, changefreq: "monthly" as const, priority: "0.6" })),
+  ...Object.values(comparisonPages).map((c) => ({
+    path: `/compare/${c.slug}`,
+    lastmod: c.checkedDate,
+    changefreq: "monthly" as const,
+    priority: "0.6",
+  })),
   ...seedSitemaps.map((s) => ({ path: `/sitemap/${s.slug}`, changefreq: "monthly" as const, priority: "0.5" })),
 ];
 

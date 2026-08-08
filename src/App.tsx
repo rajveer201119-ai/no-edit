@@ -37,6 +37,7 @@ const PublicSitemap = React.lazy(() => import("./pages/PublicSitemap"));
 const SitemapLibrary = React.lazy(() => import("./pages/SitemapLibrary"));
 const SharedSitemap = React.lazy(() => import("./pages/SharedSitemap"));
 const MyProjects = React.lazy(() => import("./pages/MyProjects"));
+const ComparisonPage = React.lazy(() => import("./pages/ComparisonPage"));
 const SitemapTemplates = React.lazy(() => import("./pages/SitemapTemplates"));
 const SitemapTemplateDetail = React.lazy(() => import("./pages/SitemapTemplateDetail"));
 
@@ -85,6 +86,7 @@ const App = () => (
               <Route path="/alternatives/:slug" element={<AlternativePage />} />
               <Route path="/analyzer" element={<WebsiteAnalyzer />} />
               <Route path="/sitemaps" element={<SitemapLibrary />} />
+              <Route path="/compare/:slug" element={<ComparisonPage />} />
               <Route path="/sitemap-templates" element={<SitemapTemplates />} />
               <Route path="/sitemap-templates/:slug" element={<SitemapTemplateDetail />} />
               <Route path="/sitemap/:slug" element={<PublicSitemap />} />
