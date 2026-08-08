@@ -448,6 +448,21 @@ const NavigationMaker = () => {
     setZoomLevel(1);
   }, [pushHistory, currentProjectId]);
 
+  // Load a starter structure from /navigation-maker?template=saas (linked from the
+  // sitemap template library). Runs once per template value.
+  const appliedTemplateRef = useRef<string | null>(null);
+  useEffect(() => {
+    const templateSlug = searchParams.get("template");
+    if (!templateSlug || appliedTemplateRef.current === templateSlug) return;
+    const template = sitemapTemplates[templateSlug];
+    if (!template) return;
+    appliedTemplateRef.current = templateSlug;
+    applyGeneratedSitemap(templateToAiSitemap(template));
+    setIsAiGenerated(false);
+    setCurrentProjectName(template.name);
+    trackEvent("template_used", { template: templateSlug });
+  }, [searchParams, applyGeneratedSitemap]);
+
   // (Keyboard shortcuts effect declared later, after duplicateNode/deleteSelected exist.)
 
   // Builder mode filters the palette: Sitemap hides "User Flow", Flow shows only it.
