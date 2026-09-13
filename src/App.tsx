@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { HelmetProvider } from "react-helmet-async";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { RetiredNotice } from "@/components/RetiredNotice";
 import React, { Suspense } from "react";
 import { RequireAuth } from "@/components/RequireAuth";
 import Index from "./pages/Index";
@@ -16,8 +17,7 @@ const ResetPassword = React.lazy(() => import("./pages/ResetPassword"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const Auth = React.lazy(() => import("./pages/Auth"));
 const Terms = React.lazy(() => import("./pages/Terms"));
-const PricingIndia = React.lazy(() => import("./pages/PricingIndia"));
-const PricingInternational = React.lazy(() => import("./pages/PricingInternational"));
+const FreeForever = React.lazy(() => import("./pages/FreeForever"));
 const Admin = React.lazy(() => import("./pages/Admin"));
 const About = React.lazy(() => import("./pages/About"));
 const Contact = React.lazy(() => import("./pages/Contact"));
@@ -62,6 +62,7 @@ const App = () => (
           </a>
           <ErrorBoundary>
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <RetiredNotice />
             <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -74,8 +75,9 @@ const App = () => (
               <Route path="/tools/:tool" element={<ToolLanding />} />
               <Route path="/navigation-maker" element={<NavigationMaker />} />
               <Route path="/my-projects" element={<RequireAuth><MyProjects /></RequireAuth>} />
-              <Route path="/pricing-india" element={<PricingIndia />} />
-              <Route path="/pricing-international" element={<PricingInternational />} />
+              <Route path="/free" element={<FreeForever />} />
+              <Route path="/pricing-india" element={<FreeForever />} />
+              <Route path="/pricing-international" element={<FreeForever />} />
               <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />

@@ -6,87 +6,61 @@ export type PlanType = "free" | "student" | "pro";
 interface UserPlan {
   plan: PlanType;
   isLoading: boolean;
-  isPremium: boolean; // student or pro
-  isPro: boolean; // pro only
-  canExportPDF: boolean; // pro only
-  canExportPNG: boolean; // free (with badge) + pro (clean)
-  canExportJSON: boolean; // free + pro
-  canUseUXTester: boolean; // pro only
-  canUseAnalyzer: boolean; // pro only
-  canUseLibrary: boolean; // pro only
-  maxProjects: number; // free: 3, pro: unlimited
-  maxPages: number; // free: 25, pro: unlimited
-  hasWatermark: boolean; // free only — small "Made with EPIC" badge on PNG
+  isPremium: boolean;
+  isPro: boolean;
+  canExportPDF: boolean;
+  canExportPNG: boolean;
+  canExportJSON: boolean;
+  canUseUXTester: boolean;
+  canUseAnalyzer: boolean;
+  canUseLibrary: boolean;
+  maxProjects: number;
+  maxPages: number;
+  hasWatermark: boolean;
   userId: string | null;
 }
 
+/**
+ * EPIC is retired and free for lifetime.
+ * Every feature is unlocked for everyone — no plans, no limits, no watermark.
+ */
 export function useUserPlan(): UserPlan {
-  const [plan, setPlan] = useState<PlanType>("free");
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPlan = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          setPlan("free");
-          setUserId(null);
-          setIsLoading(false);
-          return;
-        }
-        setUserId(user.id);
+    let active = true;
 
-        const { data, error } = await supabase
-          .from("user_subscriptions")
-          .select("plan_type, is_premium, premium_until")
-          .eq("user_id", user.id)
-          .maybeSingle();
-
-        if (error) throw error;
-
-        if (data) {
-          if (data.premium_until && new Date(data.premium_until) < new Date()) {
-            setPlan("free");
-          } else {
-            setPlan((data.plan_type as PlanType) || "free");
-          }
-        } else {
-          setPlan("free");
-        }
-      } catch (err) {
-        console.error("Failed to fetch plan:", err);
-        setPlan("free");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPlan();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      fetchPlan();
+    supabase.auth.getUser().then(({ data }) => {
+      if (!active) return;
+      setUserId(data.user?.id ?? null);
+      setIsLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUserId(session?.user?.id ?? null);
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const isPro = plan === "pro" || plan === "student";
-
   return {
-    plan,
+    plan: "pro",
     isLoading,
-    isPremium: plan !== "free",
-    isPro: plan === "pro",
-    canExportPDF: isPro,
-    canExportPNG: true, // free users can export PNG with a "Made with EPIC" badge
-    canExportJSON: true, // free users can export JSON
-    canUseUXTester: isPro,
-    canUseAnalyzer: isPro,
-    canUseLibrary: isPro,
-    maxProjects: isPro ? Infinity : 3,
-    maxPages: isPro ? Infinity : 25,
-    hasWatermark: plan === "free",
+    isPremium: true,
+    isPro: true,
+    canExportPDF: true,
+    canExportPNG: true,
+    canExportJSON: true,
+    canUseUXTester: true,
+    canUseAnalyzer: true,
+    canUseLibrary: true,
+    maxProjects: Infinity,
+    maxPages: Infinity,
+    hasWatermark: false,
     userId,
   };
 }

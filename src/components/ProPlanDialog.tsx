@@ -1,11 +1,7 @@
-// Thin wrapper — unified upgrade dialog lives in ProPaywall.
-import { ProPaywall } from "@/components/ProPaywall";
-
+// EPIC is free for lifetime — upgrade dialog disabled.
 interface ProPlanDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export const ProPlanDialog = ({ open, onOpenChange }: ProPlanDialogProps) => (
-  <ProPaywall open={open} onOpenChange={onOpenChange} />
-);
+export const ProPlanDialog = (_props: ProPlanDialogProps) => null;
