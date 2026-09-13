@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Archive, X } from "lucide-react";
 
-const KEY = "epic-retired-notice-dismissed";
+const KEY = "epic-legacy-notice-dismissed-v2";
 
 export const RetiredNotice = () => {
   const [hidden, setHidden] = useState(true);
