@@ -1,34 +1,9 @@
-// Thin wrapper — unified upgrade dialog lives in ProPaywall.
-// Keeps existing imports/props working without duplicating UI.
-import { ProPaywall } from "@/components/ProPaywall";
-
+// EPIC is free for lifetime — paywall disabled.
 interface CreatorModePaywallProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  triggerReason?:
-    | "export"
-    | "limit"
-    | "premium-feature"
-    | "hd-export"
-    | "json-export"
-    | "pdf-export"
-    | "png-export"
-    | "ux-tester"
-    | "analyzer"
-    | "library";
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  triggerReason?: string;
   featureName?: string;
 }
 
-export const CreatorModePaywall = ({
-  open,
-  onOpenChange,
-  triggerReason = "limit",
-  featureName,
-}: CreatorModePaywallProps) => (
-  <ProPaywall
-    open={open}
-    onOpenChange={onOpenChange}
-    featureName={featureName}
-    reason={triggerReason}
-  />
-);
+export const CreatorModePaywall = (_props: CreatorModePaywallProps) => null;
